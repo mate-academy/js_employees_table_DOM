@@ -7,34 +7,14 @@ const headCells = tableHead.cells;
 const tableBody = table.tBodies[0];
 const bodyRows = tableBody.rows;
 let numberOfColumn;
+let sortedColumn;
 
 // Sort table column
 
-tableHead.addEventListener('click', event => {
-  const point = event.target;
-
-  for (let i = 0; i < headCells.length; i++) {
-    if (headCells[i] === point) {
-      numberOfColumn = i;
-    }
-  }
-
-  if (point.dataset.sort === undefined) {
-    [...headCells].map(item => delete item.dataset.sort);
-    point.dataset.sort = 'ASC';
-  } else if (point.dataset.sort === 'ASC') {
-    point.dataset.sort = 'DESC';
-  } else {
-    point.dataset.sort = 'ASC';
-  }
-
+function sortTableBy() {
   const sortedTable = [...bodyRows].sort((a, b) => {
-    const firstValue = point.dataset.sort === 'ASC'
-      ? a.cells[numberOfColumn].innerHTML
-      : b.cells[numberOfColumn].innerHTML;
-    const secondValue = point.dataset.sort === 'ASC'
-      ? b.cells[numberOfColumn].innerHTML
-      : a.cells[numberOfColumn].innerHTML;
+    const firstValue = a.cells[numberOfColumn].innerHTML;
+    const secondValue = b.cells[numberOfColumn].innerHTML;
     const firstNumber = parseInt((firstValue).replace(/\D+/g, ''));
     const secondNumber = parseInt((secondValue).replace(/\D+/g, ''));
 
@@ -48,7 +28,38 @@ tableHead.addEventListener('click', event => {
   for (const row of sortedTable) {
     table.tBodies[0].append(row);
   }
+}
+
+// Reverse table column
+
+function reverseTable() {
+  const reversedTable = [...bodyRows].reverse();
+
+  for (const row of reversedTable) {
+    table.tBodies[0].append(row);
+  }
+}
+
+// Sort column on click
+
+tableHead.addEventListener('click', event => {
+  const point = event.target;
+
+  for (let i = 0; i < headCells.length; i++) {
+    if (headCells[i] === point) {
+      numberOfColumn = i;
+    }
+  }
+
+  if (sortedColumn !== point.textContent) {
+    sortedColumn = point.textContent;
+    sortTableBy();
+  } else {
+    reverseTable();
+  }
 });
+
+// Highlight active row
 
 tableBody.addEventListener('click', event => {
   const pointRow = event.target.parentNode;
@@ -59,7 +70,7 @@ tableBody.addEventListener('click', event => {
 
 // Create notification
 
-const pushNotification = (title, description, type) => {
+function createMessage(title, description, type) {
   const message = document.createElement('div');
   const titleMessage = document.createElement('h2');
   const descriptionMessage = document.createElement('p');
@@ -69,17 +80,26 @@ const pushNotification = (title, description, type) => {
   titleMessage.innerText = title;
   descriptionMessage.innerText = description;
   message.append(titleMessage, descriptionMessage);
-  main.append(message);
+
+  return message;
+}
+
+// Push notification
+
+const pushNotification = ({ title, description, type }) => {
+  main.append(createMessage(title, description, type));
+
+  const message = document.querySelector('.notification');
 
   window.setTimeout(function() {
-    message.remove(titleMessage, descriptionMessage);
+    message.remove();
   }, 2000);
 };
 
 // Form of a new value
 
 const form = document.createElement('form');
-const selectOffice = {
+const offices = {
   tokyo: 'Tokyo',
   singapore: 'Singapore',
   london: 'London',
@@ -87,99 +107,166 @@ const selectOffice = {
   edinburgh: 'Edinburgh',
   sanfrancisco: 'San Francisco',
 };
+let officeOption = '';
 
 form.classList.add('new-employee-form');
 form.action = '/';
 form.method = 'GET';
 main.append(form);
 
+for (const office in offices) {
+  officeOption += `<option value="${office}">${offices[office]}</option>`;
+}
+
 form.innerHTML = `
   <label>Name: <input name="name" type="text" required></label>
   <label>Position: <input name="position" type="text" required></label>
-  <label>Office: <select name="office">
-    <option value="tokyo">${selectOffice.tokyo}</option>
-    <option value="singapore">${selectOffice.singapore}</option>
-    <option value="london">${selectOffice.london}</option>
-    <option value="newyork">${selectOffice.newyork}</option>
-    <option value="edinburgh">${selectOffice.edinburgh}</option>
-    <option value="sanfrancisco">${selectOffice.sanfrancisco}</option>
-  </select></label>
+  <label>Office: <select name="office">${officeOption}</select></label>
   <label>Age: <input name="age" type="number" required></label>
-  <label>Sallary: <input name="sallary" type="number" required></label>
+  <label>Salary: <input name="salary" type="number" required></label>
   <button type="submit">Save to table</button>
 `;
 
-// Submit and notification for new value
+// Notification for new value
 
-form.addEventListener('submit', event => {
+const NOTIFICATIONS = {
+  shortName: {
+    title: 'Wrong  name value',
+    description: 'Name value has less than 4 letters',
+    type: 'error',
+  },
+  lowAge: {
+    title: 'Wrong age value',
+    description: 'Age value is less than 18',
+    type: 'error',
+  },
+  tooOld: {
+    title: 'Wrong age value',
+    description: 'Age value is bigger than 90',
+    type: 'error',
+  },
+  success: {
+    title: 'Succefully added',
+    description: 'New employee successfully added to the table',
+    type: 'success',
+  },
+};
+
+// Validate form
+
+function validateForm(formData) {
+  const { age, name } = formData;
+
+  if (name.length < 4) {
+    pushNotification(NOTIFICATIONS.shortName);
+
+    return false;
+  }
+
+  if (age < 18) {
+    pushNotification(NOTIFICATIONS.lowAge);
+
+    return false;
+  } else if (age > 90) {
+    pushNotification(NOTIFICATIONS.tooOld);
+
+    return false;
+  }
+
+  return true;
+}
+
+// Format salary
+
+function formatSalary(salary) {
+  if (salary.length < 4) {
+    return `$${salary}`;
+  }
+
+  return `$${new Intl.NumberFormat().format(salary)}`;
+}
+
+// Create employee row
+
+function createEmployeeRow(employee) {
+  const { name, position, office, age, salary } = employee;
+  const newRow = document.createElement('tr');
+
+  newRow.innerHTML = `
+    <td>${name}</td>
+    <td>${position}</td>
+    <td>${offices[office]}</td>
+    <td>${age}</td>
+    <td>${formatSalary(salary)}</td>
+  `;
+
+  return newRow;
+}
+
+// Submited value and add to the row
+
+function handleSubmit(event) {
   event.preventDefault();
 
   const data = new FormData(form); // eslint-disable-line
-  const dataObject = Object.fromEntries(data.entries());
-  const newRow = document.createElement('tr');
-  let sallary = '';
+  const employee = Object.fromEntries(data.entries());
 
-  if (dataObject.name.length < 4) {
-    return pushNotification('Wrong  name value',
-      'Name value has less than 4 letters', 'error');
+  if (validateForm(employee)) {
+    tableBody.append(createEmployeeRow(employee));
+
+    pushNotification(NOTIFICATIONS.success);
   }
+}
 
-  if (dataObject.age < 18) {
-    return pushNotification('Wrong age value',
-      'Age value is less than 18', 'error');
-  } else if (dataObject.age > 90) {
-    return pushNotification('Wrong age value',
-      'Age value is bigger than 90', 'error');
-  }
+form.addEventListener('submit', handleSubmit);
 
-  if (dataObject.sallary.length < 4) {
-    sallary = `$${dataObject.sallary}`;
-  } else {
-    sallary = `$${new Intl.NumberFormat().format(dataObject.sallary)}`;
-  }
+// Edit cell value
 
-  newRow.innerHTML = `
-    <td>${dataObject.name}</td>
-    <td>${dataObject.position}</td>
-    <td>${selectOffice[dataObject.office]}</td>
-    <td>${dataObject.age}</td>
-    <td>${sallary}</td>
-  `;
+let defaultValue;
 
-  tableBody.append(newRow);
+function editValue(event) {
+  const point = event.target;
+  const input = document.createElement('input');
 
-  pushNotification('Succefully added',
-    'New employee successfully added to the table', 'success');
-});
+  defaultValue = point.textContent;
+  input.classList = 'cell-input';
+  input.value = `${point.textContent}`;
+  point.textContent = '';
+  point.append(input);
+}
 
-// Editing table by double click
+// Save cell value
 
 function saveValue() {
   const inputItem = tableBody.querySelector('input');
 
-  inputItem.parentElement.textContent = inputItem.value;
+  if (inputItem.value !== '') {
+    inputItem.parentElement.textContent = inputItem.value;
+  } else {
+    inputItem.parentElement.textContent = defaultValue;
+  }
   inputItem.remove();
 }
+
+// Editing table by double click
 
 tableBody.addEventListener('dblclick', event => {
   if (tableBody.querySelector('input')) {
     saveValue();
   }
 
-  const point = event.target;
-  const input = document.createElement('input');
-
-  input.classList = 'cell-input';
-  input.value = `${point.textContent}`;
-  point.textContent = '';
-  point.append(input);
+  editValue(event);
 });
+
+// Save value if click on body
 
 main.addEventListener('click', event => {
   if (event.target.tagName === 'BODY') {
     saveValue();
   }
 });
+
+// Save value if press Enter
 
 main.addEventListener('keydown', event => {
   if (event.key === 'Enter') {
