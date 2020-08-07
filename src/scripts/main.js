@@ -7,57 +7,57 @@ const table = document.querySelector('table');
 const tHeader = table.tHead.rows[0];
 const headerCells = [...tHeader.cells];
 const tBody = table.tBodies[0];
-const rows = [...tBody.children];
 let notificationTimer = null;
-let sortOrder = 'ASC';
 let sortColumn = null;
 
 /**
  * Dynamically created elements
  */
-const form = document.createElement('form');
-const notification = document.createElement('div');
-const notificationTitle = document.createElement('h2');
-const notificationMessage = document.createElement('span');
+const form = createEmployeeForm();
+const notificationContainer = document.createElement('div');
 
-form.noValidate = true;
-form.classList.add('new-employee-form');
-document.body.append(form);
-
-notification.classList.add('notification');
-notificationTitle.classList.add('title');
-notification.append(notificationTitle, notificationMessage);
-
-form.insertAdjacentHTML(
-  'beforeend',
-  `<label>Name:
-    <input name="name" type="text" required minLength="4">
-  </label>
-  <label>Position:
-    <input name="position" type="text" required>
-  </label>
-  <label>Office:
-  <select name="office" required>
-    <option value="Tokyo">Tokyo</option>
-    <option value="Singapore">Singapore</option>
-    <option value="London">London</option>
-    <option value="New York">New York</option>
-    <option value="Edinburgh">Edinburgh</option>
-    <option value="San Francisco">San Francisco</option>
-  </select>
-  </label>
-  <label>Age:
-    <input name="age" type="number" required min="18" max="90">
-  </label>
-  <label>Salary:
-    <input name="salary" type="number" required>
-  </label>
-  <button type="submit">Save to table</button>`
-);
+document.body.append(notificationContainer);
 
 /**
  * Helper functions and handlers
  */
+function createEmployeeForm() {
+  const newForm = document.createElement('form');
+
+  newForm.noValidate = true;
+  newForm.classList.add('new-employee-form');
+  document.body.append(newForm);
+
+  newForm.insertAdjacentHTML(
+    'beforeend',
+    `<label>Name:
+      <input name="name" type="text" required minLength="4">
+    </label>
+    <label>Position:
+      <input name="position" type="text" required>
+    </label>
+    <label>Office:
+    <select name="office" required>
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    </select>
+    </label>
+    <label>Age:
+      <input name="age" type="number" required min="18" max="90">
+    </label>
+    <label>Salary:
+      <input name="salary" type="number" required>
+    </label>
+    <button type="submit">Save to table</button>`
+  );
+
+  return newForm;
+}
+
 function convertToNumber(string) {
   return parseInt(string.replace(/[^0-9]/g, ''));
 }
@@ -70,35 +70,40 @@ function formatSalary(salary) {
   }).format(salary);
 }
 
-function showNotification({ type, title, message }) {
-  hideNotification();
+function createAndShowNotification({ type, title, message }) {
+  const notification = document.createElement('div');
+  const notificationTitle = document.createElement('h2');
+  const notificationMessage = document.createElement('span');
+
+  notification.classList.add('notification');
+  notificationTitle.classList.add('title');
+  notification.append(notificationTitle, notificationMessage);
+
+  hideNotification(notification);
 
   // Add a notification type class
   notification.classList.add(type);
   notificationTitle.innerText = title;
   notificationMessage.innerHTML = message;
-  document.body.append(notification);
+  notificationContainer.append(notification);
 
-  notificationTimer = setTimeout(hideNotification, 5000);
+  clearTimeout(notificationTimer);
+  notificationTimer = setTimeout(() => hideNotification(notification), 5000);
 }
 
-function hideNotification() {
-  clearTimeout(notificationTimer);
-  // Make sure we delete old notification type class
-  notification.classList.remove('warning', 'success', 'error');
-  notification.remove();
+function hideNotification(notification) {
+  notificationContainer.innerHTML = '';
 }
 
 function addEmployee({ name, position, office, age, salary }) {
   tBody.insertAdjacentHTML(
     'beforeend',
-    `<tr>
-      <td>${name}</td>
+    ` <td>${name}</td>
       <td>${position}</td>
       <td>${office}</td>
       <td>${age}</td>
       <td>${formatSalary(salary)}</td>
-    </tr>`
+    `
   );
 }
 
@@ -107,15 +112,14 @@ function saveValue(cell, input, defaultValue) {
 }
 
 function handleTableHeadClick(e) {
+  const rows = [...tBody.children];
   const clickedLabel = headerCells.indexOf(e.target);
 
-  if (sortColumn !== e.target) {
-    sortOrder = 'ASC';
-  }
+  if (sortColumn === e.target) {
+    rows.reverse();
+  } else {
+    sortColumn = e.target;
 
-  sortColumn = e.target;
-
-  if (sortOrder === 'ASC') {
     rows.sort((a, b) => {
       const firstValue = a.cells[clickedLabel].innerText;
       const secondValue = b.cells[clickedLabel].innerText;
@@ -128,15 +132,13 @@ function handleTableHeadClick(e) {
 
       return number1 - number2;
     });
-  } else {
-    rows.reverse();
   }
 
   table.tBodies[0].append(...rows);
-  sortOrder = 'DESC';
 }
 
 function handleTableRowClick(e) {
+  const rows = [...tBody.children];
   const clickedRow = e.target.parentNode;
 
   rows.forEach((row) => {
@@ -148,12 +150,8 @@ function handleTableRowClick(e) {
   });
 }
 
-function handleFormSubmit(e) {
-  e.preventDefault();
-
-  const elements = [...e.target.elements];
+function validateFormFields(elements) {
   const errors = [];
-  const formData = {};
 
   elements.forEach((formElement) => {
     if (!['INPUT', 'SELECT'].includes(formElement.tagName)) {
@@ -171,12 +169,24 @@ function handleFormSubmit(e) {
     } else if (parseFloat(max, 10) && value > parseFloat(max, 10)) {
       errors.push(`${name} should not be greater than ${max}`);
     }
+  });
 
-    formData[name] = value;
+  return errors;
+}
+
+function handleFormSubmit(e) {
+  e.preventDefault();
+
+  const elements = [...e.target.elements];
+  const errors = validateFormFields(elements);
+  const formData = {};
+
+  elements.forEach((formElement) => {
+    formData[formElement.name] = formElement.value;
   });
 
   if (errors.length) {
-    showNotification({
+    createAndShowNotification({
       type: 'error',
       title: 'Validation error',
       message: errors.join('<br />'),
@@ -184,7 +194,7 @@ function handleFormSubmit(e) {
   } else {
     addEmployee(formData);
 
-    showNotification({
+    createAndShowNotification({
       type: 'success',
       title: 'Success',
       message: 'Employee added successfully',
@@ -197,7 +207,7 @@ function handleFinishEdit(e, defaultValue) {
   const input = e.target;
   const cell = input.parentNode;
 
-  if (e.type === 'keyup' && e.keyCode !== 13) {
+  if (e.type === 'keyup' && e.key !== 'Enter') {
     return;
   }
 
@@ -209,7 +219,7 @@ function handleTableCellDblclick(e) {
   const input = document.createElement('input');
   const defaultValue = cell.textContent;
 
-  input.classList.add('.cell-input');
+  input.classList.add('cell-input');
   input.value = defaultValue;
   cell.textContent = '';
   cell.append(input);
