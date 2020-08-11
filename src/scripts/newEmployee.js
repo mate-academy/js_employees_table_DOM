@@ -1,53 +1,39 @@
 'use strict';
 
-function checkAllField(objectEmployee, formVelues) {
-  if ((formVelues.name.value !== '') || (formVelues.name.value.length >= 4)) {
-    objectEmployee.name = formVelues.name.value;
+const parseToText = require('./helpers');
+
+function checkAllField(objectEmployee, formValues) {
+  if ((formValues.name.value !== '') || (formValues.name.value.length >= 4)) {
+    objectEmployee.name = formValues.name.value;
   }
 
-  if (formVelues.position.value !== '') {
-    objectEmployee.position = formVelues.position.value;
+  if (formValues.position.value !== '') {
+    objectEmployee.position = formValues.position.value;
   }
 
-  if (formVelues.office.value !== '') {
-    objectEmployee.office = formVelues.office.value;
+  if (formValues.office.value !== '') {
+    objectEmployee.office = formValues.office.value;
   }
 
-  if ((formVelues.age.value !== '')
-    && (!isNaN(parseFloat(formVelues.age.value)))) {
-    objectEmployee.age = formVelues.age.value;
+  if ((formValues.age.value !== '')
+    && (!isNaN(parseFloat(formValues.age.value)))) {
+    objectEmployee.age = formValues.age.value;
   }
 
-  if ((formVelues.salary.value !== '')
-    && (!isNaN(parseFloat(formVelues.salary.value)))) {
-    let item = '';
-    const salary = [];
-    let count = 0;
-
-    item += formVelues.salary.value;
-    item = item.split('').reverse();
-
-    for (let i = 0; i < item.length; i++) {
-      count++;
-      salary.push(item[i]);
-
-      if ((count === 3) && (i !== item.length - 1)) {
-        count = 0;
-        salary.push(',');
-      }
-    }
-    objectEmployee.salary = '$' + salary.reverse().join('');
+  if ((formValues.salary.value !== '')
+    && (!isNaN(parseFloat(formValues.salary.value)))) {
+    objectEmployee.salary
+    = parseToText.formatSalary(formValues.salary.value);
   }
 }
 
-function removeFormField(formValues) {
-  formValues.name.value = '';
-  formValues.position.value = '';
-  formValues.age.value = '';
-  formValues.salary.value = '';
+function resetForm(formValues) {
+  for (const valueElement in formValues) {
+    formValues[valueElement].value = '';
+  }
 };
 
 module.exports = {
   checkAllField,
-  removeFormField,
+  resetForm,
 };

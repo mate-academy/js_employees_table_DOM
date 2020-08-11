@@ -1,64 +1,80 @@
 'use strict';
 
-const body = document.querySelector('body');
-const div = document.createElement('div');
+const ERRORS = require('./constants');
 
-const error = {
-  name: 'The name must be at least 4 characters long!!!',
-  position: 'Please enter your position!!!',
-  age: 'Age must be less than 18 or bigger than 90!!!',
-  salary: 'Salary must be a number!!!',
-};
-
-const position = (event) => {
+function checkValidInfo(event, boxMessage, conteiner) {
   const target = event.target;
 
-  if (target.value === '') {
-    notificationWarning(error.position, 'Position', 'warning');
+  switch (target.name) {
+    case 'name':
+      if ((target.value === '') || (target.value.length <= 4)) {
+        pushNotification(
+          ERRORS.WARNING.NAME,
+          'Name',
+          'warning',
+          boxMessage,
+          conteiner);
+      }
+      break;
+    case 'position':
+      if (target.value === '') {
+        pushNotification(
+          ERRORS.WARNING.POSITION,
+          'Position',
+          'warning',
+          boxMessage,
+          conteiner);
+      }
+      break;
+    case 'office':
+      if (target.value === '') {
+        pushNotification(
+          ERRORS.WARNING.OFFICE,
+          'Office',
+          'warning',
+          boxMessage,
+          conteiner);
+      }
+      break;
+    case 'age':
+      if ((parseFloat(target.value) < 18) || (parseFloat(target.value) > 90)
+          || (target.value === '')) {
+        pushNotification(
+          ERRORS.WARNING.AGE,
+          'Age',
+          'warning',
+          boxMessage,
+          conteiner);
+      }
+      break;
+    case 'salary':
+      if (isNaN(parseFloat(target.value)) || target.value === '') {
+        pushNotification(
+          ERRORS.WARNING.SALARY,
+          'Salary',
+          'warning',
+          boxMessage,
+          conteiner);
+      }
+      break;
+    default:
+      break;
   }
-};
+}
 
-const name = (event) => {
-  const target = event.target;
+function pushNotification(message, title, type, boxMessage, conteiner) {
+  boxMessage.className = 'notification';
+  boxMessage.classList.add(type);
 
-  if ((target.value === '') || (target.value.length <= 4)) {
-    notificationWarning(error.name, 'Name', 'warning');
-  }
-};
-
-const age = (event) => {
-  const target = event.target;
-
-  if ((parseFloat(target.value) < 18) || (parseFloat(target.value) > 90)
-    || (target.value === '')) {
-    notificationWarning(error.age, 'Age', 'warning');
-  }
-};
-
-const salary = (event) => {
-  const target = event.target;
-
-  if (isNaN(parseFloat(target.value)) || target.value === '') {
-    notificationWarning(error.salary, 'Salary', 'warning');
-  }
-};
-
-function notificationWarning(message, title, type) {
-  div.className = 'notification';
-  div.classList.add(type);
-
-  div.innerHTML = `<h2 class = 'title'> ${title} </h2>
+  boxMessage.innerHTML = `<h2 class = 'title'> ${title} </h2>
       <p> ${message} </p>
     `;
-  body.append(div);
+  conteiner.append(boxMessage);
 
-  setTimeout(() => div.remove(), 3000);
+  setTimeout(() => boxMessage.remove(), 1500);
 }
 
 module.exports = {
-  name,
-  position,
-  age,
-  salary,
-  notificationWarning,
+  checkValidInfo,
+  pushNotification,
 };
