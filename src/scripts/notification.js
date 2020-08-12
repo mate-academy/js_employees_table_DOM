@@ -1,60 +1,67 @@
 'use strict';
 
-const ERRORS = require('./constants');
+const {
+  WARNING,
+  MIN_LENGTH,
+  MIN_AGE,
+  MAX_AGE,
+  FORM_FIELD,
+} = require('./constants');
 
-function checkValidInfo(event, boxMessage, conteiner) {
+function checkValidInfo(event, boxMessage, container) {
   const target = event.target;
 
-  switch (target.name) {
-    case 'name':
-      if ((target.value === '') || (target.value.length <= 4)) {
+  switch (target) {
+    case FORM_FIELD.name:
+      if ((target.value === '') || (target.value.length <= MIN_LENGTH)) {
         pushNotification(
-          ERRORS.WARNING.NAME,
+          WARNING.NAME,
           'Name',
           'warning',
           boxMessage,
-          conteiner);
+          container);
       }
       break;
-    case 'position':
+    case FORM_FIELD.position:
       if (target.value === '') {
         pushNotification(
-          ERRORS.WARNING.POSITION,
+          WARNING.POSITION,
           'Position',
           'warning',
           boxMessage,
-          conteiner);
+          container);
       }
       break;
-    case 'office':
+    case FORM_FIELD.office:
       if (target.value === '') {
         pushNotification(
-          ERRORS.WARNING.OFFICE,
+          WARNING.OFFICE,
           'Office',
           'warning',
           boxMessage,
-          conteiner);
+          container);
       }
       break;
-    case 'age':
-      if ((parseFloat(target.value) < 18) || (parseFloat(target.value) > 90)
+    case FORM_FIELD.age:
+      if ((parseFloat(target.value) < MIN_AGE)
+        || (parseFloat(target.value) > MAX_AGE)
           || (target.value === '')) {
         pushNotification(
-          ERRORS.WARNING.AGE,
+          WARNING.AGE,
           'Age',
           'warning',
           boxMessage,
-          conteiner);
+          container);
       }
       break;
-    case 'salary':
+    case FORM_FIELD.salary:
       if (isNaN(parseFloat(target.value)) || target.value === '') {
         pushNotification(
-          ERRORS.WARNING.SALARY,
+          WARNING.SALARY,
           'Salary',
           'warning',
           boxMessage,
-          conteiner);
+          container);
       }
       break;
     default:
@@ -62,14 +69,14 @@ function checkValidInfo(event, boxMessage, conteiner) {
   }
 }
 
-function pushNotification(message, title, type, boxMessage, conteiner) {
+function pushNotification(message, title, type, boxMessage, container) {
   boxMessage.className = 'notification';
   boxMessage.classList.add(type);
 
   boxMessage.innerHTML = `<h2 class = 'title'> ${title} </h2>
       <p> ${message} </p>
     `;
-  conteiner.append(boxMessage);
+  container.append(boxMessage);
 
   setTimeout(() => boxMessage.remove(), 1500);
 }

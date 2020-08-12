@@ -3,17 +3,26 @@
 const selectedEmployee = require('./selected');
 const sortEmployees = require('./sort');
 const addEmployee = require('./newEmployee');
-const MESSAGE = require('./constants');
 const notification = require('./notification');
+const {
+  ERROR,
+  SUCCESS,
+  STATIC_INPUT_VALUE,
+} = require('./constants');
 
 let prevTdEdit = false;
 
-const sortHandler = (event, conteiner) => {
-  const target = event.target;
-  const arrayTr = [...conteiner.querySelectorAll('tr')];
+const sortHandler = (event, tableBody) => {
+  const target = event.target.closest('span');
 
-  sortEmployees(target.innerText, arrayTr, conteiner);
-  selectedEmployee(conteiner.querySelectorAll('tr'));
+  if (!target) {
+    return;
+  }
+
+  const arrayTr = [...tableBody.querySelectorAll('tr')];
+
+  sortEmployees(target, arrayTr, tableBody);
+  selectedEmployee(tableBody.querySelectorAll('tr'));
 };
 
 const selectedHandler = (event, conteiner) => {
@@ -56,7 +65,7 @@ function editHandler(event) {
 function saveEditTdHandler(event, currentElement) {
   const targetInput = event.target.closest('input');
 
-  if ((event.keyCode === 13) || (event.type === 'blur')) {
+  if ((event.key === 'Enter') || (event.type === 'blur')) {
     prevTdEdit = false;
 
     if (targetInput.value !== '') {
@@ -79,9 +88,9 @@ const saveEmployeeHandler = (
   selectedEmployee(conteiner.querySelectorAll('tr'));
   addEmployee.checkAllField(objectEmployee, formValue);
 
-  if (Object.keys(objectEmployee).length < 5) {
+  if (Object.keys(objectEmployee).length < STATIC_INPUT_VALUE) {
     notification.pushNotification(
-      MESSAGE.ERROR,
+      ERROR,
       'Error',
       'error',
       boxMessage,
@@ -98,7 +107,7 @@ const saveEmployeeHandler = (
     addEmployee.resetForm(formValue);
 
     notification.pushNotification(
-      MESSAGE.SUCCESS,
+      SUCCESS,
       'Success',
       'success',
       boxMessage,

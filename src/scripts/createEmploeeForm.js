@@ -1,9 +1,13 @@
 'use strict';
 
-function createForm(conteiner, formElement) {
-  conteiner.classList.add('new-employee-form');
+const validValues = require('./notification');
 
-  conteiner.insertAdjacentHTML('afterbegin',
+function createElement(container) {
+  const div = document.createElement('div');
+
+  container.classList.add('new-employee-form');
+
+  container.insertAdjacentHTML('afterbegin',
     `
     <label>Name: <input name="name" type="text"></label>
     <label>Position: <input name="position" type="text"></label>
@@ -21,6 +25,12 @@ function createForm(conteiner, formElement) {
     <label>Salary: <input name="salary" type="number"></label>
     <button type="button">Save to table</button>
   `);
+
+  [...container].map((element) =>
+    element.addEventListener('blur',
+      (event) => validValues.checkValidInfo(event, div, container.parentNode)));
+
+  return container;
 }
 
-module.exports = createForm;
+module.exports = createElement;

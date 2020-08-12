@@ -8,26 +8,29 @@ const checkClick = {
   salaryClicked: false,
 };
 
-function selectTypeToSort(type, arrayTr, conteiner) {
-  switch (type) {
+function selectTypeToSort(TABLE_HEADER, arrayTr, container) {
+  const indexHeaderCell = TABLE_HEADER.parentNode.cellIndex;
+
+  switch (TABLE_HEADER.name) {
     case 'Name' :
-      mainSort(arrayTr, 0, checkClick.nameClicked, conteiner);
+      mainSort(arrayTr, indexHeaderCell, checkClick.nameClicked, container);
       checkClick.nameClicked = !checkClick.nameClicked;
       break;
     case 'Position' :
-      mainSort(arrayTr, 1, checkClick.positionClicked, conteiner);
+      mainSort(arrayTr, indexHeaderCell, checkClick.positionClicked, container);
       checkClick.positionClicked = !checkClick.positionClicked;
       break;
     case 'Office' :
-      mainSort(arrayTr, 2, checkClick.officeClicked, conteiner);
+      mainSort(arrayTr, indexHeaderCell, checkClick.officeClicked, container);
       checkClick.officeClicked = !checkClick.officeClicked;
       break;
     case 'Age' :
-      mainSort(arrayTr, 3, checkClick.ageClicked, conteiner);
+      mainSort(arrayTr, indexHeaderCell, checkClick.ageClicked, container);
       checkClick.ageClicked = !checkClick.ageClicked;
       break;
     case 'Salary' :
-      mainSort(arrayTr, 4, checkClick.salaryClicked, conteiner, 'salary');
+      mainSort(arrayTr, indexHeaderCell,
+        checkClick.salaryClicked, container, 'salary');
       checkClick.salaryClicked = !checkClick.salaryClicked;
       break;
     default:
@@ -35,7 +38,7 @@ function selectTypeToSort(type, arrayTr, conteiner) {
   }
 }
 
-function mainSort(arr, index, clicked, conteiner, type) {
+function mainSort(arr, index, clicked, container, type) {
   if (type === 'salary') {
     arr.sort((a, b) => parseNumber(a.cells[index].innerText)
         - parseNumber(b.cells[index].innerText));
@@ -54,7 +57,7 @@ function mainSort(arr, index, clicked, conteiner, type) {
   }
 
   for (let i = 0; i < arr.length; i++) {
-    conteiner.append(arr[i]);
+    container.append(arr[i]);
   }
 }
 

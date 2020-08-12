@@ -1,8 +1,12 @@
 'use strict';
 
 const createFormEmployee = require('./createEmploeeForm');
-const handlers = require('./functionHandle');
-const helperFunction = require('./helpers');
+const handlers = require('./functionHandlers');
+const {
+  coverTextOfTheadInSpan,
+  getFormFields,
+} = require('./helpers');
+const { FORM_FIELD } = require('./constants');
 
 const body = document.querySelector('body');
 const thead = document.querySelector('thead');
@@ -14,31 +18,22 @@ const div = document.createElement('div');
 thead.addEventListener('click', (event) =>
   handlers.sortHandler(event, tbody));
 
-helperFunction.coverTextOfTheadInSpan(thead.querySelectorAll('th'));
+coverTextOfTheadInSpan(thead.querySelectorAll('th'));
 
 // selected row
 tbody.addEventListener('click', (event) =>
   handlers.selectedHandler(event, tbody));
 
 // create form
-createFormEmployee(form);
-body.append(form);
+body.append(createFormEmployee(form));
 
 // append new employee
 const button = form.querySelector('button');
 
-const formValue = {
-  name: form.querySelector("input[name='name']"),
-  position: form.querySelector("input[name='position']"),
-  office: form.querySelector("select[name='office']"),
-  age: form.querySelector("input[name='age']"),
-  salary: form.querySelector("input[name='salary']"),
-};
-
-helperFunction.addEventToForm(formValue, div, body);
+getFormFields(form, FORM_FIELD);
 
 button.addEventListener('click', () =>
-  handlers.saveEmployeeHandler(tbody, formValue, div, body));
+  handlers.saveEmployeeHandler(tbody, FORM_FIELD, div, body));
 
 // edit select cell
 tbody.addEventListener('dblclick', (event) => handlers.editHandler(event));

@@ -1,20 +1,25 @@
 'use strict';
 
-const message = require('./notification');
+const { STATIC_INPUT_VALUE } = require('./constants');
+
+function getFormFields(container, object) {
+  for (let i = 0; i < STATIC_INPUT_VALUE; i++) {
+    object[container[i].name] = container[i];
+  }
+}
 
 function formatSalary(salary) {
-  let item = '';
+  let array = [];
   const newSalary = [];
   let count = 0;
 
-  item += salary;
-  item = item.split('').reverse();
+  array = salary.split('').reverse();
 
-  for (let i = 0; i < item.length; i++) {
+  for (let i = 0; i < array.length; i++) {
     count++;
-    newSalary.push(item[i]);
+    newSalary.push(array[i]);
 
-    if ((count === 3) && (i !== item.length - 1)) {
+    if ((count === 3) && (i !== array.length - 1)) {
       count = 0;
       newSalary.push(',');
     }
@@ -23,37 +28,21 @@ function formatSalary(salary) {
   return '$' + newSalary.reverse().join('');
 }
 
-function coverTextOfTheadInSpan(conteiner) {
+function coverTextOfTheadInSpan(header) {
   const span = document.createElement('span');
 
-  for (const element of [...conteiner]) {
+  for (const element of [...header]) {
     element.prepend(span.cloneNode(true));
 
     const wantedSpan = element.querySelector('span');
 
+    wantedSpan.name = element.innerText;
     wantedSpan.append(element.childNodes[1]);
   }
-}
-
-function addEventToForm(formElement, boxMessage, conteiner) {
-  formElement.name.addEventListener('blur',
-    (event) => message.checkValidInfo(event, boxMessage, conteiner));
-
-  formElement.position.addEventListener('blur',
-    (event) => message.checkValidInfo(event, boxMessage, conteiner));
-
-  formElement.office.addEventListener('blur',
-    (event) => message.checkValidInfo(event, boxMessage, conteiner));
-
-  formElement.age.addEventListener('blur',
-    (event) => message.checkValidInfo(event, boxMessage, conteiner));
-
-  formElement.salary.addEventListener('blur',
-    (event) => message.checkValidInfo(event, boxMessage, conteiner));
 }
 
 module.exports = {
   formatSalary,
   coverTextOfTheadInSpan,
-  addEventToForm,
+  getFormFields,
 };

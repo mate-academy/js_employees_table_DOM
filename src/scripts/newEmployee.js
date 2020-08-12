@@ -1,9 +1,11 @@
 'use strict';
 
-const parseToText = require('./helpers');
+const { formatSalary } = require('./helpers');
+const { MIN_LENGTH } = require('./constants');
 
 function checkAllField(objectEmployee, formValues) {
-  if ((formValues.name.value !== '') || (formValues.name.value.length >= 4)) {
+  if ((formValues.name.value !== '')
+    || (formValues.name.value.length >= MIN_LENGTH)) {
     objectEmployee.name = formValues.name.value;
   }
 
@@ -23,7 +25,7 @@ function checkAllField(objectEmployee, formValues) {
   if ((formValues.salary.value !== '')
     && (!isNaN(parseFloat(formValues.salary.value)))) {
     objectEmployee.salary
-    = parseToText.formatSalary(formValues.salary.value);
+    = formatSalary(formValues.salary.value);
   }
 }
 
