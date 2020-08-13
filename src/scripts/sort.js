@@ -1,5 +1,7 @@
 'use strict';
 
+const { TABLE_HEADER } = require('./constants');
+
 const checkClick = {
   nameClicked: false,
   positionClicked: false,
@@ -8,29 +10,29 @@ const checkClick = {
   salaryClicked: false,
 };
 
-function selectTypeToSort(TABLE_HEADER, arrayTr, container) {
-  const indexHeaderCell = TABLE_HEADER.parentNode.cellIndex;
+function selectTypeToSort(headerCell, arrayTr, container) {
+  const indexHeaderCell = headerCell.cellIndex;
 
-  switch (TABLE_HEADER.name) {
-    case 'Name' :
+  switch (headerCell.firstChild.name) {
+    case TABLE_HEADER.name :
       mainSort(arrayTr, indexHeaderCell, checkClick.nameClicked, container);
       checkClick.nameClicked = !checkClick.nameClicked;
       break;
-    case 'Position' :
+    case TABLE_HEADER.position :
       mainSort(arrayTr, indexHeaderCell, checkClick.positionClicked, container);
       checkClick.positionClicked = !checkClick.positionClicked;
       break;
-    case 'Office' :
+    case TABLE_HEADER.office :
       mainSort(arrayTr, indexHeaderCell, checkClick.officeClicked, container);
       checkClick.officeClicked = !checkClick.officeClicked;
       break;
-    case 'Age' :
+    case TABLE_HEADER.age :
       mainSort(arrayTr, indexHeaderCell, checkClick.ageClicked, container);
       checkClick.ageClicked = !checkClick.ageClicked;
       break;
-    case 'Salary' :
+    case TABLE_HEADER.salary :
       mainSort(arrayTr, indexHeaderCell,
-        checkClick.salaryClicked, container, 'salary');
+        checkClick.salaryClicked, container, TABLE_HEADER.salary);
       checkClick.salaryClicked = !checkClick.salaryClicked;
       break;
     default:
@@ -39,7 +41,7 @@ function selectTypeToSort(TABLE_HEADER, arrayTr, container) {
 }
 
 function mainSort(arr, index, clicked, container, type) {
-  if (type === 'salary') {
+  if (type === 'Salary') {
     arr.sort((a, b) => parseNumber(a.cells[index].innerText)
         - parseNumber(b.cells[index].innerText));
   } else {
@@ -67,4 +69,6 @@ function parseNumber(element) {
   return Number.parseInt(item);
 }
 
-module.exports = selectTypeToSort;
+module.exports = {
+  selectTypeToSort,
+};

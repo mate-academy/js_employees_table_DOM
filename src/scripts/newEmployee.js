@@ -3,7 +3,7 @@
 const { formatSalary } = require('./helpers');
 const { MIN_LENGTH } = require('./constants');
 
-function checkAllField(objectEmployee, formValues) {
+function validateForm(objectEmployee, formValues) {
   if ((formValues.name.value !== '')
     || (formValues.name.value.length >= MIN_LENGTH)) {
     objectEmployee.name = formValues.name.value;
@@ -36,6 +36,6 @@ function resetForm(formValues) {
 };
 
 module.exports = {
-  checkAllField,
+  validateForm,
   resetForm,
 };

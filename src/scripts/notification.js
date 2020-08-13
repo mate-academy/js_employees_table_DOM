@@ -1,63 +1,64 @@
 'use strict';
 
 const {
-  WARNING,
-  MIN_LENGTH,
+  WARNING_MESSAGE,
+  MIN_LENGTH_OF_NAME,
   MIN_AGE,
   MAX_AGE,
-  FORM_FIELD,
+  EMPLOYEES_FORM_ELEMENTS,
 } = require('./constants');
 
 function checkValidInfo(event, boxMessage, container) {
   const target = event.target;
 
-  switch (target) {
-    case FORM_FIELD.name:
-      if ((target.value === '') || (target.value.length <= MIN_LENGTH)) {
+  switch (target.name) {
+    case EMPLOYEES_FORM_ELEMENTS.name.name:
+      if ((target.value === '')
+        || (target.value.length <= MIN_LENGTH_OF_NAME)) {
         pushNotification(
-          WARNING.NAME,
+          WARNING_MESSAGE.NAME,
           'Name',
           'warning',
           boxMessage,
           container);
       }
       break;
-    case FORM_FIELD.position:
+    case EMPLOYEES_FORM_ELEMENTS.position.name:
       if (target.value === '') {
         pushNotification(
-          WARNING.POSITION,
+          WARNING_MESSAGE.POSITION,
           'Position',
           'warning',
           boxMessage,
           container);
       }
       break;
-    case FORM_FIELD.office:
+    case EMPLOYEES_FORM_ELEMENTS.office.name:
       if (target.value === '') {
         pushNotification(
-          WARNING.OFFICE,
+          WARNING_MESSAGE.OFFICE,
           'Office',
           'warning',
           boxMessage,
           container);
       }
       break;
-    case FORM_FIELD.age:
+    case EMPLOYEES_FORM_ELEMENTS.age.name:
       if ((parseFloat(target.value) < MIN_AGE)
         || (parseFloat(target.value) > MAX_AGE)
           || (target.value === '')) {
         pushNotification(
-          WARNING.AGE,
+          WARNING_MESSAGE.AGE,
           'Age',
           'warning',
           boxMessage,
           container);
       }
       break;
-    case FORM_FIELD.salary:
+    case EMPLOYEES_FORM_ELEMENTS.salary.name:
       if (isNaN(parseFloat(target.value)) || target.value === '') {
         pushNotification(
-          WARNING.SALARY,
+          WARNING_MESSAGE.SALARY,
           'Salary',
           'warning',
           boxMessage,

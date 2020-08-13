@@ -1,10 +1,8 @@
 'use strict';
 
-const { STATIC_INPUT_VALUE } = require('./constants');
-
-function getFormFields(container, object) {
-  for (let i = 0; i < STATIC_INPUT_VALUE; i++) {
-    object[container[i].name] = container[i];
+function getFormFields(container, objectElements) {
+  for (let i = 0; i < [...container].length - 1; i++) {
+    objectElements[container[i].name] = container[i];
   }
 }
 
@@ -28,7 +26,7 @@ function formatSalary(salary) {
   return '$' + newSalary.reverse().join('');
 }
 
-function coverTextOfTheadInSpan(header) {
+function coverHeadingsToSpan(header) {
   const span = document.createElement('span');
 
   for (const element of [...header]) {
@@ -43,6 +41,6 @@ function coverTextOfTheadInSpan(header) {
 
 module.exports = {
   formatSalary,
-  coverTextOfTheadInSpan,
+  coverHeadingsToSpan,
   getFormFields,
 };

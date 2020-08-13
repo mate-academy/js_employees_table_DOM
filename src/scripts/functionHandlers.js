@@ -1,18 +1,22 @@
 'use strict';
 
-const selectedEmployee = require('./selected');
-const sortEmployees = require('./sort');
-const addEmployee = require('./newEmployee');
-const notification = require('./notification');
+const { selectTypeToSort } = require('./sort');
+const { pushNotification } = require('./notification');
+
 const {
-  ERROR,
-  SUCCESS,
-  STATIC_INPUT_VALUE,
+  resetForm,
+  validateForm,
+} = require('./newEmployee');
+
+const {
+  ERROR_MESSAGE,
+  SUCCESS_MESSAGE,
+  NUMBER_OF_ENTERED_INFO,
 } = require('./constants');
 
 let prevTdEdit = false;
 
-const sortHandler = (event, tableBody) => {
+const sortEmployees = (event, tableBody) => {
   const target = event.target.closest('span');
 
   if (!target) {
@@ -21,22 +25,25 @@ const sortHandler = (event, tableBody) => {
 
   const arrayTr = [...tableBody.querySelectorAll('tr')];
 
-  sortEmployees(target, arrayTr, tableBody);
-  selectedEmployee(tableBody.querySelectorAll('tr'));
+  selectTypeToSort(target.parentNode, arrayTr, tableBody);
+
+  [...tableBody.querySelectorAll('tr')].map((row) =>
+    row.classList.toggle('active', false));
 };
 
-const selectedHandler = (event, conteiner) => {
+const selectRow = (event, container) => {
   const target = event.target.closest('tr');
 
   if (!target) {
     return;
   }
 
-  selectedEmployee(conteiner.querySelectorAll('tr'));
+  [...container.querySelectorAll('tr')].map((row) =>
+    row.classList.toggle('active', false));
   target.classList.add('active');
 };
 
-function editHandler(event) {
+function editCell(event) {
   const target = event.target.closest('td');
   const currentElement = target.cloneNode(true);
 
@@ -52,17 +59,17 @@ function editHandler(event) {
     input.classList.add('cell-inputt');
 
     input.addEventListener('blur', (e) =>
-      saveEditTdHandler(e, currentElement));
+      saveCellChanges(e, currentElement));
 
     input.addEventListener('keyup', (e) =>
-      saveEditTdHandler(e, currentElement));
+      saveCellChanges(e, currentElement));
 
     target.innerHTML = '';
     target.append(input);
   }
 };
 
-function saveEditTdHandler(event, currentElement) {
+function saveCellChanges(event, currentElement) {
   const targetInput = event.target.closest('input');
 
   if ((event.key === 'Enter') || (event.type === 'blur')) {
@@ -76,25 +83,24 @@ function saveEditTdHandler(event, currentElement) {
   }
 };
 
-const saveEmployeeHandler = (
-  conteiner,
+const submitEmployee = (
+  container,
   formValue,
   boxMessage,
-  conteinerParent
+  containerParent
 ) => {
   const tr = document.createElement('tr');
   const objectEmployee = {};
 
-  selectedEmployee(conteiner.querySelectorAll('tr'));
-  addEmployee.checkAllField(objectEmployee, formValue);
+  validateForm(objectEmployee, formValue);
 
-  if (Object.keys(objectEmployee).length < STATIC_INPUT_VALUE) {
-    notification.pushNotification(
-      ERROR,
+  if (Object.keys(objectEmployee).length < NUMBER_OF_ENTERED_INFO) {
+    pushNotification(
+      ERROR_MESSAGE,
       'Error',
       'error',
       boxMessage,
-      conteinerParent);
+      containerParent);
   } else {
     for (const element in objectEmployee) {
       const td = document.createElement('td');
@@ -103,22 +109,25 @@ const saveEmployeeHandler = (
         `${objectEmployee[element]}`);
       tr.append(td);
     }
-    conteiner.append(tr);
-    addEmployee.resetForm(formValue);
+    container.append(tr);
+    resetForm(formValue);
 
-    notification.pushNotification(
-      SUCCESS,
+    pushNotification(
+      SUCCESS_MESSAGE,
       'Success',
       'success',
       boxMessage,
-      conteinerParent);
+      containerParent);
   }
+
+  [...container.querySelectorAll('tr')].map((row) =>
+    row.classList.toggle('active', false));
 };
 
 module.exports = {
-  sortHandler,
-  selectedHandler,
-  saveEditTdHandler,
-  editHandler,
-  saveEmployeeHandler,
+  sortEmployees,
+  selectRow,
+  saveCellChanges,
+  editCell,
+  submitEmployee,
 };

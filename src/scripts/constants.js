@@ -1,6 +1,6 @@
 'use strict';
 
-const WARNING = {
+const WARNING_MESSAGE = {
   NAME: 'The name must be at least 4 characters long!!!',
   POSITION: 'Please enter your position!!!',
   OFFICE: 'Please select your office!!!',
@@ -8,25 +8,68 @@ const WARNING = {
   SALARY: 'Salary must be a number!!!',
 };
 
-const ERROR = 'Wrong Information. Please check info.!!!';
-const SUCCESS = 'Congratulations. New Employee is append :)';
+const ERROR_MESSAGE = 'Wrong Information. Please check info.!!!';
+const SUCCESS_MESSAGE = 'Congratulations. New Employee is append :)';
 
-const MIN_LENGTH = 4;
+const MIN_LENGTH_OF_NAME = 4;
 
 const MIN_AGE = 18;
 const MAX_AGE = 90;
 
-const STATIC_INPUT_VALUE = 5;
+const NUMBER_OF_ENTERED_INFO = 5;
 
-const FORM_FIELD = {};
+const TABLE_HEADER = {
+  name: 'Name',
+  position: 'Position',
+  office: 'Office',
+  age: 'Age',
+  salary: 'Salary',
+};
+
+const OPTIONS = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco'];
+
+const EMPLOYEES_FORM_ELEMENTS = {
+  name: {
+    name: 'name',
+    type: 'text',
+    placeholder: 'Name',
+  },
+  position: {
+    name: 'position',
+    type: 'text',
+    placeholder: 'Position',
+  },
+  office: {
+    name: 'office',
+    placeholder: 'Office',
+  },
+  age: {
+    name: 'age',
+    type: 'number',
+    placeholder: 'Age',
+  },
+  salary: {
+    name: 'salary',
+    type: 'number',
+    placeholder: 'Salary',
+  },
+};
 
 module.exports = {
-  WARNING,
-  ERROR,
-  SUCCESS,
-  MIN_LENGTH,
+  WARNING_MESSAGE,
+  ERROR_MESSAGE,
+  SUCCESS_MESSAGE,
+  MIN_LENGTH_OF_NAME,
   MIN_AGE,
   MAX_AGE,
-  STATIC_INPUT_VALUE,
-  FORM_FIELD,
+  NUMBER_OF_ENTERED_INFO,
+  TABLE_HEADER,
+  EMPLOYEES_FORM_ELEMENTS,
+  OPTIONS,
 };
