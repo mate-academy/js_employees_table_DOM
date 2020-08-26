@@ -6,7 +6,9 @@ const employees = [...document.querySelectorAll('tbody tr')];
   const categories = [...document.querySelectorAll(`thead th`)];
   const backwards = [];
 
-  for (const categoryIndex in categories) {
+  for (let categoryIndex = 0;
+    categoryIndex < categories.length;
+    categoryIndex++) {
     backwards.push(false);
 
     categories[categoryIndex].onclick = () => {
@@ -15,7 +17,7 @@ const employees = [...document.querySelectorAll('tbody tr')];
       ));
       backwards[categoryIndex] = !backwards[categoryIndex];
 
-      for (const i in backwards) {
+      for (let i = 0; i < backwards.length; i++) {
         if (i !== categoryIndex) {
           backwards[i] = false;
         }
@@ -26,11 +28,14 @@ const employees = [...document.querySelectorAll('tbody tr')];
   };
 
   function sorterConstructor(sortByIndex, back) {
+    function itemFormatter(item) {
+      return item.children[sortByIndex].innerHTML
+        .split('$').join('').split(',').join('');
+    };
+
     return function(a, b) {
-      let itemA = a.children[sortByIndex].innerHTML
-        .split('$').join('').split(',').join('');
-      let itemB = b.children[sortByIndex].innerHTML
-        .split('$').join('').split(',').join('');
+      let itemA = itemFormatter(a);
+      let itemB = itemFormatter(b);
 
       if (isNaN(itemA)) {
         itemA = itemA.toUpperCase();
@@ -97,15 +102,20 @@ function selectAdder() {
 
       <label>
         Salary:
-        <input name="salary" type="number" required>
+        <input
+          name="salary"
+          type="number"
+          required
+          onkeyup="this.value = this.value.replace(/[A-Za-zА-Яа-яЁё]/, '');"
+        >
       </label>
 
       <button type="submit">Save to table</button>
     </form>
   `);
 
-  document.querySelector('button[type=submit]').onclick = (event) => {
-    event.preventDefault();
+  document.querySelector('button[type=submit]').onclick = (dblClickEvent) => {
+    dblClickEvent.preventDefault();
 
     const name = document.querySelector('input[name=name]').value;
     const position = document.querySelector('input[name=position]').value;
@@ -137,6 +147,15 @@ function selectAdder() {
           <br>
           So, if ur name is Ray, Bob, etc,
           you are not able to use table. Goodluck:)`,
+        `error`
+      );
+
+      return;
+    }
+
+    if (+salary === 0) {
+      pushNotification('10px', '10px', 'Error!',
+        `Incorrect salary value`,
         `error`
       );
 
@@ -191,19 +210,32 @@ function pushNotification(top, right, title, description, type) {
 };
 
 (function cellEditor() {
-  document.querySelector('tbody').addEventListener('dblclick', (event) => {
-    const initialValue = event.target.textContent;
-    const input = document.createElement('input');
+  document.querySelector('tbody')
+    .addEventListener('dblclick', (dblClickEvent) => {
+      const initialValue = dblClickEvent.target.textContent;
+      const input = document.createElement('input');
 
-    input.className = 'cell-input';
-    input.value = initialValue;
+      input.className = 'cell-input';
+      input.value = initialValue;
+      input.style.width = window.getComputedStyle(dblClickEvent.target).width;
 
-    event.target.innerHTML = '';
-    event.target.append(input);
-    input.focus();
+      dblClickEvent.target.style.padding = '17px';
+      dblClickEvent.target.innerHTML = '';
+      dblClickEvent.target.append(input);
+      input.focus();
 
-    input.onblur = () => {
-      event.target.innerHTML = input.value ? input.value : initialValue;
-    };
-  });
+      input.onblur = exitEditMode;
+
+      input.onkeyup = (keyupEvent) => {
+        if (keyupEvent.which === 13) {
+          exitEditMode();
+        }
+      };
+
+      function exitEditMode() {
+        dblClickEvent.target.innerHTML = input.value
+          ? input.value
+          : initialValue;
+      };
+    });
 })();
