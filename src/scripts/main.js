@@ -3,7 +3,7 @@
 // start everything
 initSorting();
 initSelection();
-initEdition();
+initEditing();
 initFormAddingAndWorking();
 
 // init sorting functionality
@@ -133,13 +133,13 @@ function initSelection() {
 }
 
 // init editing functionality
-function initEdition() {
+function initEditing() {
   const tbody = document.querySelector('tbody');
 
   let currentEdited;
   let previousTextValue;
 
-  function stopEditioning() {
+  function stopEditing() {
     currentEdited.parentElement.innerText = (currentEdited.value)
       ? currentEdited.value
       : previousTextValue;
@@ -157,6 +157,9 @@ function initEdition() {
 
     input.style.width = `${event.target.offsetWidth - 2
       - parseFloat(window.getComputedStyle(event.target).padding) * 2}px`;
+
+    input.style.height = `${event.target.offsetHeight - 2
+        - parseFloat(window.getComputedStyle(event.target).padding) * 2}px`;
     input.value = previousTextValue;
     event.target.append(input);
     input.select();
@@ -170,13 +173,13 @@ function initEdition() {
     }
 
     if (event.target !== currentEdited) {
-      stopEditioning();
+      stopEditing();
     }
   });
 
   document.addEventListener('keydown', (event) => {
     if (currentEdited && event.code === 'Enter') {
-      stopEditioning();
+      stopEditing();
     }
   });
 }
