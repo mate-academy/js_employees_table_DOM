@@ -87,25 +87,15 @@ function initSorting() {
   }
 
   // init events
-  document.querySelectorAll('th')[0].onclick = () => {
-    sortStrings(0, 'name');
-  };
-
-  document.querySelectorAll('th')[1].onclick = () => {
-    sortStrings(1, 'position');
-  };
-
-  document.querySelectorAll('th')[2].onclick = () => {
-    sortStrings(2, 'office');
-  };
-
-  document.querySelectorAll('th')[3].onclick = () => {
-    sortNumbers(3, 'age');
-  };
-
-  document.querySelectorAll('th')[4].onclick = () => {
-    sortSalaries(4, 'salary');
-  };
+  document.querySelector('tr').addEventListener('click', (event) => {
+    switch (event.target.innerText) {
+      case 'Name': sortStrings(0, 'name'); break;
+      case 'Position': sortStrings(1, 'position'); break;
+      case 'Office': sortStrings(2, 'office'); break;
+      case 'Age': sortNumbers(3, 'age'); break;
+      case 'Salary': sortSalaries(4, 'salary'); break;
+    }
+  });
 }
 
 // init selecting functionality
