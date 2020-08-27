@@ -155,7 +155,7 @@ function initEdition() {
 
     input.classList.add('cell-input');
 
-    input.style.width = `${event.target.offsetWidth
+    input.style.width = `${event.target.offsetWidth - 2
       - parseFloat(window.getComputedStyle(event.target).padding) * 2}px`;
     input.value = previousTextValue;
     event.target.append(input);
