@@ -147,8 +147,11 @@ function initEditing() {
 
     input.style.width = `${event.target.offsetWidth - 2
       - parseFloat(window.getComputedStyle(event.target).paddingLeft) * 2}px`;
-    event.target.style.paddingTop = '17px';
-    event.target.style.paddingBottom = '17px'; // because of mozila
+
+    if (event.target.tagName === 'TD') {
+      event.target.style.paddingTop = '17px';
+      event.target.style.paddingBottom = '17px'; // because of mozila
+    }
 
     input.value = previousTextValue;
     event.target.append(input);
