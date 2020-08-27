@@ -146,10 +146,10 @@ function initEditing() {
     input.classList.add('cell-input');
 
     input.style.width = `${event.target.offsetWidth - 2
-      - parseFloat(window.getComputedStyle(event.target).padding) * 2}px`;
+      - parseFloat(window.getComputedStyle(event.target).paddingLeft) * 2}px`;
 
     input.style.height = `${event.target.offsetHeight - 2
-        - parseFloat(window.getComputedStyle(event.target).padding) * 2}px`;
+        - parseFloat(window.getComputedStyle(event.target).paddingLeft) * 2}px`;
     input.value = previousTextValue;
     event.target.append(input);
     input.select();
