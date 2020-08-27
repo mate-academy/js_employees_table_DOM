@@ -242,6 +242,8 @@ function initFormAddingAndWorking() {
       return;
     }
 
+    window.alert('Succesfully added');
+
     return true;
   }
 }
