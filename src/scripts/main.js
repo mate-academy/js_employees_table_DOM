@@ -281,13 +281,13 @@ function addTableEditing() {
 
     input.focus();
     input.addEventListener('blur', addEdit);
-    input.addEventListener('keydown', enterValidation);
+    input.addEventListener('keydown', checkKey);
 
     function addEdit() {
       switch (true) {
         case !input.value:
-        case !isNaN(+initValue) && isNaN(+input.value):
-        case isNaN(+initValue) && !isNaN(+input.value):
+        case !isNaN(+initValue.replace(/[$,]/g, '')) && isNaN(+input.value):
+        case isNaN(+initValue.replace(/[$,]/g, '')) && !isNaN(+input.value):
           cell.innerHTML = initValue;
           break;
 
@@ -296,7 +296,7 @@ function addTableEditing() {
       }
     }
 
-    function enterValidation(keyboardEvent) {
+    function checkKey(keyboardEvent) {
       if (keyboardEvent.code === 'Enter') {
         addEdit();
       }
