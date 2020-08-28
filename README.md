@@ -1,7 +1,7 @@
 1. Replace `<your_account>` with your Github username in the link
-    - [DEMO LINK](https://<your_account>.github.io/js_employees_table_DOM/)
+    - [DEMO LINK](https://uni-8.github.io/js_employees_table_DOM/)
 2. Follow [this instructions](https://mate-academy.github.io/layout_task-guideline/)
-    - There are no tests for this task so use `npm run lint` command instead of `npm test` 
+    - There are no tests for this task so use `npm run lint` command instead of `npm test`
 
 ### Task: Employees table
 
@@ -52,7 +52,7 @@ Start table:
 - Title and description don't matter, it's up to you.
 - You can use notifications from the previous task.
 
-##### Implement editing of table cells by double-clicking on it (Optional)   
+##### Implement editing of table cells by double-clicking on it (Optional)
 - Double click on the cell of the table, should remove text, and append input with `cell-input` class.
 - The input value should contain replaced by input text.
 - Only one cell can be edited at the time.
