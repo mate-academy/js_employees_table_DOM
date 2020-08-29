@@ -135,6 +135,8 @@ function addTableEditing() {
         editTableCell(td, input, initialValue);
       }
     });
+
+    input.remove();
   });
 }
 
@@ -231,9 +233,9 @@ function pushNotification(top, right, title, description, type) {
 function editTableCell(cell, input, cellValue) {
   if (!input.value) {
     cell.textContent = cellValue;
-  } else {
-    cell.textContent = input.value;
+
+    return;
   }
 
-  input.remove();
+  cell.textContent = input.value;
 }
