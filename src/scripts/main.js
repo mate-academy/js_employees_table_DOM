@@ -7,6 +7,7 @@ createForm();
 addTableSorting();
 addRowSelecting();
 addDataAppending();
+addTableEditing();
 
 function createForm() {
   const form = document.createElement('form');
@@ -103,12 +104,37 @@ function addDataAppending() {
 
     event.preventDefault();
 
-    if (!validateForm(activeForm.elements)) {
+    if (!validateForm(activeForm)) {
       return;
     }
 
-    addNewEmployee(activeForm.elements);
+    addNewEmployee(activeForm);
     activeForm.reset();
+  });
+}
+
+function addTableEditing() {
+  tbody.addEventListener('dblclick', (event) => {
+    const td = event.target;
+    const initialValue = td.textContent;
+    const input = document.createElement('input');
+
+    input.className = 'cell-input';
+    input.value = initialValue;
+    input.style.width = window.getComputedStyle(td).width;
+
+    td.textContent = '';
+    td.append(input);
+
+    input.addEventListener('blur', () => {
+      editTableCell(td, input, initialValue);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.code === 'Enter') {
+        editTableCell(td, input, initialValue);
+      }
+    });
   });
 }
 
@@ -139,9 +165,9 @@ function sortTableByColumn(columnIndex, columnName, sortOrder) {
   tbody.append(...rows);
 }
 
-function validateForm(formElements) {
-  const age = formElements.age.value;
-  const salary = formElements.salary.value;
+function validateForm(form) {
+  const age = form.age.value;
+  const salary = form.salary.value;
 
   if (age < 18) {
     pushNotification(440, 230, 'Error!',
@@ -167,15 +193,15 @@ function validateForm(formElements) {
   return true;
 }
 
-function addNewEmployee(formElements) {
-  const salary = `$${(+formElements.salary.value).toLocaleString()}`;
+function addNewEmployee(form) {
+  const salary = `$${(+form.salary.value).toLocaleString()}`;
 
   tbody.insertAdjacentHTML('beforeend', `
   <tr>
-    <td>${formElements.name.value}</td>
-    <td>${formElements.position.value}</td>
-    <td>${formElements.office.value}</td>
-    <td>${formElements.age.value}</td>
+    <td>${form.name.value}</td>
+    <td>${form.position.value}</td>
+    <td>${form.office.value}</td>
+    <td>${form.age.value}</td>
     <td>${salary}</td>
   </tr>
   `);
@@ -200,4 +226,14 @@ function pushNotification(top, right, title, description, type) {
   document.body.append(message);
 
   setTimeout(() => message.remove(), 2000);
-};
+}
+
+function editTableCell(cell, input, cellValue) {
+  if (!input.value) {
+    cell.textContent = cellValue;
+  } else {
+    cell.textContent = input.value;
+  }
+
+  input.remove();
+}
