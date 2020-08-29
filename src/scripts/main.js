@@ -265,6 +265,7 @@ function pushNotification(top, right, title, description, type) {
 }
 
 function addTableEditing() {
+  table.style.userSelect = 'none';
   table.tBodies[0].addEventListener('dblclick', editCell);
 
   function editCell(event) {
@@ -277,6 +278,7 @@ function addTableEditing() {
     input.style.width = window.getComputedStyle(cell).width;
 
     cell.innerHTML = '';
+    cell.style.padding = '17px'; // hello Mozilla
     cell.append(input);
 
     input.focus();
@@ -286,8 +288,14 @@ function addTableEditing() {
     function addEdit() {
       switch (true) {
         case !input.value:
-        case !isNaN(+initValue.replace(/[$,]/g, '')) && isNaN(+input.value):
-        case isNaN(+initValue.replace(/[$,]/g, '')) && !isNaN(+input.value):
+        case initValue.length === 2 && isNaN(+input.value):
+        case initValue.length === 2 && (+input.value < 18 || +input.value > 90):
+        case isNaN(+initValue.replace(/(^\$)|,/g, ''))
+             && input.value.length < 4:
+        case !isNaN(+initValue.replace(/(^\$)|,/g, ''))
+             && isNaN(+input.value.replace(/(^\$)|,/g, '')):
+        case isNaN(+initValue.replace(/(^\$)|,/g, ''))
+             && !isNaN(+input.value.replace(/(^\$)|,/g, '')):
           cell.innerHTML = initValue;
           break;
 
