@@ -128,15 +128,15 @@ function addTableEditing() {
 
     input.addEventListener('blur', () => {
       editTableCell(td, input, initialValue);
+      input.remove();
     });
 
     input.addEventListener('keydown', (e) => {
       if (e.code === 'Enter') {
         editTableCell(td, input, initialValue);
+        input.remove();
       }
     });
-
-    input.remove();
   });
 }
 
