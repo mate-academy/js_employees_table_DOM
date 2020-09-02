@@ -7,6 +7,7 @@ let sortColumn;
 let commonTextContent;
 let pointOfSortingColumn;
 let needReverseSortingForNewEmployee;
+
 const headerIndex = {
   Name: 0,
   Position: 1,
