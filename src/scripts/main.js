@@ -31,8 +31,18 @@ const notifications = {
     description: 'Age value is bigger than 90',
     type: 'error',
   },
+  incorrectAge: {
+    title: 'Wrong age',
+    description: 'Age value should have a number type',
+    type: 'error',
+  },
+  incorrectSalary: {
+    title: 'Wrong salary',
+    description: 'Salary value should have a number type',
+    type: 'error',
+  },
   success: {
-    title: 'Succefully added',
+    title: 'Successfully added',
     description: 'A new employee successfully added to the table',
     type: 'success',
   },
@@ -215,9 +225,19 @@ function rulesToAddNewEmployee(formData) {
     return false;
   }
 
-  if (!Number.isNaN(+age) && !Number.isNaN(+salary)) {
-    return true;
+  if (Number.isNaN(+age)) {
+    addNotification(notifications.incorrectAge);
+
+    return false;
   }
+
+  if (Number.isNaN(+salary)) {
+    addNotification(notifications.incorrectSalary);
+
+    return false;
+  }
+
+  return true;
 }
 
 function formatToAddToSalary(salary) {
