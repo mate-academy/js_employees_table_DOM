@@ -1,108 +1,108 @@
 'use strict';
 
 const table = document.querySelector('table');
-const tbody = document.querySelector('tbody');
+const tbody = table.tBodies[0];
 const tHead = table.tHead;
-let direction = 'asc';
-let indx = 0;
+let directionSortTable = 'asc';
+let indxCell = 0;
 
 tHead.addEventListener('click', (event) => {
   const item = event.target;
   const employees = [...tbody.children];
 
-  function getSalary(salEmployee) {
-    return (+salEmployee.textContent
-      .split(',').join('').split('$').join(''));
-  }
-
   switch (item.textContent) {
     case 'Name':
-      if (indx === 0 && direction === 'desc') {
+      if (indxCell === 0 && directionSortTable === 'desc') {
         employees.sort((a, b) => {
           return (b.children[0].textContent
             .localeCompare(a.children[0].textContent));
         });
-        indx = item.cellIndex;
-        direction = 'asc';
+        indxCell = item.cellIndex;
+        directionSortTable = 'asc';
       } else {
         employees.sort((a, b) => {
           return (a.children[0].textContent
             .localeCompare(b.children[0].textContent));
         });
-        indx = item.cellIndex;
-        direction = 'desc';
+        indxCell = item.cellIndex;
+        directionSortTable = 'desc';
       }
       break;
 
     case 'Position':
-      if (indx === 1 && direction === 'desc') {
+      if (indxCell === 1 && directionSortTable === 'desc') {
         employees.sort((a, b) => {
           return (b.children[1].textContent
             .localeCompare(a.children[1].textContent));
         });
-        indx = item.cellIndex;
-        direction = 'asc';
+        indxCell = item.cellIndex;
+        directionSortTable = 'asc';
       } else {
         employees.sort((a, b) => {
           return (a.children[1].textContent
             .localeCompare(b.children[1].textContent));
         });
-        indx = item.cellIndex;
-        direction = 'desc';
+        indxCell = item.cellIndex;
+        directionSortTable = 'desc';
       }
       break;
 
     case 'Office':
-      if (indx === 2 && direction === 'desc') {
+      if (indxCell === 2 && directionSortTable === 'desc') {
         employees.sort((a, b) => {
           return (b.children[2].textContent
             .localeCompare(a.children[2].textContent));
         });
-        indx = item.cellIndex;
-        direction = 'asc';
+        indxCell = item.cellIndex;
+        directionSortTable = 'asc';
       } else {
         employees.sort((a, b) => {
           return (a.children[2].textContent
             .localeCompare(b.children[2].textContent));
         });
-        indx = item.cellIndex;
-        direction = 'desc';
+        indxCell = item.cellIndex;
+        directionSortTable = 'desc';
       }
       break;
 
     case 'Age':
-      if (indx === 3 && direction === 'desc') {
+      if (indxCell === 3 && directionSortTable === 'desc') {
         employees.sort((a, b) => {
           return (+b.children[3].textContent - (+a.children[3].textContent));
         });
-        indx = item.cellIndex;
-        direction = 'asc';
+        indxCell = item.cellIndex;
+        directionSortTable = 'asc';
       } else {
         employees.sort((a, b) => {
           return (+a.children[3].textContent - (+b.children[3].textContent));
         });
-        indx = item.cellIndex;
-        direction = 'desc';
+        indxCell = item.cellIndex;
+        directionSortTable = 'desc';
       }
       break;
 
     case 'Salary':
-      if (indx === 4 && direction === 'desc') {
+      if (indxCell === 4 && directionSortTable === 'desc') {
         employees.sort((a, b) => getSalary(b.children[4])
           - getSalary(a.children[4]));
-        indx = item.cellIndex;
-        direction = 'asc';
+        indxCell = item.cellIndex;
+        directionSortTable = 'asc';
       } else {
         employees.sort((a, b) => getSalary(a.children[4])
           - getSalary(b.children[4]));
-        indx = item.cellIndex;
-        direction = 'desc';
+        indxCell = item.cellIndex;
+        directionSortTable = 'desc';
       }
       break;
   }
 
   tbody.append(...employees);
 });
+
+function getSalary(salEmployee) {
+  return (+salEmployee.textContent
+    .split(',').join('').split('$').join(''));
+}
 
 /* Body select=====
 ============== */
@@ -137,6 +137,7 @@ const arrCity = [
 ];
 
 createForm.className = 'new-employee-form';
+createForm.action = 'addEmployee()';
 
 for (let i = 0; i < tHead.children[0].children.length; i++) {
   const createLabel = document.createElement('label');
@@ -151,17 +152,6 @@ for (let i = 0; i < tHead.children[0].children.length; i++) {
       const createOption = document.createElement('option');
 
       createSelect.id = tHead.children[0].children[i].textContent;
-
-      // if (y === 0) {
-      //   createOption.value = '';
-      //   createOption.textContent = 'Select a city';
-      //   createOption.disabled = true;
-      //   createOption.selected = true;
-      //   createOption.hidden = true;
-      //   createSelect.append(createOption);
-      //   createForm.append(createSelect);
-      //   createOption = document.createElement('option');
-      // }
       createOption.value = arrCity[y];
       createOption.textContent = arrCity[y];
       createSelect.append(createOption);
@@ -218,77 +208,105 @@ const pushNotification = (top, right, title, description, type) => {
 };
 
 /* Add new employee in table */
-const form = document.querySelector('form');
-let createTr = document.createElement('tr');
-let numSalary = 0;
 
-form.addEventListener('submit', (event) => {
-  createTr = document.createElement('tr');
+createForm.addEventListener('submit', (event) => {
   event.preventDefault();
 
-  /*  Throw notification */
-  for (let x = 0; x < form.length - 1; x++) {
-    if (form[x].name === 'Name' && form[x].value.length < 4) {
+  if (validateForm()) {
+    addNewEmployee();
+  };
+});
+
+/*  Throw notification and validates form */
+function validateForm() {
+  for (let x = 0; x < createForm.length - 1; x++) {
+    if (createForm[x].name === 'Name' && createForm[x].value.length < 4) {
       pushNotification(50, 50,
-        `${form[x].name}`, `The name must contain more than four characters`,
+        `${createForm[x].name}`,
+        `The name must contain more than four characters`,
         'error');
 
-      form[x].focus();
+      createForm[x].focus();
 
-      return;
+      return false;
     }
 
-    if (form[x].name === 'Age') {
-      if (form[x].value < 18 || form[x].value > 90) {
+    if (createForm[x].name === 'Age') {
+      if (createForm[x].value > 90) {
         pushNotification(50, 50,
-          `${form[x].name}`, `Your age does not fit`,
+          `${createForm[x].name}`,
+          `Sorry, you cannot be our employee -
+            we are looking for young employees`,
           'error');
 
-        form[x].focus();
+        createForm[x].focus();
 
-        return;
+        return false;
+      } else if (createForm[x].value < 18) {
+        pushNotification(50, 50,
+          `${createForm[x].name}`,
+          "Sorry, you can't be our employee - you're too young", 'error');
+
+        createForm[x].focus();
+
+        return false;
       }
     }
 
-    if (form[x].value === '') {
+    if (createForm[x].value === '') {
       pushNotification(50, 50,
-        `${form[x].name}`, `Fill in the blank`,
+        `${createForm[x].name}`, `Fill in the blank`,
         'warning');
 
-      form[x].focus();
+      createForm[x].focus();
 
-      return;
+      return false;
     }
   }
 
-  /* Add new employee */
-  for (let x = 0; x < form.length - 1; x++) {
+  return true;
+}
+
+/* Add new employee */
+function addNewEmployee() {
+  const createTr = document.createElement('tr');
+  let numSalary = 0;
+
+  for (let x = 0; x < createForm.length - 1; x++) {
     const createTd = document.createElement('td');
 
-    createTd.textContent = form[x].value;
+    createTd.textContent = createForm[x].value;
     createTr.append(createTd);
 
-    if (form[x].id === 'Office') {
+    if (createForm[x].id === 'Office') {
       continue;
     }
 
-    if (form[x].id === 'Salary') {
-      numSalary = form[x].value;
+    if (createForm[x].id === 'Salary') {
+      numSalary = createForm[x].value;
 
-      if (form[x].value.length <= 3) {
-        numSalary = form[x].value;
+      if (createForm[x].value.length <= 3) {
+        numSalary = createForm[x].value;
       } else {
         numSalary = numSalary.split('');
-        numSalary.splice(-3, 0, ',');
+        numSalary.reverse();
+
+        for (let i = 0; i <= numSalary.length; i++) {
+          if (i % 4 === 0 && i > 0) {
+            numSalary.splice(i - 1, 0, ',');
+          }
+        };
+        numSalary.reverse();
+
         numSalary = numSalary.join('');
       }
       createTd.textContent = `$${numSalary}`;
     }
 
-    form[x].value = '';
+    createForm[x].value = '';
   }
   tbody.append(createTr);
-});
+}
 
 /* Editing of table cells */
 let editingTd;
@@ -317,12 +335,10 @@ function makeTdEditable(td) {
 
   const inputCreateCell = document.createElement('input');
 
-  inputCreateCell.style.width = td.clientWidth + 'px';
-  inputCreateCell.style.height = td.clientHeight + 'px';
   inputCreateCell.className = 'cell-input';
+  inputCreateCell.value = td.innerHTML;
 
   td.innerHTML = '';
-  inputCreateCell.value = td.innerHTML;
   td.appendChild(inputCreateCell);
   inputCreateCell.focus();
 
