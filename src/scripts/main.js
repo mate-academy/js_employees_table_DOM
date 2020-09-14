@@ -3,13 +3,19 @@
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 const form = document.createElement('form');
-let element;
 
 function makeNumber(num) {
   return (+num) ? +num : +num.slice(1).split(',').join('');
 };
 
-thead.addEventListener('click', (event) => {
+function selectRow(event) {
+  [...tbody.rows].map(elem => elem.classList.remove('active'));
+  event.target.parentNode.classList.add('active');
+}
+
+let element;
+
+function sortTable(event) {
   const index = event.target.cellIndex;
   const list = [...tbody.rows];
 
@@ -28,74 +34,60 @@ thead.addEventListener('click', (event) => {
     });
   }
   tbody.append(...list);
-});
-
-tbody.addEventListener('click', (event) => {
-  [...tbody.rows].map(elem => elem.classList.remove('active'));
-  event.target.parentNode.classList.add('active');
-});
+}
 
 function createForm() {
-  form.classList.add('new-employee-form');
-  document.body.append(form);
+  const arrCities = ['Tokyo', 'Singapore', 'London', 'New York',
+    'Edinburgh', 'San Francisco'];
+  const arrNames = ['Name', 'Position', 'Office', 'Age', 'Salary'];
+  const button = document.createElement('button');
 
-  form.insertAdjacentHTML('afterbegin', `
-    <label>Name:
-      <input
-        name="name"
-        type="text"
-        required
-      >
-    </label>
-    <label>Position:
-      <input
-        name="position"
-        type="text"
-        required
-      >
-    </label>
-    <label>Office:
-      <select name="office" required>
-        <option value="Tokyo">Tokyo</option>
-        <option value="Singapore">Singapore</option>
-        <option value="London">London</option>
-        <option value="New York">New York</option>
-        <option value="Edinburgh">Edinburgh</option>
-        <option value="San Francisco">San Francisco</option>
-      </select>
-    </label>
-    <label>Age:
-      <input
-        name="age"
-        type="number"
-        required
-      >
-    </label>
-    <label>Salary:
-      <input
-        name="salary"
-        type="number"
-        required
-      >
-    </label>
-    <button type="submit">Save to table</button>
-  `);
+  form.classList.add('new-employee-form');
+
+  for (const item of arrNames) {
+    const label = document.createElement('label');
+    const input = document.createElement('input');
+
+    label.textContent = `${item}:`;
+    input.name = `${item.toLowerCase()}`;
+    input.required = true;
+    label.append(input);
+    form.append(label);
+
+    if (item === 'Office') {
+      const options = arrCities.map(city => `<option>${city}</option>`);
+      const select = document.createElement('select');
+
+      select.name = item.toLowerCase();
+      select.insertAdjacentHTML('afterbegin', options.join(''));
+      input.remove();
+      label.append(select);
+    }
+
+    if (item === 'Age' || item === 'Salary') {
+      input.type = 'number';
+    }
+  }
+  button.textContent = 'Save to table';
+  button.type = 'submit';
+  form.append(button);
+  document.body.append(form);
 }
 createForm();
 
 function pushNotification(title, description, type) {
-  const div = document.createElement('div');
+  const container = document.createElement('div');
   const h2 = document.createElement('h2');
   const p = document.createElement('p');
 
-  div.classList.add('notification', type);
+  container.classList.add('notification', type);
   h2.classList.add('title');
   h2.innerText = title;
   p.innerText = description;
-  div.append(h2, p);
-  document.body.append(div);
+  container.append(h2, p);
+  document.body.append(container);
 
-  setTimeout(() => div.remove(), 3000);
+  setTimeout(() => container.remove(), 3000);
 };
 
 function validateForm() {
@@ -136,7 +128,7 @@ function addNewEmployee() {
   tbody.append(employee);
 }
 
-form.addEventListener('submit', (event) => {
+function submitForm(event) {
   event.preventDefault();
 
   const newForm = event.target;
@@ -147,7 +139,7 @@ form.addEventListener('submit', (event) => {
 
   addNewEmployee(newForm);
   newForm.reset();
-});
+}
 
 function saveValue(td, input, defaultValue) {
   if (!input.value) {
@@ -158,7 +150,7 @@ function saveValue(td, input, defaultValue) {
   td.textContent = input.value;
 }
 
-tbody.addEventListener('dblclick', (event) => {
+function handleCellEditing(event) {
   const td = event.target;
   const defaultValue = td.textContent;
   const input = document.createElement('input');
@@ -178,4 +170,8 @@ tbody.addEventListener('dblclick', (event) => {
       saveValue(td, input, defaultValue);
     }
   });
-});
+}
+tbody.addEventListener('click', selectRow);
+thead.addEventListener('click', sortTable);
+form.addEventListener('submit', submitForm);
+tbody.addEventListener('dblclick', handleCellEditing);
