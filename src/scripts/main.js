@@ -74,10 +74,10 @@ head.addEventListener('click', (event) => {
         employeess.reverse();
       }
   }
-  body.parentElement.append(...employeess);
+  body.append(...employeess);
 });
 
-body.addEventListener('mousedown', (event) => {
+body.addEventListener('click', (event) => {
   const target = event.target;
   const children = [...body.rows];
 
@@ -86,28 +86,26 @@ body.addEventListener('mousedown', (event) => {
   target.parentElement.classList.add('active');
 });
 
-function createForm() {
-  document.body.append(form);
-  form.classList.add('new-employee-form');
+form.classList.add('new-employee-form');
 
-  form.insertAdjacentHTML(`afterbegin`,
-    `<label>Name: <input name="name" type="text" required></label>
-    <label>Position: <input name="position" type="text" required></label>
-    <label>Office:
-      <select name="office">
-        <option value="Tokyo">Tokyo</option>
-        <option value="Singapore">Singapore</option>
-        <option value="London">London</option>
-        <option value="New York">New York</option>
-        <option value="Edinburgh">Edinburgh</option>
-        <option value="San Francisco">San Francisco</option>
-      </select>
-    </label>
-    <label>Age: <input name="age" type="number" required></label>
-    <label>Salary: <input name="salary" type="number" required></label>
-    <button type="submit">Save to table</button>`);
-}
-createForm();
+form.insertAdjacentHTML(`afterbegin`,
+  `<label>Name: <input name="name" type="text" required></label>
+  <label>Position: <input name="position" type="text" required></label>
+  <label>Office:
+    <select name="office">
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    </select>
+  </label>
+  <label>Age: <input name="age" type="number" required></label>
+  <label>Salary: <input name="salary" type="number" required></label>
+  <button type="submit">Save to table</button>`);
+
+document.body.append(form);
 
 function createNotification(title, description, type, color) {
   div.style.cssText = (`top: 470px; right: 270px`);
@@ -129,8 +127,10 @@ function addNewEmployee() {
     <td>${position}</td>
     <td>${office}</td>
     <td>${age}</td>
-    <td>$${(+salary)}</td>
+    <td>$${(+salary).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
   `);
+
+  employeess.push(...[employee]);
   body.append(employee);
 }
 
@@ -175,4 +175,33 @@ form.addEventListener('submit', (event) => {
 
   addNewEmployee(target);
   target.reset();
+});
+
+body.addEventListener('dblclick', (event) => {
+  const target = event.target;
+  const clone = target.textContent;
+  const input = document.createElement('input');
+
+  input.className = 'cell-input';
+  input.value = target.textContent;
+  input.type = 'text';
+  input.style.width = window.getComputedStyle(target).width;
+  target.innerHTML = '';
+
+  target.append(input);
+  input.focus();
+
+  input.addEventListener('blur', () => {
+    if (input.value.length < 1) {
+      target.textContent = clone;
+    }
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.code === 'Enter' && input.value.length >= 1) {
+      target.textContent = input.value;
+    } else if (e.code === 'Enter' && input.value.length < 1) {
+      target.textContent = clone;
+    }
+  });
 });
