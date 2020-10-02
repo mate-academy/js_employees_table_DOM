@@ -5,10 +5,10 @@ const headOfTable = document.querySelector('thead');
 const form = document.createElement('form');
 let sortDirection = 'asc';
 let clickCell = 0;
-const workers = [...bodyOfTable.children];
 
 function sorting() {
   headOfTable.addEventListener('click', (event) => {
+    const workers = [...bodyOfTable.children];
     const sortBy = event.target.innerText;
 
     switch (sortBy) {
@@ -32,7 +32,7 @@ function sorting() {
         break;
       case 'Position':
         if (clickCell === 1 && sortDirection !== 'asc') {
-          workers.sort((a, b) => {
+          [...bodyOfTable.children].sort((a, b) => {
             return b.children[1].innerText
               .localeCompare(a.children[1].innerText);
           });
@@ -50,14 +50,14 @@ function sorting() {
         break;
       case 'Office':
         if (clickCell === 2 && sortDirection !== 'asc') {
-          workers.sort((a, b) => {
+          [...bodyOfTable.children].sort((a, b) => {
             return b.children[2].innerText
               .localeCompare(a.children[2].innerText);
           });
           sortDirection = 'asc';
           clickCell = event.target.cellIndex;
         } else {
-          workers.sort((a, b) => {
+          [...bodyOfTable.children].sort((a, b) => {
             return a.children[2].innerText
               .localeCompare(b.children[2].innerText);
           });
@@ -107,6 +107,8 @@ function sorting() {
 sorting();
 
 function selectWorker() {
+  const workers = [...bodyOfTable.children];
+
   for (let i = 0; i < workers.length; i++) {
     workers[i].addEventListener('click', (event) => {
       for (let j = 0; j < workers.length; j++) {
@@ -157,7 +159,6 @@ function CreateForm() {
         type ="number" required
       >
     </label>  
-
     <label> Salary:
       <input 
         name = "salary"
@@ -165,7 +166,6 @@ function CreateForm() {
         type = "number" required
       >
     </label>
-
     <button>
       <type = "submit">
         Save to table
@@ -260,6 +260,15 @@ function employerAddValidator() {
 }
 employerAddValidator();
 
+function saveValue(td, input, defaultValue) {
+  if (!input.value) {
+    td.textContent = defaultValue;
+
+    return;
+  }
+  td.textContent = input.value;
+}
+
 function editTable() {
   bodyOfTable.addEventListener('dblclick', (event) => {
     const input = document.createElement('input');
@@ -271,6 +280,17 @@ function editTable() {
     cell.textContent = '';
     cell.append(input);
     input.focus();
+
+    input.addEventListener('blur', () =>
+      saveValue(cell, input, defaultValue)
+    );
+
+    input.addEventListener('keydown', (e) => {
+      if (e.code === 'Enter') {
+        saveValue(cell, input, defaultValue);
+      }
+    }
+    );
   });
 }
 editTable();
