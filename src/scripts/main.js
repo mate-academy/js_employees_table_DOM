@@ -54,7 +54,7 @@ tableBody.addEventListener('click', selectRow);
 
 // 5. Implement editing of table cells by double-clicking on it (Optional)
 
-function doCellEdit(event) {
+function cellEdit(event) {
   const selectedCell = event.target;
 
   const input = document.createElement('input');
@@ -76,7 +76,7 @@ function doCellEdit(event) {
   });
 }
 
-tableBody.addEventListener('dblclick', doCellEdit);
+tableBody.addEventListener('dblclick', cellEdit);
 
 /* 3 Use a script to add a form to the document
  that will allow you to add new employees to the spreadsheet. */
