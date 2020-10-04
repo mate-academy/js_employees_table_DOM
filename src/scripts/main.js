@@ -1,8 +1,10 @@
 'use strict';
 
 // write code here
-const tableHead = document.querySelector('thead');
-const tableBody = document.querySelector('tbody');
+const table = document.querySelector('table');
+
+const tableHead = table.querySelector('thead');
+const tableBody = table.querySelector('tbody');
 
 // 1.Implement table sorting by clicking on the title.
 const rows = [...tableBody.rows];
@@ -84,68 +86,43 @@ const form = document.createElement('form');
 function addForm() {
   form.classList.add('new-employee-form');
 
-  const formLabels = ['name', 'position', 'office', 'age', 'salary'];
-  //  name
-  const label = document.createElement('label');
-  const input = document.createElement('input');
+  const formLabels = ['Name', 'Position', 'Office', 'Age', 'Salary'];
 
-  input.name = formLabels[0];
-  input.required = true;
-  label.textContent = formLabels[0];
-  label.append(input);
-  form.append(label);
+  for (let i = 0; i < formLabels.length; i++) {
+    const label = document.createElement('label');
 
-  //  position
-  const label1 = document.createElement('label');
-  const input1 = document.createElement('input');
+    label.textContent = formLabels[i];
 
-  input1.name = formLabels[1];
-  input1.required = true;
-  label1.textContent = formLabels[1];
-  label1.append(input1);
-  form.append(label1);
+    if (formLabels[i] === 'Office') {
+      const select = document.createElement('select');
 
-  //  office
-  const label2 = document.createElement('label');
+      select.required = true;
 
-  label2.textContent = formLabels[2];
+      const officeCityArray
+      = [`Tokyo`, `Singapore`, `London`, `New York`,
+        `Edinburgh`, `San Francisco`];
 
-  const select = document.createElement('select');
+      const options = officeCityArray.map(city => `<option>${city}</option>`);
 
-  select.required = true;
+      select.name = formLabels[2].toLowerCase();
+      select.insertAdjacentHTML('afterbegin', options.join(''));
+      label.append(select);
+      form.append(label);
+    } else {
+      const input = document.createElement('input');
 
-  const officeCityArray
-  = [`Tokyo`, `Singapore`, `London`, `New York`, `Edinburgh`, `San Francisco`];
+      input.name = formLabels[i].toLowerCase();
+      input.required = true;
 
-  const options = officeCityArray.map(city => `<option>${city}</option>`);
+      if (formLabels[i] === 'Selary' || formLabels[i] === 'Age') {
+        input.type = 'number';
+      }
 
-  select.name = formLabels[2];
-  select.insertAdjacentHTML('afterbegin', options.join(''));
+      label.append(input);
+      form.append(label);
+    }
+  }
 
-  label2.append(select);
-  form.append(label2);
-
-  //  age
-  const label3 = document.createElement('label');
-  const input2 = document.createElement('input');
-
-  input2.name = formLabels[3];
-  input2.required = true;
-  label3.textContent = formLabels[3];
-  label3.append(input2);
-  form.append(label3);
-
-  //  selary
-  const label4 = document.createElement('label');
-  const input3 = document.createElement('input');
-
-  input3.name = formLabels[4];
-  input3.required = true;
-  label4.textContent = formLabels[4];
-  label4.append(input3);
-  form.append(label4);
-
-  // button
   const button = document.createElement('button');
 
   button.type = 'submit';
@@ -179,15 +156,14 @@ function pushNotification(title, description, type) {
   setTimeout(() => container.remove(), 2000);
 };
 
-function validate() {
-  //   const formLabels = ['name', 'position', 'office', 'age', 'salary'];
-  if (form.age.value < 18 || form.age.value > 90) {
+function validate(formToValidate) {
+  if (formToValidate.age.value < 18 || formToValidate.age.value > 90) {
     pushNotification('Retry', `Age is more then 18 & less then 90`, 'error');
 
     return false;
   }
 
-  const nameString = form.name.value;
+  const nameString = formToValidate.name.value;
 
   if (nameString.length < 4) {
     pushNotification('Retry!', `Name can't be less than 4 letters`, 'error');
@@ -195,7 +171,7 @@ function validate() {
     return false;
   }
 
-  if (+form.salary.value === 0) {
+  if (+formToValidate.salary.value === 0) {
     pushNotification('Retry!', 'Salary must be more then 0', 'error');
 
     return false;
