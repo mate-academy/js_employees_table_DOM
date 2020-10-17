@@ -43,14 +43,14 @@ tHead.addEventListener('click', (event) => {
         return aText.localeCompare(bText);
       }
 
-      return +bText - +aText;
+      return +aText - +bText;
     }
 
     if (isNaN(+aText)) {
       return bText.localeCompare(aText);
     }
 
-    return +aText - +bText;
+    return +bText - +aText;
   });
 
   heading.classList.toggle('asc-sorted');
