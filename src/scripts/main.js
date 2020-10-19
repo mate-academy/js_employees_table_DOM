@@ -11,13 +11,10 @@ table.tHead.addEventListener('click', (event) => {
     const firstRowText = firstRow.cells[sortedCellIndex].textContent;
     const secondRowText = secondRow.cells[sortedCellIndex].textContent;
 
-    if (+firstRowText.replace(/\D*/g, '')) {
-      const firstNumber = +firstRowText.replace(/\D*/g, '');
-      const secondNumber = +secondRowText.replace(/\D*/g, '');
-
+    if (getNumber(firstRowText)) {
       return sortedCell.isSortOrderChanged
-        ? secondNumber - firstNumber
-        : firstNumber - secondNumber;
+        ? getNumber(secondRowText) - getNumber(firstRowText)
+        : getNumber(firstRowText) - getNumber(secondRowText);
     }
 
     return sortedCell.isSortOrderChanged
@@ -29,6 +26,10 @@ table.tHead.addEventListener('click', (event) => {
 
   sortedCell.isSortOrderChanged = !sortedCell.isSortOrderChanged;
 });
+
+function getNumber(string) {
+  return +string.replace(/\D*/g, '');
+};
 
 tableBody.addEventListener('click', (event) => {
   const chosenRow = event.target.closest('TR');
