@@ -8,7 +8,7 @@
 Hi, dear mate!
 This is the final task of JS Advanced course. Apply all the acquired skills and show what you are capable of!
 
-Let's get started. This task consists of what you already know.
+Let's get started. This task consists of what you already know
 Briefly about your tasks:
 1. Implement table sorting by clicking on the title (this time in two directions).
 2. When you click on a row of the table, it should become selected.
