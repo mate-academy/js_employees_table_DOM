@@ -150,8 +150,13 @@ form.addEventListener('submit', (event) => {
   event.preventDefault();
 
   if (form.children[0].firstElementChild.value.length <= 3) {
-    pushNotification(10, 40, 'Invalid name', `
-    Please enter valid name`, 'error');
+    pushNotification(
+      10,
+      40,
+      'Invalid name',
+      `Please enter valid name`,
+      'error'
+    );
 
     return;
   }
@@ -160,7 +165,13 @@ form.addEventListener('submit', (event) => {
   const inputSalary = form.children[4].firstElementChild.value;
 
   if (inputAge < 18 || inputAge > 90) {
-    pushNotification(10, 40, 'Invalid age', 'Young baby:)', 'error');
+    pushNotification(
+      10,
+      40,
+      'Invalid age',
+      'Young baby:)',
+      'error'
+    );
 
     return;
   }
@@ -177,6 +188,11 @@ form.addEventListener('submit', (event) => {
 
   tBody.append(newRow);
 
-  pushNotification(10, 40, 'Congratulations', `
-  Your data has been added`, 'success');
+  pushNotification(
+    10,
+    40,
+    'Congratulations',
+    `Your data has been added`,
+    'success'
+  );
 });
