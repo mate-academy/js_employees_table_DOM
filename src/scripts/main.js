@@ -1,166 +1,189 @@
 'use strict';
 
-const table = document.querySelector('table');
-const tableBody = table.tBodies[0];
+const employeesTable = document.querySelector('table');
 
-table.tHead.addEventListener('click', (event) => {
-  const sortedCell = event.target;
-  const sortedCellIndex = event.target.cellIndex;
+addTableSorting(employeesTable);
+addRowSelect(employeesTable);
+addTableEditing(employeesTable);
 
-  const sortedRows = [...tableBody.rows].sort((firstRow, secondRow) => {
-    const firstRowText = firstRow.cells[sortedCellIndex].textContent;
-    const secondRowText = secondRow.cells[sortedCellIndex].textContent;
+const employeeForm = createForm('new-employee-form');
 
-    if (getNumber(firstRowText)) {
-      return sortedCell.isSortOrderChanged
-        ? getNumber(secondRowText) - getNumber(firstRowText)
-        : getNumber(firstRowText) - getNumber(secondRowText);
-    }
+document.body.append(employeeForm);
 
-    return sortedCell.isSortOrderChanged
-      ? secondRowText.localeCompare(firstRowText)
-      : firstRowText.localeCompare(secondRowText);
+addRowAppending(employeeForm, employeesTable);
+
+function addTableSorting(table) {
+  table.tHead.addEventListener('click', (event) => {
+    sortTable(table, event.target);
   });
 
-  tableBody.append(...sortedRows);
+  function sortTable(sortedTable, sortedColumn) {
+    const columnIndex = sortedColumn.cellIndex;
+    const tBody = sortedTable.tBodies[0];
 
-  sortedCell.isSortOrderChanged = !sortedCell.isSortOrderChanged;
-});
+    const sortedRows = [...tBody.rows].sort((firstRow, secondRow) => {
+      const firstRowText = firstRow.cells[columnIndex].textContent;
+      const secondRowText = secondRow.cells[columnIndex].textContent;
 
-function getNumber(string) {
-  return +string.replace(/\D*/g, '');
-};
+      if (getNumber(firstRowText)) {
+        return sortedColumn.isSortOrderChanged
+          ? getNumber(secondRowText) - getNumber(firstRowText)
+          : getNumber(firstRowText) - getNumber(secondRowText);
+      }
 
-tableBody.addEventListener('click', (event) => {
-  const chosenRow = event.target.closest('TR');
+      return sortedColumn.isSortOrderChanged
+        ? secondRowText.localeCompare(firstRowText)
+        : firstRowText.localeCompare(secondRowText);
+    });
 
-  if (!chosenRow) {
-    return;
+    tBody.append(...sortedRows);
+
+    sortedColumn.isSortOrderChanged = !sortedColumn.isSortOrderChanged;
   }
 
-  const previousChosenRow = document.querySelector('tr.active');
+  function getNumber(string) {
+    return +string.replace(/\D*/g, '');
+  };
+}
 
-  if (previousChosenRow) {
-    previousChosenRow.classList.remove('active');
-  }
+function addRowSelect(table) {
+  table.tBodies[0].addEventListener('click', (event) => {
+    const chosenRow = event.target.closest('TR');
 
-  chosenRow.classList.add('active');
-});
+    if (!chosenRow) {
+      return;
+    }
 
-const form = document.createElement('form');
+    const previousChosenRow = document.querySelector('tr.active');
 
-form.classList.add('new-employee-form');
+    if (previousChosenRow) {
+      previousChosenRow.classList.remove('active');
+    }
 
-document.body.append(form);
+    chosenRow.classList.add('active');
+  });
+}
 
-form.innerHTML = `
-  <label for="name">
-    Name:
-    <input
-      name="name"
-      id="name"
-      type="text"
-      required
-    >
-  </label>
-  <label for="position">
-    Position:
-    <input
-      name="position"
-      id="position"
-      type="text"
-      required
-    >
-  </label>
-  <label for="office">
-    Office:
-    <select
-      name="office"
-      id="office"
-      required
-    >
-      <option>Tokyo</option>
-      <option>Singapore</option>
-      <option>London</option>
-      <option>New York</option>
-      <option>Edinburgh</option>
-      <option>San Francisco</option>
-    </select>
-  </label>
-  <label for="age">
-    Age:
-    <input
-      name="age"
-      id="age"
-      type="number"
-      required
-    >
-  </label>
-  <label for="salary">
-    Salary:
-    <input
-      name="salary"
-      id="salary"
-      type="number"
-      required
-    >
-  </label>
-  <button type="submit">Save to table</button>
-`;
+function createForm(className) {
+  const form = document.createElement('form');
 
-form.addEventListener('submit', (event) => {
-  event.preventDefault();
+  form.classList.add(className);
 
-  const name = form.name.value;
-  const age = +form.age.value;
-
-  if (name.length < 4) {
-    pushNotification(
-      10,
-      10,
-      'Error', 'Name should have minimum 4 letters',
-      'error'
-    );
-
-    return;
-  }
-
-  if (age < 18 || age > 90) {
-    pushNotification(
-      10,
-      10,
-      'Error',
-      'Age should be between 18 and 90',
-      'error'
-    );
-
-    return;
-  }
-
-  const position = form.position.value;
-  const office = form.office.value;
-  const salary = +form.salary.value;
-
-  const newRow = document.createElement('tr');
-
-  newRow.innerHTML = `
-    <td>${name}</td>
-    <td>${position}</td>
-    <td>${office}</td>
-    <td>${age}</td>
-    <td>$${salary.toLocaleString('en-GB')}</td>
+  form.innerHTML = `
+    <label for="name">
+      Name:
+      <input
+        name="name"
+        id="name"
+        type="text"
+        required
+      >
+    </label>
+    <label for="position">
+      Position:
+      <input
+        name="position"
+        id="position"
+        type="text"
+        required
+      >
+    </label>
+    <label for="office">
+      Office:
+      <select
+        name="office"
+        id="office"
+        required
+      >
+        <option>Tokyo</option>
+        <option>Singapore</option>
+        <option>London</option>
+        <option>New York</option>
+        <option>Edinburgh</option>
+        <option>San Francisco</option>
+      </select>
+    </label>
+    <label for="age">
+      Age:
+      <input
+        name="age"
+        id="age"
+        type="number"
+        required
+      >
+    </label>
+    <label for="salary">
+      Salary:
+      <input
+        name="salary"
+        id="salary"
+        type="number"
+        required
+      >
+    </label>
+    <button type="submit">Save to table</button>
   `;
 
-  tableBody.append(newRow);
+  return form;
+}
 
-  pushNotification(
-    10,
-    10,
-    'Done!',
-    'New employee was added to the table',
-    'success'
-  );
-});
+function addRowAppending(form, table) {
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const name = form.name.value;
+    const age = +form.age.value;
+
+    if (name.length < 4) {
+      pushNotification(
+        10,
+        10,
+        'Error', 'Name should have minimum 4 letters',
+        'error'
+      );
+
+      return;
+    }
+
+    if (age < 18 || age > 90) {
+      pushNotification(
+        10,
+        10,
+        'Error',
+        'Age should be between 18 and 90',
+        'error'
+      );
+
+      return;
+    }
+
+    const position = form.position.value;
+    const office = form.office.value;
+    const salary = +form.salary.value;
+
+    const newRow = document.createElement('tr');
+
+    newRow.innerHTML = `
+      <td>${name}</td>
+      <td>${position}</td>
+      <td>${office}</td>
+      <td>${age}</td>
+      <td>$${salary.toLocaleString('en-GB')}</td>
+    `;
+
+    table.tBodies[0].append(newRow);
+
+    pushNotification(
+      10,
+      10,
+      'Done!',
+      'New employee was added to the table',
+      'success'
+    );
+
+    form.reset();
+  });
+}
 
 function pushNotification(top, right, title, description, type) {
   const message = document.createElement('div');
@@ -180,42 +203,42 @@ function pushNotification(top, right, title, description, type) {
   document.body.append(message);
 };
 
-tableBody.addEventListener('dblclick', (event) => {
-  if (event.target.tagName !== 'TD') {
-    return;
-  }
-
-  const modifiedCell = event.target;
-
-  const cellText = modifiedCell.textContent;
-
-  modifiedCell.innerHTML = `
-    <input
-      name="change"
-      class="cell-input"
-      value="${cellText}"
-    >
-  `;
-
-  const cellInput = modifiedCell.firstElementChild;
-
-  cellInput.addEventListener('blur', (e) => {
-    if (cellInput.value) {
-      modifiedCell.innerHTML = cellInput.value;
-    } else {
-      modifiedCell.innerHTML = cellText;
-    }
-  });
-
-  cellInput.addEventListener('keypress', (e) => {
-    if (e.key !== 'Enter') {
+function addTableEditing(table) {
+  table.tBodies[0].addEventListener('dblclick', (event) => {
+    if (event.target.tagName !== 'TD') {
       return;
     }
 
-    if (cellInput.value) {
-      modifiedCell.innerHTML = cellInput.value;
-    } else {
-      modifiedCell.innerHTML = cellText;
-    }
+    const modifiedCell = event.target;
+    const cellText = modifiedCell.textContent;
+    const cellInputWidth = window.getComputedStyle(modifiedCell).width;
+
+    modifiedCell.innerHTML = `
+      <input
+        name="change"
+        class="cell-input"
+        value="${cellText}"
+      >
+    `;
+
+    const cellInput = modifiedCell.querySelector('.cell-input');
+
+    cellInput.style.maxWidth = cellInputWidth;
+
+    cellInput.addEventListener('blur', (e) => {
+      modifiedCell.innerHTML = cellInput.value
+        ? cellInput.value
+        : cellText;
+    });
+
+    cellInput.addEventListener('keypress', (e) => {
+      if (e.key !== 'Enter') {
+        return;
+      }
+
+      modifiedCell.innerHTML = cellInput.value
+        ? cellInput.value
+        : cellText;
+    });
   });
-});
+}
