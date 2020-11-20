@@ -2,7 +2,7 @@
 
 describe('Employees table', () => {
   beforeEach('Open site', () => {
-    cy.visit('https://artemlav.github.io/js_employees_table_DOM/');
+    cy.visit('/');
   });
 
   it('should sort by name ASC', () => {
