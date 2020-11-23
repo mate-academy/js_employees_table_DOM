@@ -1,13 +1,19 @@
 'use strict';
 
 Cypress.Commands.add('fillTable',
-  (fvalue, svalue, tvalue, fovalue, fivalue) => {
-    cy.get('[data-qa="name"]').type(fvalue);
-    cy.get('[data-qa="position"]').type(svalue);
-    cy.get('[data-qa="city"]').select(tvalue);
-    cy.get('[data-qa="age"]').type(fovalue);
-    cy.get('[data-qa="salary"]').type(fivalue);
+  (fullName, position, city, age, salary) => {
+    cy.get('[data-qa="name"]').type(fullName);
+    cy.get('[data-qa="position"]').type(position);
+    cy.get('[data-qa="city"]').select(city);
+    cy.get('[data-qa="age"]').type(age);
+    cy.get('[data-qa="salary"]').type(salary);
     cy.get('button').contains('Save to table').click();
+  });
+
+Cypress.Commands.add('checkData',
+  (fullName, salary) => {
+    cy.get('tbody').contains(fullName).should('not.exist');
+    cy.get('tbody').contains(salary).should('not.exist');
   });
 
 describe('Employees table', () => {
@@ -107,6 +113,7 @@ describe('Employees table', () => {
     cy.fillTable('Ada', 'QA Engineer', 'San Francisco', 18, 50000);
 
     cy.get('[data-qa="notification"]').should('have.class', 'error');
+    cy.checkData('Ada', 50000);
   });
 
   it(`should have warning notification on position 
@@ -118,6 +125,7 @@ describe('Employees table', () => {
     cy.get('button').contains('Save to table').click();
 
     cy.get('[data-qa="notification"]').should('have.class', 'error');
+    cy.checkData('Adam', 50000);
   });
 
   it(`should have warning notification on age field
@@ -125,6 +133,7 @@ describe('Employees table', () => {
     cy.fillTable('Adam', 'QA Engineer', 'San Francisco', 17, 50000);
 
     cy.get('[data-qa="notification"]').should('have.class', 'error');
+    cy.checkData('Adam', 50000);
   });
 
   it(`should have warning notification on age field
@@ -132,5 +141,6 @@ describe('Employees table', () => {
     cy.fillTable('Adam', 'QA Engineer', 'San Francisco', 91, 50000);
 
     cy.get('[data-qa="notification"]').should('have.class', 'error');
+    cy.checkData('Adam', 50000);
   });
 });
