@@ -38,6 +38,14 @@ Start table:
 ```html
 <label>Name: <input name="name" type="text"></label>
 ```
+- Add qa attributes for each input field:
+```
+ data-qa="name" 
+ data-qa="position" 
+ data-qa="city" 
+ data-qa="age" 
+ data-qa="salary" 
+```
 - Select should have 6 options: `Tokyo`, `Singapore`, `London`, `New York`, `Edinburgh`, `San Francisco`.
 - Use texts for labels and buttons from the resulting screenshot.
 - Age and salary inputs should have a number type. Don't forget to convert the string from salary input to correct value like in the table.
@@ -50,9 +58,9 @@ Start table:
 - If `Age` value is less than 18 or bigger than 90 throw error notification about it.
 - If a new employee successfully added to the table throw success notification about it.
 - Title and description don't matter, it's up to you.
-- You can use notifications from the previous task.
+- Add qa attribute for notification: `data-qa="notification"` and class "warning"/"success" depending on the result.
 
-##### Implement editing of table cells by double-clicking on it (Optional)   
+##### Implement editing of table cells by double-clicking on it (Optional). 
 - Double click on the cell of the table, should remove text, and append input with `cell-input` class.
 - The input value should contain replaced by input text.
 - Only one cell can be edited at the time.
