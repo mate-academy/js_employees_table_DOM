@@ -1,14 +1,14 @@
 1. Replace `<your_account>` with your Github username in the link
-    - [DEMO LINK](https://<your_account>.github.io/js_employees_table_DOM/)
+    - [DEMO LINK](https://achervona.github.io/js_employees_table_DOM/)
 2. Follow [this instructions](https://mate-academy.github.io/layout_task-guideline/)
-    - There are no tests for this task so use `npm run lint` command instead of `npm test` 
+    - There are no tests for this task so use `npm run lint` command instead of `npm test`
 
 ### Task: Employees table
 
 Hi, dear mate!
 This is the final task of JS Advanced course. Apply all the acquired skills and show what you are capable of!
 
-Let's get started. This task consists of what you already know.
+Let's get started. This task consists of what you already know
 Briefly about your tasks:
 1. Implement table sorting by clicking on the title (this time in two directions).
 2. When you click on a row of the table, it should become selected.
@@ -52,7 +52,7 @@ Start table:
 - Title and description don't matter, it's up to you.
 - You can use notifications from the previous task.
 
-##### Implement editing of table cells by double-clicking on it (Optional)   
+##### Implement editing of table cells by double-clicking on it (Optional)
 - Double click on the cell of the table, should remove text, and append input with `cell-input` class.
 - The input value should contain replaced by input text.
 - Only one cell can be edited at the time.
