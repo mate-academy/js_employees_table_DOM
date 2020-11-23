@@ -58,7 +58,7 @@ Start table:
 - If `Age` value is less than 18 or bigger than 90 throw error notification about it.
 - If a new employee successfully added to the table throw success notification about it.
 - Title and description don't matter, it's up to you.
-- Add qa attribute for notification: `data-qa="notification"` and class "warning"/"success" depending on the result.
+- Add qa attribute for notification: `data-qa="notification"` and class "error"/"success" depending on the result.
 
 ##### Implement editing of table cells by double-clicking on it (Optional). 
 - Double click on the cell of the table, should remove text, and append input with `cell-input` class.

@@ -1,5 +1,15 @@
 'use strict';
 
+Cypress.Commands.add('fillTable',
+  (fvalue, svalue, tvalue, fovalue, fivalue) => {
+    cy.get('[data-qa="name"]').type(fvalue);
+    cy.get('[data-qa="position"]').type(svalue);
+    cy.get('[data-qa="city"]').select(tvalue);
+    cy.get('[data-qa="age"]').type(fovalue);
+    cy.get('[data-qa="salary"]').type(fivalue);
+    cy.get('button').contains('Save to table').click();
+  });
+
 describe('Employees table', () => {
   beforeEach('Open site', () => {
     cy.visit('/');
@@ -76,17 +86,13 @@ describe('Employees table', () => {
   });
 
   it('row should have class active after click', () => {
+    cy.contains('Airi Satou').parent().should('not.have.class', 'active');
     cy.get('tbody > :nth-child(1) > :nth-child(1)').click();
     cy.get('tr').should('have.class', 'active');
   });
 
   it('should be able to add a new employee', () => {
-    cy.get('[data-qa="name"]').type('Adam{enter}');
-    cy.get('[data-qa="position"]').type('QA Engineer{enter}');
-    cy.get('data-qa="city"').select('San Francisco');
-    cy.get('[data-qa="age"]').type('18{enter}');
-    cy.get('[data-qa="salary"]').type('50000{enter}');
-    cy.get('button').contains('Save to table').click();
+    cy.fillTable('Adam', 'QA Engineer', 'San Francisco', 18, 50000);
 
     cy.get('[data-qa="notification"]').should('have.class', 'success');
 
@@ -96,57 +102,35 @@ describe('Employees table', () => {
     cy.get('tbody').contains('$50,000');
   });
 
-  it('should have warning notification on name field with invalid input', () => {
-    cy.get('[data-qa="name"]').type('Ada{enter}');
-    cy.get('[data-qa="position"]').type('QA Engineer{enter}');
-    cy.get('data-qa="city"').select('San Francisco');
+  it(`should have warning notification on name field
+   with invalid input`, () => {
+    cy.fillTable('Ada', 'QA Engineer', 'San Francisco', 18, 50000);
+
+    cy.get('[data-qa="notification"]').should('have.class', 'error');
+  });
+
+  it(`should have warning notification on position 
+  field with invalid input`, () => {
+    cy.get('[data-qa="name"]').type('Adam');
+    cy.get('[data-qa="city"]').select('San Francisco');
     cy.get('[data-qa="age"]').type('18{enter}');
     cy.get('[data-qa="salary"]').type('50000{enter}');
     cy.get('button').contains('Save to table').click();
 
-    cy.get('[data-qa="notification"]').should('have.class', 'warning');
+    cy.get('[data-qa="notification"]').should('have.class', 'error');
   });
 
-  it('should have warning notification on position field with invalid input', () => {
-    cy.get('[name="name"]').type('Adam{enter}');
-    cy.get('select').select('San Francisco');
-    cy.get('[name="age"]').type('30{enter}');
-    cy.get('[data-qa="salary"]').type('50000{enter}');
-    cy.get('button').contains('Save to table').click();
+  it(`should have warning notification on age field
+   if the age less than 18`, () => {
+    cy.fillTable('Adam', 'QA Engineer', 'San Francisco', 17, 50000);
 
-    cy.get('[data-qa="notification"]').should('have.class', 'warning');
+    cy.get('[data-qa="notification"]').should('have.class', 'error');
   });
 
-  it('should have warning notification on age field if the age less than 18', () => {
-    cy.get('[name="name"]').type('Adam{enter}');
-    cy.get('[name="position"]').type('QA Engineer{enter}');
-    cy.get('select').select('San Francisco');
-    cy.get('[name="age"]').type('17{enter}');
-    cy.get('[name="salary"]').type('300000{enter}');
-    cy.get('button').contains('Save to table').click();
+  it(`should have warning notification on age field
+   if the age bigger than 90`, () => {
+    cy.fillTable('Adam', 'QA Engineer', 'San Francisco', 91, 50000);
 
-    cy.get('[data-qa="notification"]').should('have.class', 'warning');
-  });
-
-  it('should have warning notification on age field if the age bigger than 90', () => {
-    cy.get('[name="name"]').type('Adam{enter}');
-    cy.get('[name="position"]').type('QA Engineer{enter}');
-    cy.get('select').select('San Francisco');
-    cy.get('[name="age"]').type('91{enter}');
-    cy.get('[name="salary"]').type('300000{enter}');
-    cy.get('button').contains('Save to table').click();
-
-    cy.get('[data-qa="notification"]').should('have.class', 'warning');
-  });
-
-  it('should have warning notification on salary field if the salary less than $50000', () => {
-    cy.get('[name="name"]').type('Adam{enter}');
-    cy.get('[name="position"]').type('QA Engineer{enter}');
-    cy.get('select').select('San Francisco');
-    cy.get('[name="age"]').type('23{enter}');
-    cy.get('[name="salary"]').type('49999{enter}');
-    cy.get('button').contains('Save to table').click();
-
-    cy.get('[data-qa="notification"]').should('have.class', 'warning');
+    cy.get('[data-qa="notification"]').should('have.class', 'error');
   });
 });
