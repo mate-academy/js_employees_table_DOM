@@ -44,5 +44,7 @@
   "mateAcademy": {
     "projectType": "layoutDOM"
   },
-  "dependencies": {}
+  "dependencies": {
+    "tab": "^1.0.0"
+  }
 }
