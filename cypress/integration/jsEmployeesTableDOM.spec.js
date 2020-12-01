@@ -17,7 +17,7 @@ Cypress.Commands.add('checkDataDoesntExist',
   });
 
 Cypress.Commands.add('hasData', (inputName, compareValue) => {
-  cy.contains(inputName).parent().should(($column) => {
+  cy.contains('tr', inputName).should(($column) => {
     const array = [...$column].map((td) => td.innerText.split('\t'));
 
     for (let i = 0; i < 5; i++) {
