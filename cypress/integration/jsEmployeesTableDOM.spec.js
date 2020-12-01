@@ -17,7 +17,7 @@ Cypress.Commands.add('checkData',
   });
 
 describe('Employees table', () => {
-  beforeEach('Open site', () => {
+  beforeEach(() => {
     cy.visit('/');
   });
 
