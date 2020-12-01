@@ -1,6 +1,6 @@
 'use strict';
 
-Cypress.Commands.add('fillTable',
+Cypress.Commands.add('fillNewEmployeeForm',
   (fullName, position, city, age, salary) => {
     cy.get('[data-qa="name"]').type(fullName);
     cy.get('[data-qa="position"]').type(position);
