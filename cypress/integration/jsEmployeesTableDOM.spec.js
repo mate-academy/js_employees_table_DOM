@@ -19,7 +19,7 @@ Cypress.Commands.add('checkDataDoesntExist',
 Cypress.Commands.add('compareRowValuesAfterSort', (employeeName, rowValues) => {
   cy.contains('tr', employeeName).find('td').should(($rowValues) => {
     for (let i = 0; i < 5; i++) {
-      expect($rowValue.get(i).innerText).to.equal(rowValue[i]);
+      expect($rowValue.get(i).innerText).to.equal(rowValues[i]);
     }
   });
 });
