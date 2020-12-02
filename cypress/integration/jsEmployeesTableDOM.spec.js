@@ -16,7 +16,7 @@ Cypress.Commands.add('checkDataDoesntExist',
     cy.get('tbody').contains(salary).should('not.exist');
   });
 
-Cypress.Commands.add('compareRowValuesAfterSort', (employeeName, rowValue) => {
+Cypress.Commands.add('compareRowValuesAfterSort', (employeeName, rowValues) => {
   cy.contains('tr', employeeName).find('td').should(($rowValues) => {
     for (let i = 0; i < 5; i++) {
       expect($rowValue.get(i).innerText).to.equal(rowValue[i]);
