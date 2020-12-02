@@ -17,14 +17,11 @@ Cypress.Commands.add('checkDataDoesntExist',
   });
 
 Cypress.Commands.add('compareRowValuesAfterSort', (employeeName, rowValue) => {
-  cy.contains('tr', employeeName).find('td').should(($collection) => {
+  cy.contains('tr', employeeName).find('td').should(($rowValues) => {
     const tdValues = [];
 
     for (let i = 0; i < 5; i++) {
-      tdValues.push($collection.get(i).innerText);
-    }
-
-    for (let i = 0; i < 5; i++) {
+      tdValues.push($rowValues.get(i).innerText);
       expect(tdValues[i]).to.equal(rowValue[i]);
     }
   });
@@ -52,20 +49,20 @@ const checkValuesSorted = function(value1, value2) {
   return false;
 };
 
-Cypress.Commands.add('checkValuesIsSorted', (columnName, direction) => {
+Cypress.Commands.add('checkValuesSorted', (columnName, direction) => {
   cy.get(
     `tr:nth-child(n) td:nth-child(${ColumnsNames[columnName.toLowerCase()]})`
-  ).then(($collection) => {
-    const columnValues = [...$collection].map((collection) =>
-      collection.innerText.replace('$', '').replace(',', ''));
+  ).then(($rowValues) => {
+    const columnValues = [...$rowValues].map((rowValues) =>
+      rowValues.innerText.replace('$', '').replace(',', ''));
 
     for (let i = 1; i < columnValues.length; i++) {
       if (direction === 'ASC') {
-        // eslint-disable-next-line max-len
-        expect(checkValuesSorted(columnValues[i - 1], columnValues[i])).to.be.true;
+        expect(checkValuesSorted(columnValues[i - 1], columnValues[i]))
+          .to.be.true;
       } else if (direction === 'DESC') {
-        // eslint-disable-next-line max-len
-        expect(checkValuesSorted(columnValues[i], columnValues[i - 1])).to.be.true;
+        expect(checkValuesSorted(columnValues[i], columnValues[i - 1]))
+          .to.be.true;
       }
     }
   });
@@ -78,32 +75,32 @@ describe('Employees table', () => {
 
   it('should sort by name ASC', () => {
     cy.contains('Name').click();
-    cy.checkValuesIsSorted('Name', 'ASC');
+    cy.checkValuesSorted('Name', 'ASC');
   });
 
   it('should sort by name DESC', () => {
     cy.contains('Name').dblclick();
-    cy.checkValuesIsSorted('Name', 'DESC');
+    cy.checkValuesSorted('Name', 'DESC');
   });
 
   it('should sort by age ASC', () => {
     cy.contains('Age').click();
-    cy.checkValuesIsSorted('Age', 'ASC');
+    cy.checkValuesSorted('Age', 'ASC');
   });
 
   it('should sort by age DESC', () => {
     cy.contains('Age').dblclick();
-    cy.checkValuesIsSorted('Age', 'DESC');
+    cy.checkValuesSorted('Age', 'DESC');
   });
 
   it('should sort by salary ASC', () => {
     cy.contains('Salary').click();
-    cy.checkValuesIsSorted('Salary', 'ASC');
+    cy.checkValuesSorted('Salary', 'ASC');
   });
 
   it('should sort by salary DESC', () => {
     cy.contains('Salary').dblclick();
-    cy.checkValuesIsSorted('Salary', 'DESC');
+    cy.checkValuesSorted('Salary', 'DESC');
   });
 
   it('should have proper values in rows after the sorting ASC', () => {
