@@ -16,13 +16,14 @@ Cypress.Commands.add('checkDataDoesntExist',
     cy.get('tbody').contains(salary).should('not.exist');
   });
 
-Cypress.Commands.add('compareRowValuesAfterSort', (employeeName, rowValue) => {
-  cy.contains('tr', employeeName).find('td').should(($rowValues) => {
-    for (let i = 0; i < 5; i++) {
-      expect($rowValue.get(i).innerText).to.equal(rowValue[i]);
-    }
+Cypress.Commands.add('compareRowValuesAfterSort',
+  (employeeName, expectedValues) => {
+    cy.contains('tr', employeeName).find('td').should(($rowValues) => {
+      for (let i = 0; i < 5; i++) {
+        expect($rowValues.get(i).innerText).to.equal(expectedValues[i]);
+      }
+    });
   });
-});
 
 const ColumnsNames = {
   name: 1,
