@@ -18,11 +18,8 @@ Cypress.Commands.add('checkDataDoesntExist',
 
 Cypress.Commands.add('compareRowValuesAfterSort', (employeeName, rowValue) => {
   cy.contains('tr', employeeName).find('td').should(($rowValue) => {
-    const tdValues = [];
-
     for (let i = 0; i < 5; i++) {
-      tdValues.push($rowValue.get(i).innerText);
-      expect(tdValues[i]).to.equal(rowValue[i]);
+      expect($rowValue.get(i).innerText).to.equal(rowValue[i]);
     }
   });
 });
@@ -52,9 +49,9 @@ const checkValuesSorted = function(value1, value2) {
 Cypress.Commands.add('checkValuesSorted', (columnName, direction) => {
   cy.get(
     `tr:nth-child(n) td:nth-child(${ColumnsNames[columnName.toLowerCase()]})`
-  ).then(($rowValue) => {
-    const columnValues = [...$rowValue].map((rowValues) =>
-      rowValues.innerText.replace('$', '').replace(',', ''));
+  ).then(($rowValues) => {
+    const columnValues = [...$rowValues].map((rowValue) =>
+      rowValue.innerText.replace('$', '').replace(',', ''));
 
     for (let i = 1; i < columnValues.length; i++) {
       if (direction === 'ASC') {
