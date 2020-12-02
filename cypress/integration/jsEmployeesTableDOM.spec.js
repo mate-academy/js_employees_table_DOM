@@ -17,11 +17,11 @@ Cypress.Commands.add('checkDataDoesntExist',
   });
 
 Cypress.Commands.add('compareRowValuesAfterSort', (employeeName, rowValue) => {
-  cy.contains('tr', employeeName).find('td').should(($rowValues) => {
+  cy.contains('tr', employeeName).find('td').should(($rowValue) => {
     const tdValues = [];
 
     for (let i = 0; i < 5; i++) {
-      tdValues.push($rowValues.get(i).innerText);
+      tdValues.push($rowValue.get(i).innerText);
       expect(tdValues[i]).to.equal(rowValue[i]);
     }
   });
@@ -52,8 +52,8 @@ const checkValuesSorted = function(value1, value2) {
 Cypress.Commands.add('checkValuesSorted', (columnName, direction) => {
   cy.get(
     `tr:nth-child(n) td:nth-child(${ColumnsNames[columnName.toLowerCase()]})`
-  ).then(($rowValues) => {
-    const columnValues = [...$rowValues].map((rowValues) =>
+  ).then(($rowValue) => {
+    const columnValues = [...$rowValue].map((rowValues) =>
       rowValues.innerText.replace('$', '').replace(',', ''));
 
     for (let i = 1; i < columnValues.length; i++) {
