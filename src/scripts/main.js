@@ -73,10 +73,10 @@ function createForm() {
 
   form.insertAdjacentHTML('afterbegin',
     `<label>Name: <input name="name" id="name"
-    data-qa="name" type="text" required></label> 
+    data-qa="name" type="text" required></label>
     <label>Position: <input name="position"
      id="position" data-qa="position" type="text" required></label>
-    <label>Office: 
+    <label>Office:
         <select id="citySelect" data-qa="office" required>
             <option value="Tokyo">Tokyo</option>
             <option value="Singapore">Singapore</option>
@@ -196,7 +196,7 @@ const pushNotification = (title, description, type) => {
   div.setAttribute('data-qa', 'notification');
   header.innerHTML = title;
   descript.innerHTML = description;
-  div.style.cssText = 'position:absolute; padding: 20px; border-radius: 20px';
+  div.style.cssText = 'position:absolute;padding: 20px; border-radius: 20px';
   div.style.top = 10 + 'px';
   div.style.right = 0 + '%';
 
