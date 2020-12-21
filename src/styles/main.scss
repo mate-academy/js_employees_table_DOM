@@ -9,6 +9,7 @@ body {
   font-family: Roboto, sans-serif;
   margin: 0;
   box-sizing: border-box;
+  position: relative;
 }
 
 table {
@@ -162,6 +163,7 @@ tr.active {
 
   top: 10px;
   right: 10px;
+  z-index: 1;
 
   .title {
     display: block;
