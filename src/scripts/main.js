@@ -100,7 +100,7 @@ for (const el of headers) {
     el.textContent.toLowerCase());
 
   labels[i].insertAdjacentHTML(`afterbegin`,
-    `${el.textContent.toLowerCase()}:`);
+    `${el.textContent}:`);
   labels[i].children[0].dataset.qa = el.textContent.toLowerCase();
 
   if (el.textContent === `Name` || el.textContent === `Position`) {

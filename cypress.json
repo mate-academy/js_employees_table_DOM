@@ -1,5 +1,5 @@
 {
-  "baseUrl": "http://localhost:8080",
+  "baseUrl": "http://localhost:60795",
   "video": true,
   "pluginsFile": false,
   "supportFile": false,
