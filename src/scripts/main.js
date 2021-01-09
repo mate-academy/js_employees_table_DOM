@@ -6,18 +6,13 @@ const categories = header.querySelector('tr');
 const tbody = [...table.tBodies][0];
 const rows = tbody.rows;
 
+// sorting
 categories.addEventListener('click', (e) => {
   const sorted = e.target.classList.contains('ascending')
     ? sortDesc(e.target, rows, e.target.cellIndex)
     : sortAsc(e.target, rows, e.target.cellIndex);
 
   tbody.append(...sorted);
-});
-
-// active row
-tbody.addEventListener('click', (e) => {
-  [...rows].forEach(row => row.classList.remove('active'));
-  e.target.parentNode.classList.add('active');
 });
 
 function sortAsc(target, collection, i) {
@@ -110,6 +105,13 @@ function xChange(val) {
     : +val.split(',').join('').replace('$', '');
 }
 
+// active row
+tbody.addEventListener('click', (e) => {
+  [...rows].forEach(row => row.classList.remove('active'));
+  e.target.parentNode.classList.add('active');
+});
+
+// form
 const form = document.createElement('form');
 
 form.className = 'new-employee-form';
@@ -269,7 +271,7 @@ tbody.addEventListener('dblclick', (e) => {
 
     input.setAttribute('value', newValue);
 
-    if (e.code === 'Enter') {
+    if (inputE.code === 'Enter') {
       insertNew(newValue);
     }
   });
