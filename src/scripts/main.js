@@ -161,7 +161,11 @@ button.addEventListener('click', (e) => {
   e.preventDefault();
 
   const employeeForm = button.parentNode;
-  const { name : firstName, position, office, age, salary } = employeeForm.elements;
+  const { name: firstName,
+    position,
+    office,
+    age,
+    salary } = employeeForm.elements;
 
   const newEmployee = {
     firstName,
@@ -248,3 +252,41 @@ function pushNotification(posTop, posRight, title, description, type) {
 
   return div;
 };
+
+// editing
+tbody.addEventListener('dblclick', (e) => {
+  const cell = e.target;
+  const initial = cell.textContent;
+  const input = document.createElement('input');
+
+  input.className = 'cell-input';
+  cell.textContent = '';
+  cell.append(input);
+  input.focus();
+
+  input.addEventListener('keydown', (inputE) => {
+    const newValue = `${inputE.target.value}`;
+
+    input.setAttribute('value', newValue);
+
+    if (e.code === 'Enter') {
+      insertNew(newValue);
+    }
+  });
+
+  input.addEventListener('blur', (blurE) => {
+    const newValue = `${blurE.target.value}`;
+
+    input.setAttribute('value', newValue);
+    insertNew(newValue);
+  });
+
+  function insertNew(value) {
+    if (value === '') {
+      cell.textContent = initial;
+    } else {
+      cell.textContent = value;
+      input.remove();
+    }
+  }
+});
