@@ -80,22 +80,22 @@ container.addEventListener('dblclick', e => {
   input.value = dataCellText;
   input.focus();
 
-  input.addEventListener('blur', () => {
-    if (e.target.value !== '') {
-      dataCell.textContent = e.target.value;
+  input.addEventListener('blur', (eBlur) => {
+    if (eBlur.target.value !== '') {
+      dataCell.textContent = eBlur.target.value;
     } else {
       dataCell.textContent = dataCellText;
     }
     input.remove();
   });
 
-  input.addEventListener('keydown', () => {
-    if (e.key !== 'Enter') {
+  input.addEventListener('keydown', (eDown) => {
+    if (eDown.key !== 'Enter') {
       return;
     }
 
-    if (e.target.value !== '') {
-      dataCell.textContent = e.target.value;
+    if (eDown.target.value !== '') {
+      dataCell.textContent = eDown.target.value;
     } else {
       dataCell.textContent = dataCellText;
     }
