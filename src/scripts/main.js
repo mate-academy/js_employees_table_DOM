@@ -2,6 +2,11 @@
 
 const tableBody = document.querySelector('tbody');
 const tableHead = document.querySelector('thead');
+const FORM_FIELDS = ['Name', 'Position', 'Office', 'Age', 'Salary'];
+const CITIES = [
+  'Tokyo', 'Singapore', 'London',
+  'New York', 'Edinburgh', 'San Francisco',
+];
 let clickSortIndex;
 
 tableHead.addEventListener('click', e => {
@@ -54,9 +59,6 @@ tableBody.addEventListener('click', e => {
 });
 
 const epmloyeeForm = document.createElement('form');
-const formLabelsArray = ['Name', 'Position', 'Office', 'Age', 'Salary'];
-const cities = ['Tokyo', 'Singapore', 'London',
-  'New York', 'Edinburgh', 'San Francisco'];
 
 epmloyeeForm.className = 'new-employee-form';
 
@@ -70,11 +72,13 @@ const fillingForm = (form, labelsArray, selectOptions) => {
 
     createLabel.innerText = label + ':';
 
-    if (label === 'Age' || label === 'Salary') {
-      createInput.type = 'number';
-    } else {
-      createInput.type = 'text';
+    switch (label) {
+      case 'Age': case 'Salary': createInput.type = 'number';
+        break;
+
+      default: createInput.type = 'text';
     }
+
     createInput.dataset.qa = `${label.toLowerCase()}`;
     createInput.name = `${label.toLowerCase()}`;
     createSelect.dataset.qa = `${label.toLowerCase()}`;
@@ -102,7 +106,7 @@ const fillingForm = (form, labelsArray, selectOptions) => {
   epmloyeeForm.append(formButton);
 };
 
-fillingForm(epmloyeeForm, formLabelsArray, cities);
+fillingForm(epmloyeeForm, FORM_FIELDS, CITIES);
 
 const button = document.querySelector('button');
 
