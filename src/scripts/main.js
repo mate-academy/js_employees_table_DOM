@@ -148,7 +148,8 @@ form.addEventListener('submit', (ev) => {
   const formCheckResult = formCheck(
     `${age}`,
     `${data.get('name')}`,
-    `${data.get('position')}`
+    `${data.get('position')}`,
+    `${toNumber(salary)}`
   );
 
   if (!formCheckResult) {
@@ -165,43 +166,43 @@ form.addEventListener('submit', (ev) => {
     </tr>
   `);
 
-  function formCheck(ageWorker, nameWorker, positionWorler) {
+  function formCheck(ageWorker, nameWorker, positionWorker, salaryWorker) {
     if (nameWorker.length < 4) {
-      pushNotification(420, 350, 'Error',
+      pushNotification('Error',
         'the name should be atlist 4 characters', 'error');
 
       return false;
     }
 
-    if (positionWorler.length < 4) {
-      pushNotification(420, 350, 'Error',
+    if (positionWorker.length < 4) {
+      pushNotification('Error',
         'the position should be atlist 4 characters', 'error');
 
       return false;
     }
 
     if (+ageWorker < 18) {
-      pushNotification(420, 350, 'Error',
+      pushNotification('Error',
         'the age should not be less than 18', 'error');
 
       return false;
     }
 
     if (+ageWorker > 90) {
-      pushNotification(420, 350, 'Error',
+      pushNotification('Error',
         'the age should not be more than 90', 'error');
 
       return false;
     }
 
-    if (+data.get('salary') < 50000) {
-      pushNotification(420, 350, 'Error!',
+    if (+salaryWorker < 50000) {
+      pushNotification('Error!',
         'Employee\'s salary must be greater than $50,000!', 'error');
 
       return false;
     }
 
-    pushNotification(420, 350, 'Succes',
+    pushNotification('Succes',
       'new employee added to the table', 'success');
 
     return true;
@@ -210,14 +211,14 @@ form.addEventListener('submit', (ev) => {
   form.reset();
 });
 
-function pushNotification(tops, right, title, description, type) {
+function pushNotification(title, description, type) {
   const message = document.createElement('div');
 
   message.setAttribute('data-qa', 'notification');
   message.classList.add('notification');
   message.classList.add(type);
-  message.style.top = tops + 'px';
-  message.style.right = right + 'px';
+  message.style.top = '420px';
+  message.style.right = '350px';
 
   message.innerHTML = `
     <h2 class="title">${title}</h2>
