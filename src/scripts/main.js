@@ -54,14 +54,16 @@ tbody.addEventListener('click', (e) => {
 });
 
 // ----------create form---------- \\
-
 const form = document.createElement('form');
+const div = document.createElement('div');
 
+div.style.alignSelf = 'flex-start';
 form.setAttribute('action', '/');
 form.setAttribute('method', 'GET');
 
 form.classList.add('new-employee-form');
-body.append(form);
+div.append(form);
+body.append(div);
 
 form.insertAdjacentHTML('beforeend', `
   <label>
@@ -135,18 +137,22 @@ button.addEventListener('click', (e) => {
       </tr>`);
   }
 
-  const div = body.querySelector('div[data-qa');
+  const divQa = body.querySelectorAll('div[data-qa]');
 
   setTimeout(() => {
-    div.remove();
-  }, 5000);
+    for (let i = 0; i < divQa.length; i++) {
+      divQa[i].remove();
+    }
+  }, 3000);
 });
 
 function validateInput(data) {
   const notification = document.createElement('div');
 
+  notification.style.position = 'relative';
+  notification.style.marginLeft = '24px';
+
   notification.setAttribute('data-qa', 'notification');
-  body.append(notification);
 
   const { nameWorker, age, position } = data;
 
@@ -159,6 +165,8 @@ function validateInput(data) {
       <h2>Invalid NAME!!!</h2>
       <p>The name must contain at least 4 letters!</p>`);
 
+    div.append(notification);
+
     return false;
   }
 
@@ -169,6 +177,8 @@ function validateInput(data) {
       <h2>Invalid POSITION!!!</h2>
       <p>The position must contain at least 4 letters!</p>`);
 
+    div.append(notification);
+
     return false;
   }
 
@@ -178,6 +188,8 @@ function validateInput(data) {
     notification.insertAdjacentHTML('beforeend', `
       <h2>Invalid AGE!!!</h2>
       <p>Age must be at least 18 and not more than 90!</p>`);
+
+    div.append(notification);
 
     return false;
   }
@@ -192,6 +204,8 @@ function validateInput(data) {
       <p>You are included in the list!</p>`);
 
     form.reset();
+
+    div.append(notification);
 
     return true;
   }
