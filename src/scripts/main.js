@@ -182,7 +182,8 @@ function validateInput(data) {
     return false;
   }
 
-  if (age < 18 || age > 90) {
+  if ((age < 18 || age > 90)
+    || typeof age !== 'number') {
     notification.classList.add('error');
 
     notification.insertAdjacentHTML('beforeend', `
