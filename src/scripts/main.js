@@ -5,62 +5,56 @@ const tr = table.querySelectorAll('tr');
 const sortedRows = [...tr].slice(1, [...tr].length - 1);
 let reverse = true;
 
+function checkOrSalary(index) {
+  if (table.rows[1].cells[index].textContent.slice(0, 1) === '$') {
+    sortedRows
+      .sort((a, b) =>
+        +(a.cells[index].textContent.split(',').join('').replace('$', ''))
+        - +(b.cells[index].textContent.split(',').join('').replace('$', ''))
+      );
+  };
+};
+
+function checkOrSalaryReverse(index) {
+  if (table.rows[0].cells[index].textContent === 'Salary') {
+    sortedRows
+      .sort((a, b) =>
+        +(b.cells[index].textContent.split(',').join('').replace('$', ''))
+        - +(a.cells[index].textContent.split(',').join('').replace('$', ''))
+      );
+  };
+};
+
 table.addEventListener('click', e => {
   const asc = table.rows[0].cells;
   const index = [ ...asc ].indexOf(e.target);
 
   if (e.target.tagName === 'TD') {
+    const indexSelectedRow = [ ...sortedRows ].indexOf(e.target.parentNode);
+
+    [ ...sortedRows ].forEach(el => el.classList.remove('active'));
+    [ ...sortedRows ][indexSelectedRow].classList.add('active');
+
     return;
   }
-
-  function checkOrSalary() {
-    if (table.rows[1].cells[index].textContent.slice(0, 1) === '$') {
-      sortedRows
-        .sort((a, b) =>
-          +(a.cells[index].textContent.split(',').join('').replace('$', ''))
-          - +(b.cells[index].textContent.split(',').join('').replace('$', ''))
-        );
-    };
-  };
-
-  function checkOrSalaryReverse() {
-    if (table.rows[0].cells[index].textContent === 'Salary') {
-      sortedRows
-        .sort((a, b) =>
-          +(b.cells[index].textContent.split(',').join('').replace('$', ''))
-          - +(a.cells[index].textContent.split(',').join('').replace('$', ''))
-        );
-    };
-  };
 
   if (reverse) {
     sortedRows
       .sort((a, b) =>
         a.cells[index].textContent.localeCompare(b.cells[index].textContent)
       );
-    checkOrSalary();
+    checkOrSalary(index);
     reverse = false;
   } else {
     sortedRows
       .sort((a, b) =>
         b.cells[index].textContent.localeCompare(a.cells[index].textContent)
       );
-    checkOrSalaryReverse();
+    checkOrSalaryReverse(index);
     reverse = true;
   }
 
   table.tBodies[0].append(...sortedRows);
-});
-
-table.addEventListener('click', e => {
-  if (e.target.tagName === 'TH') {
-    return;
-  }
-
-  const indexSelectedRow = [ ...sortedRows ].indexOf(e.target.parentNode);
-
-  [ ...sortedRows ].forEach(el => el.classList.remove('active'));
-  [ ...sortedRows ][indexSelectedRow].classList.add('active');
 });
 
 const form = document.createElement('form');
@@ -105,20 +99,24 @@ labelSelect.append(select);
 createInput(form, 'name', 'text', 'name', 'name', 'Name');
 createInput(form, 'position', 'text', 'position', 'position', 'Position');
 form.append(labelSelect);
-createInput(form, 'age', 'number', 'position', 'age', 'Age');
-createInput(form, 'salary', 'number', 'position', 'salary', 'Salary');
+createInput(form, 'age', 'number', 'age', 'age', 'Age');
+createInput(form, 'salary', 'number', 'salary', 'salary', 'Salary');
 form.append(button);
+
+const nameInput = document.querySelector('#name');
+const positionInput = document.querySelector('#position');
+const ageInput = document.querySelector('#age');
 
 button.addEventListener('click', (e) => {
   e.preventDefault();
 
-  if (form.elements[0].value.length < 4
-    || +form.elements[3].value < 18
-    || +form.elements[3].value > 90
-    || form.elements[1].value === '') {
-    pushNotification(150, 10, 'Title of Error message',
-      'Message example.\n '
-      + 'Notification should contain title and description.', 'error');
+  if (nameInput.value.length < 4
+    || +ageInput.value < 18
+    || +ageInput.value > 90
+    || positionInput.value === '') {
+    pushNotification(150, 10, 'Wrong type of data',
+      '-`Name`  should be not less than 4 letters.\n '
+      + '- `Age` value should be not less than 18 or more than 90 ', 'error');
   } else {
     const savedRow = document.createElement('tr');
 
@@ -138,13 +136,16 @@ button.addEventListener('click', (e) => {
     });
     table.querySelector('tbody').append(savedRow);
 
-    pushNotification(10, 10, 'Title of Success message',
-      'Message example.\n '
-    + 'Notification should contain title and description.', 'success');
+    pushNotification(10, 10, 'Succes!',
+      'Your data were added.', 'success');
   }
 });
 
 const pushNotification = (posTop, posRight, title, description, type) => {
+  if (document.querySelector('.notification')) {
+    document.querySelector('.notification').remove();
+  }
+
   const root = document.querySelector('body');
 
   const element = document.createElement('div');
