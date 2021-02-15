@@ -283,7 +283,7 @@ button.addEventListener('click', (e) => {
     return;
   }
 
-  if (!ageValidation(inputs[3].value)) {
+  if (!ageValidation(inputs[3].value) || isNaN(inputs[3].value)) {
     body.append(errorNotification);
 
     setTimeout(() => {
@@ -313,7 +313,7 @@ button.addEventListener('click', (e) => {
     return;
   }
 
-  if (!inputs[4].value) {
+  if (!inputs[4].value || isNaN(inputs[4].value)) {
     body.append(errorNotification);
 
     setTimeout(() => {
@@ -337,6 +337,7 @@ button.addEventListener('click', (e) => {
 
     td.innerText = inputs[i].value;
     newTr.append(td);
+    list.push(newTr);
     tbody.append(newTr);
   }
 
