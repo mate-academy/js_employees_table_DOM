@@ -164,6 +164,7 @@ const submitForm = function() {
     const newEmpEntries = Object.fromEntries(formData.entries());
     const values = Object.values(newEmpEntries);
 
+    // eslint-disable-next-line no-shadow
     const { name, position, age, salary } = newEmpEntries;
 
     function convertSalary() {
@@ -200,7 +201,7 @@ const submitForm = function() {
   });
 };
 
-const editingCellsByDoubleClick = function () {
+const editingCellsByDoubleClick = function() {
   tBody.addEventListener('dblclick', (e) => {
     const target = e.target;
 
