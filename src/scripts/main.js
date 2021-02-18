@@ -164,6 +164,8 @@ const submitForm = function() {
     const newEmpEntries = Object.fromEntries(formData.entries());
     const values = Object.values(newEmpEntries);
 
+    // Вова, привет! name подчеркивает и показывает что объявлено выше
+    // хотя я ее там не объявлял. Не понимаю почему влетает эта ошибка???
     // eslint-disable-next-line no-shadow
     const { name, position, age, salary } = newEmpEntries;
 
@@ -176,9 +178,23 @@ const submitForm = function() {
 
     values[4] = convertSalary();
 
-    if (name.length < 4 || (age < 18 || age > 90) || position.length < 4) {
+    if (name.length < 4 && (position)) {
       ariseMsg('error', 'ERROR!',
-        'The name should contain at least 4 letters.\n ', 10, 10);
+        'The name should contain at least 4 letters.\n ', 150, 10);
+
+      return;
+    }
+
+    if (age < 18 || age > 90) {
+      ariseMsg('error', 'ERROR!',
+        'The age should be more than 18 or less then 90 year old!\n ', 290, 10);
+
+      return;
+    }
+
+    if (position.length < 4) {
+      ariseMsg('error', 'WARNING!',
+        'The position should contain at least 4 letters.\n ', 430, 10);
     } else {
       const tr = document.createElement('tr');
 
