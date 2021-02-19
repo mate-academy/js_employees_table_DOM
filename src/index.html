@@ -113,6 +113,76 @@
         </tr>
       </tfoot>
     </table>
+
+    <form
+      action=""
+      class="new-employee-form"
+      name="newEmployeeForm"
+    >
+
+      <label
+        for="new-employer-name-input"
+      >
+        Name: <input
+          name="name"
+          id="new-employer-name-input"
+          type="text"
+          autocomplete="off"
+        >
+      </label>
+
+      <label
+        for="new-employer-position-input"
+      >
+        Position: <input
+          name="position"
+          id="new-employer-position-input"
+          type="text"
+          autocomplete="off"
+        >
+      </label>
+
+      <label for="new-employer-office-select">Office:
+        <select name="office" id="new-employer-office-select">
+          <option value="Tokyo" selected>Tokyo</option>
+          <option value="Singapore">Singapore</option>
+          <option value="London">London</option>
+          <option value="New York">New York</option>
+          <option value="Edinburgh">Edinburgh</option>
+          <option value="San Francisco">San Francisco</option>
+        </select>
+      </label>
+
+      <label
+        for="new-employer-age-input"
+      >
+        Age: <input
+          name="age"
+          id="new-employer-age-input"
+          type="number"
+          autocomplete="off"
+        >
+      </label>
+
+      <label
+        for="new-employer-salary-input"
+      >
+        Salary: <input
+          name="salary"
+          id="new-employer-salary-input"
+          type="number"
+          autocomplete="off"
+        >
+      </label>
+
+      <button
+        class="save-to-table"
+        name="saveToTable"
+      >
+        Save to table
+      </button>
+
+    </form>
     <script type="text/javascript" src="scripts/main.js"></script>
   </body>
 </html>
