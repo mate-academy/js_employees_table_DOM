@@ -2,6 +2,10 @@
 
 // write code here
 
+const labels = ['Name', 'Position', 'Office', 'Age', 'Salary'];
+const offices = [`Tokyo`, `Singapore`, `London`,
+  `New York`, `Edinburgh`, `San Francisco`];
+
 const body = document.body;
 const tBody = document.querySelector('tbody');
 const tData = [...tBody.querySelectorAll('tr')];
@@ -68,58 +72,45 @@ const createForm = function() {
   form.className = 'new-employee-form';
   body.append(form);
 
-  const labels = ['Name', 'Position', 'Office', 'Age', 'Salary'];
-
-  for (const text of labels) {
+  for (let i = 0; i < labels.length; i++) {
     const label = document.createElement('label');
 
-    label.textContent = text + ':';
+    label.textContent = labels[i] + ':';
     form.append(label);
-  };
 
-  const inputName = document.createElement('input');
+    if (labels[i] === 'Office') {
+      const select = document.createElement('select');
 
-  inputName.setAttribute('name', 'name');
-  inputName.setAttribute('type', 'text');
-  inputName.setAttribute('data-qa', 'name');
-  form.children[0].append(inputName);
+      select.setAttribute('name', labels[i].toLowerCase());
+      select.setAttribute('data-qa', labels[i].toLowerCase());
+      form.children[i].append(select);
 
-  const inputPosition = document.createElement('input');
+      offices.forEach(office => {
+        const option = document.createElement('option');
 
-  inputPosition.setAttribute('name', 'position');
-  inputPosition.setAttribute('type', 'text');
-  inputPosition.setAttribute('data-qa', 'position');
-  form.children[1].append(inputPosition);
+        option.textContent = office;
+        form.children[i].firstElementChild.append(option);
+      });
 
-  const selectLocation = document.createElement('select');
+      continue;
+    }
 
-  selectLocation.setAttribute('name', 'office');
-  selectLocation.setAttribute('data-qa', 'office');
-  form.children[2].append(selectLocation);
+    if (labels[i] === 'Age' || labels[i] === 'Salary') {
+      const input = document.createElement('input');
 
-  const offices = [`Tokyo`, `Singapore`, `London`,
-    `New York`, `Edinburgh`, `San Francisco`];
+      input.setAttribute('name', labels[i].toLocaleLowerCase());
+      input.setAttribute('type', 'number');
+      input.setAttribute('data-qa', labels[i].toLocaleLowerCase());
+      form.children[i].append(input);
+    } else {
+      const input = document.createElement('input');
 
-  offices.forEach(office => {
-    const option = document.createElement('option');
-
-    option.textContent = office;
-    form.children[2].firstElementChild.append(option);
-  });
-
-  const inputAge = document.createElement('input');
-
-  inputAge.setAttribute('name', 'age');
-  inputAge.setAttribute('type', 'number');
-  inputAge.setAttribute('data-qa', 'age');
-  form.children[3].append(inputAge);
-
-  const inputSalary = document.createElement('input');
-
-  inputSalary.setAttribute('name', 'salary');
-  inputSalary.setAttribute('type', 'number');
-  inputSalary.setAttribute('data-qa', 'salary');
-  form.children[4].append(inputSalary);
+      input.setAttribute('name', labels[i].toLocaleLowerCase());
+      input.setAttribute('type', 'text');
+      input.setAttribute('data-qa', labels[i].toLocaleLowerCase());
+      form.children[i].append(input);
+    }
+  }
 
   const submitButton = document.createElement('button');
 
@@ -128,29 +119,31 @@ const createForm = function() {
   form.append(submitButton);
 };
 
-const ariseMsg = (type, title, description, posTop = 10, posRight = 10) => {
-  const msg = document.createElement('msg');
-  const div = document.createElement('div');
+const ariseMessage = (type, title, description, posTop = 10, posRight = 10) => {
+  const message = document.createElement('msg');
+  const messageContainer = document.createElement('div');
 
-  div.className = `notification ${type}`;
-  div.setAttribute('data-qa', 'notification');
-  div.setAttribute('style', `top: ${posTop}px; right: ${posRight}px;`);
-  msg.append(div);
-  body.append(msg);
+  messageContainer.className = `notification ${type}`;
+  messageContainer.setAttribute('data-qa', 'notification');
+
+  messageContainer.setAttribute('style', `top: ${posTop}px; 
+  right: ${posRight}px;`);
+  message.append(messageContainer);
+  body.append(message);
 
   const h2 = document.createElement('h2');
 
   h2.className = 'title';
   h2.textContent = title;
-  div.append(h2);
+  messageContainer.append(h2);
 
   const p = document.createElement('p');
 
   p.textContent = description;
-  div.append(p);
+  messageContainer.append(p);
 
   setTimeout(function rem() {
-    msg.remove();
+    message.remove();
   }, 5000);
 };
 
@@ -164,8 +157,6 @@ const submitForm = function() {
     const newEmpEntries = Object.fromEntries(formData.entries());
     const values = Object.values(newEmpEntries);
 
-    // Вова, привет! name подчеркивает и показывает что объявлено выше
-    // хотя я ее там не объявлял. Не понимаю почему влетает эта ошибка???
     // eslint-disable-next-line no-shadow
     const { name, position, age, salary } = newEmpEntries;
 
@@ -179,21 +170,21 @@ const submitForm = function() {
     values[4] = convertSalary();
 
     if (name.length < 4 && (position)) {
-      ariseMsg('error', 'ERROR!',
+      ariseMessage('error', 'ERROR!',
         'The name should contain at least 4 letters.\n ', 150, 10);
 
       return;
     }
 
     if (age < 18 || age > 90) {
-      ariseMsg('error', 'ERROR!',
+      ariseMessage('error', 'ERROR!',
         'The age should be more than 18 or less then 90 year old!\n ', 290, 10);
 
       return;
     }
 
     if (position.length < 4) {
-      ariseMsg('error', 'WARNING!',
+      ariseMessage('error', 'WARNING!',
         'The position should contain at least 4 letters.\n ', 430, 10);
     } else {
       const tr = document.createElement('tr');
@@ -206,13 +197,12 @@ const submitForm = function() {
       }
       tBody.append(tr);
 
-      ariseMsg('success', 'SUCCESS!',
+      ariseMessage('success', 'SUCCESS!',
         'The employee added succesfully.\n ', 10, 10);
 
-      document.querySelector('[name="name"]').value = '';
-      document.querySelector('[name="position"]').value = '';
-      document.querySelector('[name="age"]').value = '';
-      document.querySelector('[name="salary"]').value = '';
+      labels.forEach(label => {
+        document.querySelector(`[name="${label.toLowerCase()}"]`).value = '';
+      });
     }
   });
 };
