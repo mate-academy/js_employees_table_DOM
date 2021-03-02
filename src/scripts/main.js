@@ -1,94 +1,10 @@
 'use strict';
 
-const thead = document.querySelector('thead');
-const tbody = document.querySelector('tbody');
-const rows = tbody.querySelectorAll('tr');
-
-thead.addEventListener('click', sortCell);
-thead.addEventListener('dblclick', sortCellReverse);
-tbody.addEventListener('click', selectedRow);
-
-function converter(string) {
-  return string.replace('$', '').replace(',', '');
-}
-
-function sortCell(ev) {
-  const titleIndex = ev.target.closest('th').cellIndex;
-  const title = ev.target.closest('th');
-  const newRows = [...rows];
-
-  if (!title || !thead.contains(title)) {
-    return;
-  }
-
-  if (titleIndex === 0 || titleIndex === 1 || titleIndex === 2) {
-    newRows.sort((current, next) => {
-      const currentCellString = current.cells[titleIndex].innerText;
-      const nextCellString = next.cells[titleIndex].innerText;
-
-      return currentCellString.localeCompare(nextCellString);
-    });
-  }
-
-  newRows.sort((current, next) => {
-    const currentCellNum = current.cells[titleIndex].innerText;
-    const nextCellNum = next.cells[titleIndex].innerText;
-    const convertedCurrentNum = converter(currentCellNum);
-    const convertedNextNum = converter(nextCellNum);
-
-    return convertedCurrentNum - convertedNextNum;
-  });
-
-  rows.forEach(row => tbody.removeChild(row));
-
-  newRows.forEach(newRow => tbody.appendChild(newRow));
-}
-
-function sortCellReverse(ev) {
-  const titleIndex = ev.target.closest('th').cellIndex;
-  const title = ev.target.closest('th');
-  const newRows = [...rows];
-
-  if (!title || !thead.contains(title)) {
-    return;
-  }
-
-  if (titleIndex === 0 || titleIndex === 1 || titleIndex === 2) {
-    newRows.sort((current, next) => {
-      const currentCellString = current.cells[titleIndex].innerText;
-      const nextCellString = next.cells[titleIndex].innerText;
-
-      return nextCellString.localeCompare(currentCellString);
-    });
-  }
-
-  newRows.sort((current, next) => {
-    const currentCellNum = current.cells[titleIndex].innerText;
-    const nextCellNum = next.cells[titleIndex].innerText;
-    const convertedCurrentNum = converter(currentCellNum);
-    const convertedNextNum = converter(nextCellNum);
-
-    return convertedNextNum - convertedCurrentNum;
-  });
-
-  rows.forEach(row => tbody.removeChild(row));
-
-  newRows.forEach(newRow => tbody.appendChild(newRow));
-}
-
-function selectedRow(ev) {
-  const elementRow = ev.target.closest('tr');
-
-  if (!elementRow || !tbody.contains(elementRow)) {
-    return;
-  }
-
-  elementRow.classList.toggle('active');
-}
-
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
+form.method = 'GET';
+form.action = '#';
 
 form.insertAdjacentHTML('afterbegin', `
 <label>Name:
@@ -234,4 +150,104 @@ function pushNotification(posTop, posRight, title, description, type) {
   body.append(message);
 
   setTimeout(() => message.remove(), 6000);
+}
+
+const thead = document.querySelector('thead');
+const tbody = document.querySelector('tbody');
+const rows = tbody.querySelectorAll('tr');
+
+thead.addEventListener('click', sortCell);
+thead.addEventListener('dblclick', sortCellReverse);
+tbody.addEventListener('click', selectedRow);
+
+function selectedRow(ev) {
+  const elementRow = ev.target.closest('tr');
+
+  if (!elementRow || !tbody.contains(elementRow)) {
+    return;
+  }
+
+  elementRow.classList.toggle('active');
+}
+
+function converter(string) {
+  return string.replace('$', '').replace(',', '');
+}
+
+function sortCell(ev) {
+  const titleIndex = ev.target.closest('th').cellIndex;
+  const title = ev.target.closest('th');
+  const newRows = [...rows];
+
+  if (!title || !thead.contains(title)) {
+    return;
+  }
+
+  switch (title.innerText) {
+    case 'Name':
+    case 'Position':
+    case 'Office':
+      newRows.sort((current, next) => {
+        const currentCellString = current.cells[titleIndex].innerText;
+        const nextCellString = next.cells[titleIndex].innerText;
+
+        return currentCellString.localeCompare(nextCellString);
+      });
+      break;
+
+    case 'Age':
+    case 'Salary':
+      newRows.sort((current, next) => {
+        const currentCellNum = current.cells[titleIndex].innerText;
+        const nextCellNum = next.cells[titleIndex].innerText;
+        const convertedCurrentNum = converter(currentCellNum);
+        const convertedNextNum = converter(nextCellNum);
+
+        return convertedCurrentNum - convertedNextNum;
+      });
+      break;
+  }
+
+  rows.forEach(row => tbody.removeChild(row));
+
+  newRows.forEach(newRow => tbody.appendChild(newRow));
+}
+
+function sortCellReverse(ev) {
+  const titleIndex = ev.target.closest('th').cellIndex;
+  const title = ev.target.closest('th');
+  const newRows = [...rows];
+
+  if (!title || !thead.contains(title)) {
+    return;
+  }
+
+  switch (title.innerText) {
+    case 'Name':
+    case 'Position':
+    case 'Office':
+      newRows.sort((current, next) => {
+        const currentCellString = current.cells[titleIndex].innerText;
+        const nextCellString = next.cells[titleIndex].innerText;
+
+        return nextCellString.localeCompare(currentCellString);
+      });
+      break;
+
+    case 'Age':
+    case 'Salary':
+      newRows.sort((current, next) => {
+        const currentCellNum = current.cells[titleIndex].innerText;
+        const nextCellNum = next.cells[titleIndex].innerText;
+        const convertedCurrentNum = converter(currentCellNum);
+        const convertedNextNum = converter(nextCellNum);
+
+        return convertedNextNum - convertedCurrentNum;
+      });
+      break;
+  }
+
+  rows.forEach(row => tbody.removeChild(row));
+
+  newRows.forEach(newRow => tbody.appendChild(newRow));
 }
