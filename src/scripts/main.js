@@ -3,53 +3,62 @@
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 const rows = tbody.querySelectorAll('tr');
-const form = document.createElement('form');
+const employeeForm = document.createElement('form');
 
-let count = 1;
+employeeForm.classList.add('new-employee-form');
 
-const selected = (e) => {
-  const target = e.target;
+const selecteHandler = (e) => {
+  if (!e.target) {
+    return;
+  }
+
   const selectTr = e.target.parentNode;
 
-  if (target.closest('tr')) {
-    selectTr.classList.add('active');
-  }
+  selectTr.classList.add('active');
 };
 
-form.classList.add('new-employee-form');
+tbody.addEventListener('click', selecteHandler);
 
-form.insertAdjacentHTML('afterbegin', `<form action="#" method="GET">
-<label for="name">
-  Name:
-  <input name="name" data-qa="name" type="text" required>
-</label>
-<label for="position">
-  Position:
-  <input name="position" data-qa="position" type="text" required>
-</label>
-<label for="office">
-  Office:
-  <select name="office" data-qa="office" id="office" required>
-    <option value="Tokyo">Tokyo</option>
-    <option value="Singapore">Singapore</option>
-    <option value="London">London</option>
-    <option value="New York">New York</option>
-    <option value="Edinburgh">Edinburgh</option>
-    <option value="San Francisco">San Francisco</option>
-  </select>
-</label>
-<label for="age">
-  Age:
-  <input name="age" data-qa="age" type="number" required>
-</label>
-<label for="salary">
-  Salary:
-  <input name="salary" data-qa="salary" type="number" required>
-</label>
-<button type="submit">Save to table</button>
-</form>`);
+employeeForm.insertAdjacentHTML('afterbegin', `
+  <label for="name">
+    Name:
+    <input name="name" data-qa="name" type="text" required>
+  </label>
+  <label for="position">
+    Position:
+    <input name="position" data-qa="position" type="text" required>
+  </label>
+  <label for="office">
+    Office:
+    <select name="office" data-qa="office" id="office" required>
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    </select>
+  </label>
+  <label for="age">
+    Age:
+    <input name="age" data-qa="age" type="number" required>
+  </label>
+  <label for="salary">
+    Salary:
+    <input name="salary" data-qa="salary" type="number" required>
+  </label>
+  <button type="submit">Save to table</button>
+`);
 
-const pushNotification = (posTop, posRight, title, description, type) => {
+document.body.append(employeeForm);
+
+const pushNotification = (
+  positionTop,
+  positionRight,
+  title,
+  description,
+  type
+) => {
   const notification = document.createElement('div');
   const titleNotification = document.createElement('h2');
   const descriptionNotification = document.createElement('p');
@@ -62,8 +71,8 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   titleNotification.innerText = title;
   descriptionNotification.innerText = description;
 
-  notification.style.top = posTop + 'px';
-  notification.style.right = posRight + 'px';
+  notification.style.top = positionTop + 'px';
+  notification.style.right = positionRight + 'px';
 
   notification.append(titleNotification, descriptionNotification);
   document.body.append(notification);
@@ -71,70 +80,100 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   setTimeout(() => notification.remove(), 2000);
 };
 
-document.body.append(form);
-tbody.addEventListener('click', selected);
-
-const submit = document.querySelector('button');
-const input = document.querySelectorAll('input');
-const select = document.querySelector('select');
+const submit = employeeForm.querySelector('button');
+const input = employeeForm.querySelectorAll('input');
+const select = employeeForm.querySelector('select');
 
 const addToForm = (e) => {
   e.preventDefault();
 
-  const formName = input[0].value;
-  const formPosition = input[1].value;
-  const formOffice = select.value;
-  const formAge = input[2].value;
-  const formSalary = +input[3].value;
+  const inputName = input[0].value;
+  const inputPosition = input[1].value;
+  const selectOffice = select.value;
+  const inputAge = input[2].value;
+  const inputSalary = +input[3].value;
 
-  if (formName.length < 4) {
-    pushNotification(150, -0, 'error',
-      'value is less than 4 letters', 'error');
+  const minLengthOfInput = 4;
+  const minAgeForInput = 18;
+  const maxAgeForInput = 90;
+
+  if (inputName.length < 4) {
+    pushNotification(
+      150,
+      -0,
+      'error',
+      'value is less than 4 letters',
+      'error'
+    );
   }
 
-  if (!formPosition) {
-    pushNotification(-0, -0, 'error',
-      'Position is required', 'error');
+  if (!inputPosition) {
+    pushNotification(
+      -0,
+      -0,
+      'error',
+      'Position is required',
+      'error'
+    );
   }
 
-  if (!formSalary) {
-    pushNotification(450, -0, 'error',
-      'Salary is required', 'error');
+  if (!inputSalary) {
+    pushNotification(
+      450,
+      -0,
+      'error',
+      'Salary is required',
+      'error'
+    );
   }
 
-  if (formAge < 18 || formAge > 90) {
-    pushNotification(300, -0, 'error',
-      'value is less than 18 or more than 90', 'error');
+  if (inputAge < minAgeForInput || inputAge > maxAgeForInput) {
+    pushNotification(
+      300,
+      -0,
+      'error',
+      'value is less than 18 or more than 90',
+      'error'
+    );
   }
 
-  if (formName.length >= 4
-    && formPosition
-    && formSalary
-    && (formAge >= 18
-      && formAge <= 90
+  if (
+    inputName.length >= minLengthOfInput
+    && inputPosition
+    && inputSalary
+    && (
+      inputAge >= minAgeForInput
+      && inputAge <= maxAgeForInput
     )
   ) {
     tbody.insertAdjacentHTML('beforeend', `<tr>
-      <td>${formName}</td>
-      <td>${formPosition}</td>
-      <td>${formOffice}</td>
-      <td>${formAge}</td>
-      <td>$${formSalary.toLocaleString('en')}</td>
+      <td>${inputName}</td>
+      <td>${inputPosition}</td>
+      <td>${selectOffice}</td>
+      <td>${inputAge}</td>
+      <td>$${inputSalary.toLocaleString('en')}</td>
     </tr>`);
 
-    pushNotification(0, -0, 'success',
-      'congrats', 'success');
+    pushNotification(
+      0,
+      -0,
+      'success',
+      'congrats',
+      'success'
+    );
   }
 };
 
 function convertToNumber(string) {
-  return string.split('').filter(letter => (letter * 1) === +letter).join('');
+  return string.replace(/[^0-9]/g, '');
 }
+
+let count = 1;
 
 const sorted = (e) => {
   const th = e.target.closest('th');
   const thIndex = th.cellIndex;
-  const newRows = [...rows];
+  const rowsList = [...rows];
 
   count++;
 
@@ -144,7 +183,7 @@ const sorted = (e) => {
 
   if (thIndex === 0 || thIndex === 1) {
     if (count % 2 === 0) {
-      newRows.sort((currentString, nextString) => {
+      rowsList.sort((currentString, nextString) => {
         const currentStringText = currentString.cells[thIndex].innerText;
         const nextStringText = nextString.cells[thIndex].innerText;
 
@@ -153,7 +192,7 @@ const sorted = (e) => {
     }
 
     if (count % 2 !== 0) {
-      newRows.sort((currentString, nextString) => {
+      rowsList.sort((currentString, nextString) => {
         const currentStringText = currentString.cells[thIndex].innerText;
         const nextStringText = nextString.cells[thIndex].innerText;
 
@@ -162,11 +201,13 @@ const sorted = (e) => {
     }
   };
 
-  newRows.sort((currentItem, nextItem) => {
-    const currentItemNumber
-      = convertToNumber(currentItem.cells[thIndex].innerText);
-    const nextItemNumber
-      = convertToNumber(nextItem.cells[thIndex].innerText);
+  rowsList.sort((currentItem, nextItem) => {
+    const currentItemNumber = convertToNumber(
+      currentItem.cells[thIndex].innerText
+    );
+    const nextItemNumber = convertToNumber(
+      nextItem.cells[thIndex].innerText
+    );
 
     if (count % 2 === 0) {
       return currentItemNumber - nextItemNumber;
@@ -178,7 +219,7 @@ const sorted = (e) => {
   });
 
   rows.forEach(row => tbody.removeChild(row));
-  newRows.forEach(rowed => tbody.appendChild(rowed));
+  rowsList.forEach(row => tbody.appendChild(row));
 
   count > 2 ? count = 1 : count = 2;
 };
