@@ -1,5 +1,105 @@
 'use strict';
 
+const thead = document.querySelector('thead');
+const tbody = document.querySelector('tbody');
+const rows = tbody.querySelectorAll('tr');
+
+thead.addEventListener('click', sortCell);
+thead.addEventListener('dblclick', sortCellReverse);
+tbody.addEventListener('click', selectedRow);
+
+function selectedRow(ev) {
+  const elementRow = ev.target.closest('tr');
+
+  if (!elementRow || !tbody.contains(elementRow)) {
+    return;
+  }
+
+  elementRow.classList.toggle('active');
+}
+
+function converter(string) {
+  return string.replace('$', '').replace(',', '');
+}
+
+function sortCell(ev) {
+  const titleIndex = ev.target.closest('th').cellIndex;
+  const title = ev.target.closest('th');
+  const rowsForSorting = [...rows];
+
+  if (!title || !thead.contains(title)) {
+    return;
+  }
+
+  switch (title.innerText) {
+    case 'Name':
+    case 'Position':
+    case 'Office':
+      rowsForSorting.sort((current, next) => {
+        const currentCellString = current.cells[titleIndex].innerText;
+        const nextCellString = next.cells[titleIndex].innerText;
+
+        return currentCellString.localeCompare(nextCellString);
+      });
+      break;
+
+    case 'Age':
+    case 'Salary':
+      rowsForSorting.sort((current, next) => {
+        const currentCellNum = current.cells[titleIndex].innerText;
+        const nextCellNum = next.cells[titleIndex].innerText;
+        const convertedCurrentNum = converter(currentCellNum);
+        const convertedNextNum = converter(nextCellNum);
+
+        return convertedCurrentNum - convertedNextNum;
+      });
+      break;
+  }
+
+  rows.forEach(row => tbody.removeChild(row));
+
+  rowsForSorting.forEach(newRow => tbody.appendChild(newRow));
+}
+
+function sortCellReverse(ev) {
+  const titleIndexReverse = ev.target.closest('th').cellIndex;
+  const titleReverse = ev.target.closest('th');
+  const rowsForSorting = [...rows];
+
+  if (!titleReverse || !thead.contains(titleReverse)) {
+    return;
+  }
+
+  switch (titleReverse.innerText) {
+    case 'Name':
+    case 'Position':
+    case 'Office':
+      rowsForSorting.sort((current, next) => {
+        const currentCellString = current.cells[titleIndexReverse].innerText;
+        const nextCellString = next.cells[titleIndexReverse].innerText;
+
+        return nextCellString.localeCompare(currentCellString);
+      });
+      break;
+
+    case 'Age':
+    case 'Salary':
+      rowsForSorting.sort((current, next) => {
+        const currentCellNum = current.cells[titleIndexReverse].innerText;
+        const nextCellNum = next.cells[titleIndexReverse].innerText;
+        const convertedCurrentNum = converter(currentCellNum);
+        const convertedNextNum = converter(nextCellNum);
+
+        return convertedNextNum - convertedCurrentNum;
+      });
+      break;
+  }
+
+  rows.forEach(row => tbody.removeChild(row));
+
+  rowsForSorting.forEach(newRow => tbody.appendChild(newRow));
+}
+
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
@@ -63,11 +163,40 @@ form.insertAdjacentHTML('afterbegin', `
 
 document.body.append(form);
 
-const buttonForSaving = document.querySelector('button');
+/* const buttonForSaving = document.querySelector('button'); */
 const input = document.querySelectorAll('input');
 const select = document.querySelector('select');
 
-buttonForSaving.addEventListener('click', saveToTable);
+form.addEventListener('submit', saveToTable);
+
+function conditionChecker(nameInput, position, age) {
+  if (nameInput.length < 4) {
+    pushNotification(
+      150, 10,
+      'Error invalid input',
+      'The length of the name must be longer',
+      'error'
+    );
+  }
+
+  if (position.length < 4) {
+    pushNotification(
+      10, 10,
+      'Error invalid input',
+      'Position input required',
+      'error'
+    );
+  }
+
+  if (age < 18 || age > 90) {
+    pushNotification(
+      290, 10,
+      'Error invalid input',
+      'The age must be between 18 and 90',
+      'error'
+    );
+  }
+}
 
 function saveToTable(ev) {
   const tr = document.createElement('tr');
@@ -80,7 +209,7 @@ function saveToTable(ev) {
   const inputAge = input[2].value;
   const inputSalary = +input[3].value;
 
-  if (inputName.length < 4) {
+  /* if (inputName.length < 4) {
     pushNotification(
       150, 10,
       'Error invalid input',
@@ -89,7 +218,7 @@ function saveToTable(ev) {
     );
   }
 
-  if (!inputPostion) {
+  if (inputPostion.length < 2) {
     pushNotification(
       10, 10,
       'Error invalid input',
@@ -105,9 +234,12 @@ function saveToTable(ev) {
       'The age must be between 18 and 90',
       'error'
     );
-  }
+  } */
+  conditionChecker(inputName, inputPostion, inputAge, inputSalary);
 
-  if (inputName && inputPostion && selectOffice && inputAge && inputSalary
+  if (
+    inputPostion.length >= 4
+    && inputSalary > 0
     && inputName.length >= 4
     && (inputAge >= 18 && inputAge <= 90)
   ) {
@@ -150,104 +282,4 @@ function pushNotification(posTop, posRight, title, description, type) {
   body.append(message);
 
   setTimeout(() => message.remove(), 6000);
-}
-
-const thead = document.querySelector('thead');
-const tbody = document.querySelector('tbody');
-const rows = tbody.querySelectorAll('tr');
-
-thead.addEventListener('click', sortCell);
-thead.addEventListener('dblclick', sortCellReverse);
-tbody.addEventListener('click', selectedRow);
-
-function selectedRow(ev) {
-  const elementRow = ev.target.closest('tr');
-
-  if (!elementRow || !tbody.contains(elementRow)) {
-    return;
-  }
-
-  elementRow.classList.toggle('active');
-}
-
-function converter(string) {
-  return string.replace('$', '').replace(',', '');
-}
-
-function sortCell(ev) {
-  const titleIndex = ev.target.closest('th').cellIndex;
-  const title = ev.target.closest('th');
-  const newRows = [...rows];
-
-  if (!title || !thead.contains(title)) {
-    return;
-  }
-
-  switch (title.innerText) {
-    case 'Name':
-    case 'Position':
-    case 'Office':
-      newRows.sort((current, next) => {
-        const currentCellString = current.cells[titleIndex].innerText;
-        const nextCellString = next.cells[titleIndex].innerText;
-
-        return currentCellString.localeCompare(nextCellString);
-      });
-      break;
-
-    case 'Age':
-    case 'Salary':
-      newRows.sort((current, next) => {
-        const currentCellNum = current.cells[titleIndex].innerText;
-        const nextCellNum = next.cells[titleIndex].innerText;
-        const convertedCurrentNum = converter(currentCellNum);
-        const convertedNextNum = converter(nextCellNum);
-
-        return convertedCurrentNum - convertedNextNum;
-      });
-      break;
-  }
-
-  rows.forEach(row => tbody.removeChild(row));
-
-  newRows.forEach(newRow => tbody.appendChild(newRow));
-}
-
-function sortCellReverse(ev) {
-  const titleIndex = ev.target.closest('th').cellIndex;
-  const title = ev.target.closest('th');
-  const newRows = [...rows];
-
-  if (!title || !thead.contains(title)) {
-    return;
-  }
-
-  switch (title.innerText) {
-    case 'Name':
-    case 'Position':
-    case 'Office':
-      newRows.sort((current, next) => {
-        const currentCellString = current.cells[titleIndex].innerText;
-        const nextCellString = next.cells[titleIndex].innerText;
-
-        return nextCellString.localeCompare(currentCellString);
-      });
-      break;
-
-    case 'Age':
-    case 'Salary':
-      newRows.sort((current, next) => {
-        const currentCellNum = current.cells[titleIndex].innerText;
-        const nextCellNum = next.cells[titleIndex].innerText;
-        const convertedCurrentNum = converter(currentCellNum);
-        const convertedNextNum = converter(nextCellNum);
-
-        return convertedNextNum - convertedCurrentNum;
-      });
-      break;
-  }
-
-  rows.forEach(row => tbody.removeChild(row));
-
-  newRows.forEach(newRow => tbody.appendChild(newRow));
 }
