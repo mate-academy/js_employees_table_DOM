@@ -12,6 +12,10 @@ const selecteHandler = (e) => {
     return;
   }
 
+  [...tbody.children].forEach(employee => {
+    employee.classList.remove('active');
+  });
+
   const selectTr = e.target.parentNode;
 
   selectTr.classList.add('active');
@@ -173,7 +177,7 @@ let count = 1;
 const sorted = (e) => {
   const th = e.target.closest('th');
   const thIndex = th.cellIndex;
-  const rowsList = [...rows];
+  const rowsList = [...tbody.children];
 
   count++;
 
@@ -199,7 +203,7 @@ const sorted = (e) => {
         return nextStringText.localeCompare(currentStringText);
       });
     }
-  };
+  }
 
   rowsList.sort((currentItem, nextItem) => {
     const currentItemNumber = convertToNumber(
