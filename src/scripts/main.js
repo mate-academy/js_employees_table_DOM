@@ -15,22 +15,23 @@ function selectedRow(ev) {
     return;
   }
 
-  const checkingForClass = [...rows].some(x => x.className === 'active');
+  const checkingForClass
+    = [...tbody.children].some(x => x.className === 'active');
 
   if (checkingForClass === true) {
-    [...rows].forEach(x => x.classList.remove('active'));
+    [...tbody.children].forEach(row => row.classList.remove('active'));
   }
   elementRow.classList.add('active');
 }
 
 function converter(string) {
-  return string.replace('$', '').replace(',', '');
+  return string.replace('$', '').replaceAll(',', '');
 }
 
 function sortCell(ev) {
   const titleIndex = ev.target.closest('th').cellIndex;
   const title = ev.target.closest('th');
-  const rowsForSorting = [...rows];
+  const rowsForSorting = [...tbody.children];
 
   if (!title || !thead.contains(title)) {
     return;
@@ -69,7 +70,7 @@ function sortCell(ev) {
 function sortCellReverse(ev) {
   const titleIndexReverse = ev.target.closest('th').cellIndex;
   const titleReverse = ev.target.closest('th');
-  const rowsForSorting = [...rows];
+  const rowsForSorting = [...tbody.children];
 
   if (!titleReverse || !thead.contains(titleReverse)) {
     return;
