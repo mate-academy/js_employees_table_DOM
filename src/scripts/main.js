@@ -8,9 +8,7 @@ const sortFunction = (toBeSorted, columnIndex) => {
   const sorted = [...toBeSorted];
   const content = sorted[0].children[columnIndex].textContent;
 
-  content.replace(/\D/g, '');
-
-  if (content === '') {
+  if (content.replace(/\D/g, '') === '') {
     sorted.sort((one, two) => {
       const first = one.children[columnIndex].textContent;
       const second = two.children[columnIndex].textContent;
@@ -27,7 +25,7 @@ const sortFunction = (toBeSorted, columnIndex) => {
     });
   }
 
-  if (!isNaN(content)) {
+  if (!isNaN(content.replace(/\D/g, ''))) {
     sorted.sort((one, two) => {
       const first = one.children[columnIndex].textContent.replace(/\D/g, '');
       const second = two.children[columnIndex].textContent.replace(/\D/g, '');
