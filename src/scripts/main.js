@@ -120,8 +120,11 @@ function addNewEmployee(e) {
   const salary = '$' + (Number(data.get('salary')).toLocaleString('en'));
 
   if (employeeName.length < 4) {
-    return createNotification('error', 'Error',
-      'Name should consist of 5 or more letters');
+    return createNotification(
+      'error',
+      'Error',
+      'Name should consist of 5 or more letters'
+    );
   }
 
   if (!position) {
@@ -133,8 +136,11 @@ function addNewEmployee(e) {
   }
 
   if (age < 18 || age > 90) {
-    return createNotification('error', 'Error',
-      'Age should not be less than 18 or more than 90');
+    return createNotification(
+      'error',
+      'Error',
+      'Age should not be less than 18 or more than 90'
+    );
   }
 
   tbody.insertAdjacentHTML('beforeend', `
@@ -152,6 +158,49 @@ function addNewEmployee(e) {
   form.elements.position.value = '';
   form.elements.salary.value = '';
 
-  return createNotification('success', 'Success',
-    'New employee was successfully added');
+  return createNotification(
+    'success',
+    'Success',
+    'New employee was successfully added'
+  );
 }
+
+let editedElement = null;
+
+const adjustElement = (e) => {
+  e.preventDefault();
+
+  if (editedElement) {
+    return;
+  }
+
+  editedElement = e.target;
+
+  const prevText = editedElement.innerText;
+  const newElementTag = editedElement.tagName.toLowerCase();
+  const newElement = document.createElement(newElementTag);
+  const newInput = document.createElement('input');
+
+  newInput.className = 'cell-input';
+  newInput.value = prevText;
+
+  newInput.addEventListener('change', () => {
+    newElement.innerText = newInput.value !== '' ? newInput.value : prevText;
+  });
+
+  newInput.addEventListener('blur', (ev) => {
+    ev.target.replaceWith(newElement);
+    editedElement = null;
+  });
+
+  newInput.addEventListener('keydown', (eve) => {
+    if (eve.code === 'Enter') {
+      eve.target.replaceWith(newElement);
+      editedElement = null;
+    }
+  });
+
+  editedElement.replaceWith(newInput);
+};
+
+tbody.addEventListener('dblclick', adjustElement);
