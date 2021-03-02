@@ -15,7 +15,12 @@ function selectedRow(ev) {
     return;
   }
 
-  elementRow.classList.toggle('active');
+  const checkingForClass = [...rows].some(x => x.className === 'active');
+
+  if (checkingForClass === true) {
+    [...rows].forEach(x => x.classList.remove('active'));
+  }
+  elementRow.classList.add('active');
 }
 
 function converter(string) {
