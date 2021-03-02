@@ -1,10 +1,9 @@
 'use strict';
 
-const table = document.querySelectorAll('table tbody tr');
+const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
-const thead = document.querySelectorAll('table thead th');
+const rows = [...tbody.rows];
 
-const rows = [...table];
 let clicked = 0;
 let pressedIndex = 0;
 
@@ -12,29 +11,40 @@ const convert = (string) => {
   return Number(string.replace(/[$,]/g, ''));
 };
 
-thead.forEach((title, index) => title.addEventListener('click', () => {
+const sortColumn = (e) => {
+  const index = e.target.cellIndex;
+  let sorted;
+
   if (pressedIndex !== index) {
     clicked = 0;
   }
+
   pressedIndex = index;
   clicked++;
 
-  const sorted = rows.sort(
-    (currentRow, nextRow) => {
+  if (Number.isNaN(convert(rows[0].cells[index].innerText))) {
+    sorted = rows.sort(
+      (currentRow, nextRow) => {
+        const currentValue = currentRow.cells[index].innerText;
+        const nextValue = nextRow.cells[index].innerText;
+
+        return currentValue.localeCompare(nextValue);
+      });
+  } else {
+    sorted = rows.sort((currentRow, nextRow) => {
       const currentValue = currentRow.cells[index].innerText;
       const nextValue = nextRow.cells[index].innerText;
 
-      if (Number.isNaN(convert(rows[0].cells[index].innerText))) {
-        return currentValue.localeCompare(nextValue);
-      }
-
       return convert(currentValue) - convert(nextValue);
     });
+  }
 
-  (clicked % 2 !== 0)
+  clicked % 2 !== 0
     ? tbody.append(...sorted)
     : tbody.append(...sorted.reverse());
-}));
+};
+
+thead.addEventListener('click', sortColumn);
 
 const addClass = (e) => {
   const selected = e.currentTarget;
@@ -51,7 +61,7 @@ document.body.insertAdjacentHTML('beforeend', `
       <input name="name" type="text" data-qa="name" required>
     </label>
     <label>Position:
-      <input name="position" type="text" data-qa="position" required>
+      <input name="position" type="text" data-qa="position">
     </label>
     <label>Office:
       <select name="office" type="text" data-qa="office" required>
@@ -114,7 +124,7 @@ function addNewEmployee(e) {
       'Name should consist of 5 or more letters');
   }
 
-  if (position.length < 4) {
+  if (!position) {
     return createNotification('error', 'Error',
       'Please indicate the correct position');
   }
@@ -133,6 +143,11 @@ function addNewEmployee(e) {
       <td>${salary}</td>
     </tr>
   `);
+
+  form.elements.name.value = '';
+  form.elements.age.value = '';
+  form.elements.position.value = '';
+  form.elements.salary.value = '';
 
   return createNotification('success', 'Success',
     'New employee was successfully added');
