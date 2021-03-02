@@ -163,11 +163,11 @@ form.insertAdjacentHTML('afterbegin', `
 
 document.body.append(form);
 
-/* const buttonForSaving = document.querySelector('button'); */
+const buttonForSaving = document.querySelector('button');
 const input = document.querySelectorAll('input');
 const select = document.querySelector('select');
 
-form.addEventListener('submit', saveToTable);
+buttonForSaving.addEventListener('click', saveToTable);
 
 function conditionChecker(nameInput, position, age) {
   if (nameInput.length < 4) {
@@ -179,7 +179,7 @@ function conditionChecker(nameInput, position, age) {
     );
   }
 
-  if (position.length < 4) {
+  if (!position.length) {
     pushNotification(
       10, 10,
       'Error invalid input',
@@ -209,36 +209,10 @@ function saveToTable(ev) {
   const inputAge = input[2].value;
   const inputSalary = +input[3].value;
 
-  /* if (inputName.length < 4) {
-    pushNotification(
-      150, 10,
-      'Error invalid input',
-      'The length of the name must be longer',
-      'error'
-    );
-  }
-
-  if (inputPostion.length < 2) {
-    pushNotification(
-      10, 10,
-      'Error invalid input',
-      'Position input required',
-      'error'
-    );
-  }
-
-  if (inputAge < 18 || inputAge > 90) {
-    pushNotification(
-      290, 10,
-      'Error invalid input',
-      'The age must be between 18 and 90',
-      'error'
-    );
-  } */
   conditionChecker(inputName, inputPostion, inputAge, inputSalary);
 
   if (
-    inputPostion.length >= 4
+    inputPostion
     && inputSalary > 0
     && inputName.length >= 4
     && (inputAge >= 18 && inputAge <= 90)
