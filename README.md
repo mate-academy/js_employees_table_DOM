@@ -1,5 +1,5 @@
 1. Replace `<your_account>` with your Github username in the link
-    - [DEMO LINK](https://<your_account>.github.io/js_employees_table_DOM/)
+    - [DEMO LINK](https://andriypt82.github.io/js_employees_table_DOM/)
 2. Follow [this instructions](https://mate-academy.github.io/layout_task-guideline/)
     - Run `npm run test` command to test your code;
     - Run `npm run test:only -- -n` to run fast test ignoring linter;
@@ -37,7 +37,7 @@ Start table:
 - The form should have 4 inputs, 1 select and submit button.
 - Put inputs inside labels:
 ```html
-<label>Name: <input name="name" type="text"></label>
+<label>Name: <input nnameame="name" type="text"></label>
 ```
 - Add qa attributes for each input field:
 ```
