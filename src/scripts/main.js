@@ -16,7 +16,7 @@ function selectedRow(ev) {
   }
 
   const checkingForClass
-    = [...tbody.children].some(x => x.className === 'active');
+    = [...tbody.children].some(row => row.className === 'active');
 
   if (checkingForClass === true) {
     [...tbody.children].forEach(row => row.classList.remove('active'));
