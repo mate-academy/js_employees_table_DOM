@@ -61,7 +61,7 @@ document.body.insertAdjacentHTML('beforeend', `
       <input name="name" type="text" data-qa="name" required>
     </label>
     <label>Position:
-      <input name="position" type="text" data-qa="position">
+      <input name="position" type="text" data-qa="position" required>
     </label>
     <label>Office:
       <select name="office" type="text" data-qa="office" required>
@@ -125,8 +125,11 @@ function addNewEmployee(e) {
   }
 
   if (!position) {
-    return createNotification('error', 'Error',
-      'Please indicate the correct position');
+    return createNotification(
+      'error',
+      'Error',
+      'Please indicate the correct position',
+    );
   }
 
   if (age < 18 || age > 90) {
