@@ -4,8 +4,8 @@ const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 const rows = [...tbody.rows];
 
-let clicked = 0;
-let pressedIndex = 0;
+let numberOfClicks = 0;
+let indexOfPressedCell = 0;
 
 const convert = (string) => {
   return Number(string.replace(/[$,]/g, ''));
@@ -13,33 +13,40 @@ const convert = (string) => {
 
 const sortColumn = (e) => {
   const index = e.target.cellIndex;
+  const title = e.target.closest('th');
   let sorted;
 
-  if (pressedIndex !== index) {
-    clicked = 0;
+  if (indexOfPressedCell !== index) {
+    numberOfClicks = 0;
   }
 
-  pressedIndex = index;
-  clicked++;
+  indexOfPressedCell = index;
+  numberOfClicks++;
 
-  if (Number.isNaN(convert(rows[0].cells[index].innerText))) {
-    sorted = rows.sort(
-      (currentRow, nextRow) => {
+  switch (title.innerText) {
+    case 'Name':
+    case 'Position':
+    case 'Office':
+      sorted = rows.sort(
+        (currentRow, nextRow) => {
+          const currentValue = currentRow.cells[index].innerText;
+          const nextValue = nextRow.cells[index].innerText;
+
+          return currentValue.localeCompare(nextValue);
+        });
+      break;
+
+    case 'Age':
+    case 'Salary':
+      sorted = rows.sort((currentRow, nextRow) => {
         const currentValue = currentRow.cells[index].innerText;
         const nextValue = nextRow.cells[index].innerText;
 
-        return currentValue.localeCompare(nextValue);
+        return convert(currentValue) - convert(nextValue);
       });
-  } else {
-    sorted = rows.sort((currentRow, nextRow) => {
-      const currentValue = currentRow.cells[index].innerText;
-      const nextValue = nextRow.cells[index].innerText;
-
-      return convert(currentValue) - convert(nextValue);
-    });
   }
 
-  clicked % 2 !== 0
+  numberOfClicks % 2 !== 0
     ? tbody.append(...sorted)
     : tbody.append(...sorted.reverse());
 };
@@ -47,13 +54,13 @@ const sortColumn = (e) => {
 thead.addEventListener('click', sortColumn);
 
 const addClass = (e) => {
-  const selected = e.currentTarget;
+  const selected = e.target.closest('tr');
 
   rows.forEach(row => row.classList.remove('active'));
   selected.classList.add('active');
 };
 
-rows.forEach(row => row.addEventListener('click', addClass));
+tbody.addEventListener('click', addClass);
 
 document.body.insertAdjacentHTML('beforeend', `
   <form class='new-employee-form'>
@@ -61,7 +68,7 @@ document.body.insertAdjacentHTML('beforeend', `
       <input name="name" type="text" data-qa="name" required>
     </label>
     <label>Position:
-      <input name="position" type="text" data-qa="position" required>
+      <input name="position" type="text" data-qa="position">
     </label>
     <label>Office:
       <select name="office" type="text" data-qa="office" required>
@@ -118,8 +125,11 @@ function addNewEmployee(e) {
   const age = data.get('age');
   const position = data.get('position');
   const salary = '$' + (Number(data.get('salary')).toLocaleString('en'));
+  const minAge = 18;
+  const maxAge = 90;
+  const minNameLength = 4;
 
-  if (employeeName.length < 4) {
+  if (employeeName.length < minNameLength) {
     return createNotification(
       'error',
       'Error',
@@ -135,7 +145,7 @@ function addNewEmployee(e) {
     );
   }
 
-  if (age < 18 || age > 90) {
+  if (age < minAge || age > maxAge) {
     return createNotification(
       'error',
       'Error',
@@ -165,19 +175,19 @@ function addNewEmployee(e) {
   );
 }
 
-let editedElement = null;
+let selectedElement;
 
 const adjustElement = (e) => {
   e.preventDefault();
 
-  if (editedElement) {
+  if (selectedElement) {
     return;
   }
 
-  editedElement = e.target;
+  selectedElement = e.target;
 
-  const prevText = editedElement.innerText;
-  const newElementTag = editedElement.tagName.toLowerCase();
+  const prevText = selectedElement.innerText;
+  const newElementTag = selectedElement.tagName.toLowerCase();
   const newElement = document.createElement(newElementTag);
   const newInput = document.createElement('input');
 
@@ -190,17 +200,17 @@ const adjustElement = (e) => {
 
   newInput.addEventListener('blur', (ev) => {
     ev.target.replaceWith(newElement);
-    editedElement = null;
+    selectedElement = null;
   });
 
   newInput.addEventListener('keydown', (eve) => {
     if (eve.code === 'Enter') {
       eve.target.replaceWith(newElement);
-      editedElement = null;
+      selectedElement = null;
     }
   });
 
-  editedElement.replaceWith(newInput);
+  selectedElement.replaceWith(newInput);
 };
 
 tbody.addEventListener('dblclick', adjustElement);
