@@ -8,7 +8,9 @@ const employeeForm = document.createElement('form');
 employeeForm.classList.add('new-employee-form');
 
 const selecteHandler = (e) => {
-  if (!e.target) {
+  const selectRow = e.target.closest('tr');
+
+  if (!selectRow || !tbody.contains(selectRow)) {
     return;
   }
 
@@ -91,17 +93,17 @@ const select = employeeForm.querySelector('select');
 const addToForm = (e) => {
   e.preventDefault();
 
-  const inputName = input[0].value;
-  const inputPosition = input[1].value;
-  const selectOffice = select.value;
-  const inputAge = input[2].value;
-  const inputSalary = +input[3].value;
+  const inputValueName = input[0].value;
+  const inputValuePosition = input[1].value;
+  const selectValueOffice = select.value;
+  const inputValueAge = input[2].value;
+  const inputValueSalary = +input[3].value;
 
   const minLengthOfInput = 4;
   const minAgeForInput = 18;
   const maxAgeForInput = 90;
 
-  if (inputName.length < 4) {
+  if (inputValueName.length < 4) {
     pushNotification(
       150,
       -0,
@@ -111,7 +113,7 @@ const addToForm = (e) => {
     );
   }
 
-  if (!inputPosition) {
+  if (!inputValuePosition) {
     pushNotification(
       -0,
       -0,
@@ -121,7 +123,7 @@ const addToForm = (e) => {
     );
   }
 
-  if (!inputSalary) {
+  if (!inputValueSalary) {
     pushNotification(
       450,
       -0,
@@ -131,7 +133,7 @@ const addToForm = (e) => {
     );
   }
 
-  if (inputAge < minAgeForInput || inputAge > maxAgeForInput) {
+  if (inputValueAge < minAgeForInput || inputValueAge > maxAgeForInput) {
     pushNotification(
       300,
       -0,
@@ -142,20 +144,20 @@ const addToForm = (e) => {
   }
 
   if (
-    inputName.length >= minLengthOfInput
-    && inputPosition
-    && inputSalary
+    inputValueName.length >= minLengthOfInput
+    && inputValuePosition
+    && inputValueSalary
     && (
-      inputAge >= minAgeForInput
-      && inputAge <= maxAgeForInput
+      inputValueAge >= minAgeForInput
+      && inputValueAge <= maxAgeForInput
     )
   ) {
     tbody.insertAdjacentHTML('beforeend', `<tr>
-      <td>${inputName}</td>
-      <td>${inputPosition}</td>
-      <td>${selectOffice}</td>
-      <td>${inputAge}</td>
-      <td>$${inputSalary.toLocaleString('en')}</td>
+      <td>${inputValueName}</td>
+      <td>${inputValuePosition}</td>
+      <td>${selectValueOffice}</td>
+      <td>${inputValueAge}</td>
+      <td>$${inputValueSalary.toLocaleString('en')}</td>
     </tr>`);
 
     pushNotification(
@@ -181,51 +183,47 @@ const sorted = (e) => {
 
   count++;
 
-  if (!th || !thead.contains(th)) {
+  if (!thead.contains(th)) {
     return;
   }
 
-  if (thIndex === 0 || thIndex === 1) {
-    if (count % 2 === 0) {
+  switch (th.innerText) {
+    case 'Name':
+    case 'Position' :
       rowsList.sort((currentString, nextString) => {
         const currentStringText = currentString.cells[thIndex].innerText;
         const nextStringText = nextString.cells[thIndex].innerText;
 
-        return currentStringText.localeCompare(nextStringText);
-      });
-    }
+        if (count % 2 === 0) {
+          return currentStringText.localeCompare(nextStringText);
+        }
 
-    if (count % 2 !== 0) {
-      rowsList.sort((currentString, nextString) => {
-        const currentStringText = currentString.cells[thIndex].innerText;
-        const nextStringText = nextString.cells[thIndex].innerText;
-
-        return nextStringText.localeCompare(currentStringText);
+        if (count % 2 !== 0) {
+          return nextStringText.localeCompare(currentStringText);
+        }
       });
-    }
+      break;
+
+    case 'Age':
+    case 'Salary':
+      rowsList.sort((currentItem, nextItem) => {
+        const currentItemNumber
+          = convertToNumber(currentItem.cells[thIndex].innerText);
+        const nextItemNumber
+          = convertToNumber(nextItem.cells[thIndex].innerText);
+
+        if (count % 2 === 0) {
+          return currentItemNumber - nextItemNumber;
+        }
+
+        if (count % 2 !== 0) {
+          return nextItemNumber - currentItemNumber;
+        }
+      });
   }
-
-  rowsList.sort((currentItem, nextItem) => {
-    const currentItemNumber = convertToNumber(
-      currentItem.cells[thIndex].innerText
-    );
-    const nextItemNumber = convertToNumber(
-      nextItem.cells[thIndex].innerText
-    );
-
-    if (count % 2 === 0) {
-      return currentItemNumber - nextItemNumber;
-    }
-
-    if (count % 2 !== 0) {
-      return nextItemNumber - currentItemNumber;
-    }
-  });
 
   rows.forEach(row => tbody.removeChild(row));
   rowsList.forEach(row => tbody.appendChild(row));
-
-  count > 2 ? count = 1 : count = 2;
 };
 
 submit.addEventListener('click', addToForm);
