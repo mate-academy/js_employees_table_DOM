@@ -5,6 +5,7 @@ const tableBody = document.querySelector('tbody');
 const tableHead = document.querySelector('thead');
 
 const minNameLength = 4;
+const minPositionLength = 4;
 const minAge = 18;
 const maxAge = 90;
 
@@ -165,8 +166,11 @@ function createNotification(type, title, description, posTop, posRight) {
 function validateFormData(employee) {
   const employeeName = employee.name;
   const employeeAge = formatNumber(employee.age);
+  const employeePosition = employee.position;
 
-  if (employeeName.length < minNameLength) {
+  if (
+    employeeName.length < minNameLength || employeePosition < minPositionLength
+  ) {
     return false;
   }
 
