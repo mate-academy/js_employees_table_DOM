@@ -175,42 +175,40 @@ function addNewEmployee(e) {
   );
 }
 
-let selectedElement;
+let selectedField = null;
 
-const adjustElement = (e) => {
+const handleDblclickOnTableField = (e) => {
   e.preventDefault();
 
-  if (selectedElement) {
+  if (selectedField) {
     return;
   }
 
-  selectedElement = e.target;
+  selectedField = e.target;
 
-  const prevText = selectedElement.innerText;
-  const newElementTag = selectedElement.tagName.toLowerCase();
-  const newElement = document.createElement(newElementTag);
-  const newInput = document.createElement('input');
+  const text = selectedField.innerText;
+  const input = document.createElement('input');
 
-  newInput.className = 'cell-input';
-  newInput.value = prevText;
+  input.className = 'cell-input';
+  input.value = text;
 
-  newInput.addEventListener('change', () => {
-    newElement.innerText = newInput.value !== '' ? newInput.value : prevText;
+  input.addEventListener('change', () => {
+    selectedField.innerText = input.value !== '' ? input.value : text;
   });
 
-  newInput.addEventListener('blur', (ev) => {
-    ev.target.replaceWith(newElement);
-    selectedElement = null;
+  input.addEventListener('blur', (ev) => {
+    ev.target.replaceWith(selectedField);
+    selectedField = null;
   });
 
-  newInput.addEventListener('keydown', (eve) => {
+  input.addEventListener('keydown', (eve) => {
     if (eve.code === 'Enter') {
-      eve.target.replaceWith(newElement);
-      selectedElement = null;
+      eve.target.replaceWith(selectedField);
+      selectedField = null;
     }
   });
 
-  selectedElement.replaceWith(newInput);
+  selectedField.replaceWith(input);
 };
 
-tbody.addEventListener('dblclick', adjustElement);
+tbody.addEventListener('dblclick', handleDblclickOnTableField);
