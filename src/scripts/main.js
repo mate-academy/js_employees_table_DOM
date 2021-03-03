@@ -165,7 +165,7 @@ form.insertAdjacentHTML('afterbegin', `
     >
   </label>
   <button type="submit">Save to table</button>
-  `);
+`);
 
 document.body.append(form);
 
