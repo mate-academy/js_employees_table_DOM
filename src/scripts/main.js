@@ -56,25 +56,14 @@ body.insertAdjacentHTML('beforeend', `
   name="new-employee"
   method="POST"
 >
-  <label>
-    Name:
-    <input
-      type="text"
-      name="name"
-      data-qa="name"
-    >
+  <label> Name:
+    <input type="text" name="name" data-qa="name" required>
   </label>
-  <label>
-    Position:
-    <input
-      type="text"
-      name="position"
-      data-qa="position"
-    >
+  <label> Position:
+    <input type="text" name="position" data-qa="position" required>
   </label>
-  <label>
-    Office:
-    <select id="country" data-qa="office">
+  <label> Office:
+    <select id="country" data-qa="office" required>
       <option value="Tokyo">Tokyo</option>
       <option value="Singapore">Singapore</option>
       <option value="London">London</option>
@@ -83,25 +72,13 @@ body.insertAdjacentHTML('beforeend', `
       <option value=San Francisco">San Francisco</option>
     </select>
   </label>
-  <label>
-    Age:
-    <input
-      type="number"
-      name="age"
-      data-qa="age"
-    >
+  <label> Age:
+    <input type="number" name="age" data-qa="age" required>
   </label>
-  <label>
-    Salary:
-    <input
-      type="number"
-      name="salary"
-      data-qa="salary"
-    >
+  <label> Salary:
+    <input type="number" name="salary" data-qa="salary" required>
   </label>
-  <button type="submit">
-    Save to table
-  </button>
+  <button type="submit"> Save to table </button>
 </form>
 `);
 
@@ -119,45 +96,23 @@ form.addEventListener('submit', function(e) {
   }, {}
   );
 
-  let notification;
+  const minNameLength = 4;
+  const minAge = 18;
+  const maxAge = 90;
 
-  if (employee.name.length <= 4) {
-    body.insertAdjacentHTML('beforeend', `
-  <div class="notification warning" data-qa="notification">
-    <h2 class="title">Warning</h2>
-    <p>
-      Your name is invalid, it has to be at least 5 letters long
-    </p>
-  </div>
-      `);
-    notification = document.querySelector('.notification');
-    setTimeout(() => notification.remove(), 3000);
+  if (employee.name.length <= minNameLength) {
+    pushNotification('Warning message',
+      'Sorry, but your name has to consist at least 4 letters', 'warning');
 
     return;
-  } else if (employee.age < 18 || employee.age > 90) {
-    body.insertAdjacentHTML('beforeend', `
-  <div class="notification error" data-qa="notification">
-    <h2 class="title">Error</h2>
-    <p>
-      Your age is invalid, age is valid only in the range from 18 to 90
-    </p>
-  </div>
-    `);
-    notification = document.querySelector('.notification');
-    setTimeout(() => notification.remove(), 3000);
+  } else if (employee.age < minAge || employee.age > maxAge) {
+    pushNotification('Error message',
+      'You can not add your profile due to your age', 'error');
 
     return;
   } else {
-    body.insertAdjacentHTML('beforeend', `
-    <div class="notification success" data-qa="notification">
-      <h2 class="title">Success</h2>
-      <p>
-        Well done, You have been added to the table;
-      </p>
-    </div>
-      `);
-    notification = document.querySelector('.notification');
-    setTimeout(() => notification.remove(), 3000);
+    pushNotification('Success message',
+      'You have done it, you have added your profile', 'success');
   }
 
   tableBody.insertAdjacentHTML('afterend', `
@@ -207,3 +162,24 @@ tableBody.addEventListener('dblclick', (e) => {
     });
   });
 });
+
+const pushNotification = (title, description, type) => {
+  const notification = document.createElement('div');
+  const notificationTitle = document.createElement('h2');
+  const notificationText = document.createElement('p');
+
+  notification.className = 'notification';
+  notification.classList.add(type);
+
+  notificationTitle.innerText = title;
+  notificationTitle.className = 'title';
+
+  notificationText.innerText = description;
+
+  body.append(notification);
+  notification.append(notificationTitle, notificationText);
+
+  setTimeout(function() {
+    return notification.remove();
+  }, 3000);
+};
