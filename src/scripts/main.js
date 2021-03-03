@@ -4,19 +4,19 @@ const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 const rows = tbody.querySelectorAll('tr');
 
-thead.addEventListener('click', sortCell);
-thead.addEventListener('dblclick', sortCellReverse);
-tbody.addEventListener('click', selectedRow);
+thead.addEventListener('click', handleSortByCell);
+thead.addEventListener('dblclick', handleSortByCellReverse);
+tbody.addEventListener('click', handleSelectRow);
 
-function selectedRow(ev) {
+function handleSelectRow(ev) {
   const elementRow = ev.target.closest('tr');
 
   if (!elementRow || !tbody.contains(elementRow)) {
     return;
   }
 
-  const checkingForClass
-    = [...tbody.children].some(row => row.className === 'active');
+  const checkingForClass = [...tbody.children]
+    .some(row => row.className === 'active');
 
   if (checkingForClass === true) {
     [...tbody.children].forEach(row => row.classList.remove('active'));
@@ -28,7 +28,7 @@ function converter(string) {
   return string.replace('$', '').replaceAll(',', '');
 }
 
-function sortCell(ev) {
+function handleSortByCell(ev) {
   const titleIndex = ev.target.closest('th').cellIndex;
   const title = ev.target.closest('th');
   const rowsForSorting = [...tbody.children];
@@ -67,7 +67,7 @@ function sortCell(ev) {
   rowsForSorting.forEach(newRow => tbody.appendChild(newRow));
 }
 
-function sortCellReverse(ev) {
+function handleSortByCellReverse(ev) {
   const titleIndexReverse = ev.target.closest('th').cellIndex;
   const titleReverse = ev.target.closest('th');
   const rowsForSorting = [...tbody.children];
@@ -113,70 +113,72 @@ form.method = 'GET';
 form.action = '#';
 
 form.insertAdjacentHTML('afterbegin', `
-<label>Name:
-  <input
-    class="cell-input"
-    type="text"
-    name="name"
-    data-qa="name"
-    required
-  >
-</label>
-<label>Position:
-  <input
-    class="cell-input"
-    type="text"
-    name="position"
-    data-qa="position"
-    required
-  >
-</label>
-<label>Office:
-  <select
-    class="cell-input"
-    name="office"
-    data-qa="office"
-    required
-  >
-    <option value="Tokyo">Tokyo</option>
-    <option value="Singapore">Singapore</option>
-    <option value="London">London</option>
-    <option value="New York">New York</option>
-    <option value="Edinburgh">Edinburgh</option>
-    <option value="San Francisco">San Francisco</option>
-  </select>
-</label>
-<label>Age:
-  <input
-    class="cell-input"
-    type="number"
-    name="age"
-    data-qa="age"
-    required
-  >
-</label>
-<label>Salary:
-  <input
-    class="cell-input"
-    type="number"
-    name="salary"
-    data-qa="salary"
-    required
-  >
-</label>
-<button type="submit">Save to table</button>
+  <label>Name:
+    <input
+      class="cell-input name"
+      type="text"
+      name="name"
+      data-qa="name"
+      required
+    >
+  </label>
+  <label>Position:
+    <input
+      class="cell-input position"
+      type="text"
+      name="position"
+      data-qa="position"
+      required
+    >
+  </label>
+  <label>Office:
+    <select
+      class="cell-input office"
+      name="office"
+      data-qa="office"
+      required
+    >
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    </select>
+  </label>
+  <label>Age:
+    <input
+      class="cell-input age"
+      type="number"
+      name="age"
+      data-qa="age"
+      required
+    >
+  </label>
+  <label>Salary:
+    <input
+      class="cell-input salary"
+      type="number"
+      name="salary"
+      data-qa="salary"
+      required
+    >
+  </label>
+  <button type="submit">Save to table</button>
   `);
 
 document.body.append(form);
 
-const buttonForSaving = document.querySelector('button');
-const input = document.querySelectorAll('input');
-const select = document.querySelector('select');
+const saveButton = form.querySelector('button');
 
-buttonForSaving.addEventListener('click', saveToTable);
+saveButton.addEventListener('click', saveToTable);
 
 function conditionChecker(nameInput, position, age) {
-  if (nameInput.length < 4) {
+  const minLengthOfName = 4;
+  const minAge = 18;
+  const maxAge = 90;
+
+  if (nameInput.length < minLengthOfName) {
     pushNotification(
       150, 10,
       'Error invalid input',
@@ -194,7 +196,7 @@ function conditionChecker(nameInput, position, age) {
     );
   }
 
-  if (age < 18 || age > 90) {
+  if (age < minAge || age > maxAge) {
     pushNotification(
       290, 10,
       'Error invalid input',
@@ -209,11 +211,11 @@ function saveToTable(ev) {
 
   ev.preventDefault();
 
-  const inputName = input[0].value;
-  const inputPostion = input[1].value;
-  const selectOffice = select.value;
-  const inputAge = input[2].value;
-  const inputSalary = +input[3].value;
+  const inputName = form.querySelector('.name').value;
+  const inputPostion = form.querySelector('.position').value;
+  const selectOffice = form.querySelector('.office').value;
+  const inputAge = form.querySelector('.age').value;
+  const inputSalary = +form.querySelector('.salary').value;
 
   conditionChecker(inputName, inputPostion, inputAge, inputSalary);
 
@@ -224,11 +226,11 @@ function saveToTable(ev) {
     && (inputAge >= 18 && inputAge <= 90)
   ) {
     tr.insertAdjacentHTML('afterbegin', `
-  <td>${inputName}</td>
-  <td>${inputPostion}</td>
-  <td>${selectOffice}</td>
-  <td>${inputAge}</td>
-  <td>${'$' + inputSalary.toLocaleString('en')}</td>
+      <td>${inputName}</td>
+      <td>${inputPostion}</td>
+      <td>${selectOffice}</td>
+      <td>${inputAge}</td>
+      <td>${'$' + inputSalary.toLocaleString('en')}</td>
   `);
     tbody.appendChild(tr);
 
@@ -241,7 +243,13 @@ function saveToTable(ev) {
   }
 }
 
-function pushNotification(posTop, posRight, title, description, type) {
+function pushNotification(
+  positionTop,
+  positionRight,
+  title,
+  description,
+  type
+) {
   const body = document.querySelector('body');
   const message = document.createElement('div');
   const messageTitle = document.createElement('h2');
@@ -249,8 +257,8 @@ function pushNotification(posTop, posRight, title, description, type) {
 
   message.classList.add('notification', type);
   message.dataset.qa = 'notification';
-  message.style.top = posTop + 'px';
-  message.style.right = posRight + 'px';
+  message.style.top = positionTop + 'px';
+  message.style.right = positionRight + 'px';
 
   messageTitle.innerText = title;
   messageTitle.classList.add('title');
