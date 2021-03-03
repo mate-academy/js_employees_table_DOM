@@ -10,19 +10,17 @@ tableHead.addEventListener('click', (e) => {
   const { target } = e;
   const { cellIndex } = target;
 
+  isSorted = isSorted === undefined ? cellIndex : undefined;
+
   function getNumber(value) {
     return +value.replace(/[^0-9]/g, '');
   }
-
-  isSorted = cellIndex;
 
   const sorted = [...tableBody.rows].sort((currentElement, nextElement) => {
     const currentValue = currentElement.cells[cellIndex].innerText;
     const nextValue = nextElement.cells[cellIndex].innerText;
 
-    if (isSorted) {
-      isSorted = undefined;
-
+    if (isSorted !== undefined) {
       return getNumber(currentValue)
         ? getNumber(currentValue) - getNumber(nextValue)
         : currentValue.localeCompare(nextValue);
@@ -44,35 +42,61 @@ tableBody.addEventListener('click', (e) => {
 });
 
 body.insertAdjacentHTML('beforeend', `
-<form
-  class="new-employee-form"
-  name="new-employee"
-  method="POST"
->
-  <label> Name:
-    <input type="text" name="name" data-qa="name" required>
-  </label>
-  <label> Position:
-    <input type="text" name="position" data-qa="position" required>
-  </label>
-  <label> Office:
-    <select id="country" data-qa="office" required>
-      <option value="Tokyo">Tokyo</option>
-      <option value="Singapore">Singapore</option>
-      <option value="London">London</option>
-      <option value="New York">New York</option>
-      <option value="Edinburgh">Edinburgh</option>
-      <option value=San Francisco">San Francisco</option>
-    </select>
-  </label>
-  <label> Age:
-    <input type="number" name="age" data-qa="age" required>
-  </label>
-  <label> Salary:
-    <input type="number" name="salary" data-qa="salary" required>
-  </label>
-  <button type="submit"> Save to table </button>
-</form>
+  <form
+    class="new-employee-form"
+    name="new-employee"
+    method="POST"
+  >
+    <label>
+      Name:
+      <input
+        type="text"
+        name="name"
+        data-qa="name"
+        required
+      >
+    </label>
+    <label>
+      Position:
+      <input
+        type="text"
+        name="position"
+        data-qa="position"
+      >
+    </label>
+    <label>
+      Office:
+      <select id="country" data-qa="office" required>
+        <option value="Tokyo">Tokyo</option>
+        <option value="Singapore">Singapore</option>
+        <option value="London">London</option>
+        <option value="New York">New York</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="San Francisco">San Francisco</option>
+      </select>
+    </label>
+    <label>
+      Age:
+      <input
+        type="number"
+        name="age"
+        data-qa="age"
+        required
+      >
+    </label>
+    <label>
+      Salary:
+      <input
+        type="number"
+        name="salary"
+        data-qa="salary"
+        required
+      >
+    </label>
+    <button type="submit">
+      Save to table
+    </button>
+  </form>
 `);
 
 const form = document.querySelector('form');
@@ -80,9 +104,9 @@ const form = document.querySelector('form');
 form.addEventListener('submit', function(e) {
   e.preventDefault();
 
-  const inputsValues = document.querySelectorAll('form label');
+  const inputValues = document.querySelectorAll('form label');
 
-  const employee = [...inputsValues].reduce((accumulator, item) => {
+  const newEmployee = [...inputValues].reduce((accumulator, item) => {
     accumulator[item.children[0].dataset.qa] = item.children[0].value;
 
     return accumulator;
@@ -93,31 +117,71 @@ form.addEventListener('submit', function(e) {
   const minAge = 18;
   const maxAge = 90;
 
-  if (employee.name.length <= minNameLength) {
-    pushNotification('Warning message',
-      'Sorry, but your name has to consist at least 4 letters', 'warning');
-
-    return;
-  } else if (employee.age < minAge || employee.age > maxAge) {
-    pushNotification('Error message',
-      'You can not add your profile due to your age', 'error');
-
-    return;
-  } else {
-    pushNotification('Success message',
-      'You have done it, you have added your profile', 'success');
+  if (newEmployee.name.length < minNameLength) {
+    return throwNotification(
+      'Warning message',
+      'Sorry, but your name has to consist at least 4 letters',
+      'error'
+    );
+  } else if (!newEmployee.position) {
+    return throwNotification(
+      'Error message',
+      'Please choose your position',
+      'error'
+    );
+  } else if (newEmployee.age < minAge || newEmployee.age > maxAge) {
+    return throwNotification(
+      'Error message',
+      'You can not add your profile due to your age',
+      'error'
+    );
   }
 
   tableBody.insertAdjacentHTML('afterend', `
     <tr>
-      <td>${employee.name}</td>
-      <td>${employee.position}</td>
-      <td>${employee.office}</td>
-      <td>${+employee.age}</td>
-      <td>$${(+employee.salary).toLocaleString()}</td>
+      <td>${newEmployee.name}</td>
+      <td>${newEmployee.position}</td>
+      <td>${newEmployee.office}</td>
+      <td>${+newEmployee.age}</td>
+      <td>$${(+newEmployee.salary).toLocaleString('en')}</td>
     </tr>
     `);
+
+  [...form.elements].forEach(elem => {
+    if (elem.name) {
+      elem.value = '';
+    }
+  });
+
+  return throwNotification(
+    'Success message',
+    'You have done it, you have added your profile',
+    'success');
 });
+
+const throwNotification = (title, description, type) => {
+  const notification = document.createElement('div');
+
+  notification.className = 'notification';
+  notification.setAttribute('data-qa', 'notification');
+  notification.classList.add(type);
+
+  const notificationTitle = document.createElement('h2');
+
+  notificationTitle.innerText = title;
+  notificationTitle.className = 'title';
+
+  const notificationText = document.createElement('p');
+
+  notificationText.innerText = description;
+
+  body.append(notification);
+  notification.append(notificationTitle, notificationText);
+
+  setTimeout(function() {
+    return notification.remove();
+  }, 3000);
+};
 
 tableBody.addEventListener('dblclick', (e) => {
   const { target } = e;
@@ -155,24 +219,3 @@ tableBody.addEventListener('dblclick', (e) => {
     });
   });
 });
-
-const pushNotification = (title, description, type) => {
-  const notification = document.createElement('div');
-  const notificationTitle = document.createElement('h2');
-  const notificationText = document.createElement('p');
-
-  notification.className = 'notification';
-  notification.classList.add(type);
-
-  notificationTitle.innerText = title;
-  notificationTitle.className = 'title';
-
-  notificationText.innerText = description;
-
-  body.append(notification);
-  notification.append(notificationTitle, notificationText);
-
-  setTimeout(function() {
-    return notification.remove();
-  }, 3000);
-};
