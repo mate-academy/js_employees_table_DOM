@@ -14,33 +14,26 @@ tableHead.addEventListener('click', (e) => {
     return +value.replace(/[^0-9]/g, '');
   }
 
-  if (isSorted !== cellIndex) {
-    isSorted = cellIndex;
+  isSorted = cellIndex;
 
-    const sorted = [...tableBody.rows].sort((currentElement, nextElement) => {
-      const currentValue = currentElement.cells[cellIndex].innerText;
-      const nextValue = nextElement.cells[cellIndex].innerText;
+  const sorted = [...tableBody.rows].sort((currentElement, nextElement) => {
+    const currentValue = currentElement.cells[cellIndex].innerText;
+    const nextValue = nextElement.cells[cellIndex].innerText;
+
+    if (isSorted) {
+      isSorted = undefined;
 
       return getNumber(currentValue)
         ? getNumber(currentValue) - getNumber(nextValue)
         : currentValue.localeCompare(nextValue);
-    });
-
-    tableBody.append(...sorted);
-  } else {
-    isSorted = undefined;
-
-    const sorted = [...tableBody.rows].sort((currentElement, nextElement) => {
-      const currentValue = currentElement.cells[cellIndex].innerText;
-      const nextValue = nextElement.cells[cellIndex].innerText;
-
+    } else {
       return getNumber(currentValue)
         ? getNumber(nextValue) - getNumber(currentValue)
         : nextValue.localeCompare(currentValue);
-    });
+    }
+  });
 
-    tableBody.append(...sorted);
-  }
+  tableBody.append(...sorted);
 });
 
 tableBody.addEventListener('click', (e) => {
