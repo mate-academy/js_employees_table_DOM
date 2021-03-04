@@ -9,7 +9,7 @@ const minPositionLength = 4;
 const minAge = 18;
 const maxAge = 90;
 
-let sortedAscendingOrder = false;
+let isSortedAscendingOrder = false;
 let lastSortedColumnIndex = -1;
 
 // creating and adding form
@@ -55,7 +55,7 @@ tableHead.addEventListener('click', e => {
   let sortedRows;
 
   if (columnIndex !== lastSortedColumnIndex) {
-    sortedAscendingOrder = false;
+    isSortedAscendingOrder = false;
     lastSortedColumnIndex = columnIndex;
   }
 
@@ -64,7 +64,7 @@ tableHead.addEventListener('click', e => {
     case 'Position':
     case 'Office':
       sortedRows = [...tableBody.children].sort((currentRow, nextRow) => {
-        return sortedAscendingOrder
+        return isSortedAscendingOrder
           ? stringsCompare(
             nextRow.children[columnIndex].textContent,
             currentRow.children[columnIndex].textContent,
@@ -78,7 +78,7 @@ tableHead.addEventListener('click', e => {
     case 'Age':
     case 'Salary':
       sortedRows = [...tableBody.children].sort((currentRow, nextRow) => {
-        return sortedAscendingOrder
+        return isSortedAscendingOrder
           ? numbersCompare(
             formatNumber(nextRow.children[columnIndex].textContent),
             formatNumber(currentRow.children[columnIndex].textContent),
@@ -91,7 +91,7 @@ tableHead.addEventListener('click', e => {
       break;
   }
 
-  sortedAscendingOrder = !sortedAscendingOrder;
+  isSortedAscendingOrder = !isSortedAscendingOrder;
   tableBody.append(...sortedRows);
 });
 
@@ -123,10 +123,9 @@ form.addEventListener('submit', e => {
   const formData = new FormData(form);
   const newEmployeeData = Object.fromEntries(formData.entries());
 
-  form.reset();
-
   if (!validateFormData(newEmployeeData)) {
     createNotification('error', 'Error!', 'Wrong data!', 20, 20);
+    form.reset();
 
     return;
   }
