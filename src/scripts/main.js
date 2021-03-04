@@ -194,17 +194,17 @@ tableBody.addEventListener('click', toggleActiveField);
 tableBody.addEventListener('dblclick', (e) => {
   const { target } = e;
 
-  const inputElement = document.createElement('input');
+  const inputByDoubleClick = document.createElement('input');
   const initialValue = target.innerText;
 
   target.innerText = '';
-  inputElement.value = initialValue;
-  inputElement.className = 'cell-input';
-  target.appendChild(inputElement).focus();
+  inputByDoubleClick.value = initialValue;
+  inputByDoubleClick.className = 'cell-input';
+  target.appendChild(inputByDoubleClick).focus();
 
   const focusedInput = document.querySelector('.cell-input');
 
-  function modified() {
+  function modifiedActiveInput() {
     if (focusedInput.value) {
       target.innerText = focusedInput.value;
     } else {
@@ -218,11 +218,11 @@ tableBody.addEventListener('dblclick', (e) => {
       const { type, code } = evt;
 
       if (type === 'blur') {
-        setTimeout(() => modified(), 0);
+        setTimeout(() => modifiedActiveInput(), 0);
       };
 
       if (code === 'Enter') {
-        modified();
+        modifiedActiveInput();
       }
     });
   });
