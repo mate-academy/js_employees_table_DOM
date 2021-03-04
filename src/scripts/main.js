@@ -4,42 +4,45 @@ const body = document.querySelector('body');
 const tableHead = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
 
-let isSorted;
+let checkedStatusOfSorting;
 
-tableHead.addEventListener('click', (e) => {
-  const { target } = e;
-  const { cellIndex } = target;
+function getNumber(checkedValue) {
+  return +checkedValue.replace(/[^0-9]/g, '');
+}
 
-  isSorted = isSorted === undefined ? cellIndex : undefined;
+function sortTableHandler(e) {
+  const { cellIndex } = e.target;
 
-  function getNumber(value) {
-    return +value.replace(/[^0-9]/g, '');
-  }
+  checkedStatusOfSorting = checkedStatusOfSorting === undefined
+    ? cellIndex
+    : undefined;
 
-  const sorted = [...tableBody.rows].sort((currentElement, nextElement) => {
-    const currentValue = currentElement.cells[cellIndex].innerText;
-    const nextValue = nextElement.cells[cellIndex].innerText;
+  const sortedByCategory = [...tableBody.rows].sort(
+    (currentElement, nextElement) => {
+      const currentValue = currentElement.cells[cellIndex].innerText;
+      const nextValue = nextElement.cells[cellIndex].innerText;
 
-    if (isSorted !== undefined) {
-      return getNumber(currentValue)
-        ? getNumber(currentValue) - getNumber(nextValue)
-        : currentValue.localeCompare(nextValue);
-    } else {
-      return getNumber(currentValue)
-        ? getNumber(nextValue) - getNumber(currentValue)
-        : nextValue.localeCompare(currentValue);
-    }
-  });
+      switch (checkedStatusOfSorting !== undefined) {
+        case getNumber(currentValue):
+          return getNumber(currentValue) - getNumber(nextValue);
 
-  tableBody.append(...sorted);
-});
+        case !getNumber(currentValue):
+          return currentValue.localeCompare(nextValue);
+      }
 
-tableBody.addEventListener('click', (e) => {
-  const { target } = e;
+      switch (!checkedStatusOfSorting) {
+        case getNumber(currentValue):
+          return getNumber(nextValue) - getNumber(currentValue);
 
-  [...tableBody.rows].forEach(row => row.classList.remove('active'));
-  target.closest('tr').classList.add('active');
-});
+        default:
+          return nextValue.localeCompare(currentValue);
+      }
+    });
+
+  tableBody.append(...sortedByCategory);
+}
+
+tableHead.addEventListener('click', sortTableHandler);
 
 body.insertAdjacentHTML('beforeend', `
   <form
@@ -99,7 +102,7 @@ body.insertAdjacentHTML('beforeend', `
   </form>
 `);
 
-const form = document.querySelector('form');
+const form = body.querySelector('form');
 
 form.addEventListener('submit', function(e) {
   e.preventDefault();
@@ -110,8 +113,7 @@ form.addEventListener('submit', function(e) {
     accumulator[item.children[0].dataset.qa] = item.children[0].value;
 
     return accumulator;
-  }, {}
-  );
+  }, {});
 
   const minNameLength = 4;
   const minAge = 18;
@@ -129,7 +131,8 @@ form.addEventListener('submit', function(e) {
       'Please choose your position',
       'error'
     );
-  } else if (newEmployee.age < minAge || newEmployee.age > maxAge) {
+  } else if (newEmployee.age < minAge
+    || newEmployee.age > maxAge) {
     return throwNotification(
       'Error message',
       'You can not add your profile due to your age',
@@ -137,7 +140,7 @@ form.addEventListener('submit', function(e) {
     );
   }
 
-  tableBody.insertAdjacentHTML('afterend', `
+  tableBody.insertAdjacentHTML('beforeend', `
     <tr>
       <td>${newEmployee.name}</td>
       <td>${newEmployee.position}</td>
@@ -182,6 +185,14 @@ const throwNotification = (title, description, type) => {
     return notification.remove();
   }, 3000);
 };
+
+function toggleActiveField(e) {
+  const { target } = e;
+
+  [...tableBody.rows].forEach(row => row.classList.remove('active'));
+  target.closest('tr').classList.add('active');
+};
+tableBody.addEventListener('click', toggleActiveField);
 
 tableBody.addEventListener('dblclick', (e) => {
   const { target } = e;
