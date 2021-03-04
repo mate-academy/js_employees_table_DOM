@@ -22,20 +22,17 @@ function sortTableHandler(e) {
       const currentValue = currentElement.cells[cellIndex].innerText;
       const nextValue = nextElement.cells[cellIndex].innerText;
 
-      switch (checkedStatusOfSorting !== undefined) {
-        case getNumber(currentValue):
-          return getNumber(currentValue) - getNumber(nextValue);
+      switch (true) {
+        case checkedStatusOfSorting !== undefined:
 
-        case !getNumber(currentValue):
-          return currentValue.localeCompare(nextValue);
-      }
-
-      switch (!checkedStatusOfSorting) {
-        case getNumber(currentValue):
-          return getNumber(nextValue) - getNumber(currentValue);
+          return getNumber(currentValue)
+            ? getNumber(currentValue) - getNumber(nextValue)
+            : currentValue.localeCompare(nextValue);
 
         default:
-          return nextValue.localeCompare(currentValue);
+          return getNumber(currentValue)
+            ? getNumber(nextValue) - getNumber(currentValue)
+            : nextValue.localeCompare(currentValue);
       }
     });
 
