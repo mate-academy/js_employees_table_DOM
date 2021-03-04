@@ -7,7 +7,11 @@ const tbody = document.querySelector('tbody');
 const rows = [...tbody.rows];
 
 body.insertAdjacentHTML('beforeend', `
-  <form class='new-employee-form'>
+  <form
+    class='new-employee-form'
+    name='new-employee'
+    method='POST'
+    >
     <label>Name:
       <input name="name" type="text" data-qa="name" required>
     </label>
@@ -34,49 +38,83 @@ body.insertAdjacentHTML('beforeend', `
   </form>
 `);
 
-let clicks = 0;
+// let clicks = 0;
 
-let indexOfPressedCell = 0;
+// let indexCell = 0;
+
+// thead.addEventListener('click', (e) => {
+//   const index = e.target.cellIndex;
+//   const title = e.target.closest('th');
+//   let rowsList;
+
+//   if (indexCell !== index) {
+//     clicks = 0;
+//   }
+
+//   indexCell = index;
+//   clicks++;
+
+//   switch (title.innerText) {
+//     case 'Name':
+//     case 'Position':
+//     case 'Office':
+//       rowsList = rows.sort(
+//         (current, next) => {
+//           const currentValue = current.cells[index].innerText;
+//           const nextValue = next.cells[index].innerText;
+
+//           return currentValue.localeCompare(nextValue);
+//         });
+//       break;
+
+//     case 'Age':
+//     case 'Salary':
+//       rowsList = rows.sort((currentRow, nextRow) => {
+//         const currentValue = currentRow.cells[index].innerText;
+//         const nextValue = nextRow.cells[index].innerText;
+
+//         return Number(currentValue.replace(/[$,]/g, ''))
+//         - Number(nextValue.replace(/[$,]/g, ''));
+//       });
+//   }
+
+//   clicks % 2 !== 0
+//     ? tbody.append(...rowsList)
+//     : tbody.append(...rowsList.reverse());
+// }
+// );
+
+let check;
 
 thead.addEventListener('click', (e) => {
-  const index = e.target.cellIndex;
-  const title = e.target.closest('th');
-  let rowsList;
+  const cellIndex = e.target.cellIndex;
 
-  if (indexOfPressedCell !== index) {
-    clicks = 0;
-  }
+  check = check === undefined
+    ? cellIndex
+    : undefined;
 
-  indexOfPressedCell = index;
-  clicks++;
+  const sort = [...tbody.rows].sort(
+    (currentElement, nextElement) => {
+      const currentValue = currentElement.cells[cellIndex].innerText;
+      const nextValue = nextElement.cells[cellIndex].innerText;
 
-  switch (title.innerText) {
-    case 'Name':
-    case 'Position':
-    case 'Office':
-      rowsList = rows.sort(
-        (current, next) => {
-          const currentValue = current.cells[index].innerText;
-          const nextValue = next.cells[index].innerText;
+      switch (true) {
+        case check !== undefined:
 
-          return currentValue.localeCompare(nextValue);
-        });
-      break;
+          return currentValue.replace(/[^0-9]/g, '')
+            ? currentValue.replace(/[^0-9]/g, '')
+             - nextValue.replace(/[^0-9]/g, '')
+            : currentValue.localeCompare(nextValue);
 
-    case 'Age':
-    case 'Salary':
-      rowsList = rows.sort((currentRow, nextRow) => {
-        const currentValue = currentRow.cells[index].innerText;
-        const nextValue = nextRow.cells[index].innerText;
+        default:
+          return currentValue.replace(/[^0-9]/g, '')
+            ? nextValue.replace(/[^0-9]/g, '')
+             - currentValue.replace(/[^0-9]/g, '')
+            : nextValue.localeCompare(currentValue);
+      }
+    });
 
-        return Number(currentValue.replace(/[$,]/g, ''))
-        - Number(nextValue.replace(/[$,]/g, ''));
-      });
-  }
-
-  clicks % 2 !== 0
-    ? tbody.append(...rowsList)
-    : tbody.append(...rowsList.reverse());
+  tbody.append(...sort);
 }
 );
 
