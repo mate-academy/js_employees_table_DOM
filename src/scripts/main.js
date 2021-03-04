@@ -136,7 +136,7 @@ body.insertAdjacentHTML('beforeend', `
         data-qa="salary" 
       >
     </label>
-    <button type="button" value="add">Add</button>
+    <button type="button" value="add">Save to table</button>
 
   </form>
 `);
@@ -154,12 +154,6 @@ form.addEventListener('click', e => {
   if (!closestLabel) {
     return false;
   }
-
-  // const formField = closestLabel.firstElementChild;
-
-  // formField.addEventListener('input', e => {
-  //   console.log(e.target.value);
-  // });
 });
 
 button.addEventListener('click', e => {
@@ -239,6 +233,7 @@ button.addEventListener('click', e => {
 
 function pushNotification(posTop, posRight, title, decriptionText, type) {
   const notification = document.createElement('div');
+  notification.dataset.qa = 'notification';
 
   const header = document.createElement('h2');
   const description = document.createElement('p');
