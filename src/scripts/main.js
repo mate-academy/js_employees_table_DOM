@@ -38,52 +38,6 @@ body.insertAdjacentHTML('beforeend', `
   </form>
 `);
 
-// let clicks = 0;
-
-// let indexCell = 0;
-
-// thead.addEventListener('click', (e) => {
-//   const index = e.target.cellIndex;
-//   const title = e.target.closest('th');
-//   let rowsList;
-
-//   if (indexCell !== index) {
-//     clicks = 0;
-//   }
-
-//   indexCell = index;
-//   clicks++;
-
-//   switch (title.innerText) {
-//     case 'Name':
-//     case 'Position':
-//     case 'Office':
-//       rowsList = rows.sort(
-//         (current, next) => {
-//           const currentValue = current.cells[index].innerText;
-//           const nextValue = next.cells[index].innerText;
-
-//           return currentValue.localeCompare(nextValue);
-//         });
-//       break;
-
-//     case 'Age':
-//     case 'Salary':
-//       rowsList = rows.sort((currentRow, nextRow) => {
-//         const currentValue = currentRow.cells[index].innerText;
-//         const nextValue = nextRow.cells[index].innerText;
-
-//         return Number(currentValue.replace(/[$,]/g, ''))
-//         - Number(nextValue.replace(/[$,]/g, ''));
-//       });
-//   }
-
-//   clicks % 2 !== 0
-//     ? tbody.append(...rowsList)
-//     : tbody.append(...rowsList.reverse());
-// }
-// );
-
 let check;
 
 thead.addEventListener('click', (e) => {
