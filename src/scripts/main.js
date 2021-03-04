@@ -95,7 +95,7 @@ body.insertAdjacentHTML('beforeend', `
       <input
         name="name"
         type="text"
-        data-qa="fullName" 
+        data-qa="name" 
       >
     </label>
     <label>
@@ -172,7 +172,7 @@ button.addEventListener('click', e => {
     const value = elem.value;
 
     switch (key) {
-      case 'fullName':
+      case 'name':
         if (value.length < 4) {
           newEmployee[key] = null;
           pushNotification(500, 10, 'Error', 'Name is too short', 'error');
@@ -219,12 +219,12 @@ button.addEventListener('click', e => {
       'success'
     );
 
-    const { fullName, position, office, age, salary } = newEmployee;
+    const { name, position, office, age, salary } = newEmployee;
     const convertedSalary = +salary;
 
     tBody.insertAdjacentHTML('beforeend', `
     <tr>
-      <td>${fullName}</td>
+      <td>${name}</td>
       <td>${position}</td>
       <td>${office}</td>
       <td>${age}</td>
