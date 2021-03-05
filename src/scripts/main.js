@@ -171,7 +171,10 @@ button.addEventListener('click', e => {
       case 'position':
         if (value.length < 4) {
           newEmployee[key] = null;
-          pushNotification(500, 10, 'Error', 'invalid field', 'error');
+
+          pushNotification(
+            500, 10, 'Error', `${key} must be longer than 4`, 'error'
+          );
         } else {
           newEmployee[key] = value;
         }
