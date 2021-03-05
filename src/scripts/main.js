@@ -4,18 +4,20 @@ const thead = document.querySelector('tr');
 const tBody = document.querySelector('tbody');
 let rowsList = tBody.querySelectorAll('tr');
 
-const regExpThrowSymbols = /[^\d]/g;
+const regExpThrowSymbols = new RegExp(/[^\d]/g);
 
 function numbersFilter(value) {
   return Number(value.replace(regExpThrowSymbols, ''));
 }
 
-function sortByHeadline(callback, tableRows, columnPosition, fieldName, flag) {
+function sortByHeadline(
+  callback, tableRows, columnPosition, fieldName, checker
+) {
   const sortStrings = (prevPerson, nextPerson) => {
     const prevProperty = prevPerson.children[columnPosition].textContent;
     const nextProperty = nextPerson.children[columnPosition].textContent;
 
-    return flag % 2
+    return checker % 2
       ? prevProperty.localeCompare(nextProperty)
       : nextProperty.localeCompare(prevProperty);
   };
@@ -25,12 +27,12 @@ function sortByHeadline(callback, tableRows, columnPosition, fieldName, flag) {
     const nextProperty = nextPerson.children[columnPosition].textContent;
 
     if (prevProperty.match(regExpThrowSymbols) !== null) {
-      return flag % 2
+      return checker % 2
         ? callback(prevProperty) - callback(nextProperty)
         : callback(nextProperty) - callback(prevProperty);
     }
 
-    return flag % 2
+    return checker % 2
       ? prevProperty - nextProperty
       : nextProperty - prevProperty;
   };
@@ -49,7 +51,8 @@ function sortByHeadline(callback, tableRows, columnPosition, fieldName, flag) {
       sortedColumn = [...tableRows].sort(sortNumbers);
       break;
 
-    default: return 0;
+    default:
+      break;
   }
 
   return sortedColumn;
@@ -59,20 +62,23 @@ let counter = 0;
 const events = [];
 
 thead.addEventListener('click', e => {
-  const selectedTarget = e.target.textContent;
-  const column = e.target.cellIndex;
+  const selectedHeadline = e.target.textContent;
+  const columnIndex = e.target.cellIndex;
 
   counter++;
-  events.push(selectedTarget);
+  events.push(selectedHeadline);
 
   if (counter >= 2) {
-    if (events[events.length - 1] !== events[events.length - 2]) {
+    const CurrentHeadline = events[events.length - 1];
+    const previousHeadline = events[events.length - 2];
+
+    if (CurrentHeadline !== previousHeadline) {
       counter = 1;
     }
   }
 
   const sortedColumn = sortByHeadline(
-    numbersFilter, rowsList, column, selectedTarget, counter
+    numbersFilter, rowsList, columnIndex, selectedHeadline, counter
   );
 
   tBody.append(...sortedColumn);
@@ -85,7 +91,7 @@ tBody.addEventListener('click', e => {
     row.className = '';
   }
 
-  selectedRow.className = 'active';
+  selectedRow.classList.toggle('active');
 });
 
 const body = document.querySelector('body');
@@ -163,40 +169,39 @@ button.addEventListener('click', e => {
   const newEmployee = {};
 
   const employee = elementDataSets.map(elem => {
-    const key = elem.dataset.qa;
+    const headlineName = elem.dataset.qa;
     const value = elem.value;
 
-    switch (key) {
+    switch (headlineName) {
       case 'name':
       case 'position':
         if (value.length < 4) {
-          newEmployee[key] = null;
+          newEmployee[headlineName] = null;
 
           pushNotification(
-            500, 10, 'Error', `${key} must be longer than 4`, 'error'
+            500, 10, 'Error', `${headlineName} must be longer than 4`, 'error'
           );
         } else {
-          newEmployee[key] = value;
+          newEmployee[headlineName] = value;
         }
-
         break;
 
       case 'age':
         if (+value < 18 || +value > 90) {
-          newEmployee[key] = null;
+          newEmployee[headlineName] = null;
+
           pushNotification(650, 10, 'Error', 'Invalid Age', 'error');
         } else {
-          newEmployee[key] = +value;
+          newEmployee[headlineName] = +value;
         }
-
         break;
 
       case 'office':
       case 'salary':
         if (value === '') {
-          newEmployee[key] = null;
+          newEmployee[headlineName] = null;
         } else {
-          newEmployee[key] = value;
+          newEmployee[headlineName] = value;
         }
 
         break;
@@ -205,8 +210,10 @@ button.addEventListener('click', e => {
     return employee;
   });
 
-  const isCheckingPassed = Object.values(newEmployee)
+  const allFieldAreValid = Object.values(newEmployee)
     .every(value => value !== null);
+
+  const isCheckingPassed = allFieldAreValid;
 
   if (isCheckingPassed) {
     pushNotification(
@@ -218,7 +225,7 @@ button.addEventListener('click', e => {
     );
 
     const { position, office, age, salary } = newEmployee;
-    const convertedSalary = +salary;
+    const convertedSalary = Number(salary);
 
     tBody.insertAdjacentHTML('beforeend', `
     <tr>
