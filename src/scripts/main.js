@@ -38,37 +38,34 @@ body.insertAdjacentHTML('beforeend', `
   </form>
 `);
 
-let check;
+let checkStarusSorting;
 
 thead.addEventListener('click', (e) => {
   const cellIndex = e.target.cellIndex;
 
-  check = check === undefined
+  checkStarusSorting = checkStarusSorting === undefined
     ? cellIndex
     : undefined;
 
-  const sort = [...tbody.rows].sort(
+  const sortRows = [...tbody.rows].sort(
     (currentElement, nextElement) => {
       const currentValue = currentElement.cells[cellIndex].innerText;
       const nextValue = nextElement.cells[cellIndex].innerText;
 
-      switch (true) {
-        case check !== undefined:
-
-          return currentValue.replace(/[^0-9]/g, '')
-            ? currentValue.replace(/[^0-9]/g, '')
-             - nextValue.replace(/[^0-9]/g, '')
-            : currentValue.localeCompare(nextValue);
-
-        default:
-          return currentValue.replace(/[^0-9]/g, '')
-            ? nextValue.replace(/[^0-9]/g, '')
-             - currentValue.replace(/[^0-9]/g, '')
-            : nextValue.localeCompare(currentValue);
+      if (checkStarusSorting !== undefined) {
+        return currentValue.replace(/[^0-9]/g, '')
+          ? currentValue.replace(/[^0-9]/g, '')
+            - nextValue.replace(/[^0-9]/g, '')
+          : currentValue.localeCompare(nextValue);
+      } else {
+        return currentValue.replace(/[^0-9]/g, '')
+          ? nextValue.replace(/[^0-9]/g, '')
+            - currentValue.replace(/[^0-9]/g, '')
+          : nextValue.localeCompare(currentValue);
       }
     });
 
-  tbody.append(...sort);
+  tbody.append(...sortRows);
 }
 );
 
@@ -162,38 +159,38 @@ function createNotification(type, title, description) {
   }, 3000);
 }
 
-let filed = null;
+let selectedField = null;
 
 tbody.addEventListener('dblclick', (e) => {
   e.preventDefault();
 
-  if (filed) {
+  if (selectedField) {
     return;
   }
 
-  filed = e.target;
+  selectedField = e.target;
 
-  const text = filed.innerText;
+  const text = selectedField.innerText;
   const input = document.createElement('input');
 
   input.className = 'cell-input';
   input.value = text;
 
   input.addEventListener('change', () => {
-    filed.innerText = input.value !== '' ? input.value : text;
+    selectedField.innerText = input.value !== '' ? input.value : text;
   });
 
   input.addEventListener('blur', (eventBlur) => {
-    eventBlur.target.replaceWith(filed);
-    filed = null;
+    eventBlur.target.replaceWith(selectedField);
+    selectedField = null;
   });
 
   input.addEventListener('keydown', (eventKeydown) => {
     if (eventKeydown.code === 'Enter') {
-      eventKeydown.target.replaceWith(filed);
-      filed = null;
+      eventKeydown.target.replaceWith(selectedField);
+      selectedField = null;
     }
   });
 
-  filed.replaceWith(input);
+  selectedField.replaceWith(input);
 });
