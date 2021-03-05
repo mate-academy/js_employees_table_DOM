@@ -8,7 +8,7 @@ function dolarToNumber(value) {
   return +value.replace('$', '').replace(',', '.');
 };
 
-function sortingTableByColumn(targetTitle) {
+function sortTableByColumn(targetTitle) {
   const position = targetTitle.cellIndex;
   const tableRows = [...tbody.children];
 
@@ -44,34 +44,34 @@ function sortingTableByColumn(targetTitle) {
   title.dataset.clickedTitle = false;
 });
 
-const AppendingSortedTable = e => {
-  const item = e.target;
+const appendSortedTable = e => {
+  const title = e.target.closest('th');
 
-  if (item.dataset.clickedTitle === 'false') {
-    tbody.append(...sortingTableByColumn(item));
-    item.dataset.clickedTitle = true;
+  if (title.dataset.clickedTitle === 'false') {
+    tbody.append(...sortTableByColumn(title));
+    title.dataset.clickedTitle = true;
   } else {
-    tbody.append(...sortingTableByColumn(item).reverse());
-    item.dataset.clickedTitle = false;
+    tbody.append(...sortTableByColumn(title).reverse());
+    title.dataset.clickedTitle = false;
   }
 };
 
-thead.addEventListener('click', AppendingSortedTable);
-tfoot.addEventListener('click', AppendingSortedTable);
+thead.addEventListener('click', appendSortedTable);
+tfoot.addEventListener('click', appendSortedTable);
 
 let clickedRow = false;
 let previousActiveRow;
 
 tbody.addEventListener('click', e => {
-  const item = e.target.closest('tr');
+  const tableRow = e.target.closest('tr');
 
   if (clickedRow) {
     previousActiveRow.classList.remove('active');
     clickedRow = true;
   }
 
-  previousActiveRow = item;
-  item.classList.add('active');
+  previousActiveRow = tableRow;
+  tableRow.classList.add('active');
   clickedRow = true;
 });
 
@@ -109,7 +109,7 @@ document.body.insertAdjacentHTML('beforeend', `
 
 const form = document.querySelector('form');
 
-form.addEventListener('submit', addingNewRowToTable);
+form.addEventListener('submit', addRowToTable);
 
 const pushNotification = (title, description, type) => {
   const notification = document.createElement('div');
@@ -130,7 +130,7 @@ const pushNotification = (title, description, type) => {
   setTimeout(() => notification.remove(), 5000);
 };
 
-function addingNewRowToTable(e) {
+function addRowToTable(e) {
   e.preventDefault();
 
   const currentForm = new FormData(form);
