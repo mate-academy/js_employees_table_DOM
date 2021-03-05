@@ -2,7 +2,7 @@
 
 const thead = document.querySelector('tr');
 const tBody = document.querySelector('tbody');
-let rowsList = [...tBody.children];
+let rowsList = tBody.querySelectorAll('tr');
 
 const regExpThrowSymbols = /[^\d]/g;
 
@@ -81,7 +81,9 @@ thead.addEventListener('click', e => {
 tBody.addEventListener('click', e => {
   const selectedRow = e.target.closest('tr');
 
-  rowsList.map(row => row.className = '');
+  for (const row of rowsList) {
+    row.className = '';
+  }
 
   selectedRow.className = 'active';
 });
@@ -104,7 +106,6 @@ body.insertAdjacentHTML('beforeend', `
         name="name"
         type="text"
         data-qa="position"
-        required
       >
     </label>
     <label>
@@ -167,9 +168,10 @@ button.addEventListener('click', e => {
 
     switch (key) {
       case 'name':
+      case 'position':
         if (value.length < 4) {
           newEmployee[key] = null;
-          pushNotification(500, 10, 'Error', 'Name is too short', 'error');
+          pushNotification(500, 10, 'Error', 'invalid field', 'error');
         } else {
           newEmployee[key] = value;
         }
@@ -186,7 +188,6 @@ button.addEventListener('click', e => {
 
         break;
 
-      case 'position':
       case 'office':
       case 'salary':
         if (value === '') {
@@ -213,12 +214,12 @@ button.addEventListener('click', e => {
       'success'
     );
 
-    const { name, position, office, age, salary } = newEmployee;
+    const { position, office, age, salary } = newEmployee;
     const convertedSalary = +salary;
 
     tBody.insertAdjacentHTML('beforeend', `
     <tr>
-      <td>${name}</td>
+      <td>${newEmployee.name}</td>
       <td>${position}</td>
       <td>${office}</td>
       <td>${age}</td>
@@ -226,13 +227,17 @@ button.addEventListener('click', e => {
     </tr>
     `);
 
-    inputs.map(input => input.value = '');
+    for (const input of inputs) {
+      input.value = '';
+    }
+
     rowsList = [...tBody.children];
   }
 });
 
 function pushNotification(posTop, posRight, title, decriptionText, type) {
   const notification = document.createElement('div');
+
   notification.dataset.qa = 'notification';
 
   const header = document.createElement('h2');
