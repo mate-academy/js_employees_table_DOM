@@ -10,12 +10,10 @@ function numbersFilter(value) {
   return Number(value.replace(regExpThrowSymbols, ''));
 }
 
-function sortByHeadline(
-  callback, tableRows, columnPosition, fieldName, checker
-) {
+function sortByHeadline(callback, tableRows, columnIndex, fieldName, checker) {
   const sortStrings = (prevPerson, nextPerson) => {
-    const prevProperty = prevPerson.children[columnPosition].textContent;
-    const nextProperty = nextPerson.children[columnPosition].textContent;
+    const prevProperty = prevPerson.children[columnIndex].textContent;
+    const nextProperty = nextPerson.children[columnIndex].textContent;
 
     return checker % 2
       ? prevProperty.localeCompare(nextProperty)
@@ -23,8 +21,8 @@ function sortByHeadline(
   };
 
   const sortNumbers = (prevPerson, nextPerson) => {
-    const prevProperty = prevPerson.children[columnPosition].textContent;
-    const nextProperty = nextPerson.children[columnPosition].textContent;
+    const prevProperty = prevPerson.children[columnIndex].textContent;
+    const nextProperty = nextPerson.children[columnIndex].textContent;
 
     if (prevProperty.match(regExpThrowSymbols) !== null) {
       return checker % 2
