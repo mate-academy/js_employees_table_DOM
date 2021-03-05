@@ -1,8 +1,8 @@
 'use strict';
 
 const body = document.body;
-const tableBody = document.querySelector('tbody');
-const tableHead = document.querySelector('thead');
+const tableBody = body.querySelector('tbody');
+const tableHead = body.querySelector('thead');
 
 const minNameLength = 4;
 const minPositionLength = 4;
@@ -14,31 +14,34 @@ let lastSortedColumnIndex = -1;
 
 // creating and adding form
 
-const formHTML = `
-  <form class="new-employee-form" action="#" method="GET">
-    <label>Name: <input name="name" type="text" data-qa="name"></label>
-    <label>Position:
-      <input name="position" type="text" data-qa="position">
-    </label>
-    <label>Office:
-      <select name="office" type="text" data-qa="office">
-        <option value="Tokyo">Tokyo</option>
-        <option value="Singapore">Singapore</option>
-        <option value="London">London</option>
-        <option value="New York">New York</option>
-        <option value="Edinburgh">Edinburgh</option>
-        <option value="San Francisco">San Francisco</option>
-      </select>
-    </label>
-    <label>Age: <input name="age" type="number" data-qa="age"></label>
-    <label>Salary: <input name="salary" type="number" data-qa="salary"></label>
-    <button type="submit">Save to table</button>
-  </form>
+const form = document.createElement('form');
+
+form.classList.add('new-employee-form');
+form.action = '#';
+form.method = 'GET';
+
+const formInnerHTML = `
+  <label>Name: <input name="name" type="text" data-qa="name"></label>
+  <label>Position:
+    <input name="position" type="text" data-qa="position">
+  </label>
+  <label>Office:
+    <select name="office" type="text" data-qa="office">
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    </select>
+  </label>
+  <label>Age: <input name="age" type="number" data-qa="age"></label>
+  <label>Salary: <input name="salary" type="number" data-qa="salary"></label>
+  <button type="submit">Save to table</button>
 `;
 
-body.insertAdjacentHTML('beforeend', formHTML);
-
-const form = document.querySelector('form');
+form.insertAdjacentHTML('afterbegin', formInnerHTML);
+body.append(form);
 
 // sorting columns
 
@@ -148,18 +151,25 @@ form.addEventListener('submit', e => {
 // create notification
 
 function createNotification(type, title, description, posTop, posRight) {
-  const notification = `
-    <div
-      class="notification ${type}" data-qa="notification"
-      style="top: ${posTop}px; right: ${posRight}px"
-    >
-      <h2 class="title" style="font-size: 18px;">${title}</h2>
-      <p>${description}</p>
-    </div>
-  `;
+  const notification = document.createElement('div');
+  const titleElement = document.createElement('h2');
+  const paragraphElement = document.createElement('p');
 
-  document.body.insertAdjacentHTML('beforeend', notification);
-  setTimeout(() => document.querySelector('.notification').remove(), 2000);
+  notification.classList.add('notification', type);
+  notification.style.top = posTop + 'px';
+  notification.style.right = posRight + 'px';
+  notification.setAttribute('data-qa', 'notification');
+
+  titleElement.classList.add('title');
+  titleElement.style.fontSize = '18px';
+  titleElement.textContent = title;
+
+  paragraphElement.textContent = description;
+
+  notification.append(titleElement, paragraphElement);
+  body.append(notification);
+
+  setTimeout(() => notification.remove(), 2000);
 }
 
 function validateFormData(employee) {
