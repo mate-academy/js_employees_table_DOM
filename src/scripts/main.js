@@ -40,7 +40,7 @@ function sortTableByColumn(targetTitle) {
   return tableRows;
 }
 
-thead.firstElementChild.children.forEach(title => {
+[...thead.firstElementChild.children].forEach(title => {
   title.dataset.clickedTitle = false;
 });
 
