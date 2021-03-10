@@ -40,7 +40,7 @@ function sortTableByColumn(targetTitle) {
   return tableRows;
 }
 
-[...thead.firstElementChild.children].forEach(title => {
+thead.firstElementChild.children.forEach(title => {
   title.dataset.clickedTitle = false;
 });
 
@@ -142,33 +142,29 @@ function addRowToTable(e) {
   const inputs = document.querySelectorAll('input');
 
   if (currentName.length < 4) {
-    return pushNotification(
+    pushNotification(
       'Name value has less than 4 letters', 'error', 'error'
     );
-  }
-
-  if (currentPosition === '') {
-    return pushNotification('Write position', 'error', 'error');
-  }
-
-  if (currentAge < 18 || currentAge > 90) {
-    return pushNotification(
+  } else if (currentPosition === '') {
+    pushNotification('Write position', 'error', 'error');
+  } else if (currentAge < 18 || currentAge > 90) {
+    pushNotification(
       'Age value is less than 18 or more than 90 show', 'error', 'error'
     );
+  } else {
+    tbody.insertAdjacentHTML('beforeend', `
+    <tr>
+      <td>${currentName}</td>
+      <td>${currentPosition}</td>
+      <td>${currentOffice}</td>
+      <td>${currentAge}</td>
+      <td>$${Number(currentSalary).toLocaleString('en')}</td>
+    </tr>
+  `);
+    pushNotification('МАЛАДЄЦ', 'success', 'success');
+
+    [...inputs].forEach(input => {
+      input.value = '';
+    });
   }
-
-  tbody.insertAdjacentHTML('beforeend', `
-  <tr>
-    <td>${currentName}</td>
-    <td>${currentPosition}</td>
-    <td>${currentOffice}</td>
-    <td>${currentAge}</td>
-    <td>$${Number(currentSalary).toLocaleString('en')}</td>
-  </tr>
-`);
-  pushNotification('МАЛАДЄЦ', 'success', 'success');
-
-  [...inputs].forEach(input => {
-    input.value = '';
-  });
 };
