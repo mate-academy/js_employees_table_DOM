@@ -38,36 +38,52 @@ body.insertAdjacentHTML('beforeend', `
   </form>
 `);
 
-let checkStarusSorting;
+let numberClicks = 0;
+let indexOfPressedCell = 0;
+
+const convertToNumber = (string) => {
+  return Number(string.replace(/[$,]/g, ''));
+};
 
 thead.addEventListener('click', (e) => {
-  const cellIndex = e.target.cellIndex;
+  const index = e.target.cellIndex;
+  const title = e.target.closest('th');
+  let sorted;
 
-  checkStarusSorting = checkStarusSorting === undefined
-    ? cellIndex
-    : undefined;
+  if (indexOfPressedCell !== index) {
+    numberClicks = 0;
+  }
 
-  const sortRows = [...tbody.rows].sort(
-    (currentElement, nextElement) => {
-      const currentValue = currentElement.cells[cellIndex].innerText;
-      const nextValue = nextElement.cells[cellIndex].innerText;
+  indexOfPressedCell = index;
+  numberClicks++;
 
-      if (checkStarusSorting !== undefined) {
-        return currentValue.replace(/[^0-9]/g, '')
-          ? currentValue.replace(/[^0-9]/g, '')
-            - nextValue.replace(/[^0-9]/g, '')
-          : currentValue.localeCompare(nextValue);
-      } else {
-        return currentValue.replace(/[^0-9]/g, '')
-          ? nextValue.replace(/[^0-9]/g, '')
-            - currentValue.replace(/[^0-9]/g, '')
-          : nextValue.localeCompare(currentValue);
-      }
-    });
+  switch (title.innerText) {
+    case 'Name':
+    case 'Position':
+    case 'Office':
+      sorted = rows.sort(
+        (currentRow, nextRow) => {
+          const currentValue = currentRow.cells[index].innerText;
+          const nextValue = nextRow.cells[index].innerText;
 
-  tbody.append(...sortRows);
-}
-);
+          return currentValue.localeCompare(nextValue);
+        });
+      break;
+
+    case 'Age':
+    case 'Salary':
+      sorted = rows.sort((currentRow, nextRow) => {
+        const currentValue = currentRow.cells[index].innerText;
+        const nextValue = nextRow.cells[index].innerText;
+
+        return convertToNumber(currentValue) - convertToNumber(nextValue);
+      });
+  }
+
+  numberClicks % 2 !== 0
+    ? tbody.append(...sorted)
+    : tbody.append(...sorted.reverse());
+});
 
 tbody.addEventListener('click', (e) => {
   const selected = e.target.closest('tr');
