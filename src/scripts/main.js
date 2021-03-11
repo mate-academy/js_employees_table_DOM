@@ -145,7 +145,7 @@ function addRowToTable(clickEvent) {
   const inputs = document.querySelectorAll('input');
 
   if (currentName.length >= 4
-    && currentPosition !== ''
+    && currentPosition.length
     && currentAge >= 18
     && currentAge <= 90) {
     tbody.insertAdjacentHTML('beforeend', `
@@ -170,13 +170,14 @@ function addRowToTable(clickEvent) {
     );
   }
 
-  if (currentPosition === '') {
-    pushNotification('Write position', 'error', 'error', 310, 10);
+  if (!currentPosition.length) {
+    pushNotification('Write position', 'error', 'error', 10, 10);
   }
 
   if (currentAge < 18 || currentAge > 90) {
     pushNotification(
-      'Age value is less than 18 or more than 90 show', 'error', 'error', 10, 10
+      'Age value is less than 18 or more than 90 show',
+      'error', 'error', 290, 10
     );
   }
 };
