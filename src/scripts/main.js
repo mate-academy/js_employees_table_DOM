@@ -141,21 +141,10 @@ function addRowToTable(clickEvent) {
   const currentSalary = currentForm.get('salary');
   const inputs = document.querySelectorAll('input');
 
-  if (currentName.length < 4) {
-    pushNotification(
-      'Name value has less than 4 letters', 'error', 'error'
-    );
-  }
-
-  if (currentPosition === '') {
-    pushNotification('Write position', 'error', 'error');
-  }
-
-  if (currentAge < 18 || currentAge > 90) {
-    pushNotification(
-      'Age value is less than 18 or more than 90 show', 'error', 'error'
-    );
-  } else {
+  if (currentName.length >= 4
+    && currentPosition !== ''
+    && currentAge >= 18
+    && currentAge <= 90) {
     tbody.insertAdjacentHTML('beforeend', `
     <tr>
       <td>${currentName}</td>
@@ -170,5 +159,21 @@ function addRowToTable(clickEvent) {
     [...inputs].forEach(input => {
       input.value = '';
     });
+  }
+
+  if (currentName.length < 4) {
+    pushNotification(
+      'Name value has less than 4 letters', 'error', 'error'
+    );
+  }
+
+  if (currentPosition === '') {
+    pushNotification('Write position', 'error', 'error');
+  }
+
+  if (currentAge < 18 || currentAge > 90) {
+    pushNotification(
+      'Age value is less than 18 or more than 90 show', 'error', 'error'
+    );
   }
 };
