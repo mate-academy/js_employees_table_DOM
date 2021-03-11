@@ -108,16 +108,16 @@ form.addEventListener('submit', (clickEvent) => {
   const maxAge = 90;
   const minNameLength = 4;
 
-  if (employeeName >= 4 && age >= 18 && age <= 90 && position !== '') {
+  if (employeeName.length >= 4 && position !== '' && age >= 18 && age <= 90) {
     tbody.insertAdjacentHTML('beforeend', `
-  <tr>
-    <td>${employeeName}</td>
-    <td>${position}</td>
-    <td>${data.get('office')}</td>
-    <td>${age}</td>
-    <td>${salary}</td>
-  </tr>
-`);
+    <tr>
+      <td>${employeeName}</td>
+      <td>${position}</td>
+      <td>${data.get('office')}</td>
+      <td>${age}</td>
+      <td>${salary}</td>
+    </tr>
+  `);
 
     form.elements.name.value = '';
     form.elements.age.value = '';
@@ -125,6 +125,8 @@ form.addEventListener('submit', (clickEvent) => {
     form.elements.salary.value = '';
 
     createNotification(
+      10,
+      10,
       'success',
       'Success',
       'New employee was successfully added'
@@ -189,7 +191,7 @@ function createNotification(
 
   setTimeout(() => {
     notification.remove();
-  }, 3000);
+  }, 5000);
 }
 
 let selectedField = null;
