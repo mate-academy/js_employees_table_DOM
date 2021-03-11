@@ -111,12 +111,15 @@ const form = document.querySelector('form');
 
 form.addEventListener('submit', addRowToTable);
 
-const pushNotification = (title, description, type) => {
+const pushNotification = (
+  title, description, type, positionTop, positionRight) => {
   const notification = document.createElement('div');
-  const h2 = document.createElement('h2');
+  const h2 = document.createElement('h3');
   const p = document.createElement('p');
 
   notification.className = `notification ${type}`;
+  notification.style.top = positionTop + 'px';
+  notification.style.right = positionRight + 'px';
   notification.dataset.qa = 'notification';
 
   h2.className = 'title';
@@ -154,7 +157,7 @@ function addRowToTable(clickEvent) {
       <td>$${Number(currentSalary).toLocaleString('en')}</td>
     </tr>
   `);
-    pushNotification('МАЛАДЄЦ', 'success', 'success');
+    pushNotification('МАЛАДЄЦ', 'success', 'success', 10, 10);
 
     [...inputs].forEach(input => {
       input.value = '';
@@ -163,17 +166,17 @@ function addRowToTable(clickEvent) {
 
   if (currentName.length < 4) {
     pushNotification(
-      'Name value has less than 4 letters', 'error', 'error'
+      'Name value has less than 4 letters', 'error', 'error', 170, 10
     );
   }
 
   if (currentPosition === '') {
-    pushNotification('Write position', 'error', 'error');
+    pushNotification('Write position', 'error', 'error', 310, 10);
   }
 
   if (currentAge < 18 || currentAge > 90) {
     pushNotification(
-      'Age value is less than 18 or more than 90 show', 'error', 'error'
+      'Age value is less than 18 or more than 90 show', 'error', 'error', 10, 10
     );
   }
 };
