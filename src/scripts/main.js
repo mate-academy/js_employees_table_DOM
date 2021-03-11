@@ -48,7 +48,7 @@ const convertToNumber = (string) => {
 thead.addEventListener('click', (e) => {
   const index = e.target.cellIndex;
   const title = e.target.closest('th');
-  let sorted;
+  let sortedColums;
 
   if (indexOfPressedCell !== index) {
     numberClicks = 0;
@@ -61,7 +61,7 @@ thead.addEventListener('click', (e) => {
     case 'Name':
     case 'Position':
     case 'Office':
-      sorted = rows.sort(
+      sortedColums = rows.sort(
         (currentRow, nextRow) => {
           const currentValue = currentRow.cells[index].innerText;
           const nextValue = nextRow.cells[index].innerText;
@@ -72,7 +72,7 @@ thead.addEventListener('click', (e) => {
 
     case 'Age':
     case 'Salary':
-      sorted = rows.sort((currentRow, nextRow) => {
+      sortedColums = rows.sort((currentRow, nextRow) => {
         const currentValue = currentRow.cells[index].innerText;
         const nextValue = nextRow.cells[index].innerText;
 
@@ -80,16 +80,18 @@ thead.addEventListener('click', (e) => {
       });
   }
 
-  numberClicks % 2 !== 0
-    ? tbody.append(...sorted)
-    : tbody.append(...sorted.reverse());
+  if (numberClicks % 2 !== 0) {
+    tbody.append(...sortedColums);
+  } else {
+    tbody.append(...sortedColums.reverse());
+  }
 });
 
 tbody.addEventListener('click', (e) => {
-  const selected = e.target.closest('tr');
+  const selectedRow = e.target.closest('tr');
 
   rows.forEach(row => row.classList.remove('active'));
-  selected.classList.add('active');
+  selectedRow.classList.add('active');
 });
 
 const form = document.querySelector('form');
@@ -112,17 +114,13 @@ form.addEventListener('submit', (e) => {
       'Error',
       'Name should consist of 5 or more letters'
     );
-  }
-
-  if (!position) {
+  } else if (!position) {
     return createNotification(
       'error',
       'Error',
       'Please indicate the correct position',
     );
-  }
-
-  if (age < minAge || age > maxAge) {
+  } else if (age < minAge || age > maxAge) {
     return createNotification(
       'error',
       'Error',
