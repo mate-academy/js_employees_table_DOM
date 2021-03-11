@@ -44,8 +44,8 @@ function sortTableByColumn(targetTitle) {
   title.dataset.clickedTitle = false;
 });
 
-const appendSortedTable = e => {
-  const title = e.target.closest('th');
+const appendSortedTable = clickEvent => {
+  const title = clickEvent.target.closest('th');
 
   if (title.dataset.clickedTitle === 'false') {
     tbody.append(...sortTableByColumn(title));
@@ -62,8 +62,8 @@ tfoot.addEventListener('click', appendSortedTable);
 let clickedRow = false;
 let previousActiveRow;
 
-tbody.addEventListener('click', e => {
-  const tableRow = e.target.closest('tr');
+tbody.addEventListener('click', clickEvent => {
+  const tableRow = clickEvent.target.closest('tr');
 
   if (clickedRow) {
     previousActiveRow.classList.remove('active');
@@ -130,8 +130,8 @@ const pushNotification = (title, description, type) => {
   setTimeout(() => notification.remove(), 5000);
 };
 
-function addRowToTable(e) {
-  e.preventDefault();
+function addRowToTable(clickEvent) {
+  clickEvent.preventDefault();
 
   const currentForm = new FormData(form);
   const currentName = currentForm.get('name');
@@ -145,9 +145,13 @@ function addRowToTable(e) {
     pushNotification(
       'Name value has less than 4 letters', 'error', 'error'
     );
-  } else if (currentPosition === '') {
+  }
+
+  if (currentPosition === '') {
     pushNotification('Write position', 'error', 'error');
-  } else if (currentAge < 18 || currentAge > 90) {
+  }
+
+  if (currentAge < 18 || currentAge > 90) {
     pushNotification(
       'Age value is less than 18 or more than 90 show', 'error', 'error'
     );
