@@ -45,9 +45,9 @@ const convertToNumber = (string) => {
   return Number(string.replace(/[$,]/g, ''));
 };
 
-thead.addEventListener('click', (e) => {
-  const index = e.target.cellIndex;
-  const title = e.target.closest('th');
+thead.addEventListener('click', (clickEvent) => {
+  const index = clickEvent.target.cellIndex;
+  const title = clickEvent.target.closest('th');
   let sortedColums;
 
   if (indexOfPressedCell !== index) {
@@ -87,8 +87,8 @@ thead.addEventListener('click', (e) => {
   }
 });
 
-tbody.addEventListener('click', (e) => {
-  const selectedRow = e.target.closest('tr');
+tbody.addEventListener('click', (clickEvent) => {
+  const selectedRow = clickEvent.target.closest('tr');
 
   rows.forEach(row => row.classList.remove('active'));
   selectedRow.classList.add('active');
@@ -96,8 +96,8 @@ tbody.addEventListener('click', (e) => {
 
 const form = document.querySelector('form');
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
+form.addEventListener('submit', (clickEvent) => {
+  clickEvent.preventDefault();
 
   const data = new FormData(form);
   const employeeName = data.get('name');
@@ -108,53 +108,72 @@ form.addEventListener('submit', (e) => {
   const maxAge = 90;
   const minNameLength = 4;
 
+  if (employeeName >= 4 && age >= 18 && age <= 90 && position !== '') {
+    tbody.insertAdjacentHTML('beforeend', `
+  <tr>
+    <td>${employeeName}</td>
+    <td>${position}</td>
+    <td>${data.get('office')}</td>
+    <td>${age}</td>
+    <td>${salary}</td>
+  </tr>
+`);
+
+    form.elements.name.value = '';
+    form.elements.age.value = '';
+    form.elements.position.value = '';
+    form.elements.salary.value = '';
+
+    createNotification(
+      'success',
+      'Success',
+      'New employee was successfully added'
+    );
+  }
+
   if (employeeName.length < minNameLength) {
-    return createNotification(
+    createNotification(
+      350,
+      10,
       'error',
       'Error',
       'Name should consist of 5 or more letters'
     );
-  } else if (!position) {
-    return createNotification(
+  };
+
+  if (!position) {
+    createNotification(
+      170,
+      10,
       'error',
       'Error',
       'Please indicate the correct position',
     );
-  } else if (age < minAge || age > maxAge) {
-    return createNotification(
+  }
+
+  if (age < minAge || age > maxAge) {
+    createNotification(
+      0,
+      10,
       'error',
       'Error',
       'Age should not be less than 18 or more than 90'
     );
   }
-
-  tbody.insertAdjacentHTML('beforeend', `
-    <tr>
-      <td>${employeeName}</td>
-      <td>${position}</td>
-      <td>${data.get('office')}</td>
-      <td>${age}</td>
-      <td>${salary}</td>
-    </tr>
-  `);
-
-  form.elements.name.value = '';
-  form.elements.age.value = '';
-  form.elements.position.value = '';
-  form.elements.salary.value = '';
-
-  return createNotification(
-    'success',
-    'Success',
-    'New employee was successfully added'
-  );
 });
 
-function createNotification(type, title, description) {
+function createNotification(
+  positionTop,
+  positionRight,
+  type,
+  title,
+  description) {
   const notification = document.createElement('div');
 
   notification.className = `notification ${type}`;
   notification.dataset.qa = 'notification';
+  notification.style.top = positionTop + 'px';
+  notification.style.right = positionRight + 'px';
 
   const h2 = document.createElement('h2');
 
@@ -175,14 +194,14 @@ function createNotification(type, title, description) {
 
 let selectedField = null;
 
-tbody.addEventListener('dblclick', (e) => {
-  e.preventDefault();
+tbody.addEventListener('dblclick', (clickEvent) => {
+  clickEvent.preventDefault();
 
   if (selectedField) {
     return;
   }
 
-  selectedField = e.target;
+  selectedField = clickEvent.target;
 
   const text = selectedField.innerText;
   const input = document.createElement('input');
