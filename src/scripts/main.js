@@ -4,18 +4,20 @@ const thead = document.querySelector('tr');
 const tBody = document.querySelector('tbody');
 let rowsList = tBody.querySelectorAll('tr');
 
-const regExpThrowSymbols = new RegExp(/[^\d]/g);
+const leaveNumbers = new RegExp(/[^\d]/g);
 
 function numbersFilter(value) {
-  return Number(value.replace(regExpThrowSymbols, ''));
+  return Number(value.replace(leaveNumbers, ''));
 }
 
-function sortByHeadline(callback, tableRows, columnIndex, fieldName, checker) {
+function sortByColumnName(
+  callback, tableRows, columnIndex, fieldName, isReversed
+) {
   const sortStrings = (prevPerson, nextPerson) => {
     const prevProperty = prevPerson.children[columnIndex].textContent;
     const nextProperty = nextPerson.children[columnIndex].textContent;
 
-    return checker % 2
+    return isReversed
       ? prevProperty.localeCompare(nextProperty)
       : nextProperty.localeCompare(prevProperty);
   };
@@ -24,13 +26,13 @@ function sortByHeadline(callback, tableRows, columnIndex, fieldName, checker) {
     const prevProperty = prevPerson.children[columnIndex].textContent;
     const nextProperty = nextPerson.children[columnIndex].textContent;
 
-    if (prevProperty.match(regExpThrowSymbols) !== null) {
-      return checker % 2
+    if (prevProperty.match(leaveNumbers) !== null) {
+      return isReversed
         ? callback(prevProperty) - callback(nextProperty)
         : callback(nextProperty) - callback(prevProperty);
     }
 
-    return checker % 2
+    return isReversed
       ? prevProperty - nextProperty
       : nextProperty - prevProperty;
   };
@@ -56,27 +58,27 @@ function sortByHeadline(callback, tableRows, columnIndex, fieldName, checker) {
   return sortedColumn;
 }
 
-let counter = 0;
-const events = [];
+let previousHeadline;
+let flag = true;
 
 thead.addEventListener('click', e => {
-  const selectedHeadline = e.target.textContent;
-  const columnIndex = e.target.cellIndex;
+  e.preventDefault();
 
-  counter++;
-  events.push(selectedHeadline);
+  const currentHeadline = e.target.textContent;
 
-  if (counter >= 2) {
-    const CurrentHeadline = events[events.length - 1];
-    const previousHeadline = events[events.length - 2];
-
-    if (CurrentHeadline !== previousHeadline) {
-      counter = 1;
+  if (previousHeadline) {
+    if (previousHeadline === currentHeadline) {
+      flag = !flag;
+    } else {
+      flag = true;
     }
   }
 
-  const sortedColumn = sortByHeadline(
-    numbersFilter, rowsList, columnIndex, selectedHeadline, counter
+  previousHeadline = e.target.textContent;
+
+  const columnIndex = e.target.cellIndex;
+  const sortedColumn = sortByColumnName(
+    numbersFilter, rowsList, columnIndex, previousHeadline, flag
   );
 
   tBody.append(...sortedColumn);
