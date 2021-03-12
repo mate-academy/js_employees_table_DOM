@@ -11,13 +11,13 @@ function numbersFilter(value) {
 }
 
 function sortByColumnName(
-  callback, tableRows, columnIndex, fieldName, isReversed
+  callback, tableRows, columnIndex, fieldName, isColumnReversed
 ) {
   const sortStrings = (prevPerson, nextPerson) => {
     const prevProperty = prevPerson.children[columnIndex].textContent;
     const nextProperty = nextPerson.children[columnIndex].textContent;
 
-    return isReversed
+    return isColumnReversed
       ? prevProperty.localeCompare(nextProperty)
       : nextProperty.localeCompare(prevProperty);
   };
@@ -27,12 +27,12 @@ function sortByColumnName(
     const nextProperty = nextPerson.children[columnIndex].textContent;
 
     if (prevProperty.match(leaveNumbers) !== null) {
-      return isReversed
+      return isColumnReversed
         ? callback(prevProperty) - callback(nextProperty)
         : callback(nextProperty) - callback(prevProperty);
     }
 
-    return isReversed
+    return isColumnReversed
       ? prevProperty - nextProperty
       : nextProperty - prevProperty;
   };
@@ -59,26 +59,24 @@ function sortByColumnName(
 }
 
 let previousHeadline;
-let flag = true;
+let isReversed = true;
 
-thead.addEventListener('click', e => {
-  e.preventDefault();
+thead.addEventListener('click', ckickEvent => {
+  ckickEvent.preventDefault();
 
-  const currentHeadline = e.target.textContent;
+  const currentHeadline = ckickEvent.target.textContent;
 
-  if (previousHeadline) {
-    if (previousHeadline === currentHeadline) {
-      flag = !flag;
-    } else {
-      flag = true;
-    }
+  if (previousHeadline === currentHeadline) {
+    isReversed = !isReversed;
+  } else {
+    isReversed = true;
   }
 
-  previousHeadline = e.target.textContent;
+  previousHeadline = ckickEvent.target.textContent;
 
-  const columnIndex = e.target.cellIndex;
+  const columnIndex = ckickEvent.target.cellIndex;
   const sortedColumn = sortByColumnName(
-    numbersFilter, rowsList, columnIndex, previousHeadline, flag
+    numbersFilter, rowsList, columnIndex, previousHeadline, isReversed
   );
 
   tBody.append(...sortedColumn);
@@ -178,9 +176,17 @@ button.addEventListener('click', e => {
         if (value.length < 4) {
           newEmployee[headlineName] = null;
 
-          pushNotification(
-            500, 10, 'Error', `${headlineName} must be longer than 4`, 'error'
-          );
+          if (headlineName === 'name') {
+            pushNotification(
+              500, 10, 'Error', `${headlineName} must be longer than 4`, 'error'
+            );
+          };
+
+          if (headlineName === 'position') {
+            pushNotification(
+              350, 10, 'Error', `${headlineName} must be longer than 4`, 'error'
+            );
+          }
         } else {
           newEmployee[headlineName] = value;
         }
