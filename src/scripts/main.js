@@ -232,29 +232,8 @@ function getNewEmployee(clickButton) {
     <td>${positionInput}</td>
     <td>${officeSelected}</td>
     <td>${ageInput}</td>
-    <td>${getFormattedSalary(salaryInput)}</td>
+    <td>$${Number(salaryInput).toLocaleString('en')}</td>
   `);
 }
 
 submitButton.addEventListener('click', getNewEmployee);
-
-function getFormattedSalary(salary) {
-  const salaryParams = String(salary).split('');
-
-  if (String(salary).length > 3 && String(salary).length <= 6) {
-    salaryParams.splice(String(salary).length - 3, 0, ',');
-  }
-
-  if (String(salary).length > 6 && String(salary).length <= 9) {
-    salaryParams.splice(String(salary).length - 3, 0, ',');
-    salaryParams.splice(String(salary).length - 6, 0, ',');
-  }
-
-  if (String(salary).length > 9) {
-    salaryParams.splice(String(salary).length - 3, 0, ',');
-    salaryParams.splice(String(salary).length - 6, 0, ',');
-    salaryParams.splice(String(salary).length - 9, 0, ',');
-  }
-
-  return '$' + salaryParams.join('');
-}
