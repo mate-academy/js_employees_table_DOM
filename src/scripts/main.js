@@ -194,7 +194,7 @@ const notificationShow = (clickEvent) => {
       )
     );
 
-    formElement.forEach(element => {
+    formElement.querySelectorAll('input').forEach(element => {
       element.value = '';
     });
   }
