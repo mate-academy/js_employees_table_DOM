@@ -2,7 +2,7 @@
 
 const mainTable = document.querySelector('table');
 
-const tbody = document.querySelector('tbody');
+const tbody = mainTable.querySelector('tbody');
 const trElemnets = [...tbody.rows];
 
 const thElements = [...mainTable.rows[0].cells];
@@ -13,7 +13,7 @@ function formatText(tableValue) {
 
 let counter = 0;
 
-function sortTableElments(clickEvent) {
+function sortTableElements(clickEvent) {
   if (clickEvent.target.tagName === 'TH') {
     const cellIndex = thElements.indexOf(clickEvent.target);
 
@@ -44,7 +44,7 @@ function sortTableElments(clickEvent) {
   }
 }
 
-mainTable.addEventListener('click', sortTableElments);
+mainTable.addEventListener('click', sortTableElements);
 
 let selected;
 
@@ -122,6 +122,10 @@ const inputOffice = formElement.querySelector('select');
 const inputAge = formElement.querySelectorAll('input')[2];
 const inputSalary = formElement.querySelectorAll('input')[3];
 
+const minNameValue = 4;
+const ageMinValue = 18;
+const ageMaxValue = 90;
+
 function createNotification(title, description, type) {
   const notificationMessage = `
   <div class = 'notification ${type}' data-qa= 'notification'>
@@ -145,19 +149,19 @@ function addUser(firstName, position, office, age, salary) {
   `;
 }
 
-const notificationShow = (e) => {
-  e.preventDefault();
+const notificationShow = (clickEvent) => {
+  clickEvent.preventDefault();
 
-  if (inputName.value.length < 4) {
+  if (inputName.value.length < minNameValue) {
     bodyElement.insertAdjacentHTML(
       'beforeend',
       createNotification(
         'Error Message',
-        'Sorr, but your name field has less than 4 symbols',
+        `Sorr, but your name field has less than ${minNameValue} symbols`,
         'error'
       )
     );
-  } else if (+inputAge.value < 18 || +inputAge.value > 90) {
+  } else if (+inputAge.value < ageMinValue || +inputAge.value > ageMaxValue) {
     bodyElement.insertAdjacentHTML(
       'beforeend',
       createNotification(
@@ -190,10 +194,9 @@ const notificationShow = (e) => {
       )
     );
 
-    inputAge.value = '';
-    inputName.value = '';
-    inputPosition.value = '';
-    inputSalary.value = '';
+    formElement.forEach(element => {
+      element.value = '';
+    });
   }
 
   setTimeout(() => {
@@ -202,25 +205,3 @@ const notificationShow = (e) => {
 };
 
 saveButton.addEventListener('click', notificationShow);
-
-// tbody.addEventListener('dblclick', (clickEvent) => {
-//   const currenValue = clickEvent.target.innerText;
-
-//   clickEvent.target.innerText = '';
-
-//   const inputCell = document.createElement('input');
-
-//   inputCell.classList.add('cell-input');
-//   inputCell.value = currenValue;
-
-//   clickEvent.target.append(inputCell);
-
-//   const activeNode = document.querySelector('.cell-input');
-
-//   if (activeNode.value !== clickEvent.target.innerText) {
-//     tbody.addEventListener('click', () => {
-//       activeNode.parentNode.innerText = activeNode.value;
-//       activeNode.remove();
-//     });
-//   }
-// });
