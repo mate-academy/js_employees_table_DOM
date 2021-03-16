@@ -3,6 +3,7 @@
 const mainTable = document.querySelector('table');
 
 const tbody = mainTable.querySelector('tbody');
+// const trElemnets = [...tbody.rows];
 
 const thElements = [...mainTable.rows[0].cells];
 
@@ -101,8 +102,8 @@ document.body.insertAdjacentHTML('beforeend', `
 <form class="new-employee-form">
   <label>Name:
     <input
-      class="new-employee-form__name"
       name="name"
+      class = "new-employee-form__input employee-name"
       data-qa="name"
       type="text"
       required
@@ -110,15 +111,15 @@ document.body.insertAdjacentHTML('beforeend', `
     </label>
   <label>Position:
     <input
-      class="new-employee-form__position"
       name="position"
+      class = "new-employee-form__input employee-position"
       data-qa="position"
       type="text"
     >
   </label>
   <label>Office:
     <select
-      name="position"
+      name="office"
       data-qa="office"
       required
     >
@@ -132,8 +133,8 @@ document.body.insertAdjacentHTML('beforeend', `
   </label>
   <label>Age:
     <input
-      class="new-employee-form__age"
       name="age"
+      class = "new-employee-form__input employee-age"
       data-qa="age"
       type="number"
       required
@@ -141,17 +142,14 @@ document.body.insertAdjacentHTML('beforeend', `
   </label>
   <label>Salary:
     <input
-      class="new-employee-form__salary"
       name="salary"
+      class = "new-employee-form__input employee-salary"
       data-qa="salary"
       type="number"
       required
     >
   </label>
-  <button
-  class="new-employee-form__button-save"
-  type ="submit"
-  >
+  <button type ="submit">
     Save to table
   </button>
 </form>
@@ -159,15 +157,15 @@ document.body.insertAdjacentHTML('beforeend', `
 
 const bodyElement = document.querySelector('body');
 
-const saveButton = document.querySelector('.new-employee-form__button-save');
+const saveButton = document.querySelector('button');
 
 const formElement = document.querySelector('.new-employee-form');
 
-const inputName = formElement.querySelector('.new-employee-form__name');
-const inputPosition = formElement.querySelector('new-employee-form__position');
+const inputName = formElement.querySelector('.employee-name');
+const inputPosition = formElement.querySelector('.employee-position');
 const inputOffice = formElement.querySelector('select');
-const inputAge = formElement.querySelector('.new-employee-form__age');
-const inputSalary = formElement.querySelector('new-employee-form__salary');
+const inputAge = formElement.querySelector('.employee-age');
+const inputSalary = formElement.querySelector('.employee-salary');
 
 const minNameValue = 4;
 const ageMinValue = 18;
@@ -196,7 +194,9 @@ function addUser(firstName, position, office, age, salary) {
   `;
 }
 
-const notificationShow = () => {
+const notificationShow = (clickEvent) => {
+  clickEvent.preventDefault();
+
   if (inputName.value.length < minNameValue) {
     bodyElement.insertAdjacentHTML(
       'beforeend',
