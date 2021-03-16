@@ -2,7 +2,7 @@
 
 const table = document.querySelector('table');
 const tbody = table.querySelector('tbody');
-const rows = [...tbody.rows];
+const rows = [...tbody.children];
 
 const form = document.createElement('form');
 
@@ -11,51 +11,42 @@ let previousElement = null;
 
 function getSalaryAmount(salary) {
   return Number(salary
-    .split('$')
-    .join('')
-    .split(',')
+    .split(/[$,]/)
     .join('')
   );
 }
 
+// const tableRows = [...tbody.children];
+
 function getSortedData(column) {
-  const index = column.cellIndex;
-  const contentOfTheFirstCell = rows[0].cells[index].textContent;
+  const position = column.cellIndex;
 
-  const sortedRows = rows.sort((cellA, cellB) => {
-    const cellFirst = cellA.cells[index].textContent;
-    const cellSecond = cellB.cells[index].textContent;
+  switch (column.innerText) {
+    case 'Name':
+    case 'Position':
+    case 'Office':
+      rows.sort((currentRow, nextRow) => {
+        return currentRow.children[position].innerText
+          .localeCompare(nextRow.children[position].innerText);
+      });
+      break;
 
-    if (contentOfTheFirstCell.includes('$')) {
-      const valueFirst = getSalaryAmount(cellFirst);
-      const valueSecond = getSalaryAmount(cellSecond);
+    case 'Age':
+      rows.sort((currentRow, nextRow) => {
+        return currentRow.children[position].innerText
+          - nextRow.children[position].innerText;
+      });
+      break;
 
-      if (!isAlreadySorted) {
-        return valueFirst > valueSecond ? 1 : -1;
-      } else {
-        return valueFirst < valueSecond ? 1 : -1;
-      }
-    }
+    case 'Salary':
+      rows.sort((currentRow, nextRow) => {
+        return getSalaryAmount(currentRow.children[position].innerText)
+          - getSalaryAmount(nextRow.children[position].innerText);
+      });
+      break;
+  }
 
-    if (Number(contentOfTheFirstCell)) {
-      const valueFirst = Number(cellFirst);
-      const valueSecond = Number(cellSecond);
-
-      if (!isAlreadySorted) {
-        return valueFirst > valueSecond ? 1 : -1;
-      } else {
-        return valueFirst < valueSecond ? 1 : -1;
-      }
-    }
-
-    if (!isAlreadySorted) {
-      return cellFirst > cellSecond ? 1 : -1;
-    } else {
-      return cellFirst < cellSecond ? 1 : -1;
-    }
-  });
-
-  tbody.append(...sortedRows);
+  return rows;
 }
 
 function activeElementHandler(eventOnCell) {
@@ -73,6 +64,12 @@ function activeElementHandler(eventOnCell) {
 table.addEventListener('click', (clickEvent) => {
   if (table.tHead.contains(clickEvent.target)) {
     getSortedData(clickEvent.target);
+
+    if (!isAlreadySorted) {
+      tbody.append(...rows);
+    } else {
+      tbody.append(...rows.reverse());
+    }
 
     isAlreadySorted = !isAlreadySorted;
   }
@@ -173,6 +170,9 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 };
 
 const submitButton = form.querySelector('button');
+const minLengthOfName = 4;
+const minAge = 18;
+const maxAge = 90;
 
 function getNewEmployee(clickButton) {
   clickButton.preventDefault();
@@ -183,7 +183,7 @@ function getNewEmployee(clickButton) {
   const officeSelected = form.querySelector('#office').value;
   const salaryInput = Number(form.querySelector('#salary').value);
 
-  if (nameInput.length < 4) {
+  if (nameInput.length < minLengthOfName) {
     pushNotification(
       10, 10, 'Invalid input', 'Name should be longer than 4 letters', 'error'
     );
@@ -207,7 +207,7 @@ function getNewEmployee(clickButton) {
     return;
   }
 
-  if (ageInput < 18 || ageInput > 90) {
+  if (ageInput < minAge || ageInput > maxAge) {
     pushNotification(
       150, 10, 'Invalid input', 'Age should be between 18 and 90', 'error'
     );
