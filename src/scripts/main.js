@@ -3,7 +3,6 @@
 const mainTable = document.querySelector('table');
 
 const tbody = mainTable.querySelector('tbody');
-const trElemnets = [...tbody.rows];
 
 const thElements = [...mainTable.rows[0].cells];
 
@@ -11,56 +10,98 @@ function formatText(tableValue) {
   return tableValue.replace(/[^a-zA-Z0-9_-]/g, '');
 }
 
-let counter = 0;
+let clickCounter = 0;
+
+function sortNumber(list, index, click) {
+  if (click % 2 === 0) {
+    return list.sort(
+      (currentElement,
+        nextElement
+      ) =>
+        formatText(nextElement.cells[index].textContent)
+        - formatText(currentElement.cells[index].textContent)
+    );
+  } else {
+    return list.sort(
+      (currentElement,
+        nextElement
+      ) =>
+        formatText(currentElement.cells[index].textContent)
+        - formatText(nextElement.cells[index].textContent)
+    );
+  }
+}
+
+function sortString(list, index, click) {
+  if (click % 2 === 0) {
+    return list.sort(
+      (currentElement,
+        nextElement
+      ) =>
+        nextElement.cells[index].textContent
+          .localeCompare(currentElement.cells[index].textContent)
+    );
+  } else {
+    return list.sort(
+      (currentElement,
+        nextElement
+      ) =>
+        currentElement.cells[index].textContent
+          .localeCompare(nextElement.cells[index].textContent)
+    );
+  }
+}
 
 function sortTableElements(clickEvent) {
   if (clickEvent.target.tagName === 'TH') {
+    let sortedList;
+
+    const isColumn = clickEvent.target.tagName === 'TH';
+
+    const rows = [...tbody.rows];
+
     const cellIndex = thElements.indexOf(clickEvent.target);
 
-    counter++;
+    if (!isColumn) {
+      return;
+    }
 
-    const sortedByCategory = trElemnets.sort(
-      (currentTbodyElement, nextTbodyElement) => {
-        const Value = formatText(
-          currentTbodyElement.cells[cellIndex].textContent
-        );
-        const nextValue = formatText(
-          nextTbodyElement.cells[cellIndex].textContent
-        );
+    clickCounter++;
 
-        if (counter % 2 === 0) {
-          return isNaN(parseInt(Value))
-            ? nextValue.localeCompare(Value)
-            : parseInt(nextValue) - parseInt(Value);
-        }
+    switch (clickEvent.target.textContent) {
+      case 'Name' :
+      case 'Position' :
+      case 'Office':
+        sortedList = sortString(rows, cellIndex, clickCounter);
+        break;
+      case 'Age' :
+      case 'Salary':
+        sortedList = sortNumber(rows, cellIndex, clickCounter);
+        break;
+    }
 
-        return isNaN(parseInt(Value))
-          ? Value.localeCompare(nextValue)
-          : parseInt(Value) - parseInt(nextValue);
-      }
-    );
-
-    tbody.append(...sortedByCategory);
+    tbody.append(...sortedList);
   }
 }
 
 mainTable.addEventListener('click', sortTableElements);
 
-let selected;
+let selectedElement;
 
 tbody.addEventListener('click', (clickEvent) => {
-  if (selected) {
-    selected.parentNode.classList.remove('active');
+  if (selectedElement) {
+    selectedElement.parentNode.classList.remove('active');
   }
 
-  selected = clickEvent.target;
-  selected.parentNode.classList.add('active');
+  selectedElement = clickEvent.target;
+  selectedElement.parentNode.classList.add('active');
 });
 
 document.body.insertAdjacentHTML('beforeend', `
 <form class="new-employee-form">
   <label>Name:
     <input
+      class="new-employee-form__name"
       name="name"
       data-qa="name"
       type="text"
@@ -69,6 +110,7 @@ document.body.insertAdjacentHTML('beforeend', `
     </label>
   <label>Position:
     <input
+      class="new-employee-form__position"
       name="position"
       data-qa="position"
       type="text"
@@ -90,6 +132,7 @@ document.body.insertAdjacentHTML('beforeend', `
   </label>
   <label>Age:
     <input
+      class="new-employee-form__age"
       name="age"
       data-qa="age"
       type="number"
@@ -98,13 +141,17 @@ document.body.insertAdjacentHTML('beforeend', `
   </label>
   <label>Salary:
     <input
+      class="new-employee-form__salary"
       name="salary"
       data-qa="salary"
       type="number"
       required
     >
   </label>
-  <button type ="submit">
+  <button
+  class="new-employee-form__button-save"
+  type ="submit"
+  >
     Save to table
   </button>
 </form>
@@ -112,15 +159,15 @@ document.body.insertAdjacentHTML('beforeend', `
 
 const bodyElement = document.querySelector('body');
 
-const saveButton = document.querySelector('button');
+const saveButton = document.querySelector('.new-employee-form__button-save');
 
 const formElement = document.querySelector('.new-employee-form');
 
-const inputName = formElement.querySelectorAll('input')[0];
-const inputPosition = formElement.querySelectorAll('input')[1];
+const inputName = formElement.querySelector('.new-employee-form__name');
+const inputPosition = formElement.querySelector('new-employee-form__position');
 const inputOffice = formElement.querySelector('select');
-const inputAge = formElement.querySelectorAll('input')[2];
-const inputSalary = formElement.querySelectorAll('input')[3];
+const inputAge = formElement.querySelector('.new-employee-form__age');
+const inputSalary = formElement.querySelector('new-employee-form__salary');
 
 const minNameValue = 4;
 const ageMinValue = 18;
@@ -149,9 +196,7 @@ function addUser(firstName, position, office, age, salary) {
   `;
 }
 
-const notificationShow = (clickEvent) => {
-  clickEvent.preventDefault();
-
+const notificationShow = () => {
   if (inputName.value.length < minNameValue) {
     bodyElement.insertAdjacentHTML(
       'beforeend',
@@ -200,7 +245,7 @@ const notificationShow = (clickEvent) => {
   }
 
   setTimeout(() => {
-    document.querySelector('div').remove();
+    document.querySelector('.notification').remove();
   }, 5000);
 };
 
