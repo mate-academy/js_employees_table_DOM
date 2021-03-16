@@ -3,7 +3,6 @@
 const mainTable = document.querySelector('table');
 
 const tbody = mainTable.querySelector('tbody');
-// const trElemnets = [...tbody.rows];
 
 const thElements = [...mainTable.rows[0].cells];
 
@@ -149,7 +148,7 @@ document.body.insertAdjacentHTML('beforeend', `
       required
     >
   </label>
-  <button type ="submit">
+  <button>
     Save to table
   </button>
 </form>
