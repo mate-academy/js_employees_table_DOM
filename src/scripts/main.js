@@ -6,56 +6,68 @@ const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 
 [...thead.firstElementChild.children].forEach(title => {
-  title.classList.toggle('check');
+  title.dataset.clickedTitle = false;
 });
 
-thead.addEventListener('click', sortedEmployee);
+function sortedEmployee(targetTitle) {
+  const position = targetTitle.cellIndex;
+  const tableRows = [...tbody.children];
 
-function sortedEmployee(clickEvent) {
-  const arrOfEmployees = [...document.querySelectorAll('tbody > tr')];
-  const indexOfElement = clickEvent.target.cellIndex;
-  const title = clickEvent.target.closest('th');
+  switch (targetTitle.innerText.toLowerCase()) {
+    case 'name':
+    case 'position':
+    case 'office':
+      tableRows.sort((prev, next) => {
+        const firstElement = prev.children[position].innerText;
+        const secondElement = next.children[position].innerText;
 
-  title.classList.toggle('check');
+        return firstElement.localeCompare(secondElement);
+      });
+      break;
 
-  arrOfEmployees.sort((prew, next) => {
-    let firstElement = prew.children[indexOfElement].textContent;
-    let secondElement = next.children[indexOfElement].textContent;
+    case 'salary':
+    case 'age':
+      tableRows.sort((prev, next) => {
+        let firstElement = prev.children[position].innerText;
+        let secondElement = next.children[position].innerText;
+        const regexp = new RegExp(/[^0-9]/g);
 
-    if (firstElement.includes('$')) {
-      const regexp = new RegExp(/[^0-9]/g);
+        firstElement = firstElement.replace(regexp, '');
+        secondElement = secondElement.replace(regexp, '');
 
-      firstElement = firstElement.replace(regexp, '');
-      secondElement = secondElement.replace(regexp, '');
-    }
+        return firstElement - secondElement;
+      });
+      break;
+  }
 
-    if (title.classList.value === '') {
-      return isNaN(firstElement)
-        ? firstElement.localeCompare(secondElement)
-        : firstElement - secondElement;
-    } else {
-      return isNaN(firstElement)
-        ? secondElement.localeCompare(firstElement)
-        : secondElement - firstElement;
-    }
-  });
-
-  tbody.append(...arrOfEmployees);
+  return tableRows;
 }
 
-let activeRow = false;
+const appendSortedEmployee = clickEvent => {
+  const title = clickEvent.target.closest('th');
+
+  if (title.dataset.clickedTitle === 'false') {
+    tbody.append(...sortedEmployee(title));
+    title.dataset.clickedTitle = true;
+  } else {
+    tbody.append(...sortedEmployee(title).reverse());
+    title.dataset.clickedTitle = false;
+  }
+};
+
+thead.addEventListener('click', appendSortedEmployee);
+
 let previousActiveRow;
 
 tbody.addEventListener('click', (clickEvent) => {
   const currentRow = clickEvent.target.closest('tr');
 
-  if (activeRow) {
+  if (previousActiveRow) {
     previousActiveRow.classList.remove('active');
   }
 
   previousActiveRow = currentRow;
   currentRow.classList.add('active');
-  activeRow = true;
 });
 
 body.insertAdjacentHTML('beforeend', `
@@ -77,7 +89,7 @@ body.insertAdjacentHTML('beforeend', `
     </label>
     <label>Office:
       <select
-        name="position"
+        name="office"
         data-qa="office"
         required
       >
@@ -113,34 +125,31 @@ body.insertAdjacentHTML('beforeend', `
 
 const form = document.querySelector('.new-employee-form');
 const inputs = form.querySelectorAll('input');
-const select = form.querySelector('select');
 
 form.addEventListener('submit', addNewEmployee);
 
 function addNewEmployee(clickEvent) {
   clickEvent.preventDefault();
 
-  const formNameValue = inputs[0].value;
-  const formPositionValue = inputs[1].value;
-  const formSelectValue = select.value;
-  const formAgeValue = inputs[2].value;
-  const formSalaryValue = inputs[3].value;
+  const formData = new FormData(form);
+  const newEmployeeData = Object.fromEntries(formData.entries());
+
   const minAge = 18;
   const maxAge = 90;
   const minNameLength = 4;
 
-  if (formNameValue.length >= minNameLength
-    && formAgeValue >= minAge
-    && formAgeValue <= maxAge
-    && formPositionValue.length) {
+  if (newEmployeeData.name.length >= minNameLength
+    && newEmployeeData.age >= minAge
+    && newEmployeeData.age <= maxAge
+    && newEmployeeData.position.length) {
     tbody.insertAdjacentHTML('beforeend', `
-    <tr>
-      <td>${formNameValue}</td>
-      <td>${formPositionValue}</td>
-      <td>${formSelectValue}</td>
-      <td>${formAgeValue}</td>
-      <td>$${Number(formSalaryValue).toLocaleString('en')}</td>
-    </tr>
+      <tr>
+        <td>${newEmployeeData.name}</td>
+        <td>${newEmployeeData.position}</td>
+        <td>${newEmployeeData.office}</td>
+        <td>${newEmployeeData.age}</td>
+        <td>$${Number(newEmployeeData.salary).toLocaleString('en')}</td>
+      </tr>
   `);
 
     pushNotification(30, 10, 'Succsess',
@@ -151,17 +160,17 @@ function addNewEmployee(clickEvent) {
     });
   }
 
-  if (formNameValue.length < minNameLength) {
+  if (newEmployeeData.name.length < minNameLength) {
     return pushNotification(30, 10, 'Error',
       `Name length must be more than ${minNameLength} charecters`, 'error');
   }
 
-  if (!formPositionValue.length) {
+  if (!newEmployeeData.position.length) {
     return pushNotification(370, 10, 'Error',
       'Should contain correct position', 'error');
   }
 
-  if (formAgeValue < minAge || formAgeValue > maxAge) {
+  if (newEmployeeData.age < minAge || newEmployeeData.age > maxAge) {
     return pushNotification(200, 10, 'Error',
       `Age must be more than ${minAge} and less than ${maxAge}`, 'error');
   }
@@ -173,8 +182,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   const messageText = document.createElement('p');
 
   notification.dataset.qa = 'notification';
-  notification.classList.add('notification');
-  notification.classList.add(type);
+  notification.classList.add('notification', type);
   notification.style.top = posTop + 'px';
   notification.style.right = posRight + 'px';
 
@@ -184,8 +192,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   messageText.textContent = `${description}`;
 
   body.append(notification);
-  notification.append(titleText);
-  notification.append(messageText);
+  notification.append(titleText, messageText);
 
   setTimeout(() => {
     notification.remove();
