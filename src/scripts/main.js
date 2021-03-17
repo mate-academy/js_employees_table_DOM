@@ -10,22 +10,20 @@ function formatText(tableValue) {
   return tableValue.replace(/[^a-zA-Z0-9_-]/g, '');
 }
 
-let clickCounter = 0;
+let clickCheck = 0;
 
 function sortNumber(list, index, click) {
   if (click % 2 === 0) {
     return list.sort(
       (currentElement,
-        nextElement
-      ) =>
+        nextElement) =>
         formatText(nextElement.cells[index].textContent)
         - formatText(currentElement.cells[index].textContent)
     );
   } else {
     return list.sort(
       (currentElement,
-        nextElement
-      ) =>
+        nextElement) =>
         formatText(currentElement.cells[index].textContent)
         - formatText(nextElement.cells[index].textContent)
     );
@@ -36,16 +34,14 @@ function sortString(list, index, click) {
   if (click % 2 === 0) {
     return list.sort(
       (currentElement,
-        nextElement
-      ) =>
+        nextElement) =>
         nextElement.cells[index].textContent
           .localeCompare(currentElement.cells[index].textContent)
     );
   } else {
     return list.sort(
       (currentElement,
-        nextElement
-      ) =>
+        nextElement) =>
         currentElement.cells[index].textContent
           .localeCompare(nextElement.cells[index].textContent)
     );
@@ -66,17 +62,17 @@ function sortTableElements(clickEvent) {
       return;
     }
 
-    clickCounter++;
+    clickCheck++;
 
     switch (clickEvent.target.textContent) {
       case 'Name' :
       case 'Position' :
       case 'Office':
-        sortedList = sortString(rows, cellIndex, clickCounter);
+        sortedList = sortString(rows, cellIndex, clickCheck);
         break;
       case 'Age' :
       case 'Salary':
-        sortedList = sortNumber(rows, cellIndex, clickCounter);
+        sortedList = sortNumber(rows, cellIndex, clickCheck);
         break;
     }
 
