@@ -10,10 +10,12 @@ function formatText(tableValue) {
   return tableValue.replace(/[^a-zA-Z0-9_-]/g, '');
 }
 
-let clickCheck = 0;
+let pervoius;
 
-function sortNumber(list, index, click) {
-  if (click % 2 === 0) {
+function sortNumber(list, index, currentTableElement) {
+  if (currentTableElement === pervoius) {
+    pervoius = undefined;
+
     return list.sort(
       (currentElement,
         nextElement) =>
@@ -21,6 +23,8 @@ function sortNumber(list, index, click) {
         - formatText(currentElement.cells[index].textContent)
     );
   } else {
+    pervoius = currentTableElement;
+
     return list.sort(
       (currentElement,
         nextElement) =>
@@ -30,8 +34,10 @@ function sortNumber(list, index, click) {
   }
 }
 
-function sortString(list, index, click) {
-  if (click % 2 === 0) {
+function sortString(list, index, currentTableElement) {
+  if (currentTableElement === pervoius) {
+    pervoius = undefined;
+
     return list.sort(
       (currentElement,
         nextElement) =>
@@ -39,6 +45,8 @@ function sortString(list, index, click) {
           .localeCompare(currentElement.cells[index].textContent)
     );
   } else {
+    pervoius = currentTableElement;
+
     return list.sort(
       (currentElement,
         nextElement) =>
@@ -52,27 +60,23 @@ function sortTableElements(clickEvent) {
   if (clickEvent.target.tagName === 'TH') {
     let sortedList;
 
-    const isColumn = clickEvent.target.tagName === 'TH';
+    if (!clickEvent.target.tagName === 'TH') {
+      return;
+    }
 
     const rows = [...tbody.rows];
 
     const cellIndex = thElements.indexOf(clickEvent.target);
 
-    if (!isColumn) {
-      return;
-    }
-
-    clickCheck++;
-
     switch (clickEvent.target.textContent) {
       case 'Name' :
       case 'Position' :
       case 'Office':
-        sortedList = sortString(rows, cellIndex, clickCheck);
+        sortedList = sortString(rows, cellIndex, clickEvent.target);
         break;
       case 'Age' :
       case 'Salary':
-        sortedList = sortNumber(rows, cellIndex, clickCheck);
+        sortedList = sortNumber(rows, cellIndex, clickEvent.target);
         break;
     }
 
