@@ -19,11 +19,7 @@ thead.addEventListener('click', (e) => {
     countClick = 0;
   }
 
-  if ((e.target.cellIndex === 0
-    || e.target.cellIndex === 1
-    || e.target.cellIndex === 2
-    || e.target.cellIndex === 3
-    || e.target.cellIndex === 4) && countClick === 0) {
+  if (countClick === 0) {
     countClick++;
   } else {
     reverse = true;
@@ -175,7 +171,8 @@ function validationForm() {
 
   if (!ageInput || ageInput < 18 || ageInput > 90) {
     return popNotification('Age ERROR',
-      'Sorry, but you have a wrong age', 'error');
+      'Sorry, but the age must be at least '
+      + '18 years old and no more then 90', 'error');
   }
 
   if (!salaryInput) {
