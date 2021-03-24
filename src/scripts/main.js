@@ -4,37 +4,30 @@
 const body = document.querySelector('body');
 const tableHead = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
-
-let willReverse;
+let curentTitleName;
 
 tableHead.addEventListener('click', (e) => {
+  const childArr = [...tableBody.children];
   const targetOnHead = e.target.innerText;
-  const targeIndex = e.target.cellIndex;
-  const toReverse = willReverse === targetOnHead;
+  const targetIndex = e.target.cellIndex;
 
-  [...tableBody.children].sort((a, b) => {
-    const firstElement = a.cells[targeIndex].innerText;
-    const secondElement = b.cells[targeIndex].innerText;
+  if (curentTitleName !== targetOnHead) {
+    childArr.sort((a, b) => {
+      const [A, B] = methodReverse(targetOnHead, targetIndex, a, b);
 
-    if (targetOnHead === 'Age' || targetOnHead === 'Salary') {
-      const A = +(firstElement.replace('$', '').replace(/,/g, ''));
-      const B = +(secondElement.replace('$', '').replace(/,/g, ''));
+      if (Number.isInteger(A)) {
+        return A - B;
+      }
 
-      return toReverse
-        ? B - A
-        : A - B;
-    }
+      return A.localeCompare(B);
+    });
+    curentTitleName = targetOnHead;
+  } else {
+    childArr.reverse();
+    curentTitleName = '';
+  }
 
-    return toReverse
-      ? secondElement.localeCompare(firstElement)
-      : firstElement.localeCompare(secondElement);
-  }).forEach(element => {
-    tableBody.append(element);
-  });
-
-  willReverse = willReverse === targetOnHead
-    ? undefined
-    : targetOnHead;
+  childArr.forEach(el => tableBody.append(el));
 });
 
 let targetTag;
@@ -48,62 +41,76 @@ tableBody.addEventListener('click', (e) => {
   e.target.closest('tr').classList.add('active');
 });
 
-const form = document.createElement('form');
-
-form.classList.add(`new-employee-form`);
-
-body.append(form);
-
-const headTitles = tableHead.innerText.trim().split(/\s+/);
-
-const cities = [`Tokyo`, `Singapore`, `London`, `New York`,
-  `Edinburgh`, `San Francisco`];
-
-const button = document.createElement('button');
-
-button.innerText = 'Save to table';
-button.type = 'button';
-
-headTitles.forEach(text => {
+function createInput(title) {
   const label = document.createElement('label');
+  const cities = [`Tokyo`, `Singapore`, `London`, `New York`,
+    `Edinburgh`, `San Francisco`];
 
-  label.innerText = text + ':';
+  label.innerText = title + ':';
 
-  if (text === 'Office') {
+  if (title !== 'Office') {
+    const input = document.createElement('input');
+
+    input.setAttribute('name', title.toLowerCase());
+    input.setAttribute('data-qa', title.toLowerCase());
+
+    title === 'Age' || title === 'Salary'
+      ? input.setAttribute('type', 'number')
+      : input.setAttribute('type', 'text');
+    label.append(input);
+  } else {
     const select = document.createElement('select');
 
-    select.name = text.toLowerCase();
-    select.setAttribute('data-qa', text.toLowerCase());
+    select.setAttribute('name', title.toLowerCase());
+    select.setAttribute('data-qa', title.toLowerCase());
 
     cities.forEach(citie => {
       const option = document.createElement('option');
 
       option.innerText = citie;
       select.append(option);
-      label.append(select);
     });
-
-    form.append(label);
-
-    return;
+    label.append(select);
   }
 
-  const input = document.createElement('input');
+  return label;
+}
 
-  input.name = text.toLowerCase();
+function createForm() {
+  const form = document.createElement('form');
+  const button = document.createElement('button');
+  const th = tableHead.querySelectorAll('tr>th');
 
-  input.setAttribute('data-qa', text.toLowerCase());
+  form.classList.add(`new-employee-form`);
+  button.innerText = 'Save to table';
 
-  text === 'Age' || text === 'Salary'
-    ? input.type = 'number'
-    : input.type = 'text';
+  th.forEach(tag => {
+    form.append(createInput(tag.innerText));
+  });
+  form.append(button);
+  body.append(form);
+}
 
-  label.append(input);
-  form.append(label, button);
-  // form.append();
+createForm();
+
+const tableForm = document.querySelector('form');
+
+tableForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const nameValue = tableForm.children[0].firstElementChild.value;
+  const positionValue = tableForm.children[1].firstElementChild.value;
+  const ageValue = tableForm.children[3].firstElementChild.value;
+
+  const result = validation(ageValue, nameValue, positionValue);
+
+  if (result) {
+    createEmployee(tableForm);
+    showMessage(message, 'success');
+  } else {
+    showMessage(message, 'error');
+  }
 });
-
-const forms = document.querySelector('form');
 
 tableBody.addEventListener('dblclick', (e) => {
   const input = document.createElement('input');
@@ -128,22 +135,21 @@ tableBody.addEventListener('dblclick', (e) => {
   });
 });
 
-button.addEventListener('click', (e) => {
-  const nameValue = form.children[0].firstElementChild.value;
-  const positionValue = form.children[1].firstElementChild.value;
-  const ageValue = form.children[3].firstElementChild.value;
-
-  const result = validation(ageValue, nameValue, positionValue);
-
-  if (result) {
-    createEmploy(forms);
-    showMessage(message, 'success');
-  } else {
-    showMessage(message, 'error');
-  }
-});
-
 let message;
+
+function methodReverse(targetText, index, elA, elB) {
+  const firstElement = elA.cells[index].innerText;
+  const secondElement = elB.cells[index].innerText;
+
+  if (['Age', 'Salary'].includes(targetText)) {
+    const A = +(firstElement.replace('$', '').replace(/,/g, ''));
+    const B = +(secondElement.replace('$', '').replace(/,/g, ''));
+
+    return [A, B];
+  }
+
+  return [firstElement, secondElement];
+}
 
 function validation(ageValue, nameValue, positionValue) {
   if (nameValue.length < 4 || ageValue > 90 || ageValue < 18) {
@@ -184,11 +190,11 @@ function showMessage(info, statusInfo) {
   }, 3000);
 }
 
-function createEmploy(formInputs) {
+function createEmployee(formInputs) {
   const tr = document.createElement('tr');
 
   [...formInputs].forEach(input => {
-    if (input.type !== 'button') {
+    if (input.tagName !== 'BUTTON') {
       const td = document.createElement('td');
 
       td.innerText = input.value;
