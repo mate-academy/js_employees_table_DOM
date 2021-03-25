@@ -4,89 +4,76 @@
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 const arrChildren = [...tbody.children];
-let val = false;
+let sortBy = '';
 
 thead.addEventListener('click', (e) => {
   switch (e.target.innerText) {
     case 'Name':
-      if (val) {
-        const arrName = arrChildren.sort((a, b) => {
-          return b.children[0].innerText.localeCompare(a.children[0].innerText);
-        });
+      if (sortBy === 'Name') {
+        const arrName = arrChildren.reverse();
 
-        val = false;
+        sortBy = '';
         tbody.append(...arrName);
       } else {
         const arrName = arrChildren.sort((a, b) => {
           return a.children[0].innerText.localeCompare(b.children[0].innerText);
         });
 
-        val = true;
+        sortBy = 'Name';
         tbody.append(...arrName);
       }
       break;
     case 'Position':
-      if (val) {
-        const arrPos = arrChildren.sort((a, b) => {
-          return b.children[1].innerText.localeCompare(a.children[1].innerText);
-        });
+      if (sortBy === 'Position') {
+        const arrPos = arrChildren.reverse();
 
-        val = false;
+        sortBy = '';
         tbody.append(...arrPos);
       } else {
         const arrPos = arrChildren.sort((a, b) => {
           return a.children[1].innerText.localeCompare(b.children[1].innerText);
         });
 
-        val = true;
+        sortBy = 'Position';
         tbody.append(...arrPos);
       }
       break;
     case 'Office':
-      if (val) {
-        const arrOff = arrChildren.sort((a, b) => {
-          return b.children[2].innerText.localeCompare(a.children[2].innerText);
-        });
+      if (sortBy === 'Office') {
+        const arrOff = arrChildren.reverse();
 
-        val = false;
+        sortBy = '';
         tbody.append(...arrOff);
       } else {
         const arrOff = arrChildren.sort((a, b) => {
           return a.children[2].innerText.localeCompare(b.children[2].innerText);
         });
 
-        val = true;
+        sortBy = 'Office';
         tbody.append(...arrOff);
       }
       break;
     case 'Age':
 
-      if (val) {
-        const arrAge = arrChildren.sort((a, b) => {
-          return b.children[3].innerText.localeCompare(a.children[3].innerText);
-        });
+      if (sortBy === 'Age') {
+        const arrAge = arrChildren.reverse();
 
-        val = false;
+        sortBy = '';
         tbody.append(...arrAge);
       } else {
         const arrAge = arrChildren.sort((a, b) => {
           return a.children[3].innerText.localeCompare(b.children[3].innerText);
         });
 
-        val = true;
+        sortBy = 'Age';
         tbody.append(...arrAge);
       }
       break;
     case 'Salary':
-      if (val) {
-        const arrSal = arrChildren.sort((a, b) => {
-          const salaryA = +a.children[4].innerText.replace(/[$,]/g, '');
-          const salaryB = +b.children[4].innerText.replace(/[$,]/g, '');
+      if (sortBy === 'Salary') {
+        const arrSal = arrChildren.reverse();
 
-          return salaryB - salaryA;
-        });
-
-        val = false;
+        sortBy = '';
         tbody.append(...arrSal);
       } else {
         const arrSal = arrChildren.sort((a, b) => {
@@ -96,7 +83,7 @@ thead.addEventListener('click', (e) => {
           return salaryA - salaryB;
         });
 
-        val = true;
+        sortBy = 'Salary';
         tbody.append(...arrSal);
       }
       break;
@@ -113,167 +100,134 @@ tbody.addEventListener('click', (e) => {
 });
 
 const body = document.querySelector('body');
-const form = document.createElement('form');
 
-form.className = 'new-employee-form';
-form.action = '/';
-form.method = 'GET';
-body.append(form);
+function createAddEmployeeForm(container) {
+  const form = document.createElement('form');
 
-const lableName = document.createElement('label');
+  form.className = 'new-employee-form';
+  form.action = '/';
+  form.method = 'GET';
+  container.append(form);
 
-lableName.innerText = 'Name: ';
-form.append(lableName);
+  const arrayLabelsForm = [];
 
-const inputName = document.createElement('input');
+  const labelName = document.createElement('label');
 
-inputName.name = 'name';
-inputName.type = 'text';
-inputName.dataset.qa = 'name';
-lableName.append(inputName);
+  labelName.innerText = 'Name: ';
 
-const lablePos = document.createElement('label');
+  const labelPos = document.createElement('label');
 
-lablePos.innerText = 'Position: ';
-form.append(lablePos);
+  labelPos.innerText = 'Position: ';
 
-const inputPos = document.createElement('input');
+  const labelOffice = document.createElement('label');
 
-inputPos.name = 'position';
-inputPos.type = 'text';
-inputPos.dataset.qa = 'position';
-lablePos.append(inputPos);
+  labelOffice.innerText = 'Office: ';
 
-const lableOffice = document.createElement('label');
+  const labelAge = document.createElement('label');
 
-lableOffice.innerText = 'Office: ';
-form.append(lableOffice);
+  labelAge.innerText = 'Age: ';
 
-const selectOffice = document.createElement('select');
+  const labelSalary = document.createElement('label');
 
-selectOffice.className = 'select';
-selectOffice.dataset.qa = 'office';
+  labelSalary.innerText = 'Salary: ';
 
-lableOffice.append(selectOffice);
+  arrayLabelsForm.push(labelName, labelPos, labelOffice, labelAge, labelSalary);
 
-const optTokyo = document.createElement('option');
+  const correctArrayLabelsForm = arrayLabelsForm.map((label) => {
+    const text = label.innerText.toLowerCase();
+    const inputLabel = document.createElement('input');
+    const selectLabel = document.createElement('select');
 
-optTokyo.value = 'Tokyo';
-optTokyo.innerText = 'Tokyo';
+    if (text !== 'office: ') {
+      inputLabel.name = text.replace(/: /g, '');
 
-selectOffice.append(optTokyo);
-
-const optSing = document.createElement('option');
-
-optSing.value = 'Singapore';
-optSing.innerText = 'Singapore';
-
-selectOffice.append(optSing);
-
-const optLon = document.createElement('option');
-
-optLon.value = 'London';
-optLon.innerText = 'London';
-
-selectOffice.append(optLon);
-
-const optNew = document.createElement('option');
-
-optNew.value = 'New York';
-optNew.innerText = 'New York';
-
-selectOffice.append(optNew);
-
-const optEdin = document.createElement('option');
-
-optEdin.value = 'Edinburgh';
-optEdin.innerText = 'Edinburgh';
-
-selectOffice.append(optEdin);
-
-const optSan = document.createElement('option');
-
-optSan.value = 'San Francisco';
-optSan.innerText = 'San Francisco';
-
-selectOffice.append(optSan);
-
-const lableAge = document.createElement('label');
-
-lableAge.innerText = 'Age: ';
-form.append(lableAge);
-
-const inputAge = document.createElement('input');
-
-inputAge.name = 'age';
-inputAge.type = 'number';
-inputAge.dataset.qa = 'age';
-lableAge.append(inputAge);
-
-const lableSalary = document.createElement('label');
-
-lableSalary.innerText = 'Salary: ';
-form.append(lableSalary);
-
-const inputSalary = document.createElement('input');
-
-inputSalary.name = 'salary';
-inputSalary.type = 'number';
-inputSalary.dataset.qa = 'salary';
-lableSalary.append(inputSalary);
-
-const button = document.createElement('button');
-
-button.innerText = 'Save to table';
-button.type = 'submit';
-form.append(button);
-
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  const newTr = document.createElement('tr');
-  const inputs = document.querySelectorAll('input');
-  const tdOff = document.createElement('td');
-
-  tdOff.innerText = selectOffice.value;
-
-  for (let i = 0; i < inputs.length; i++) {
-    const td = document.createElement('td');
-
-    if (inputs[i].dataset.qa === 'salary') {
-      td.innerText = `$${inputs[i].value
-        .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+      if (inputLabel.name === 'salary' || inputLabel.name === 'age') {
+        inputLabel.type = 'number';
+      } else {
+        inputLabel.type = 'text';
+      }
+      inputLabel.dataset.qa = inputLabel.name;
+      label.append(inputLabel);
     } else {
-      td.innerText = inputs[i].value;
+      selectLabel.className = 'select';
+      selectLabel.dataset.qa = 'office';
+      label.append(selectLabel);
     }
-    tbody.append(newTr);
-    inputs[i].value = '';
-    newTr.append(td);
-  }
-  newTr.insertBefore(tdOff, newTr.children[2]);
 
-  if (newTr.firstChild.innerText.length < 4) {
-    pushNotification('Title of Error message', 'error');
-    newTr.remove();
-  } else if (newTr.children[3].innerText < 18
-    || newTr.children[3].innerText >= 90) {
-    pushNotification('Title of Error message', 'error');
-    newTr.remove();
-  } else if (newTr.children[1].innerText === '') {
-    pushNotification('Title of Error message', 'error');
-    newTr.remove();
-  } else {
-    pushNotification('Title of Success message', 'success');
-  }
-});
+    return label;
+  });
 
-const pushNotification = (title, type) => {
+  for (const label of correctArrayLabelsForm) {
+    form.append(label);
+  }
+
+  const arrayOffices = [
+    'Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco'];
+
+  const selectOffice = document.querySelector('.select');
+
+  for (const office of arrayOffices) {
+    const option = document.createElement('option');
+
+    option.value = office;
+    option.innerText = office;
+
+    selectOffice.append(option);
+  }
+
+  const button = document.createElement('button');
+
+  button.innerText = 'Save to table';
+  button.type = 'submit';
+  form.append(button);
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const newTr = document.createElement('tr');
+    const inputs = document.querySelectorAll('input');
+    const tdOff = document.createElement('td');
+
+    tdOff.innerText = selectOffice.value;
+
+    for (let i = 0; i < inputs.length; i++) {
+      const td = document.createElement('td');
+
+      if (inputs[i].dataset.qa === 'salary') {
+        td.innerText = `$${inputs[i].value
+          .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+      } else {
+        td.innerText = inputs[i].value;
+      }
+      tbody.append(newTr);
+      inputs[i].value = '';
+      newTr.append(td);
+    }
+    newTr.insertBefore(tdOff, newTr.children[2]);
+
+    if (newTr.firstChild.innerText.length < 4) {
+      pushNotification('Title of Error message', 'error', body);
+      newTr.remove();
+    } else if (newTr.children[3].innerText < 18
+      || newTr.children[3].innerText >= 90) {
+      pushNotification('Title of Error message', 'error', body);
+      newTr.remove();
+    } else if (newTr.children[1].innerText === '') {
+      pushNotification('Title of Error message', 'error', body);
+      newTr.remove();
+    } else {
+      pushNotification('Title of Success message', 'success', body);
+    }
+  });
+}
+
+const pushNotification = (title, type, container) => {
   const div = document.createElement('div');
 
   div.className = 'notification';
   div.dataset.qa = 'notification';
   div.classList.add(type);
-  body.append(div);
+  container.append(div);
 
   const h2 = document.createElement('h2');
 
@@ -281,3 +235,5 @@ const pushNotification = (title, type) => {
   h2.textContent = title;
   div.append(h2);
 };
+
+createAddEmployeeForm(body);
