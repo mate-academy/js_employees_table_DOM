@@ -1,5 +1,4 @@
 'use strict';
-// debugger;
 
 (function sortHandler() {
   const table = document.querySelector('table');
@@ -108,7 +107,14 @@
     const { name: fname, position, office, age, salary }
       = button.parentNode.elements;
 
-    if ([fname, position, office, age, salary]
+    if (position.value.length === 0) {
+      e.preventDefault();
+
+      pushNotification(10, 10, 'Incorrect position',
+        'Position should not be empty', 'error');
+    }
+
+    if ([fname, office, age, salary]
       .every(input => input.value.length > 0)) {
       if (fname.value.length < 4) {
         e.preventDefault();
@@ -123,7 +129,7 @@
       } else {
         e.preventDefault();
 
-        addEmployeeRow([name, position, office, age, salary]);
+        addEmployeeRow([fname, position, office, age, salary]);
 
         pushNotification(10, 10, 'Added new employee',
           'New employee is successfully added', 'success');
@@ -143,6 +149,7 @@ function addEmployeeRow(values) {
           currency: 'USD',
           currencyDisplay: 'symbol',
           maximumFractionDigits: 0,
+          minimumFractionDigits: 0,
         })
       : `${object.value}`;
 
