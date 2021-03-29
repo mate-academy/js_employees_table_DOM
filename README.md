@@ -1,7 +1,6 @@
 ## Employees table DOM
 
-
-    - [DEMO LINK](https://Smikhotur.github.io/js_employees_table_DOM/)
+ - [DEMO LINK](https://Smikhotur.github.io/js_employees_table_DOM/)
 
 
 ## Instructions
