@@ -59,6 +59,8 @@ tbody.addEventListener('click', (e) => {
 tbody.addEventListener('dblclick', (e) => {
   const target = e.target;
   const value = target.textContent;
+  const width
+    = window.getComputedStyle(target.closest('td')).getPropertyValue('width');
 
   e.preventDefault();
   target.textContent = '';
@@ -67,7 +69,7 @@ tbody.addEventListener('dblclick', (e) => {
     <input type="text" class="cell-input" value ="${value}">
   `);
 
-  document.querySelector('.cell-input').style.width = '150px';
+  document.querySelector('.cell-input').style.width = width;
   document.querySelector('.cell-input').focus();
 
   document.querySelector('.cell-input').selectionStart
@@ -122,6 +124,14 @@ button.addEventListener('click', (e) => {
     <div class="notification error" data-qa="notification">
       <h2 class="title">Error</h2>
       <p>Fill your position</p>
+    </div>
+    `);
+    setTimeout(() => document.querySelector('.error').remove(), 2000);
+  } else if (+document.querySelector('#salary').value.length < 4) {
+    document.body.insertAdjacentHTML('beforeend', `
+    <div class="notification error" data-qa="notification">
+      <h2 class="title">Error</h2>
+      <p>Are you need money?</p>
     </div>
     `);
     setTimeout(() => document.querySelector('.error').remove(), 2000);
