@@ -112,9 +112,7 @@
 
       pushNotification(10, 10, 'Incorrect position',
         'Position should not be empty', 'error');
-    }
-
-    if ([fname, office, age, salary]
+    } else if ([fname, office, age, salary]
       .every(input => input.value.length > 0)) {
       if (fname.value.length < 4) {
         e.preventDefault();
