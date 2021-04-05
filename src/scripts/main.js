@@ -151,14 +151,18 @@ function sortTable() {
   const theadRows = document.querySelector('thead tr');
   const tbodyElement = document.querySelector('tbody');
 
+  let columnNumber;
   let isAscSorting = true;
 
   theadRows.addEventListener('click', e => {
     const trElements = [];
-    let columnNumber;
 
     for (let i = 0; i < theadRows.children.length; i++) {
       if (theadRows.children.item(i) === e.target) {
+        if (columnNumber !== i) {
+          isAscSorting = true;
+        }
+
         columnNumber = i;
       }
     }
