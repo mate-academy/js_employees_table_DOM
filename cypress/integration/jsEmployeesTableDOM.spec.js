@@ -101,14 +101,14 @@ describe('Employees table', () => {
     cy.checkValuesSorted('Salary', 'DESC');
   });
 
-  it('should have proper values in rows after the sorting ASC', () => {
+  it('should have proper values in rows after the sortTable.js ASC', () => {
     cy.get('th').contains('Name').click();
 
     cy.compareRowValuesAfterSort('Airi Satou',
       ['Airi Satou', 'Accountant', 'Tokyo', '33', '$162,700']);
   });
 
-  it('should have proper values in rows after the sorting DESC', () => {
+  it('should have proper values in rows after the sortTable.js DESC', () => {
     cy.get('th').contains('Name').dblclick();
 
     cy.compareRowValuesAfterSort('Zorita Serrano',
@@ -139,7 +139,7 @@ describe('Employees table', () => {
     cy.checkDataDoesntExist('Ada', 50000);
   });
 
-  it(`should have warning notification on position 
+  it(`should have warning notification on position
   field with invalid input`, () => {
     cy.get('[data-qa="name"]').type('Adam');
     cy.get('[data-qa="office"]').select('San Francisco');
