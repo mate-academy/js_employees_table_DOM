@@ -3,78 +3,76 @@
 sortTable();
 addSelectToTbodyRows();
 addForm();
-addDataFromFormToTable();
+handleSubmit();
 
 function addForm() {
-  const body = document.querySelector('body');
-  const form = document.createElement('form');
+  const offices = [
+    'Tokyo',
+    'Singapore',
+    'London',
+    'New York',
+    'Edinburgh',
+    'San Francisco',
+  ];
 
-  form.classList.add('new-employee-form');
-  form.setAttribute('action', '/');
+  document.querySelector('body')
+    .insertAdjacentHTML('beforeend', `
+    <form class="new-employee-form" onsubmit="return false;">
+        <label>Name: <input data-qa="name" name="name" type="text"></label>
+        <label>Position:
+          <input data-qa="position" name="position" type="text">
+        </label>
+        <label>Office:
+          <select data-qa="office" name="office">
+              ${offices.map(office => `<option>${office}</option>`)}
+          </select>
+        </label>
+        <label>Age: <input data-qa="age" name="age" type="number"></label>
+        <label>Salary:
+            <input data-qa="salary" name="salary" type="number">
+        </label>
 
-  form.innerHTML = `
-  <label>Name: <input data-qa="name" name="name" type="text"></label>
-  <label>Position:
-    <input data-qa="position" name="position" type="text">
-  </label>
-  <label>Office:
-    <select data-qa="office" name="office">
-      <option>Tokyo</option>
-      <option>Singapore</option>
-      <option>London</option>
-      <option>New York</option>
-      <option>Edinburgh</option>
-      <option>San Francisco</option>
-    </select>
-  </label>
-  <label>Age: <input data-qa="age" name="age" type="number"></label>
-  <label>Salary: <input data-qa="salary" name="salary" type="number"></label>
-
-  <button type="submit">Save to table</button>
-  `;
-
-  body.appendChild(form);
+        <button type="submit">Save to table</button>
+    </form>
+  `);
 }
 
-function addDataFromFormToTable() {
-  const button = document.querySelector('form button');
+function handleSubmit() {
+  document.querySelector('form')
+    .addEventListener('submit', () => {
+      const filledForm = document.forms[0];
 
-  button.addEventListener('click', ev => {
-    ev.preventDefault();
+      const nameValue = filledForm.name.value;
+      const positionValue = filledForm.position.value;
+      const officeValue = filledForm.office.value;
+      const ageValue = +filledForm.age.value;
+      const salaryValue = +filledForm.salary.value;
 
-    const filledForm = document.forms[0];
+      if (validateFields(nameValue, positionValue, officeValue, ageValue)) {
+        const trElement = document.createElement('tr');
 
-    const nameValue = filledForm.name.value;
-    const positionValue = filledForm.position.value;
-    const officeValue = filledForm.office.value;
-    const ageValue = +filledForm.age.value;
-    const salaryValue = +filledForm.salary.value;
+        trElement.innerHTML = `
+          <td>${nameValue}</td>
+          <td>${positionValue}</td>
+          <td>${officeValue}</td>
+          <td>${ageValue}</td>
+          <td>$${salaryValue.toLocaleString('en-US')}</td>
+        `;
 
-    if (validateFields(nameValue, positionValue, officeValue, ageValue)) {
-      const trElement = document.createElement('tr');
+        for (const child of filledForm.children) {
+          const input = child.querySelector('input');
 
-      trElement.innerHTML = `
-        <td>${nameValue}</td>
-        <td>${positionValue}</td>
-        <td>${officeValue}</td>
-        <td>${ageValue}</td>
-        <td>$${salaryValue.toLocaleString('en-US')}</td>
-      `;
-
-      for (const child of filledForm.children) {
-        const input = child.querySelector('input');
-
-        if (input !== null) {
-          input.value = null;
+          if (input !== null) {
+            input.value = null;
+          }
         }
+
+        document.querySelector('tbody').appendChild(trElement);
+
+        pushNotification(10, 10, 'Success!',
+          'Your data added to table!', 'success');
       }
-
-      document.querySelector('tbody').appendChild(trElement);
-
-      pushNotification(10, 10, 'Success!',
-        'Your data added to table!', 'success');
-    }
-  });
+    });
 }
 
 function validateFields(nameValue, positionValue, officeValue, ageValue) {
@@ -112,19 +110,18 @@ function validateRequired(value) {
 
 function pushNotification(posTop, posRight, title, description, type) {
   const notification = document.createElement('div');
-  const h2 = document.createElement('h2');
-  const p = document.createElement('p');
+  const notificationTitle = document.createElement('h2');
+  const notificationDescription = document.createElement('p');
 
   notification.setAttribute('data-qa', 'notification');
   document.body.append(notification);
-  notification.append(h2);
-  notification.append(p);
+  notification.append(notificationTitle);
+  notification.append(notificationDescription);
 
-  h2.textContent = title;
-  h2.classList.add('title');
+  notificationTitle.textContent = title;
+  notificationTitle.classList.add('title');
 
-  p.textContent = description;
-
+  notificationDescription.textContent = description;
   notification.classList.add('notification', type);
 
   notification.style.top = posTop + 'px';
@@ -179,24 +176,24 @@ function sortTable() {
         aData = aData.replace(/[$-,]/g, '');
         bData = bData.replace(/[$-,]/g, '');
 
-        return isAscSorting
-          ? aData - bData
-          : bData - aData;
+        return aData - bData;
       }
 
-      return isAscSorting
-        ? aData.localeCompare(bData)
-        : bData.localeCompare(aData);
+      return aData.localeCompare(bData);
     });
-
-    isAscSorting = !isAscSorting;
 
     for (const child of trElements) {
       tbodyElement.removeChild(child);
     }
 
-    for (const trElement of trElements) {
-      tbodyElement.appendChild(trElement);
+    if (!isAscSorting) {
+      trElements.reverse();
     }
+
+    for (const row of trElements) {
+      tbodyElement.appendChild(row);
+    }
+
+    isAscSorting = !isAscSorting;
   });
 }
