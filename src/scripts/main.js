@@ -1,18 +1,15 @@
 'use strict';
 
-let nameSort = true;
-let positionSort = true;
-let officeSort = true;
-let ageSort = true;
-let salarySort = true;
+let bySort = null;
 const officeArr = ['Tokyo', 'Singapore', 'London',
   'New York', 'Edinburgh', 'San Francisco'];
 const head = document.querySelector('thead').querySelector('tr');
-const body = document.querySelector('tbody');
+const list = document.querySelector('tbody');
+const table = document.querySelector('table');
 
 const mySort = (arr, index, order) => {
-  if (index === 4) {
-    if (order) {
+  if (order.textContent === 'Salary') {
+    if (bySort !== order.textContent) {
       arr.sort((a, b) => {
         const first = Number(a.children[index].textContent
           .slice(1).split(',').join(''));
@@ -21,144 +18,75 @@ const mySort = (arr, index, order) => {
 
         return first - second;
       });
+      bySort = order.textContent;
     } else {
-      arr.sort((a, b) => {
-        const first = Number(a.children[index].textContent
-          .slice(1).split(',').join(''));
-        const second = Number(b.children[index].textContent
-          .slice(1).split(',').join(''));
-
-        return second - first;
-      });
+      arr.reverse();
     }
-  } else if (index === 3) {
-    if (order) {
+  } else if (order.textContent === 'Age') {
+    if (bySort !== order.textContent) {
       arr.sort((a, b) => {
         return a.children[index].textContent - b.children[index].textContent;
       });
+      bySort = order.textContent;
     } else {
-      arr.sort((a, b) => {
-        return b.children[index].textContent - a.children[index].textContent;
-      });
+      arr.reverse();
     }
   } else {
-    if (order) {
+    if (bySort !== order.textContent) {
       arr.sort((a, b) => {
         return a.children[index].textContent
           .localeCompare(b.children[index].textContent);
       });
+      bySort = order.textContent;
     } else {
-      arr.sort((a, b) => {
-        return b.children[index].textContent
-          .localeCompare(a.children[index].textContent);
-      });
+      arr.reverse();
     }
   }
 };
 
-document.querySelector('thead').addEventListener('click', (e) => {
-  const item = e.target;
-  const sortedBody = [...body.querySelectorAll('tr')];
-  const index = [...head.querySelectorAll('th')].findIndex(td => {
-    return item.textContent === td.textContent;
-  });
+const createInputArr = (...args) => {
+  const funcInputArr = [];
 
-  switch (item.textContent) {
-    case 'Name':
-      mySort(sortedBody, index, nameSort);
-      nameSort = !nameSort;
-      break;
+  for (let i = 0; i < args.length; i++) {
+    const labelName = document.createElement('label');
 
-    case 'Position':
-      mySort(sortedBody, index, positionSort);
-      positionSort = !positionSort;
-      break;
+    labelName.textContent = `${args[i][0].toUpperCase() + args[i].slice(1)}: `;
 
-    case 'Office':
-      mySort(sortedBody, index, officeSort);
-      officeSort = !officeSort;
-      break;
+    if (args[i] !== 'office') {
+      const inputName = document.createElement('input');
 
-    case 'Age':
-      mySort(sortedBody, index, ageSort);
-      ageSort = !ageSort;
-      break;
+      inputName.setAttribute('name', args[i]);
+      inputName.setAttribute('type', 'text');
+      inputName.setAttribute('required', true);
+      inputName.setAttribute('data-qa', args[i]);
+      labelName.append(inputName);
+    } else {
+      const inputName = document.createElement('select');
 
-    case 'Salary':
-      mySort(sortedBody, index, salarySort);
-      salarySort = !salarySort;
-      break;
+      officeArr.forEach(item => {
+        const selOff = document.createElement('option');
+
+        selOff.textContent = item;
+        inputName.append(selOff);
+      });
+      inputName.setAttribute('name', args[i]);
+      inputName.setAttribute('data-qa', args[i]);
+      labelName.append(inputName);
+    }
+    funcInputArr.push(labelName);
   }
 
-  body.prepend(...sortedBody);
-});
+  return funcInputArr;
+};
 
-const list = document.querySelector('tbody');
-const table = document.querySelector('table');
-
-const createForm = () => {
+const createForm = (inputs) => {
   const newForm = document.createElement('form');
 
   newForm.className = 'new-employee-form';
 
-  const labelName = document.createElement('label');
-  const inputName = document.createElement('input');
-
-  inputName.setAttribute('name', 'name');
-  inputName.setAttribute('type', 'text');
-  inputName.setAttribute('required', true);
-  inputName.setAttribute('data-qa', 'name');
-  labelName.textContent = 'Name: ';
-  labelName.append(inputName);
-  newForm.append(labelName);
-
-  const labelPos = document.createElement('label');
-  const inputPos = document.createElement('input');
-
-  inputPos.setAttribute('name', 'position');
-  inputPos.setAttribute('type', 'text');
-  inputPos.setAttribute('required', true);
-  inputPos.setAttribute('data-qa', 'position');
-  labelPos.textContent = 'Position: ';
-  labelPos.append(inputPos);
-  newForm.append(labelPos);
-
-  const labelOffice = document.createElement('label');
-  const selectOffice = document.createElement('select');
-
-  officeArr.forEach(item => {
-    const selOff = document.createElement('option');
-
-    selOff.textContent = item;
-    selectOffice.append(selOff);
-  });
-  selectOffice.setAttribute('name', 'office');
-  selectOffice.setAttribute('data-qa', 'office');
-  labelOffice.textContent = 'Office: ';
-  labelOffice.append(selectOffice);
-  newForm.append(labelOffice);
-
-  const labelAge = document.createElement('label');
-  const inputAge = document.createElement('input');
-
-  inputAge.setAttribute('name', 'age');
-  inputAge.setAttribute('type', 'number');
-  inputAge.setAttribute('required', true);
-  inputAge.setAttribute('data-qa', 'age');
-  labelAge.textContent = 'Age: ';
-  labelAge.append(inputAge);
-  newForm.append(labelAge);
-
-  const labelSalary = document.createElement('label');
-  const inputSalary = document.createElement('input');
-
-  inputSalary.setAttribute('name', 'salary');
-  inputSalary.setAttribute('type', 'number');
-  inputSalary.setAttribute('required', true);
-  inputSalary.setAttribute('data-qa', 'salary');
-  labelSalary.textContent = 'Salary: ';
-  labelSalary.append(inputSalary);
-  newForm.append(labelSalary);
+  for (const input of inputs) {
+    newForm.append(input);
+  }
 
   const myButton = document.createElement('button');
 
@@ -204,7 +132,21 @@ const addRow = (data) => {
   return tr;
 };
 
-const form = createForm();
+const inputArr = createInputArr('name', 'position', 'office', 'age', 'salary');
+
+document.querySelector('thead').addEventListener('click', (e) => {
+  const item = e.target;
+  const sortedBody = [...list.querySelectorAll('tr')];
+  const index = [...head.querySelectorAll('th')].findIndex(td => {
+    return item.textContent === td.textContent;
+  });
+
+  mySort(sortedBody, index, [...head.querySelectorAll('th')][index]);
+
+  list.prepend(...sortedBody);
+});
+
+const form = createForm(inputArr);
 
 table.parentNode.append(form);
 
@@ -216,7 +158,8 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   if (data.get('name').length < 4 || data.get('age') < 18
-  || data.get('age') > 90) {
+  || data.get('age') > 90 || isNaN(data.get('age'))
+  || isNaN(data.get('salary'))) {
     bodyNode.prepend(notification('Error!', 'Enter valid data, please',
       'notification error'));
   } else {
@@ -231,9 +174,7 @@ form.addEventListener('submit', (e) => {
   }, 2000);
 });
 
-// const selectTr = document.querySelector('tbody');
-
-body.addEventListener('click', (e) => {
+list.addEventListener('click', (e) => {
   if (document.querySelector('.active') !== null) {
     document.querySelector('.active').classList.remove('active');
   }
@@ -241,7 +182,7 @@ body.addEventListener('click', (e) => {
   e.target.closest('tr').classList.add('active');
 });
 
-body.addEventListener('dblclick', (e) => {
+list.addEventListener('dblclick', (e) => {
   const td = e.target;
   const text = td.textContent;
 
