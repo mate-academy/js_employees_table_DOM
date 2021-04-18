@@ -3,6 +3,7 @@
 const table = document.querySelector('table');
 const tableBody = document.querySelector('tbody');
 
+// sort table handler
 table.tHead.addEventListener('click', ev => {
   const targetHeader = ev.target.closest('th');
 
@@ -32,8 +33,6 @@ table.tHead.addEventListener('click', ev => {
 
     const idx = ev.target.cellIndex;
 
-    // .map(row => row.cells[idx].textContent);
-
     if (targetHeader.textContent === 'Age'
       || targetHeader.textContent === 'Salary') {
       rows.sort((rowA, rowB) => {
@@ -41,9 +40,11 @@ table.tHead.addEventListener('click', ev => {
           - +rowB.cells[idx].textContent.replace(/\D/g, '');
       });
     } else {
-      rows.sort((rowA, rowB) => rowA.cells[idx].textContent.localeCompare(
-        rowB.cells[idx].textContent
-      ));
+      rows.sort((rowA, rowB) => {
+        return rowA.cells[idx].textContent.localeCompare(
+          rowB.cells[idx].textContent
+        );
+      });
     }
   }
 
@@ -52,6 +53,7 @@ table.tHead.addEventListener('click', ev => {
   });
 });
 
+// select row handler
 tableBody.addEventListener('click', ev => {
   const targetRow = ev.target.closest('tr');
 
@@ -72,6 +74,7 @@ tableBody.addEventListener('click', ev => {
   targetRow.classList.toggle('active');
 });
 
+// modify table content handler
 tableBody.addEventListener('dblclick', ev => {
   const cell = ev.target.closest('td');
 
@@ -81,50 +84,56 @@ tableBody.addEventListener('dblclick', ev => {
 
   const content = cell.textContent;
 
-  cell.textContent = '';
+  cell.innerHTML = '';
 
   cell.insertAdjacentHTML('afterbegin', `
     <input
-      type="${cell.cellIndex === 3 ? 'number' : 'text'}"
+      type="${cell.cellIndex >= 3 ? 'number' : 'text'}"
       class="cell-input"
-      value="${content}"
-    >
-  `);
+      data-value="${content}"
+      >
+      `);
+
+  cell.firstElementChild.focus();
+
+  cell.firstElementChild.addEventListener('blur', onBlur);
+  cell.firstElementChild.addEventListener('keydown', onEnter);
 });
 
-tableBody.addEventListener('focusout', ev => {
-  const cell = ev.target.closest('td');
+function onBlur(e) {
+  const targetCell = e.target.closest('td');
 
-  if (!cell || !tableBody.contains(cell)) {
+  saveCellInput(targetCell);
+}
+
+function onEnter(e) {
+  if (e.code !== 'Enter') {
     return;
   }
 
-  if (cell.firstElementChild
-    && cell.firstElementChild.classList.contains('cell-input')) {
-    const newValue = cell.firstElementChild.value
-      || cell.firstElementChild.getAttribute('value');
+  const targetCell = e.target.closest('td');
 
-    cell.firstElementChild.remove();
-    cell.textContent = newValue;
+  e.target.removeEventListener('blur', onBlur);
+  saveCellInput(targetCell);
+}
+
+function saveCellInput(cell) {
+  const cellValue = cell.firstElementChild.value
+    || cell.firstElementChild.dataset.value;
+
+  cell.firstElementChild.remove();
+
+  if (cell.cellIndex === 4) {
+    cell.textContent = formatSalaryInput(cellValue);
+  } else {
+    cell.textContent = cellValue;
   }
-});
+}
 
-tableBody.addEventListener('keydown', ev => {
-  if (ev.code !== 'Enter') {
-    return;
+function formatSalaryInput(salary) {
+  if (isNaN(salary)) {
+    return salary;
   }
 
-  const cell = ev.target.closest('td');
-
-  if (!cell || !tableBody.contains(cell)) {
-    return;
-  }
-
-  if (cell.firstElementChild
-      && cell.firstElementChild.classList.contains('cell-input')) {
-    const newValue = cell.firstElementChild.value
-      || cell.firstElementChild.getAttribute('value');
-
-    cell.textContent = newValue;
-  }
-});
+  return '$' + (+salary).toLocaleString('en-us');
+}
