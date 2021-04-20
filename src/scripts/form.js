@@ -1,43 +1,90 @@
 'use strict';
 
+const locations = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
+
+const formValidation = {
+  nameValid: false,
+  ageValid: false,
+  allFieldsNonEmpty: false,
+};
+
 const tableBody = document.querySelector('tbody');
-const form = document.createElement('form');
+const newEmployeeForm = createForm();
 
-form.classList.add('new-employee-form');
-document.body.insertAdjacentElement('beforeend', form);
+document.body.insertAdjacentElement('beforeend', newEmployeeForm);
 
-form.insertAdjacentHTML('afterbegin', `
-  <label>Name:
-    <input name="name" type="text" data-qa="name" required>
-  </label>
-  <label>Position:
-    <input name="position" type="text" data-qa="position">
-  </label>
-  <label>Office:
-    <select name="office" type="text" data-qa="office" required>
-      <option value="Tokyo">Tokyo</option>
-      <option value="Singapore">Singapore</option>
-      <option value="London">London</option>
-      <option value="New York">New York</option>
-      <option value="Edinburg">Edinburg</option>
-      <option value="San Francisco">San Francisco</option>
-    </select>
-  </label>
-  <label>Age:
-    <input name="age" type="number" data-qa="age" required>
-  </label>
-  <label>Salary:
-    <input name="salary" type="number" data-qa="salary" required>
-  </label>
-  <button type="submit">Save to table</button>
-`);
+function createForm() {
+  const form = document.createElement('form');
 
-form.addEventListener('submit', ev => {
-  ev.preventDefault();
+  form.classList.add('new-employee-form');
+  form.addEventListener('submit', submitForm);
 
-  const employee = Object.fromEntries(new FormData(form).entries());
+  form.insertAdjacentHTML('afterbegin', `
+    <label>Name:
+      <input
+        type="text"
+        name="name"
+        data-qa="name"
+        placeholder="Name"
+        required
+      >
+    </label>
+    <label>Position:
+      <input
+        type="text"
+        name="position"
+        data-qa="position"
+        placeholder="Position"
+        required
+      >
+    </label>
+    <label>Office:
+      <select
+        type="text"
+        name="office"
+        data-qa="office"
+        required
+      >
+        ${getLocationHTMLOptions()}
+      </select>
+    </label>
+    <label>Age:
+      <input
+        type="number"
+        name="age"
+        data-qa="age"
+        placeholder="Age"
+        required
+      >
+    </label>
+    <label>Salary:
+      <input
+        type="number"
+        name="salary"
+        data-qa="salary"
+        placeholder="Salary"
+        required>
+    </label>
+    <button type="submit">Save to table</button>
+  `);
 
-  if (isFormInputValid(employee)) {
+  return form;
+}
+
+function submitForm(e) {
+  e.preventDefault();
+
+  let notification;
+  const employee = Object.fromEntries(new FormData(newEmployeeForm).entries());
+
+  if (validateInput(employee)) {
     tableBody.insertAdjacentHTML('beforeend', `
       <tr>
         <td>${employee.name}</td>
@@ -48,15 +95,15 @@ form.addEventListener('submit', ev => {
       </tr>
     `);
 
-    showNotification(
-      createNotification('success', 'New employee has been added to the table')
+    notification = createNotification(
+      'success', 'New employee has been added to the table'
     );
   } else {
-    showNotification(
-      createNotification('error', 'Form data is invalid')
-    );
+    notification = createNotification('error', getErrorMessage());
   }
-});
+
+  showNotification(notification);
+}
 
 function createNotification(type, text) {
   const notification = document.createElement('div');
@@ -77,22 +124,53 @@ function createNotification(type, text) {
 }
 
 function showNotification(notification) {
-  form.insertAdjacentElement('afterend', notification);
+  newEmployeeForm.insertAdjacentElement('afterend', notification);
 
   setTimeout(() => {
     notification.remove();
   }, 3000);
 }
 
-function isFormInputValid(employee) {
-  if (Object.values(employee).some(value => value.length === 0)) {
-    return false;
-  }
+function getLocationHTMLOptions() {
+  return locations.map(city => {
+    return `<option value="${city}">${city}</option>`;
+  }).join('');
+}
 
+function validateInput(employee) {
+  formValidation.nameValid = checkNameLength(employee.name);
+  formValidation.ageValid = checkAge(employee.age);
+  formValidation.allFieldsNonEmpty = checkAllFieldsNonEmpty(employee);
+
+  return Object.values(formValidation).every(valid => valid);
+}
+
+function checkNameLength(employeeName) {
   const minNameLength = 4;
+
+  return employeeName.length >= minNameLength;
+}
+
+function checkAge(age) {
   const minAge = 18;
   const maxAge = 90;
 
-  return employee.name.length >= minNameLength
-    && +employee.age >= minAge && +employee.age <= maxAge;
+  return +age >= minAge && +age <= maxAge;
+}
+
+function checkAllFieldsNonEmpty(employee) {
+  return Object.values(employee).every(value => value.length > 0);
+}
+
+function getErrorMessage() {
+  switch (false) {
+    case formValidation.nameValid:
+      return 'Name should be at least 4 characters long';
+    case formValidation.ageValid:
+      return 'Age should be in the range from 18 to 90 years';
+    case formValidation.allFieldsNonEmpty:
+      return 'All fields are required and shouldn\'t be empty';
+  }
+
+  return 'Error';
 }

@@ -2,6 +2,9 @@
 
 const table = document.querySelector('table');
 const tableBody = document.querySelector('tbody');
+let sortedByHeader;
+
+const headers = [ 'Name', 'Position', 'Office', 'Age', 'Salary' ];
 
 // sort table handler
 table.tHead.addEventListener('click', ev => {
@@ -11,46 +14,16 @@ table.tHead.addEventListener('click', ev => {
     return;
   }
 
-  const header = table.tHead.firstElementChild;
-
-  // the table can be sorted only by one column at a time
-  // if it was sorted by 'Name' before and now the 'Age' is pressed
-  // it will not be sorted by 'Name' anymore, hence remove the flag
-  const previousHeader = [...header.cells].find(cell => {
-    return cell.sorted && cell !== ev.target;
-  });
-
-  if (previousHeader) {
-    previousHeader.sorted = false;
-  }
-
   const rows = [...tableBody.rows];
 
-  if (targetHeader.sorted) {
+  if (sortedByHeader === targetHeader) {
     rows.reverse();
   } else {
-    targetHeader.sorted = true;
-
-    const idx = ev.target.cellIndex;
-
-    if (targetHeader.textContent === 'Age'
-      || targetHeader.textContent === 'Salary') {
-      rows.sort((rowA, rowB) => {
-        return +rowA.cells[idx].textContent.replace(/\D/g, '')
-          - +rowB.cells[idx].textContent.replace(/\D/g, '');
-      });
-    } else {
-      rows.sort((rowA, rowB) => {
-        return rowA.cells[idx].textContent.localeCompare(
-          rowB.cells[idx].textContent
-        );
-      });
-    }
+    sortedByHeader = targetHeader;
+    rows.sort(getSortCallback(targetHeader.textContent, ev.target.cellIndex));
   }
 
-  rows.forEach(row => {
-    table.tBodies[0].insertAdjacentElement('beforeend', row);
-  });
+  table.tBodies[0].append(...rows);
 });
 
 // select row handler
@@ -61,17 +34,13 @@ tableBody.addEventListener('click', ev => {
     return;
   }
 
-  const rows = tableBody.querySelectorAll('tr');
-
-  const selectedRow = [...rows].find(row => {
-    return row.classList.contains('active') && row !== targetRow;
+  [...table.rows].forEach(row => {
+    if (row === targetRow) {
+      row.classList.toggle('active');
+    } else {
+      row.classList.remove('active');
+    }
   });
-
-  if (selectedRow) {
-    selectedRow.classList.toggle('active');
-  }
-
-  targetRow.classList.toggle('active');
 });
 
 // modify table content handler
@@ -84,21 +53,35 @@ tableBody.addEventListener('dblclick', ev => {
 
   const content = cell.textContent;
 
-  cell.innerHTML = '';
-
-  cell.insertAdjacentHTML('afterbegin', `
+  cell.innerHTML = `
     <input
-      type="${cell.cellIndex >= 3 ? 'number' : 'text'}"
+      type="${['Age', 'Salary'].includes(headers[cell.cellIndex])
+    ? 'number' : 'text'}"
       class="cell-input"
       data-value="${content}"
       >
-      `);
+  `;
 
+  sortedByHeader = null;
   cell.firstElementChild.focus();
-
   cell.firstElementChild.addEventListener('blur', onBlur);
   cell.firstElementChild.addEventListener('keydown', onEnter);
 });
+
+function getSortCallback(sortBy, idx) {
+  if (['Age', 'Salary'].includes(sortBy)) {
+    return (rowA, rowB) => {
+      return +rowA.cells[idx].textContent.replace(/\D/g, '')
+        - +rowB.cells[idx].textContent.replace(/\D/g, '');
+    };
+  }
+
+  return (rowA, rowB) => {
+    return rowA.cells[idx].textContent.localeCompare(
+      rowB.cells[idx].textContent
+    );
+  };
+}
 
 function onBlur(e) {
   const targetCell = e.target.closest('td');
@@ -123,7 +106,7 @@ function saveCellInput(cell) {
 
   cell.firstElementChild.remove();
 
-  if (cell.cellIndex === 4) {
+  if (headers[cell.cellIndex] === 'Salary') {
     cell.textContent = formatSalaryInput(cellValue);
   } else {
     cell.textContent = cellValue;
