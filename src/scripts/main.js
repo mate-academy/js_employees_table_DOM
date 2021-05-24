@@ -1,15 +1,15 @@
 'use strict';
 
 const table = document.querySelector('table');
-const thead = table.querySelector('thead');
-const tbody = table.querySelector('tbody');
+const thead = table.tHead;
+const tbody = table.tBodies[0];
 let indicator;
 let counter = 1;
 
 // click on the table header to sort
 thead.addEventListener('click', e => {
-  const onClick = e.target.closest('th');
-  const cellIndex = onClick.cellIndex;
+  const targetHeaderCell = e.target.closest('th');
+  const cellIndex = targetHeaderCell.cellIndex;
 
   if (indicator === cellIndex) {
     counter++;
@@ -19,7 +19,7 @@ thead.addEventListener('click', e => {
 
   indicator = cellIndex;
 
-  getSortRows(cellIndex, onClick.innerHTML);
+  getSortRows(cellIndex, targetHeaderCell.innerHTML);
 });
 
 // sort table rows
@@ -71,18 +71,22 @@ function getSortRows(colNum, colName) {
 
 // click on a table row to select
 tbody.addEventListener('click', e => {
-  const onClick = e.target.closest('tr');
+  const targetRow = e.target.closest('tr');
 
   for (const row of tbody.rows) {
     row.classList.remove('active');
   }
 
-  onClick.classList.add('active');
+  targetRow.classList.add('active');
 });
 
 // add Form
-table.insertAdjacentHTML('afterend', `
-  <form class="new-employee-form" method="post">
+const form = document.createElement('form');
+
+function createForm() {
+  form.className = 'new-employee-form';
+
+  form.innerHTML = `
     <label>
       Name: 
         <input name="name" data-qa="name" type="text" required>
@@ -93,14 +97,7 @@ table.insertAdjacentHTML('afterend', `
     </label>
     <label>
       Office:
-        <select name="office" data-qa="office">
-          <option selected value="Tokyo">Tokyo</option>
-          <option value="Singapore">Singapore</option>
-          <option value="London">London</option>
-          <option value="New York">New York</option>
-          <option value="Edinburgh">Edinburgh</option>
-          <option value="San Francisco">San Francisco</option>
-        </select>
+        <select name="office" data-qa="office"></select>
     </label>
     <label>
       Age:
@@ -111,22 +108,27 @@ table.insertAdjacentHTML('afterend', `
         <input name="salary" data-qa="salary" type="number" required>
     </label>
     <button type="submit">Save to table</button>
-  </form>
-`);
+  `;
 
-const form = document.querySelector('form');
+  const offices = [
+    'Tokyo',
+    'Singapore',
+    'London',
+    'New&nbspYork',
+    'Edinburgh',
+    'San&nbspFrancisco',
+  ];
 
-// add notifications
-form.insertAdjacentHTML('afterend', `
-  <div class="notification" data-qa="notification">
-    <span class="title">
-    </span>
-  </div>
-`);
+  offices.map(office => {
+    form.elements.office.insertAdjacentHTML('beforeend', `
+      <option value=${office}>${office}</option>
+    `);
+  });
 
-const notification = document.querySelector('.notification');
+  document.body.append(form);
+};
 
-notification.hidden = true;
+createForm();
 
 // click on the "Save to table" button to add a new employee to the table
 form.addEventListener('submit', e => {
@@ -152,11 +154,15 @@ function addErrorChecking(employeeName,
   employeeOffice,
   employeeAge,
   employeeSalary) {
+  form.insertAdjacentHTML('afterend', `
+    <div class="notification error" data-qa="notification">
+      <span class="title">
+      </span>
+    </div>
+  `);
+
+  const notification = document.querySelector('.notification');
   const title = notification.querySelector('.title');
-
-  notification.hidden = false;
-
-  notification.classList.add('error');
 
   if (employeeName.length < 4) {
     title.innerHTML = 'Error! The "Name" field has less than 4 characters.';
@@ -167,16 +173,14 @@ function addErrorChecking(employeeName,
     notification.classList.add('success');
     title.innerHTML = 'Success! A new employee has been added to the table.';
 
-    setTimeout(function() {
-      notification.hidden = true;
-    }, 4000);
-
     addNewEmployeeToTable(employeeName,
       employeePosition,
       employeeOffice,
       employeeAge,
       employeeSalary);
   }
+
+  setTimeout(() => notification.remove(), 3000);
 }
 
 // add a new employee to the table
