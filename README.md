@@ -71,5 +71,4 @@ Start table:
 
 Expected result of your code:
 ![Result](./src/images/result.png)
-
 Good luck. We believe in you!
