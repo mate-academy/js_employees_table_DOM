@@ -33,42 +33,34 @@ tbody.addEventListener('click', e => {
   }
 });
 
-document.addEventListener('click', e => {
+function sortABCTable(word, index) {
+  if (checkout[word]) {
+    array.sort((a, b) => a[index].localeCompare(b[index]));
+    checkout[word] = !checkout[word];
+  } else {
+    array.reverse();
+    checkout[word] = !checkout[word];
+  }
+}
+
+table.addEventListener('click', e => {
   if (e.target.tagName === 'TH') {
     switch (e.target.innerText) {
       case 'Name':
-        if (checkout.name) {
-          array.sort((a, b) => a[0].localeCompare(b[0]));
-          checkout.name = !checkout.name;
-        } else {
-          array.sort((a, b) => b[0].localeCompare(a[0]));
-          checkout.name = !checkout.name;
-        }
+        sortABCTable('name', 0);
         break;
       case 'Position':
-        if (checkout.position) {
-          array.sort((a, b) => a[1].localeCompare(b[1]));
-          checkout.position = !checkout.position;
-        } else {
-          array.sort((a, b) => b[1].localeCompare(a[1]));
-          checkout.position = !checkout.position;
-        }
+        sortABCTable('position', 1);
         break;
       case 'Office':
-        if (checkout.office) {
-          array.sort((a, b) => a[2].localeCompare(b[2]));
-          checkout.office = !checkout.office;
-        } else {
-          array.sort((a, b) => b[2].localeCompare(a[2]));
-          checkout.office = !checkout.office;
-        }
+        sortABCTable('office', 2);
         break;
       case 'Age':
         if (checkout.age) {
           array.sort((a, b) => a[3] - b[3]);
           checkout.age = !checkout.age;
         } else {
-          array.sort((a, b) => b[3] - a[3]);
+          array.reverse();
           checkout.age = !checkout.age;
         }
         break;
@@ -79,9 +71,7 @@ document.addEventListener('click', e => {
           });
           checkout.salary = !checkout.salary;
         } else {
-          array.sort((a, b) => {
-            return b[4].replace(/[^0-9]/g, '') - a[4].replace(/[^0-9]/g, '');
-          });
+          array.reverse();
           checkout.salary = !checkout.salary;
         }
         break;
@@ -152,6 +142,12 @@ body.insertAdjacentHTML('beforeend',
 const form = document.querySelector('form');
 
 form.addEventListener('submit', (e) => {
+  const check = document.querySelector('.notification');
+
+  if (check) {
+    check.remove();
+  }
+
   if (e.target.name.value.length < 4) {
     pushNotification(10, 10, 'Упс...',
       `Имя раба слишком короткое!\n
