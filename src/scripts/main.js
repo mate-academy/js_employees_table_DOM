@@ -1,8 +1,8 @@
 'use strict';
 
 const body = document.querySelector('body');
-const tbody = document.querySelector('tbody');
-const rows = tbody.querySelectorAll('tr');
+const table = document.querySelector('table');
+const tbody = table.querySelector('tbody');
 const array = [...tbody.rows].map(row =>
   [
     row.cells[0].innerText,
@@ -21,7 +21,9 @@ const checkout = {
   salary: true,
 };
 
-document.addEventListener('click', e => {
+tbody.addEventListener('click', e => {
+  const rows = tbody.querySelectorAll('tr');
+
   if (e.target.tagName === 'TD') {
     for (const row of rows) {
       row.closest('tr').classList.toggle(
@@ -29,7 +31,9 @@ document.addEventListener('click', e => {
       );
     }
   }
+});
 
+document.addEventListener('click', e => {
   if (e.target.tagName === 'TH') {
     switch (e.target.innerText) {
       case 'Name':
@@ -82,14 +86,23 @@ document.addEventListener('click', e => {
         }
         break;
     }
-  }
-
-  for (let i = 0; i < tbody.rows.length; i++) {
-    for (let j = 0; j < tbody.rows[i].cells.length; j++) {
-      tbody.rows[i].cells[j].innerText = array[i][j];
-    }
+    changeTheTable(array);
   }
 });
+
+function changeTheTable(arr) {
+  tbody.innerHTML = '';
+
+  for (const row of arr) {
+    const newRow = tbody.insertRow();
+
+    for (let j = 0; j < row.length; j++) {
+      const newCell = newRow.insertCell();
+
+      newCell.appendChild(document.createTextNode(row[j]));
+    }
+  }
+}
 
 const list = [
   'Tokyo',
@@ -183,14 +196,17 @@ form.addEventListener('submit', (e) => {
 
   addToTable.push('$' + value.toLocaleString('en'));
 
-  const newRow = tbody.insertRow();
+  array.push(addToTable);
 
-  addToTable.forEach((item) => {
-    return newRow.insertCell().appendChild(document.createTextNode(item));
-  });
+  changeTheTable(array);
 
   pushNotification(10, 10, 'Успех!',
     'Добален новый раб!', 'success');
+
+  e.target.name.value = '';
+  e.target.position.value = '';
+  e.target.age.value = '';
+  e.target.salary.value = '';
 });
 
 const pushNotification = (posTop, posRight, title, description, type) => {
@@ -211,7 +227,11 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   setTimeout(() => notification.remove(), 5000);
 };
 
-tbody.addEventListener('dblclick', e => {
+table.addEventListener('dblclick', e => {
+  if (e.target.tagName !== 'TD') {
+    return;
+  }
+
   const input = document.createElement('input');
 
   input.setAttribute('type', 'text');
@@ -221,16 +241,22 @@ tbody.addEventListener('dblclick', e => {
   const indexCell = [...selectedRow.children].findIndex(x => x === e.target);
   const indexRow = [...tbody.rows].findIndex(x => x === selectedRow);
 
-  tbody.rows[indexRow].deleteCell(indexCell);
-  tbody.rows[indexRow].cells[indexCell - 1].after(input);
+  tbody.rows[indexRow].replaceChild(
+    input, tbody.rows[indexRow].cells[indexCell]);
+
   input.select();
 
+  input.addEventListener('keydown', act => {
+    if (act.key === 'Enter') {
+      array[indexRow][indexCell] = input.value;
+
+      changeTheTable(array);
+    }
+  });
+
   input.addEventListener('blur', act => {
-    const td = document.createElement('td');
+    array[indexRow][indexCell] = input.value;
 
-    td.textContent = input.value;
-
-    tbody.rows[indexRow].cells[indexCell - 1].after(td);
-    input.remove();
+    changeTheTable(array);
   });
 });
