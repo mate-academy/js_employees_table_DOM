@@ -6,7 +6,6 @@ const head = table.querySelector('thead');
 
 const bodyTable = table.querySelector('tbody');
 
-// Sort Table
 let click;
 
 head.addEventListener('click', (push) => {
@@ -22,8 +21,6 @@ head.addEventListener('click', (push) => {
 
   click = th.innerText;
 });
-
-// Selected row
 
 bodyTable.addEventListener('click', (e) => {
   const row = e.target;
@@ -42,8 +39,6 @@ bodyTable.addEventListener('click', (e) => {
 
   row.parentElement.setAttribute('class', 'active');
 });
-
-// Sorted functions
 
 function sortAsc(numCol, nameCol) {
   const sorted = [...bodyTable.rows];
@@ -76,8 +71,6 @@ function sortDesc(numCol, nameCol) {
 function conv(item) {
   return +(item.replace(/\D/g, ''));
 };
-
-//  Adding form
 
 const body = document.querySelector('body');
 
@@ -190,8 +183,6 @@ form.addEventListener('submit', (e) => {
     'success');
 });
 
-// Notification
-
 const pushNotification = (title, description, type) => {
   const div = document.createElement('div');
 
@@ -211,8 +202,6 @@ const pushNotification = (title, description, type) => {
   div.append(messageText);
 };
 
-// Cell changes
-
 bodyTable.addEventListener('dblclick', (e) => {
   const cell = e.target;
 
@@ -223,19 +212,23 @@ bodyTable.addEventListener('dblclick', (e) => {
   const cellInput = document.createElement('input');
 
   cellInput.setAttribute('class', 'cell-input');
-  // cellInput.setAttribute('value', cellText)
+  cellInput.setAttribute('value', cellText);
 
   cell.append(cellInput);
 
   cellInput.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter') {
+      cellInput.remove();
+
       cell.textContent = (cellInput.value === '')
         ? cellText
         : cellInput.value;
-    }
+    };
   });
 
   cellInput.addEventListener('blur', (even) => {
+    cellInput.remove();
+
     cell.textContent = (cellInput.value === '')
       ? cellText
       : cellInput.value;
