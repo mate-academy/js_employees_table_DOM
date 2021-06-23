@@ -65,7 +65,7 @@ const addFuncItem = (item) => {
   });
 
   [item].forEach((elem) => {
-    [...elem.children].map((cell) => {
+    [...elem.children].map((cell, index) => {
       cell.addEventListener('dblclick', () => {
         const oldValue = cell.innerHTML;
 
@@ -82,7 +82,12 @@ const addFuncItem = (item) => {
         });
 
         input.addEventListener('blur', () => {
-          if (input.value !== '') {
+           if (input.value !== '') {
+            if (index === 4) {
+              cell.innerHTML = formatSalary(input.value);
+
+              return;
+            }
             cell.innerHTML = input.value;
           } else {
             cell.innerHTML = oldValue;
