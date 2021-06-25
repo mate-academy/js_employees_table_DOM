@@ -1,56 +1,54 @@
 'use strict';
 
 // write code here
-const tbodyTr = document.querySelectorAll('tbody tr');
+const tbodyRows = document.querySelectorAll('tbody tr');
 const tbody = document.querySelector('tbody');
-const thead = document.querySelectorAll('thead th');
-
-const prnt = tbodyTr[0].parentElement;
+const theadColumnTitle = document.querySelectorAll('thead th');
 
 const strInNumber = (str) => {
   return str.replace(/[^\d]/g, '') * 1;
 };
 
-let variable = '';
+let selectedColumnSort = '';
 
 const sortTable = (column) => {
   let reverse = false;
 
-  if (variable === column) {
+  if (selectedColumnSort === column) {
     reverse = true;
-    variable = '';
+    selectedColumnSort = '';
   } else {
-    variable = column;
+    selectedColumnSort = column;
   }
 
-  [...document.querySelectorAll('tbody tr')].sort((item, item1) => {
-    let elem = item.children[column].textContent;
-    let elem1 = item1.children[column].textContent;
+  [...document.querySelectorAll('tbody tr')].sort((prevRow, nextRow) => {
+    let prevElem = prevRow.children[column].textContent;
+    let nextElem = nextRow.children[column].textContent;
 
     if (reverse) {
-      elem = item1.children[column].textContent;
-      elem1 = item.children[column].textContent;
+      prevElem = nextRow.children[column].textContent;
+      nextElem = prevRow.children[column].textContent;
     }
 
-    if (column !== 4 && column !== 3) {
-      if (elem1 > elem) {
-        return -1;
-      }
-
-      if (elem1 < elem) {
-        return 1;
-      }
-
-      return 0;
+    if (strInNumber(prevElem)) {
+      return strInNumber(nextElem) - strInNumber(prevElem);
     }
 
-    return strInNumber(elem1) - strInNumber(elem);
+    if (nextElem > prevElem) {
+      return -1;
+    }
+
+    if (nextElem < prevElem) {
+      return 1;
+    }
+
+    return 0;
   }).forEach(function(node) {
-    prnt.appendChild(node);
+    tbody.appendChild(node);
   });
 };
 
-thead.forEach((elem, index) => {
+theadColumnTitle.forEach((elem, index) => {
   elem.onclick = () => {
     sortTable(index);
   };
@@ -82,7 +80,7 @@ const addFuncItem = (item) => {
         });
 
         input.addEventListener('blur', () => {
-           if (input.value !== '') {
+          if (input.value !== '') {
             if (index === 4) {
               cell.innerHTML = formatSalary(input.value);
 
@@ -98,7 +96,7 @@ const addFuncItem = (item) => {
   });
 };
 
-tbodyTr.forEach((item) => {
+tbodyRows.forEach((item) => {
   addFuncItem(item);
 });
 
@@ -198,7 +196,7 @@ const validForm = () => {
     newError += '|| no valid age || ';
   }
 
-  if (newError.length > 1) {
+  if (newError) {
     newNotification('err', newError);
 
     return false;
@@ -210,11 +208,12 @@ const validForm = () => {
 };
 
 btnForm.addEventListener('click', () => {
-  if (form.name.value !== '' && form.salary.value !== '') {
-    if (form.position.value !== '' && form.age.value !== '') {
+  if (form.name.value && form.salary.value) {
+    if (form.position.value && form.age.value) {
       if (validForm()) {
         crtPeople();
       }
     }
   }
 });
+
