@@ -2,81 +2,79 @@
 
 const table = document.querySelector('table');
 const tableRows = table.tBodies[0].rows;
-let clicked;
-let clickCount = 0;
+let clickedCell = '';
+let isCellClicked = false;
 
-function formatData(string) {
-  const recString = string.slice(1);
-  const number = +recString.split(',').join('');
+function convertToNumber(salaryString) {
+  const recString = salaryString.slice(1);
+  const salaryNumber = +recString.split(',').join('');
 
-  return number;
+  return salaryNumber;
 }
 
 table.tHead.onclick = function(e) {
   const target = e.target;
-  const index = target.cellIndex;
+  const cellName = target.innerText;
 
-  clickCount = (index === clicked) ? (clickCount + 1) : 1;
+  isCellClicked = (cellName === clickedCell);
 
   const sortedArr = Array.from(tableRows);
 
-  switch (index) {
-    case 0:
-    case 1:
-    case 2:
-      sortStr(index);
+  switch (cellName) {
+    case 'Name':
+    case 'Position':
+    case 'Office':
+      sortStr();
       break;
-    case 3:
+    case 'Age':
       sortNum();
       break;
-    case 4:
+    case 'Salary':
       sortSalary();
       break;
   }
 
-  function sortStr(type) {
-    if (clickCount === 2) {
-      sortedArr.sort((a, b) => {
-        return a.cells[index].innerText > b.cells[index].innerText
-          ? -1 : 1;
-      });
-    } else {
-      sortedArr.sort((a, b) => {
-        return a.cells[index].innerText > b.cells[index].innerText
-          ? 1 : -1;
-      });
-    };
+  function sortStr() {
+    sortedArr.sort((a, b) => {
+      if (isCellClicked) {
+        return a.cells[target.cellIndex].innerText
+        > b.cells[target.cellIndex].innerText
+          ? -1
+          : 1;
+      } else {
+        return a.cells[target.cellIndex].innerText
+        > b.cells[target.cellIndex].innerText
+          ? 1
+          : -1;
+      };
+    });
   };
 
   function sortNum() {
-    if (clickCount === 2) {
-      sortedArr.sort((a, b) => {
-        return a.cells[index].innerText - b.cells[index].innerText;
-      });
-    } else {
-      sortedArr.sort((a, b) => {
-        return b.cells[index].innerText - a.cells[index].innerText;
-      });
-    };
+    sortedArr.sort((a, b) => {
+      if (isCellClicked) {
+        return a.cells[target.cellIndex].innerText
+        - b.cells[target.cellIndex].innerText;
+      } else {
+        return b.cells[target.cellIndex].innerText
+        - a.cells[target.cellIndex].innerText;
+      };
+    });
   }
 
   function sortSalary() {
-    if (clickCount === 2) {
-      sortedArr.sort((a, b) => {
-        return formatData(a.cells[index].innerText)
-        - formatData(b.cells[index].innerText);
-      });
-    } else {
-      sortedArr.sort((a, b) => {
-        return formatData(b.cells[index].innerText)
-        - formatData(a.cells[index].innerText);
-      });
-    }
+    sortedArr.sort((a, b) => {
+      if (isCellClicked) {
+        return convertToNumber(a.cells[target.cellIndex].innerText)
+        - convertToNumber(b.cells[target.cellIndex].innerText);
+      } else {
+        return convertToNumber(b.cells[target.cellIndex].innerText)
+        - convertToNumber(a.cells[target.cellIndex].innerText);
+      };
+    });
   };
 
-  clicked = target.cellIndex;
-
-  clickCount = (clickCount >= 2) ? 0 : clickCount;
+  clickedCell = target.innerText;
 
   table.tBodies[0].append(...sortedArr);
 };
@@ -140,6 +138,8 @@ saveButton.onclick = function(e) {
   }
 
   if (!personName || !position || !age || !salary) {
+    pushNotification(10, 10, 'Error', 'Required fields are empty', 'error');
+
     return;
   }
 
