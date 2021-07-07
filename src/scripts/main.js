@@ -155,6 +155,9 @@ btn.addEventListener('click', (e) => {
 });
 
 // function for adding new employer
+function getUpperCaseFirstLetter(string) {
+  return string[0].toUpperCase() + string.slice(1)
+}
 function addNewEmployer(
   names,
   position,
@@ -163,17 +166,17 @@ function addNewEmployer(
   salary) {
   const tr = document.createElement('tr');
   const salaryForm = '$'
-  + salary.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  + salary.value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
   tr.insertAdjacentHTML('beforeend', `
-  <td>${names.value}</td>
-  <td>${position.value}</td>
+  <td>${getUpperCaseFirstLetter(names.value)}</td>
+  <td>${getUpperCaseFirstLetter(position.value)}</td>
   <td>${office.value}</td>
   <td>${age.value}</td>
   <td>${salaryForm}</td> 
   `);
 
-  tBody.append(tr);
+  tBody.appendChild(tr);
 };
 
 // Function for notification
