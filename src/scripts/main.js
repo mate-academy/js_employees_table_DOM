@@ -91,7 +91,6 @@ table.insertAdjacentHTML('afterend', `
         name="name"
         type="text"
         data-qa="name"
-        required
       >
     </label>
 
@@ -101,7 +100,6 @@ table.insertAdjacentHTML('afterend', `
         name="position"
         type="text"
         data-qa="position"
-        required
       >
     </label>    
     
@@ -110,7 +108,6 @@ table.insertAdjacentHTML('afterend', `
       <select
         name="office"
         data-qa="office"
-        required
       >
         <option
           value=""
@@ -132,7 +129,6 @@ table.insertAdjacentHTML('afterend', `
         name="age"
         type="number"
         data-qa="age"
-        required
       >
     </label>
 
@@ -142,7 +138,6 @@ table.insertAdjacentHTML('afterend', `
         name="number"
         type="text"
         data-qa="salary"
-        required
       >
     </label>
     <button class="sbumit-employee-form" type="submit">Save to table</button>
@@ -176,7 +171,7 @@ function makeNotification(type, message) {
 form.addEventListener('submit', e => {
   e.preventDefault();
 
-  if (employeeNameInput.value.length < 5) {
+  if (employeeNameInput.value.length < 4) {
     document.body.append(
       makeNotification('error', 'Name is less than 4 letters!')
     );
