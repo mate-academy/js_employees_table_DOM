@@ -251,6 +251,7 @@ tableBody.addEventListener('dblclick', e => {
 
   item.innerText = '';
   item.append(inputCell);
+  inputCell.value = information;
 
   inputCell.addEventListener('blur', () => {
     if (inputCell.value.length > 0) {
