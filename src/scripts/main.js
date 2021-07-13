@@ -245,6 +245,8 @@ tableBody.addEventListener('dblclick', e => {
   const item = e.target;
   const information = item.innerText;
 
+  inputCell.style.width = window.getComputedStyle(item).width;
+
   setTimeout(() => {
     inputCell.focus();
   }, 20);
