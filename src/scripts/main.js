@@ -27,26 +27,13 @@ function salaryFromNumber(salary) {
   return `$${copy.join('')}`;
 }
 
-// проверка полей формы на корректность вводимых данных
-function formCheck() {
-  const nameCheck = form.name.value.length >= 4;
-  const positionCheck = form.position.value !== '';
-  const ageCheck = form.age.value >= 18
-    && form.age.value <= 90;
-  const salaryCheck = form.salary.value !== '';
-
-  return nameCheck
-  && positionCheck
-  && ageCheck
-  && salaryCheck;
-}
-
 const header = document.querySelector('thead');
 const headerRow = header.querySelector('tr');
 // массив из заколовков таблицы
 const headerItems = [...headerRow.children].map(item => item.textContent);
 
 const body = document.querySelector('tbody');
+let bodyRows = body.querySelectorAll('tr');
 
 const sortingFlags = new Flags();
 const cities = [
@@ -64,7 +51,8 @@ const descriptionBlock = document.createElement('p');
 
 // Сортировки
 headerRow.addEventListener('click', () => {
-  let bodyRows = body.querySelectorAll('tr');
+  bodyRows = body.querySelectorAll('tr');
+
   const index = [...headerRow.children].indexOf(event.target);
   const columnName = headerRow.children[index].textContent;
 
@@ -157,11 +145,51 @@ body.addEventListener('click', () => {
   event.target.closest('tr').classList.add('active');
 });
 
+// проверка полей формы на корректность вводимых данных
+function formCheck() {
+  const wrongFields = [];
+
+  const nameCheck = form.name.value.length >= 4
+    && inputCheck(form.name, headerItems.indexOf('Name'));
+
+  const positionCheck = inputCheck(form.position,
+    headerItems.indexOf('Position'));
+
+  const ageCheck = form.age.value >= 18
+    && form.age.value <= 90
+    && inputCheck(form.age, headerItems.indexOf('Age'));
+
+  const salaryCheck = inputCheck(form.salary, headerItems.indexOf('Age'));
+
+  if (!nameCheck) {
+    wrongFields.push('Name');
+  }
+
+  if (!positionCheck) {
+    wrongFields.push('Position');
+  }
+
+  if (!ageCheck) {
+    wrongFields.push('Age');
+  }
+
+  if (!salaryCheck) {
+    wrongFields.push('Salary');
+  }
+
+  if (wrongFields.length === 0) {
+    return true;
+  }
+
+  return wrongFields;
+}
+
 // Создание формы для добавления строки в таблицу
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
 
+// добавление лейблов в форму
 for (let i = 0; i < headerItems.length; i++) {
   const label = document.createElement('label');
 
@@ -226,9 +254,13 @@ saveBtn.addEventListener('click', () => {
   notification.classList.add('notification');
   notification.dataset.qa = 'notification';
 
-  if (formCheck()) {
-    titleBlock.innerText = 'Good';
-    descriptionBlock.innerText = 'Good';
+  const checkRes = formCheck();
+
+  if (checkRes === true) {
+    titleBlock.innerText = 'SUCCESS';
+
+    descriptionBlock.innerText = `${form.name.value}`
+      + ` was successfully added to the table`;
 
     notification.classList.remove('error');
     notification.classList.add('success');
@@ -239,6 +271,7 @@ saveBtn.addEventListener('click', () => {
     document.body.append(notification);
 
     body.append(newRow);
+    bodyRows = body.querySelectorAll('tr');
 
     // цикл очищает все поля формы
     for (let i = 0; i < headerItems.length; i++) {
@@ -249,8 +282,10 @@ saveBtn.addEventListener('click', () => {
       }
     }
   } else {
-    titleBlock.innerText = 'Bad';
-    descriptionBlock.innerText = 'Bad';
+    titleBlock.innerText = 'ERROR';
+
+    descriptionBlock.innerText = `${checkRes.join(', ')}`
+      + ` fields were filled in incorrectly`;
 
     notification.classList.remove('success');
     notification.classList.add('error');
@@ -262,32 +297,65 @@ saveBtn.addEventListener('click', () => {
   }
 });
 
+function inputCheck(input) {
+  if (input.value === '') {
+    return false;
+  }
+
+  const arr = `${input.value}`.split('');
+
+  if (input.type === 'number') {
+    if (arr.filter(num => isNaN(num)).length === 0) {
+      return true;
+    }
+  } else {
+    if (arr.filter(num => !isNaN(num)).length === 0) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function saveChanges(input, cell, index, previousValue) {
+  input.value = input.value.trim();
+
+  cell.textContent = input.value !== ''
+    ? headerItems[index] === 'Salary'
+      ? cell.textContent = salaryFromNumber(input.value)
+      : cell.textContent = input.value
+    : previousValue;
+
+  input.remove();
+}
+
 // изменение ячеек таблицы
 body.addEventListener('dblclick', () => {
+  const currentRow = event.target.closest('tr');
   const cell = event.target;
+  const indexOfCell = [...currentRow.children].indexOf(cell);
   const changeInput = document.createElement('input');
   const previousValue = cell.textContent;
 
-  changeInput.type = 'text';
+  changeInput.value = previousValue;
+
+  changeInput.type = indexOfCell === 3 || indexOfCell === 4
+    ? 'number'
+    : 'text';
   changeInput.classList.add('cell-input');
 
   cell.textContent = '';
   cell.append(changeInput);
+  changeInput.focus();
+
+  changeInput.addEventListener('blur', () => {
+    saveChanges(changeInput, cell, indexOfCell, previousValue);
+  });
 
   changeInput.addEventListener('keydown', () => {
-    const currentRow = event.target.closest('tr');
-    const currentCell = event.target.closest('td');
-    const indexOfCell = [...currentRow.children].indexOf(currentCell);
-
     // Enter
-    if (event.keyCode === 13) {
-      cell.textContent = changeInput.value !== ''
-        ? headerItems[indexOfCell] === 'Salary'
-          ? cell.textContent = salaryFromNumber(changeInput.value)
-          : cell.textContent = changeInput.value
-        : previousValue;
-
-      changeInput.remove();
+    if (event.keyCode === 13 && inputCheck(changeInput, indexOfCell)) {
+      saveChanges(changeInput, cell, indexOfCell, previousValue);
     }
   });
 });
