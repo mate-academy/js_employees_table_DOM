@@ -95,15 +95,9 @@ function parseNum(par) {
 
 table.insertAdjacentHTML('afterend', `
 <form class="new-employee-form" action="#" method="get">
-  <label>
-    Name:
-    <input name="name" type="text" required>
-  </label>
+  <label>Name:<input name="name" type="text" required></label>
 
-  <label>
-    Position:
-    <input name="position" type="text" required>
-  </label>
+  <label>Position:<input name="position" type="text" required></label>
 
   <label>
     Office: 
@@ -117,18 +111,11 @@ table.insertAdjacentHTML('afterend', `
     </select>
   </label>
 
-  <label>
-    Age:
-    <input name="age" type="number" required>
-  </label>
+  <label>Age:<input name="age" type="number" required></label>
 
-  <label>
-    Salary:
-    <input name="salary" type="number" required>
-  </label>
+  <label>Salary:<input name="salary" type="number" required></label>
 
   <button type="submit">Save to table</button>
-  <button type="reset">Reset</button>
 </form>`);
 
 const form = document.querySelector('form');
@@ -180,6 +167,8 @@ form.addEventListener('submit', (e) => {
     pushNotification('SUCCESS',
       'New employee is successfully added to the table', 'success');
   };
+
+  document.querySelector('button').type = 'reset';
 });
 
 function pushNotification(title, description, type) {
@@ -220,21 +209,25 @@ tbody.addEventListener('dblclick', (anEvent) => {
   const input = document.createElement('input');
 
   input.id = 'newData';
+
+  input.value = (savedData.includes('$'))
+    ? parseNum(savedData)
+    : savedData;
+
   target.textContent = '';
 
-  input.type = (savedData.includes('$') || +savedData)
+  input.type = (+savedData || savedData.includes('$'))
     ? 'number'
     : 'text';
 
-  if (input.type === 'number') {
+  if (input.type === 'number' && !savedData.includes('$')) {
     input.min = '18';
     input.max = '90';
   };
 
   input.className = 'cell-input';
-  input.style.width = '100%';
 
-  let newData = '';
+  let newData = savedData;
 
   input.oninput = () => {
     newData = input.value;
@@ -242,15 +235,12 @@ tbody.addEventListener('dblclick', (anEvent) => {
 
   input.addEventListener('keydown', (asEvent) => {
     if (asEvent.key === 'Enter') {
-      if ((newData.length < 4 && input.type === 'text')) {
-        if (notif) {
-          pushNotification('ERROR',
-            'Name must be longer than 4 letters', 'error');
-        };
-
-        target.textContent = savedData;
+      if (input.type === 'text' && !savedData.includes('$')) {
+        target.textContent = newData.length < 1
+          ? savedData
+          : newData;
       } else if ((newData < 18 || newData > 90)
-        && !savedData.includes('$')) {
+      && !savedData.includes('$')) {
         if (notif) {
           pushNotification('ERROR',
             'Age must be between 18 and 90', 'error');
@@ -261,7 +251,7 @@ tbody.addEventListener('dblclick', (anEvent) => {
         if (!newData) {
           target.textContent = savedData;
         } else {
-          newData = +newData;
+          newData = parseNum(newData);
           newData = '$' + newData.toLocaleString('en-US');
           target.textContent = newData;
         };
@@ -272,5 +262,19 @@ tbody.addEventListener('dblclick', (anEvent) => {
   });
 
   target.append(input);
+
+  document.addEventListener('click', (e) => {
+    const targ = e.target;
+    const inp = document.querySelector('.cell-input');
+
+    if (targ === inp) {
+      return;
+    };
+
+    target.textContent = newData.length < 1
+      ? savedData
+      : newData;
+  });
+
   input.focus();
 });
