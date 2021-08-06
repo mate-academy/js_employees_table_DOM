@@ -1,98 +1,67 @@
 'use strict';
 
-function salary(node) {
-  return +node.cells[4].innerText.replace('$', '')
-    .replace(/,/gi, '');
-}
+const table = document.querySelector('table');
+const headers = [...document.querySelectorAll('th')].slice(0, 5);
 
-function sorting(action, header) {
-  if (header.dataset.sortingOrder === 'descending'
-    || header.dataset.sortingOrder === undefined) {
-    let switching = 'happened';
-
-    while (switching === 'happened') {
-      switching = 'not happened';
-
-      const list = Array.from(document
-        .querySelectorAll('tr')).slice(1, -1);
-
-      for (let i = 0; i < list.length - 1; i++) {
-        if (action(list[i]) > action(list[i + 1])) {
-          list[i].parentNode.insertBefore(list[i + 1], list[i]);
-          switching = 'happened';
-        };
-      }
-    }
-
-    header.dataset.sortingOrder = 'ascending';
+document.querySelector('table').addEventListener('click', ev => {
+  if (headers.includes(ev.target)) {
+    tableSorting(ev.target);
   } else {
-    let switching = 'happened';
+    [...table.rows].slice(1, -1).forEach(element => {
+      element.classList.remove('active');
+    });
 
-    while (switching === 'happened') {
-      switching = 'not happened';
+    ev.target.closest('tr').className = 'active';
+  }
+});
 
-      const list = Array.from(document
-        .querySelectorAll('tr')).slice(1, -1);
+function tableSorting(header) {
+  const index = header.cellIndex;
+  let shift = 'happened';
 
-      for (let i = 0; i < list.length - 1; i++) {
-        if (action(list[i]) < action(list[i + 1])) {
-          list[i].parentNode.insertBefore(list[i + 1], list[i]);
-          switching = 'happened';
-        };
+  while (shift === 'happened') {
+    shift = 'not happened';
+
+    const list = [...document.querySelectorAll('tr')].slice(1, -1);
+
+    for (let i = 0; i < list.length - 1; i++) {
+      let a = list[i].cells[index].innerText;
+      let b = list[i + 1].cells[index].innerText;
+
+      if (header.innerText === 'Salary') {
+        a = +a.replace(/,|\$/gi, '');
+        b = +b.replace(/,|\$/gi, '');
       }
-    }
 
+      if (((a > b)
+        && (header.dataset.sortingOrder === 'descending'
+        || header.dataset.sortingOrder === undefined))
+      || ((a < b)
+        && (header.dataset.sortingOrder === 'ascending'))) {
+        list[i].parentNode.insertBefore(list[i + 1], list[i]);
+        shift = 'happened';
+      };
+    }
+  }
+
+  if (header.dataset.sortingOrder === 'ascending') {
     header.dataset.sortingOrder = 'descending';
+  } else {
+    header.dataset.sortingOrder = 'ascending';
   }
 }
 
-const table = document.querySelector('table');
+const newForm = document.createElement('form');
 
-for (let i = 0; i < table.rows[0].cells.length; i++) {
-  table.rows[0].cells[i].onclick = function() {
-    const header = Array.from(document.querySelectorAll('th')).slice(0, 5)[i];
+newForm.className = 'new-employee-form';
 
-    if (this.cellIndex === 4) {
-      sorting(salary, header);
-    } else {
-      sorting((node) => {
-        return node.cells[this.cellIndex].innerText;
-      }, header);
-    };
-  };
-}
-
-function ActiveRow() {
-  [...table.rows].slice(1, -1).forEach((row) => {
-    row.onclick = () => {
-      [...table.rows].slice(1, -1).forEach(element => {
-        element.classList.remove('active');
-      });
-      row.className = 'active';
-    };
-  });
-}
-
-ActiveRow();
-
-function AddingEmployee() {
-  const newForm = document.createElement('form');
-
-  newForm.className = 'new-employee-form';
-
-  newForm.innerHTML
+newForm.innerHTML
   = `<label>Name: <input data-qa="name" name="name" type="text" required>
   </label>
   <label>Position: <input data-qa="position" name="position"
   type="text" required></label>
   <label>Office: 
-  <select data-qa="office" name="office" id="pet-select" required>
-      <option>Tokyo</option>
-      <option>Singapore</option>
-      <option>London</option>
-      <option>New York</option>
-      <option>Edinburgh</option>
-      <option>San Francisco</option>
+  <select data-qa="office" name="office" id="cities" required>
   </select>
   </label>
   <label>Age: <input data-qa="age" name="age" type="number" required></label>
@@ -100,61 +69,80 @@ function AddingEmployee() {
   </label>
   <button name="save_to_table">Save to table</button>`;
 
-  document.body.append(newForm);
+document.body.append(newForm);
 
-  document.body.querySelector('button').addEventListener('click', (evnt) => {
-    evnt.preventDefault();
+const cities = ['Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh',
+  'San Francisco'];
+const select = document.querySelector('#cities');
 
-    const newEmployee = document.createElement('tr');
-    const emplMoney = '$' + Intl.NumberFormat('en-US')
-      .format(document.querySelector('[name = "salary"]').value);
+for (let i = 0; i < cities.length; i++) {
+  const option = document.createElement('option');
 
-    const pushNotification = (posTop, posRight, title, description, type) => {
-      const block = document.createElement('div');
-      const text = document.createElement('p');
-      const divTitle = document.createElement('h2');
-
-      block.setAttribute('data-qa', 'notification');
-      divTitle.className = 'title';
-      divTitle.textContent = title;
-
-      text.innerText = description;
-      block.className = `notification ${type}`;
-      block.style.top = `${posTop}px`;
-      block.style.right = `${posRight}px`;
-      block.append(divTitle);
-      block.append(text);
-
-      document.body.append(block);
-
-      // setTimeout(() => {
-      //   block.remove();
-      // }, 2000);
-    };
-
-    if ((document.querySelector('[name = "name"]').value.length < 4)
-    || (document.querySelector('[name = "position"]').value.length < 4)
-    || (document.querySelector('[name = "age"]').value < 18)
-    || (document.querySelector('[name = "age"]').value > 90)) {
-      pushNotification(150, 10, 'Title of Error message',
-        'Message example.\n '
-        + 'Notification should contain title and description.', 'error');
-    } else {
-      newEmployee.innerHTML
-      = `<td>${document.querySelector('[name = "name"]').value}</td>
-      <td>${document.querySelector('[name = "position"]').value}</td>
-      <td>${document.querySelector('[name = "office"]').value}</td>
-      <td>${document.querySelector('[name = "age"]').value}</td>
-      <td>${emplMoney}</td>`;
-
-      document.querySelector('table').lastElementChild
-        .previousElementSibling.append(newEmployee);
-
-      pushNotification(150, 10, 'Title of Succes message',
-        'Message example.\n '
-        + 'Notification should contain title and description.', 'success');
-    }
-  });
+  option.value = option.innerText = cities[i];
+  select.add(option);
 }
 
-AddingEmployee();
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const block = document.createElement('div');
+  const text = document.createElement('p');
+  const divTitle = document.createElement('h2');
+
+  block.setAttribute('data-qa', 'notification');
+  divTitle.className = 'title';
+  divTitle.textContent = title;
+
+  text.innerText = description;
+  block.className = `notification ${type}`;
+  block.style.top = `${posTop}px`;
+  block.style.right = `${posRight}px`;
+  block.append(divTitle);
+  block.append(text);
+
+  document.body.append(block);
+
+  setTimeout(() => {
+    block.remove();
+  }, 2000);
+};
+
+document.body.querySelector('button').addEventListener('click', (evnt) => {
+  evnt.preventDefault();
+
+  const emplName = document.querySelector('[name = "name"]').value;
+  const emplPosition = document.querySelector('[name = "position"]').value;
+  const emplAge = document.querySelector('[name = "age"]').value;
+  const emplOffice = document.querySelector('[name = "office"]').value;
+  const newEmployee = document.createElement('tr');
+  const emplMoney = '$' + Intl.NumberFormat('en-US')
+    .format(document.querySelector('[name = "salary"]').value);
+
+  if (!validateForm(emplName, emplPosition, emplAge)) {
+    pushNotification(700, 10, 'Title of Error message',
+      'Message example.\n '
+        + 'Notification should contain title and description.', 'error');
+  } else {
+    newEmployee.innerHTML
+      = `<td>${emplName}</td>
+      <td>${emplPosition}</td>
+      <td>${emplOffice}</td>
+      <td>${emplAge}</td>
+      <td>${emplMoney}</td>`;
+
+    document.querySelector('table').lastElementChild
+      .previousElementSibling.append(newEmployee);
+
+    pushNotification(700, 10, 'Title of Succes message',
+      'Message example.\n '
+        + 'Notification should contain title and description.', 'success');
+  }
+});
+
+function validateForm(name1, position, age) {
+  // "name already declared in the upper scope", без понятия где,
+  // но линтер не победить. По-этому пришлось name1 писать.
+  if (name1.length < 4 || position.length < 4 || age < 18 || age > 90) {
+    return false;
+  } else {
+    return true;
+  }
+}
