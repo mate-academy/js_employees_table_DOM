@@ -1,13 +1,12 @@
 'use strict';
 
-const table = document.querySelector('table');
 const headers = [...document.querySelectorAll('th')].slice(0, 5);
 
 document.querySelector('table').addEventListener('click', ev => {
   if (headers.includes(ev.target)) {
     tableSorting(ev.target);
   } else {
-    [...table.rows].slice(1, -1).forEach(element => {
+    [...document.querySelectorAll('tbody tr')].forEach(element => {
       element.classList.remove('active');
     });
 
@@ -22,7 +21,7 @@ function tableSorting(header) {
   while (shift === 'happened') {
     shift = 'not happened';
 
-    const list = [...document.querySelectorAll('tr')].slice(1, -1);
+    const list = [...document.querySelectorAll('tbody tr')];
 
     for (let i = 0; i < list.length - 1; i++) {
       let a = list[i].cells[index].innerText;
@@ -137,10 +136,8 @@ document.body.querySelector('button').addEventListener('click', (evnt) => {
   }
 });
 
-function validateForm(name1, position, age) {
-  // "name already declared in the upper scope", без понятия где,
-  // но линтер не победить. По-этому пришлось name1 писать.
-  if (name1.length < 4 || position.length < 4 || age < 18 || age > 90) {
+function validateForm(formName, position, age) {
+  if (formName.length < 4 || position.length < 4 || age < 18 || age > 90) {
     return false;
   } else {
     return true;
