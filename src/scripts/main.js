@@ -42,10 +42,19 @@ for (let i = 0; i < selectorTop.childElementCount; i++) {
 
 // adding elements by hand into the table
 
-const allCells = [...document.querySelectorAll('td')];
+const allCells = document.querySelectorAll('tr');
 
-allCells.map(cell => {
-  cell.contentEditable = true;
+allCells.forEach(cell => {
+  cell.addEventListener('click', (e) => {
+    allCells.forEach(activeCell => {
+      activeCell.classList.remove('active');
+    });
+    e.target.closest('tr').classList.add('active');
+
+    if (e.target.closest('tr').classList.contains('active') === true) {
+      e.target.contentEditable = true;
+    };
+  });
 });
 
 // form
@@ -186,9 +195,10 @@ function formCheck() {
 };
 
 form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
   if (formCheck() === true) {
     addEmployee();
-    e.preventDefault();
   }
 });
 
