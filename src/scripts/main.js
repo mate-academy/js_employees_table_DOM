@@ -42,7 +42,7 @@ for (let i = 0; i < selectorTop.childElementCount; i++) {
 
 // adding elements by hand into the table
 
-const allCells = document.querySelectorAll('tr');
+const allCells = tBody.querySelectorAll('tr');
 
 allCells.forEach(cell => {
   cell.addEventListener('click', (e) => {
@@ -194,11 +194,16 @@ function formCheck() {
   return checkName && checkPosition && checkAge && checkSalary;
 };
 
+function resetFormValues() {
+  document.querySelectorAll('form')[0].reset();
+}
+
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   if (formCheck() === true) {
     addEmployee();
+    resetFormValues();
   }
 });
 
