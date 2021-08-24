@@ -1,52 +1,65 @@
 'use strict';
 
 // write code here
-const form = document.createElement('form');
 const body = document.querySelector('body');
 let counter = 0;
 const tbody = document.querySelector('tbody');
-const array = [...tbody.rows];
 
-const countries = ['Tokyo', 'Singapore',
-  'London', 'New York', 'Edinburgh', 'San Francisco'];
+const createEmployeeForm = () => {
+  const countries = ['Tokyo', 'Singapore',
+    'London', 'New York', 'Edinburgh', 'San Francisco'];
+  const form = document.createElement('form');
 
-body.append(form);
-form.className = 'new-employee-form';
+  body.append(form);
+  form.className = 'new-employee-form';
 
-form.insertAdjacentHTML('afterbegin', `
-  <label>
-    Name: <input id="name" type="text">
-  </label>
-  <label>
-    Position: <input id="position" type="text">
-  </label>
-  <label>
-    Office:
-    <select id="office"></select>
-  </label>
-  <label>
-    Age: <input id="age" type="number">
-  </label>
-  <label>
-    Salary: <input id="salary" type="number">
-  </label>
-  <button type="submit">Save to table</button>
-`);
+  form.insertAdjacentHTML('afterbegin', `
+    <label>
+      Name: <input id="name" type="text">
+    </label>
+    <label>
+      Position: <input id="position" type="text">
+    </label>
+    <label>
+      Office:
+      <select id="office"></select>
+    </label>
+    <label>
+      Age: <input id="age" type="number">
+    </label>
+    <label>
+      Salary: <input id="salary" type="number">
+    </label>
+    <button type="submit">Save to table</button>
+  `);
 
-const select = document.querySelector('select');
-const inputs = document.querySelectorAll('input');
+  const select = document.querySelector('select');
+  const inputs = document.querySelectorAll('input');
+
+  for (const input of inputs) {
+    input.setAttribute('data-qa', `${input.name}`);
+    input.required = true;
+  }
+
+  for (let i = 0; i < countries.length; i++) {
+    select.insertAdjacentHTML('afterbegin', `
+    <option value='${countries[i]}'>${countries[i]}</otion>
+    `);
+  }
+};
+
+createEmployeeForm();
+
 const button = document.querySelector('button');
 
-for (const input of inputs) {
-  input.setAttribute('data-qa', `${input.name}`);
-  input.required = true;
-}
-
-for (let i = 0; i < countries.length; i++) {
-  select.insertAdjacentHTML('afterbegin', `
-  <option value='${countries[i]}'>${countries[i]}</otion>
-  `);
-}
+const createNotification = (text, result) => {
+  return `
+      <div class="notification ${result}" data-qa="notification">
+        <h2 class="title">${result}</h2>
+        <p>${text}</p>
+      </div>
+    `;
+};
 
 button.addEventListener('click', (e) => {
   e.preventDefault();
@@ -60,44 +73,24 @@ button.addEventListener('click', (e) => {
   }
 
   if (document.querySelector('#name').value.length < 4) {
-    document.body.insertAdjacentHTML('beforeend', `
-      <div class="notification error" data-qa="notification">
-        <h2 class="title">Error</h2>
-        <p>Name should be longer than 4 character.</p>
-      </div>
-    `);
-    setTimeout(() => document.querySelector('.error').remove(), 2000);
-  } else if (+document.querySelector('#age').value < 18) {
-    document.body.insertAdjacentHTML('beforeend', `
-    <div class="notification error" data-qa="notification">
-      <h2 class="title">Error</h2>
-      <p>Employee too young.</p>
-    </div>
-    `);
+    document.body.insertAdjacentHTML('beforeend',
+      createNotification('Name should be longer than 4 character.', 'error'));
     setTimeout(() => document.querySelector('.error').remove(), 2000);
   } else if (+document.querySelector('#position').value.length === 0) {
-    document.body.insertAdjacentHTML('beforeend', `
-    <div class="notification error" data-qa="notification">
-      <h2 class="title">Error</h2>
-      <p>Set position</p>
-    </div>
-    `);
+    document.body.insertAdjacentHTML('beforeend',
+      createNotification('Set position.', 'error'));
+    setTimeout(() => document.querySelector('.error').remove(), 2000);
+  } else if (+document.querySelector('#age').value < 18) {
+    document.body.insertAdjacentHTML('beforeend',
+      createNotification('Employee too young.', 'error'));
     setTimeout(() => document.querySelector('.error').remove(), 2000);
   } else if (+document.querySelector('#age').value > 90) {
-    document.body.insertAdjacentHTML('beforeend', `
-    <div class="notification error" data-qa="notification">
-      <h2 class="title">Error</h2>
-      <p>Employee too old.</p>
-    </div>
-    `);
+    document.body.insertAdjacentHTML('beforeend',
+      createNotification('Employee too old.', 'error'));
     setTimeout(() => document.querySelector('.error').remove(), 2000);
   } else if (+document.querySelector('#salary').value.length < 4) {
-    document.body.insertAdjacentHTML('beforeend', `
-    <div class="notification error" data-qa="notification">
-      <h2 class="title">Error</h2>
-      <p>Salary too small</p>
-    </div>
-    `);
+    document.body.insertAdjacentHTML('beforeend',
+      createNotification('Salary too small', 'error'));
     setTimeout(() => document.querySelector('.error').remove(), 2000);
   } else {
     tbody.insertAdjacentHTML('beforeend', `
@@ -110,21 +103,23 @@ button.addEventListener('click', (e) => {
       </tr>
     `);
 
-    body.insertAdjacentHTML('beforeend', `
-        <div class="notification success" data-qa="notification">
-          <h2 class="title">Success</h2>
-          <p>Employee added.</p>
-        </div>
-    `);
+    body.insertAdjacentHTML('beforeend',
+      createNotification('Employee added.', 'success'));
     setTimeout(() => document.querySelector('.success').remove(), 1500);
   }
 });
 
 document.querySelector('thead').addEventListener('click', (e) => {
+  const array = [...tbody.rows];
+
   counter++;
 
   function onlyNumber(string) {
-    return +string.slice(1).replace(/,/g, '');
+    if (isNaN(string)) {
+      return +string.slice(1).replace(/,/g, '');
+    } else {
+      return string;
+    }
   };
 
   if (counter % 2 === 0) {
