@@ -2,8 +2,6 @@
 
 const table = document.querySelector('table');
 
-const tbody = table.querySelector('tbody');
-
 // ------- sorting ----------------
 
 const thead = table.querySelector('thead');
@@ -30,9 +28,9 @@ function sortTable(e) {
   const indexOfSortedColumn = clickedElementRow.findIndex(
     (item) => item.textContent === clickedElement.textContent);
 
-  const tbodysortTable = table.querySelector('tbody');
+  const tbodyCurrent = table.querySelector('tbody');
 
-  const rows = [...tbodysortTable.querySelectorAll('tr')];
+  const rows = [...tbodyCurrent.querySelectorAll('tr')];
 
   rows.sort((a, b) => {
     let firsElem = a.children[indexOfSortedColumn].textContent;
@@ -64,15 +62,19 @@ function sortTable(e) {
     tbodySorted.append(elem);
   }
 
-  tbodysortTable.remove();
+  tbodyCurrent.remove();
 
   thead.after(tbodySorted);
 }
 
 // ------- row selection ----------------
 
-tbody.addEventListener('click', (e) => {
-  const activeClass = tbody.querySelector('.active');
+table.addEventListener('click', (e) => {
+  if (e.target.tagName === 'TH') {
+    return;
+  }
+
+  const activeClass = table.querySelector('.active');
 
   if (activeClass !== null) {
     activeClass.classList.remove('active');
@@ -222,6 +224,12 @@ function formValidate(formData, notification) {
 
 table.addEventListener('dblclick', (e) => {
   const cell = e.target;
+
+  const cellTag = cell.parentElement.parentElement.tagName;
+
+  if (cellTag === 'THEAD' || cellTag === 'TFOOT') {
+    return;
+  }
 
   const innerText = cell.firstChild;
 
