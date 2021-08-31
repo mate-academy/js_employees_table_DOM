@@ -220,7 +220,7 @@ function formValidate(formData, notification) {
 
 // ------- table editing ----------------
 
-tbody.addEventListener('dblclick', (e) => {
+table.addEventListener('dblclick', (e) => {
   const cell = e.target;
 
   const innerText = cell.firstChild;
