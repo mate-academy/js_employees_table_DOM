@@ -1,102 +1,42 @@
 'use strict';
 
-function convertToNumber(string) {
-  return +string.replace(/\D/g, '');
-}
-
-function convertString(string) {
-  const arr = string.split(' ');
-  let newString = '';
-
-  for (const value of arr) {
-    if (value !== '') {
-      newString += value[0].toUpperCase() + value.slice(1).toLowerCase() + ' ';
-    }
-  }
-
-  return newString.trim();
-}
-
-function convertSalary(string) {
-  return `$${string.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
-}
-
-function showNotification(condition, message) {
-  const notification = document.createElement('div');
-  const notificationTitle = document.createElement('h2');
-  const notificationDescription = document.createElement('p');
-
-  if (body.children[3]) {
-    body.children[3].remove();
-  }
-  notification.className = 'notification ' + condition;
-  notification.setAttribute('data-qa', 'notification');
-  notificationTitle.className = 'title';
-  notificationTitle.textContent = convertString(condition);
-  notificationDescription.textContent = message;
-  notification.append(notificationTitle);
-  notification.append(notificationDescription);
-  body.append(notification);
-  setTimeout(() => notification.remove(), 3000);
-}
-
-function nameVerification(value) {
-  if (value.length < 4) {
-    notificationMessage = 'Name must contain more than three letters!';
-    showNotification(error, notificationMessage);
-
-    return true;
-  }
-}
-
-function ageVerification(age) {
-  if (+age < 18) {
-    notificationMessage = 'The employee must be over than 18 years old!';
-    showNotification(error, notificationMessage);
-
-    return true;
-  }
-
-  if (+age > 90) {
-    notificationMessage = 'The employee must be under than 90 years of age!';
-    showNotification(error, notificationMessage);
-
-    return true;
-  }
-}
-
 const body = document.body;
 const thead = document.querySelector('thead');
-const titles = thead.rows[0].children;
+const titles = thead.querySelectorAll('th');
 const tbody = document.querySelector('tbody');
 const employes = tbody.rows;
+const form = document.createElement('form');
+const success = 'success';
+const error = 'error';
 let clickedTitle = null;
+let prevEmployeeName = '';
+let notificationMessage = '';
+let cellIsClicked = false;
+
+form.className = 'new-employee-form';
 
 // Сортування списку
-
 thead.addEventListener('click', e => {
   const title = e.target.closest('th');
-  const titleIndex = [...titles].indexOf(title);
   const sortedTbody = document.createElement('tbody');
+  const titleIndex = getItemIndex(titles, title);
 
   const sortedEmployes = [...employes].sort((prev, current) => {
     const prevText = prev.children[titleIndex].textContent;
     const currentText = current.children[titleIndex].textContent;
 
-    if (convertToNumber(currentText) === 0) {
+    if (title.textContent === 'Age' || title.textContent === 'Salary') {
       return (clickedTitle === title)
-        ? currentText.localeCompare(prevText)
-        : prevText.localeCompare(currentText);
+        ? convertToNumber(currentText) - convertToNumber(prevText)
+        : convertToNumber(prevText) - convertToNumber(currentText);
     }
 
     return (clickedTitle === title)
-      ? convertToNumber(currentText) - convertToNumber(prevText)
-      : convertToNumber(prevText) - convertToNumber(currentText);
+      ? currentText.localeCompare(prevText)
+      : prevText.localeCompare(currentText);
   });
 
-  for (const employee of sortedEmployes) {
-    sortedTbody.append(employee);
-  }
+  sortedTbody.append(...sortedEmployes);
   tbody.innerHTML = sortedTbody.innerHTML;
 
   clickedTitle = (clickedTitle === title)
@@ -105,22 +45,20 @@ thead.addEventListener('click', e => {
 });
 
 // Виділення працівника
-
 tbody.addEventListener('click', e => {
   const tr = e.target.closest('tr');
 
   for (const employee of employes) {
-    employee.className = '';
+    if (employee.children[0].textContent === prevEmployeeName) {
+      employee.classList.toggle('active');
+    }
   }
 
-  tr.className = 'active';
+  tr.classList.toggle('active');
+  prevEmployeeName = tr.children[0].textContent;
 });
 
 // Додавання форми
-const form = document.createElement('form');
-
-form.className = 'new-employee-form';
-
 form.insertAdjacentHTML('afterbegin', `
   <label>
     Name:
@@ -168,14 +106,9 @@ form.insertAdjacentHTML('afterbegin', `
 
   <button>Save to table</button>
 `);
-
 body.append(form);
 
 // Додавання нового працівника
-const success = 'success';
-const error = 'error';
-let notificationMessage = '';
-
 form.addEventListener('submit', e => {
   e.preventDefault();
 
@@ -187,11 +120,7 @@ form.addEventListener('submit', e => {
   const age = dataObject.age;
   const salary = convertSalary(dataObject.salary);
 
-  if (nameVerification(fullName)) {
-    return;
-  }
-
-  if (ageVerification(age)) {
+  if (checkNameValidity(fullName) || !checkAgeValidity(age)) {
     return;
   }
 
@@ -210,22 +139,13 @@ form.addEventListener('submit', e => {
 });
 
 // Редагування списку
-
-const labels = document.querySelectorAll('label');
-let cellIsClicked = false;
-
 tbody.addEventListener('dblclick', e => {
   const tr = e.target.closest('tr');
   const td = e.target.closest('td');
-  const input = (tr.children[0] === td)
-    ? labels[0].children[0].cloneNode(true)
-    : (tr.children[1] === td)
-      ? labels[1].children[0].cloneNode(true)
-      : (tr.children[2] === td)
-        ? labels[2].children[0].cloneNode(true)
-        : (tr.children[3] === td)
-          ? labels[3].children[0].cloneNode(true)
-          : labels[4].children[0].cloneNode(true);
+  const labels = document.querySelectorAll('label');
+  const itemIndex = getItemIndex(tr.children, td);
+
+  const input = labels[itemIndex].children[0].cloneNode(true);
 
   const oldText = (input.name === 'salary')
     ? td.textContent.replace(/\D/g, '')
@@ -246,7 +166,7 @@ tbody.addEventListener('dblclick', e => {
           break;
 
         case input.name === 'name':
-          if (nameVerification(input.value)) {
+          if (checkNameValidity(input.value)) {
             td.textContent = oldText;
             break;
           }
@@ -259,7 +179,7 @@ tbody.addEventListener('dblclick', e => {
           break;
 
         case input.name === 'age':
-          if (ageVerification(input.value)) {
+          if (!checkAgeValidity(input.value)) {
             td.textContent = oldText;
             break;
           }
@@ -280,3 +200,79 @@ tbody.addEventListener('dblclick', e => {
     }
   });
 });
+
+// Функції
+
+function convertToNumber(string) {
+  return +string.replace(/\D/g, '');
+}
+
+function convertString(string) {
+  const arr = string.split(' ');
+  let newString = '';
+
+  for (const value of arr) {
+    if (value !== '') {
+      newString += value[0].toUpperCase() + value.slice(1).toLowerCase() + ' ';
+    }
+  }
+
+  return newString.trim();
+}
+
+function convertSalary(string) {
+  return `$${string.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+}
+
+function showNotification(condition, message) {
+  const oldNotification = body.querySelector('#notification');
+
+  if (oldNotification) {
+    oldNotification.remove();
+  }
+
+  const notification = document.createElement('div');
+  const notificationTitle = document.createElement('h2');
+  const notificationDescription = document.createElement('p');
+
+  notification.id = 'notification';
+  notification.className = `notification ${condition}`;
+  notification.setAttribute('data-qa', 'notification');
+  notificationTitle.className = 'title';
+  notificationTitle.textContent = convertString(condition);
+  notificationDescription.textContent = message;
+  notification.append(notificationTitle, notificationDescription);
+  body.append(notification);
+  setTimeout(() => notification.remove(), 3000);
+}
+
+function checkNameValidity(value) {
+  if (value.length < 4) {
+    notificationMessage = 'Name must contain more than three letters!';
+    showNotification(error, notificationMessage);
+
+    return true;
+  }
+}
+
+function checkAgeValidity(age) {
+  if (+age < 18) {
+    notificationMessage = 'The employee must be over than 18 years old!';
+    showNotification(error, notificationMessage);
+
+    return false;
+  }
+
+  if (+age > 90) {
+    notificationMessage = 'The employee must be under than 90 years of age!';
+    showNotification(error, notificationMessage);
+
+    return false;
+  }
+
+  return true;
+}
+
+function getItemIndex(collection, item) {
+  return [...collection].indexOf(item);
+}
