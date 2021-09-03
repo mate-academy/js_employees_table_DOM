@@ -4,16 +4,16 @@ const tbody = document.querySelector('tbody');
 const thead = document.querySelector('thead');
 let count = 0;
 
-thead.addEventListener('click', (e) => {
-  const item = e.target;
-  const contents = [...thead.children[0].children];
-  const indexContents = contents.findIndex(elem => elem === item);
+// Converted string to correct format of Salary
+const correctFormatSalary = (string) => {
+  const number = +string.replace(/\D/g, '');
 
-  sortList(indexContents, tbody);
-});
+  return `$${number.toLocaleString('en')}`;
+};
 
+// Converted string to number
 const toNum = (string) => {
-  return string.replace('$', '').replace(',', '');
+  return +string.replace('$', '').replace(/,/g, '');
 };
 
 function sortList(index, sortableList) {
@@ -44,54 +44,81 @@ function sortList(index, sortableList) {
   };
 };
 
+// Sort by click
+thead.addEventListener('click', (e) => {
+  const item = e.target;
+  const contents = [...thead.children[0].children];
+  const indexContents = contents.findIndex(elem => elem === item);
+
+  sortList(indexContents, tbody);
+});
+
+// Adding to the selected item class="active"
 tbody.addEventListener('click', (e) => {
   const item = e.target.closest('tr');
 
   [...tbody.children].map(elem => elem.removeAttribute('class'));
 
-  item.setAttribute('class', 'active');
+  item.classList.add('active');
 });
 
+// Edit list by double click
 tbody.addEventListener('dblclick', (e) => {
   const item = e.target;
   const input = document.createElement('input');
   const text = item.textContent;
 
-  input.classList.add('cell-input');
-  input.setAttribute('type', 'text');
-  input.setAttribute('value', '');
   item.textContent = '';
+  item.append(input);
+  input.classList.add('cell-input');
+  input.value = `${text}`;
+  input.focus();
 
-  tbody.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Enter') {
-      item.textContent = input.value;
+  if (item === item.parentNode.children[3]) {
+    input.oninput = () => {
+      input.value = input.value.substr(0, 2);
+    };
+  };
 
-      if (input.value === '') {
+  tbody.addEventListener('click', (ev) => {
+    if (ev.target.classList.value !== 'cell-input') {
+      if (input.value.trim() === '') {
         item.textContent = text;
+      } else if (item === item.parentNode.children[4]) {
+        item.textContent = correctFormatSalary(input.value);
+      } else if (item === item.parentNode.children[3]) {
+        if (input.value >= 90 || input.value <= 18) {
+          item.textContent = text;
+        } else {
+          item.textContent = input.value.replace(/\D/g, '');
+        }
+      } else {
+        item.textContent = input.value.trim();
       }
+
+      input.remove();
     }
   });
-
-  item.append(input);
 });
 
+// Adding form to a page
 const form = document.createElement('tform');
 
-form.setAttribute('class', 'new-employee-form');
+form.classList.add('new-employee-form');
 document.body.append(form);
 
 form.innerHTML = `
 <label>
   Name:
-  <input name="name" type="text" data-qa="name" required>
+  <input class="form__item" name="name" type="text" data-qa="name" required>
 </label>
 <label>
   Position:
-  <input name="position" type="text" data-qa="position">
+  <input class="form__item" name="position" type="text" data-qa="position">
 </label>
 <label>
   Office:
-  <select name="office">
+  <select class="form__item" name="office" data-qa="office">
     <option>Tokyo</option>
     <option>Singapore</option>
     <option>London</option>
@@ -102,105 +129,87 @@ form.innerHTML = `
 </label>
 <label>
   Age:
-  <input name="age" type="number" data-qa="age">
+  <input class="form__item" name="age" type="number" data-qa="age">
 </label>
 <label>
   Salary:
-  <input name="salary" type="number" data-qa="salary">
+  <input class="form__item" name="salary" type="number" data-qa="salary">
 </label>
-<button type="submit">Save to table</button>`;
-
-const button = document.querySelector('button');
-const inputName = document.getElementsByName('name');
-const inputPosition = document.getElementsByName('position');
-const inputAge = document.getElementsByName('age');
-const inputSalary = document.getElementsByName('salary');
-const selectOffice = document.getElementsByName('office');
-
-const correctFormatSalary = (number) => `$${number.toLocaleString('en')}`;
-
-const notification = document.createElement('div');
-
-notification.setAttribute('class', 'notification');
-notification.setAttribute('data-qa', 'notification');
-notification.style.color = '#fff';
-notification.style.width = '100%';
-notification.style.height = '100%';
-notification.style.top = '0px';
-notification.style.right = '0px';
-notification.style.display = 'none';
-form.append(notification);
-
-const notificationError = document.createElement('h2');
-const errorText = [
-  'Name must contain more than 4 letters',
-  'Age cannot be less than 18 or more than 90',
-  'All fields must be filled',
-];
-
-notificationError.setAttribute('class', 'title');
-
-notificationError.innerHTML = `
-Please enter correct data
-<ul style="padding: 16px;">
-${errorText.map(item => `
-<li style = "
-  font-size: 16px;
-  font-weight: 600;
-  padding-bottom: 10px"
->${item}</li>
-`).join(' ')}
-</ul>
+<button class="form__item" type="submit">Save to table</button>
+<div data-qa="notification" class="notification"></div>
 `;
 
-const notificationSuccess = document.createElement('h2');
+const inputs = document.querySelectorAll('.form__item');
+const notification = document.querySelector('.notification');
 
-notificationSuccess.textContent = 'New employee added successfully';
-notificationSuccess.style.taxtAling = 'center';
+const getNotificationText = (stat) => {
+  if (!stat) {
+    const text = [
+      'Name must contain more than 4 letters',
+      'Age cannot be less than 18 or more than 90',
+      'All fields must be filled',
+    ];
 
-button.addEventListener('click', () => {
+    notification.innerHTML = `
+    <h2>Please enter correct data</h2>
+    <ul style="padding: 16px;">
+    ${text.map(item => `
+    <li style = "
+      font-size: 16px;
+      font-weight: 600;
+      padding-bottom: 10px"
+    >${item}</li>
+    `).join(' ')}
+    </ul>
+    `;
+  } else if (stat) {
+    notification.innerHTML = `
+    <h2>New employee added successfully</h2>
+    `;
+  }
+};
+
+// Adding data to a list
+inputs[5].addEventListener('click', () => {
   if (
-    (inputName[0].value).length <= 4
-    || (inputPosition[0].value).length <= 0
-    || inputAge[0].value < 18
-    || inputAge[0].value > 90
-    || inputSalary[0].value === ''
+    (inputs[0].value).length <= 4
+    || (inputs[1].value).length <= 0
+    || inputs[3].value < 18
+    || inputs[3].value > 90
+    || inputs[4].value === ''
   ) {
-    notification.setAttribute('class', 'notification error');
-    notification.style.display = 'block';
-    notification.style.background = 'rgba(252, 96, 96, 0.8)';
-    notification.append(notificationError);
+    notification.classList.add('error');
+    getNotificationText(false);
 
     setTimeout(() => {
-      notification.style.display = 'none';
-      notificationError.remove();
+      notification.classList.remove('error');
     }, 3000);
 
     return;
   };
 
-  const element = [...tbody.children].find(item => item).cloneNode(true);
+  const element = [...tbody.children][0].cloneNode(true);
 
-  element.children[0].textContent = inputName[0].value;
-  element.children[1].textContent = inputPosition[0].value;
-  element.children[2].textContent = selectOffice[0].value;
-  element.children[3].textContent = inputAge[0].value;
-  element.children[4].textContent = correctFormatSalary(+inputSalary[0].value);
+  for (let i = 0; i < [...inputs].length - 1; i++) {
+    if (i !== 4) {
+      element.children[i].textContent = inputs[i].value;
+    } else {
+      element.children[i].textContent = correctFormatSalary(inputs[i].value);
+    }
+  }
 
   tbody.append(element);
 
-  inputName[0].value = '';
-  inputPosition[0].value = '';
-  inputAge[0].value = '';
-  inputSalary[0].value = '';
+  for (let y = 0; y < [...inputs].length; y++) {
+    if (y !== 2) {
+      inputs[y].value = '';
+    };
+  };
 
-  notification.setAttribute('class', 'notification success');
-  notification.style.display = 'block';
-  notification.style.background = 'rgba(96, 189, 96, 0.8)';
-  notification.append(notificationSuccess);
+  notification.classList.add('success');
+  getNotificationText(true);
 
   setTimeout(() => {
-    notification.style.display = 'none';
-    notificationSuccess.remove();
+    notification.classList.remove('success');
   }, 3000);
 });
