@@ -147,17 +147,19 @@ tbody.addEventListener('dblclick', e => {
 
   const input = labels[itemIndex].children[0].cloneNode(true);
 
+  input.className = 'cell-input';
+
   const oldText = (input.name === 'salary')
     ? td.textContent.replace(/\D/g, '')
     : td.textContent;
-
-  input.className = 'cell-input';
 
   if (cellIsClicked === false) {
     cellIsClicked = true;
     td.textContent = '';
     input.value = oldText;
     td.append(input);
+
+    input.focus();
 
     input.onblur = function() {
       switch (true) {
