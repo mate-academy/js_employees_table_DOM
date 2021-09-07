@@ -160,9 +160,7 @@ form.addEventListener('submit', (e) => {
   if (notification.errors.length === 0) {
     const newRow = document.createElement('tr');
 
-    let salary = +(formData.salary.replace(',', '.'));
-
-    salary = '$' + salary.toFixed(3).replace('.', ',');
+    const salary = '$' + (+formData.salary).toFixed(3).replace('.', ',');
 
     newRow.insertAdjacentHTML('afterbegin', `
       <td>${formData.name}</td>
@@ -214,6 +212,22 @@ function formValidate(formData, notification) {
     );
   }
 
+  if (!+formData.age) {
+    notification.errors.push(
+      `Age must be a number!</br>
+      You entered <strong>${formData.age}</strong>.`
+    );
+  }
+
+  formData.salary = formData.salary.replace(',', '.');
+
+  if (!+formData.salary) {
+    notification.errors.push(
+      `Salary must be a number!</br>
+      You entered <strong>${formData.salary}</strong>.`
+    );
+  }
+
   if (notification.errors.length > 0) {
     notification.typeOfNotification = 'error';
     notification.title = 'Error!';
@@ -224,6 +238,7 @@ function formValidate(formData, notification) {
 
 table.addEventListener('dblclick', (e) => {
   const cell = e.target;
+  const cellText = cell.textContent;
 
   const cellTag = cell.parentElement.parentElement.tagName;
 
@@ -239,31 +254,29 @@ table.addEventListener('dblclick', (e) => {
 
   const input = document.createElement('input');
 
+  input.value = cellText;
   input.classList.add('cell-input');
 
-  input.addEventListener('input', (ev) => {
-    newText = ev.target.value;
-  });
+  cell.append(input);
+  input.focus();
 
-  input.onmouseout = () => {
+  input.oninput = () => {
+    newText = input.value;
+  };
+
+  input.onblur = () => {
     if (newText.length === 0) {
       newText = innerText;
     }
 
     cell.append(newText);
+
     input.remove();
   };
 
   input.addEventListener('keydown', (even) => {
     if (even.code === 'Enter') {
-      if (newText.length === 0) {
-        newText = innerText;
-      }
-
-      cell.append(newText);
-      input.remove();
+      input.blur();
     }
   });
-
-  cell.append(input);
 });
