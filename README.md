@@ -1,5 +1,5 @@
 1. Replace `<your_account>` with your Github username in the link
-    - [DEMO LINK](https://<your_account>.github.io/js_employees_table_DOM/)
+    - [DEMO LINK](https://Lenur29.github.io/js_employees_table_DOM/)
 2. Follow [this instructions](https://mate-academy.github.io/layout_task-guideline/)
     - Run `npm run test` command to test your code;
     - Run `npm run test:only -- -n` to run fast test ignoring linter;
@@ -25,15 +25,15 @@ Start table:
 ![Preview](./src/images/preview.png)
 
 ##### Implement table sorting by clicking on the title (in two directions)
-- When users clicks on one of the table headers, table should be sorted in ASC order, the second click sorts it in DESC order.
-- When users click on a new title, always sort in ASC order.
+<!-- - When users clicks on one of the table headers, table should be sorted in ASC order, the second click sorts it in DESC order.
+- When users click on a new title, always sort in ASC order. -->
 
 ##### When user clicks on a row, it should become selected.
-- Use 'active' class for table row to indicate it is selected.
-- Only one line can be selected at a time.
+<!-- - Use 'active' class for table row to indicate it is selected.
+- Only one line can be selected at a time. -->
 
 ##### Write a script to add a form to the document. Form allows users to add new employees to the spreadsheet.
-- The form should have class `new-employee-form` (to apply correct styles).
+- The form should have class `new-employee-form` (to apply correct styles). -->
 - The form should have 4 inputs, 1 select and submit button.
 - Put inputs inside labels:
 ```html
