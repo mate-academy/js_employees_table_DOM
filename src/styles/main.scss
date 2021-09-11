@@ -152,16 +152,18 @@ tr.active {
 
 .notification {
   position: absolute;
-  width: 300px;
-  min-height: 100px;
+  display: none;
+  width: 100%;
+  min-height: 100%;
   padding: 0 16px;
   box-sizing: border-box;
 
   border-radius: 10px;
   background: rgba(132, 132, 132, 0.3);
+  color: #fff;
 
-  top: 10px;
-  right: 10px;
+  top: 0;
+  right: 0;
 
   .title {
     display: block;
@@ -174,10 +176,12 @@ tr.active {
   }
 
   &.success {
-    background: rgba(10, 189, 0, 0.3);
+    display: block;
+    background: rgba(96, 189, 96, 0.8);
   }
 
   &.error {
-    background: rgba(253, 0, 0, 0.3);
+    display: block;
+    background: rgba(252, 96, 96, 0.8);
   }
 }
