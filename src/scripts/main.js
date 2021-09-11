@@ -2,7 +2,7 @@
 
 const tbody = document.querySelector('tbody');
 const thead = document.querySelector('thead');
-let count = 0;
+let sortedBy;
 
 // Converted string to correct format of Salary
 const correctFormatSalary = (string) => {
@@ -17,31 +17,28 @@ const toNum = (string) => {
 };
 
 function sortList(index, sortableList) {
-  count++;
+  let sorted = [...sortableList.children];
 
-  const children = [...sortableList.children];
-  const sorted = children.sort((a, b) => {
-    let prev;
-    let next;
+  if (thead.children[0].children[index].textContent === sortedBy) {
+    sorted = sorted.reverse();
+  } else {
+    sorted = sorted.sort((a, b) => {
+      const next = b.children[index].textContent;
+      const prev = a.children[index].textContent;
 
-    if (count % 2 !== 0) {
-      prev = a.children[index].textContent;
-      next = b.children[index].textContent;
-    } else {
-      prev = b.children[index].textContent;
-      next = a.children[index].textContent;
-    };
+      if (isNaN(toNum(prev))) {
+        return prev.localeCompare(next);
+      }
 
-    if (isNaN(toNum(prev))) {
-      return prev.localeCompare(next);
-    }
-
-    return toNum(prev) - toNum(next);
-  });
+      return toNum(prev) - toNum(next);
+    });
+  }
 
   for (const person of sorted) {
     tbody.append(person);
   };
+
+  sortedBy = thead.children[0].children[index].textContent;
 };
 
 // Sort by click
@@ -80,25 +77,25 @@ tbody.addEventListener('dblclick', (e) => {
     };
   };
 
-  tbody.addEventListener('click', (ev) => {
-    if (ev.target.classList.value !== 'cell-input') {
-      if (input.value.trim() === '') {
-        item.textContent = text;
-      } else if (item === item.parentNode.children[4]) {
-        item.textContent = correctFormatSalary(input.value);
-      } else if (item === item.parentNode.children[3]) {
-        if (input.value >= 90 || input.value <= 18) {
-          item.textContent = text;
-        } else {
-          item.textContent = input.value.replace(/\D/g, '');
-        }
-      } else {
-        item.textContent = input.value.trim();
-      }
+  input.onblur = onBlur;
 
-      input.remove();
+  function onBlur() {
+    if (input.value.trim() === '') {
+      item.textContent = text;
+    } else if (item === item.parentNode.children[4]) {
+      item.textContent = correctFormatSalary(input.value);
+    } else if (item === item.parentNode.children[3]) {
+      if (input.value >= 90 || input.value <= 18) {
+        item.textContent = text;
+      } else {
+        item.textContent = input.value.replace(/\D/g, '');
+      }
+    } else {
+      item.textContent = input.value.trim();
     }
-  });
+
+    input.remove();
+  };
 });
 
 // Adding form to a page
