@@ -1,95 +1,115 @@
 'use strict';
 
-const tbody = document.querySelector('tbody');
-const sortButton = document.querySelectorAll('th');
+const table = document.querySelector('tbody');
+const header = document.querySelectorAll('th');
 const data = [];
-const thead = document.querySelector('thead');
-let selectedCell;
-let oldValue;
-let newValue = '';
 const newInput = document.createElement('input');
+let oldValue = '';
+let rowIndex = '';
+let cellIndex = '';
 
-function addEventTocell() {
-  const table = document.querySelector('tbody');
-
-  for (let i = 0; i < table.querySelectorAll('td').length; i++) {
-    table.querySelectorAll('td')[i].addEventListener('click', changeValue);
-  }
-}
-
-function removeEventTocell() {
-  const table = document.querySelector('tbody');
-
-  for (let i = 0; i < table.querySelectorAll('td').length; i++) {
-    table.querySelectorAll('td')[i].removeEventListener('click', changeValue);
-  }
-}
-
-addEventTocell();
-
-for (let i = 0; i < thead.children[0].children.length; i++) {
-  thead.children[0].children[i].setAttribute('status', 'true');
-}
-
-for (let j = 0; j < sortButton.length; j++) {
-  sortButton[j].addEventListener('click', createHTML);
-}
-
-for (let i = 0; i < tbody.rows.length; i++) {
+for (let i = 0; i < table.rows.length; i++) {
   data.push({
-    isActive: false,
-    name: tbody.rows[i].cells[0].innerHTML,
-    position: tbody.rows[i].cells[1].innerHTML,
-    office: tbody.rows[i].cells[2].innerHTML,
-    age: tbody.rows[i].cells[3].innerHTML,
-    money: +tbody.rows[i].cells[4].innerHTML.replace(/\D/g, ''),
+    name: table.rows[i].cells[0].innerHTML,
+    position: table.rows[i].cells[1].innerHTML,
+    office: table.rows[i].cells[2].innerHTML,
+    age: table.rows[i].cells[3].innerHTML,
+    salary: +table.rows[i].cells[4].innerHTML.replace(/\D/g, ''),
+  });
+}
+
+for (let i = 0; i < header.length; i++) {
+  header[i].setAttribute('state', true);
+
+  header[i].addEventListener('click', () => {
+    filterData(
+      header[i].innerText,
+      header[i].getAttribute('state'),
+      header[i]
+    );
+  });
+}
+
+function clickRow(e) {
+  rowIndex = [...table.rows].indexOf(e.currentTarget);
+  cellIndex = [...e.currentTarget.cells].indexOf(e.target);
+
+  oldValue = e.target.innerHTML;
+  e.target.innerHTML = '';
+  newInput.value = oldValue;
+  e.target.append(newInput);
+
+  newInput.addEventListener('keyup', () => {
+    changeValue(e, rowIndex, cellIndex);
   });
 
-  addActionRows();
+  newInput.addEventListener('blur', () => {
+    blurInput(rowIndex, cellIndex);
+  });
+
+  newInput.focus();
+
+  removeClickRow();
 }
 
-function addActionRows() {
-  const table = document.querySelector('tbody');
+function changeValue(e, row, cell) {
+  if (window.event.key === 'Enter') {
+    newInput.blur();
+  }
 
-  for (let i = 0; i < table.rows.length; i++) {
-    table.rows[i].addEventListener('click', setActivRow);
+  switch (cell) {
+    case 0:
+      data[row].name = newInput.value;
+      break;
+
+    case 1:
+      data[row].position = newInput.value;
+      break;
+
+    case 2:
+      data[row].office = newInput.value;
+      break;
+
+    case 3:
+      data[row].age = +newInput.value.replace(/\D/g, '');
+      break;
+
+    case 4:
+      data[row].salary = +newInput.value.replace(/\D/g, '');
+      break;
   }
 }
 
-function setActivRow(e) {
-  const table = document.querySelector('tbody');
-  const rows = [...table.rows];
+function blurInput(row, cell) {
+  newInput.removeEventListener('keyup', () => {
+    changeValue();
+  });
 
-  for (let i = 0; i < table.rows.length; i++) {
-    if (e.currentTarget !== table.rows[i]) {
-      table.rows[i].classList.remove('active');
-      data[i].isActive = false;
+  if (newInput.value === '') {
+    switch (cell) {
+      case 0:
+        data[row].name = oldValue;
+        break;
+      case 1:
+        data[row].position = oldValue;
+        break;
+      case 2:
+        data[row].office = oldValue;
+        break;
+      case 3:
+        data[row].age = oldValue;
+        break;
+      case 4:
+        data[row].salary = +newInput.value.replace(/\D/g, '');
+        break;
     }
   }
 
-  if (!data[rows.indexOf(e.currentTarget)].isActive) {
-    e.currentTarget.classList.add('active');
-    data[rows.indexOf(e.currentTarget)].isActive = true;
-  } else {
-    e.currentTarget.classList.remove('active');
-    data[rows.indexOf(e.currentTarget)].isActive = false;
-  }
-}
-
-function checkActivLink() {
-  const table = document.querySelector('tbody');
-
-  for (let i = 0; i < table.rows.length; i++) {
-    if (data[i].isActive === true) {
-      table.rows[i].classList.add('active');
-    }
-  }
+  createHTML();
 }
 
 function createHTML(e) {
-  const element = e.currentTarget || thead.querySelectorAll('th')[0];
-
-  tbody.innerHTML = '';
+  table.innerHTML = '';
 
   data.map((item) => {
     const row = document.createElement('tr');
@@ -99,130 +119,43 @@ function createHTML(e) {
       <td>${item.position}</td>
       <td>${item.office}</td>
       <td>${item.age}</td>
-      <td class="money">$${item.money.toLocaleString('en')}</td>
+      <td>$${item.salary.toLocaleString('en')}</td>
     `;
-    tbody.append(row);
+    table.append(row);
+    row.addEventListener('dblclick', clickRow);
+    row.addEventListener('click', activeRow);
   });
-  addEventTocell();
-  filterData(element.innerHTML, element.getAttribute('status'), element);
 }
+
+function removeClickRow() {
+  for (let i = 0; i < table.rows.length; i++) {
+    table.rows[i].removeEventListener('dblclick', clickRow);
+  }
+}
+
+function activeRow(e) {
+  const rows = table.rows;
+
+  for (let i = 0; i < rows.length; i++) {
+    rows[i].classList.remove('active');
+  }
+  e.currentTarget.classList.toggle('active');
+}
+
+createHTML();
 
 function filterData(filterName, state, element) {
-  if (filterName === 'Name') {
-    if (state === 'true') {
-      data.sort((a, b) => a.name > b.name ? 1 : -1);
-      element.setAttribute('status', 'false');
-    } else {
-      data.sort((a, b) => a.name < b.name ? 1 : -1);
-      element.setAttribute('status', 'true');
-    }
-  }
+  const key = filterName.toLowerCase();
 
-  if (filterName === 'Position') {
-    if (state === 'true') {
-      data.sort((a, b) => a.position > b.position ? 1 : -1);
-      element.setAttribute('status', 'false');
-    } else {
-      data.sort((a, b) => a.position < b.position ? 1 : -1);
-      element.setAttribute('status', 'true');
-    }
-  }
+  data.sort((a, b) => {
+    return (
+      state === 'true' ? a[key] > b[key] ? 1 : -1 : a[key] < b[key] ? 1 : -1
+    );
+  });
 
-  if (filterName === 'Office') {
-    if (state === 'true') {
-      data.sort((a, b) => a.office > b.office ? 1 : -1);
-      element.setAttribute('status', 'false');
-    } else {
-      data.sort((a, b) => a.office < b.office ? 1 : -1);
-      element.setAttribute('status', 'true');
-    }
-  }
+  element.setAttribute('state', state === 'true' ? 'false' : 'true');
 
-  if (filterName === 'Age') {
-    if (state === 'true') {
-      data.sort((a, b) => a.age > b.age ? 1 : -1);
-      element.setAttribute('status', 'false');
-    } else {
-      data.sort((a, b) => a.age < b.age ? 1 : -1);
-      element.setAttribute('status', 'true');
-    }
-  }
-
-  if (filterName === 'Salary') {
-    if (state === 'true') {
-      data.sort((a, b) => a.money > b.money ? 1 : -1);
-      element.setAttribute('status', 'false');
-    } else {
-      data.sort((a, b) => a.money < b.money ? 1 : -1);
-      element.setAttribute('status', 'true');
-    }
-  }
-
-  setTimeout(() => {
-    checkActivLink();
-    addActionRows();
-  },);
-}
-
-document.body.insertAdjacentHTML('beforeend', `
-  <div class='notification error error-all'
-  data-qa="notification">
-  <h1 class='title'>All fields are required</h1>
-  </div>
-
-  <div class='notification error invalid-name'
-  data-qa="notification">
-  <h1 class='title'>Invalid name</h1>
-  </div>
-
-  <div class='notification error short-name'
-  data-qa="notification">
-  <h1 class='title'>Name must be more than 3 characters</h1>
-  </div>
-
-  <div class='notification error long-name'
-  data-qa="notification">
-  <h1 class='title'>Name must be less than 90 characters</h1>
-  </div>
-
-  <div class='notification error position'
-  data-qa="notification">
-  <h1 class='title'>Specify position</h1>
-  </div>
-
-  <div class='notification error invalid-age'
-  data-qa="notification">
-  <h1 class='title'>Invalid age</h1>
-  </div>
-
-  <div class='notification error yong-age'
-  data-qa="notification">
-  <h1 class='title'>You are too young</h1>
-  </div>
-
-  <div class='notification error salary'
-  data-qa="notification">
-  <h1 class='title'>Invalid salary</h1>
-  </div>
-
-  <div class='notification success'
-  data-qa="notification">
-  <h1 class='title'>Person was succeffully added</h1>
-  </div>
-`);
-
-const notification = document.querySelectorAll('.notification');
-const shortName = document.querySelector('.short-name');
-const invalidtName = document.querySelector('.invalid-name');
-const longName = document.querySelector('.long-name');
-const position = document.querySelector('.position');
-const invalidAge = document.querySelector('.invalid-age');
-const youngAge = document.querySelector('.yong-age');
-const salary = document.querySelector('.salary');
-const success = document.querySelector('.success');
-
-for (const mess of notification) {
-  mess.style.display = 'none';
+  createHTML();
 }
 
 document.body.insertAdjacentHTML('beforeend', `
@@ -249,194 +182,107 @@ document.body.insertAdjacentHTML('beforeend', `
   <label>Salary:
   <input required name="salary" type="number" data-qa="salary">
   </label>
-  <button type = "button">Save to table</button>
+  <button type="button">Save to table</button>
   </form>
 `);
 
-const saveBtn = document.querySelector('button');
 const form = document.querySelector('form');
+const saveBtn = document.querySelector('button');
 
-saveBtn.addEventListener('click', formValidation);
+saveBtn.addEventListener('click', validationForm);
 
-function formValidation(e) {
-  const userForm = form.elements;
+function addPerson() {
+  const formData = new FormData(form);
+
+  data.push({
+    name: formData.get('name'),
+    position: formData.get('position'),
+    office: formData.get('office'),
+    age: formData.get('age'),
+    salary: +formData.get('salary').replace(/\D/g, ''),
+  });
+
+  createHTML();
+}
+
+function validationForm() {
+  const formData = new FormData(form);
 
   if (
-    userForm['name'].value.length === 0
-      && userForm['position'].value.length === 0
-      && userForm['age'].value.length === 0
-      && userForm['salary'].value.length === 0
+    formData.get('name').length === 0
+    && formData.get('position').length === 0
+    && formData.get('age').length === 0
+    && formData.get('salary').length === 0
   ) {
-    errorAll();
+    validationAlert(
+      'error',
+      'All fields are required'
+    );
   } else {
-    errorName(e, userForm);
+    validationName(formData);
   }
 }
 
-function errorAll() {
-  notification[0].style.display = 'block';
-
-  setTimeout(() => {
-    notification[0].style.display = 'none';
-  }, 2000);
+function validationName(formData) {
+  if (formData.get('name').length < 4) {
+    validationAlert(
+      'error',
+      'Name must be more than 3 letters'
+    );
+  } else {
+    validationPosition(formData);
+  }
 }
 
-function errorName(e, userForm) {
-  if (userForm['name'].value.length === 0) {
-    invalidtName.style.display = 'block';
-
-    setTimeout(() => {
-      invalidtName.style.display = 'none';
-    }, 2000);
+function validationPosition(formData) {
+  if (formData.get('position').length < 2) {
+    validationAlert(
+      'error',
+      'Indicate your position'
+    );
+  } else {
+    validationAge(formData);
   }
+}
 
-  if (userForm['name'].value.length < 4) {
-    shortName.style.display = 'block';
-
-    setTimeout(() => {
-      shortName.style.display = 'none';
-    }, 2000);
-  }
-
-  if (userForm['name'].value.length > 90) {
-    longName.style.display = 'block';
-
-    setTimeout(() => {
-      longName.style.display = 'none';
-    }, 2000);
-  }
-
-  if (userForm['name'].value.length !== 0
-    && userForm['name'].value.length >= 4
-    && userForm['name'].value.length < 90
+function validationAge(formData) {
+  if (+formData.get('age') < 18
+    || +formData.get('age') > 90
   ) {
-    errorPosition(e, userForm);
-  }
-}
-
-function errorPosition(e, userForm) {
-  if (userForm['position'].value.length === 0) {
-    position.style.display = 'block';
-
-    setTimeout(() => {
-      position.style.display = 'none';
-    }, 2000);
+    validationAlert(
+      'error',
+      'Indicate age not less than 18 and not more than 90'
+    );
   } else {
-    errorAge(e, userForm);
+    validationSalary(formData);
   }
 }
 
-function errorAge(e, userForm) {
-  if (userForm['age'].value === '') {
-    invalidAge.style.display = 'block';
-
-    setTimeout(() => {
-      invalidAge.style.display = 'none';
-    }, 2000);
+function validationSalary(formData) {
+  if (+formData.get('salary').length === 0) {
+    validationAlert(
+      'error',
+      'Please indicate salary'
+    );
   } else {
-    if (userForm['age'].value < 18) {
-      youngAge.style.display = 'block';
+    addPerson();
 
-      setTimeout(() => {
-        youngAge.style.display = 'none';
-      }, 2000);
-    } else {
-      errorSalary(e, userForm);
-    }
+    validationAlert(
+      'success',
+      'Data added to table'
+    );
   }
 }
 
-function errorSalary(e, userForm) {
-  if (userForm['salary'].value.length === 0) {
-    salary.style.display = 'block';
-
-    setTimeout(() => {
-      salary.style.display = 'none';
-    }, 2000);
-  } else {
-    succeffully(e, userForm);
-  }
-}
-
-function succeffully(e, userForm) {
-  success.style.display = 'block';
+function validationAlert(className, text) {
+  document.body.insertAdjacentHTML('beforeend', `
+  <div class='notification ${className}'
+  data-qa="notification">
+  <h1 class='title'>${text}</h1>
+  </div>
+`);
 
   setTimeout(() => {
-    success.style.display = 'none';
-  }, 2000);
-
-  addPerson(e, userForm);
-}
-
-function addPerson(e, userForm) {
-  data.push({
-    isActive: false,
-    name: userForm['name'].value,
-    position: userForm['position'].value,
-    office: userForm['office'].value,
-    age: userForm['age'].value,
-    money: +userForm['salary'].value.replace(/\D/g, ''),
-  });
-
-  setTimeout(() => {
-    addEventTocell();
-  }, 500);
-
-  createHTML(e);
-}
-
-function changeValue(e) {
-  removeEventTocell();
-
-  const indexOf = e.currentTarget.innerHTML.indexOf('$');
-
-  oldValue = indexOf === 0
-    ? +e.currentTarget.innerHTML.replace(/\D/g, '').toLocaleString('en')
-    : e.currentTarget.innerHTML;
-
-  newValue = indexOf === 0
-    ? +e.currentTarget.innerHTML.replace(/\D/g, '').toLocaleString('en')
-    : e.currentTarget.innerHTML;
-  selectedCell = e.currentTarget;
-
-  newInput.addEventListener('keyup', () => {
-    writeNewValue(indexOf);
-  });
-
-  e.currentTarget.innerHTML = '';
-  newInput.value = oldValue;
-  selectedCell.append(newInput);
-  newInput.focus();
-
-  newInput.addEventListener('blur', () => {
-    addNewValue(indexOf);
-  });
-}
-
-function addNewValue(indexOf) {
-  setTimeout(() => {
-    if (newValue === '' || newValue === 0) {
-      selectedCell.innerHTML
-      = indexOf === 0 ? `$${oldValue.toLocaleString('en')}` : oldValue;
-    } else {
-      setTimeout(() => {
-        selectedCell.innerHTML
-        = indexOf === 0 ? `$${newValue.toLocaleString('en')}` : newValue;
-        newInput.remove();
-      }, 10);
-    }
-  },);
-
-  for (let i = 0; i < tbody.querySelectorAll('td').length; i++) {
-    tbody.querySelectorAll('td')[i].addEventListener('click', changeValue);
-  }
-}
-
-function writeNewValue(indexOf) {
-  if (event.code === 'Enter') {
-    addNewValue(indexOf);
-  }
-
-  newValue = indexOf === 0
-    ? +newInput.value.replace(/\D/g, '') : newInput.value;
+    document.querySelector('.notification').remove();
+  }, 3000);
 }
