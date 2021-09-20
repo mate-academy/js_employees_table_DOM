@@ -201,6 +201,11 @@ body.append(form);
 
 /* валидация данных формы и вставки их в общую таблицу */
 
+function deletePreviousMessage() {
+  document.querySelectorAll('.notification')
+    .forEach(message => message.remove());
+}
+
 form.addEventListener('submit', (e) => {
   const sel = document.querySelector('select');
 
@@ -217,6 +222,8 @@ form.addEventListener('submit', (e) => {
   let checkSum = 0;
 
   if (nameNewEmp[1].length < 4) {
+    deletePreviousMessage();
+
     pushNotification(450, 10, 'ERROR',
       'Имя должно сожержать более 4-х символов.', 'error');
   } else {
@@ -224,9 +231,13 @@ form.addEventListener('submit', (e) => {
   }
 
   if (isNaN(+age[1])) {
+    deletePreviousMessage();
+
     pushNotification(600, 10, 'ERROR',
       'Введите Ваш возраст в числовом формате.', 'error');
   } else if (+age[1] < 18 || +age[1] > 90) {
+    deletePreviousMessage();
+
     pushNotification(600, 10, 'ERROR',
       'Ваш возраст должен быть от 18 до 90 лет.', 'error');
   } else {
@@ -234,6 +245,8 @@ form.addEventListener('submit', (e) => {
   }
 
   if (isNaN(+salary[1])) {
+    deletePreviousMessage();
+
     pushNotification(750, 10, 'ERROR',
       'Введите Вашу заработную плату в числовом формате.', 'error');
   } else {
@@ -242,6 +255,8 @@ form.addEventListener('submit', (e) => {
   }
 
   if (checkSum >= 3) {
+    deletePreviousMessage();
+
     pushNotification(450, 10, 'SUCCESS', 'Это успешный УСПЕХ', 'success');
 
     const newEmployeeRow = document.createElement('tr');
@@ -263,6 +278,9 @@ tableBody.addEventListener('dblclick', (e) => {
   const targetCell = e.target;
   const prevTargetInner = targetCell.innerText;
 
+  const columnHeader
+    = [...document.querySelectorAll('th')][targetCell.cellIndex];
+
   targetCell.innerText = '';
 
   const cellInput = document.createElement('input');
@@ -276,9 +294,74 @@ tableBody.addEventListener('dblclick', (e) => {
 
     if (newValueFromInput.length <= 0) {
       targetCell.innerText = prevTargetInner;
-    } else {
-      targetCell.innerText = newValueFromInput;
-      cellInput.remove();
+    }
+
+    switch (columnHeader.innerText) {
+      case 'Name':
+
+        /* не знаю как написать регулярку,
+          чтобы проверялось есть после буквы число или нет
+          (чтоб в имени вообще не было цифр) */
+
+        if ((/([A-Za-z])/g).test(newValueFromInput)
+            && newValueFromInput.length >= 4) {
+          targetCell.innerText = newValueFromInput;
+          cellInput.remove();
+          deletePreviousMessage();
+        } else if (!(/([A-Za-z])/g).test(newValueFromInput)
+            || newValueFromInput.length < 4) {
+          deletePreviousMessage();
+
+          pushNotification(450, 10, 'ERROR',
+            'Вводимые данны должны быть СТРОКОЙ \n '
+              + 'и содержать более 4-х символов', 'error');
+        }
+        break;
+      case 'Position':
+      case 'Office':
+        if ((/[A-Za-z]/g).test(newValueFromInput)) {
+          targetCell.innerText = newValueFromInput;
+          cellInput.remove();
+          deletePreviousMessage();
+        } else if (!(/[A-Za-z]/g).test(newValueFromInput)) {
+          deletePreviousMessage();
+
+          pushNotification(450, 10, 'ERROR',
+            'Вводимые данны должны быть СТРОКОЙ.', 'error');
+        }
+        break;
+
+      case 'Age':
+        if (!isNaN(+newValueFromInput)
+            && +newValueFromInput > 18 && +newValueFromInput < 90) {
+          targetCell.innerText = newValueFromInput;
+          cellInput.remove();
+          deletePreviousMessage();
+        } else if (isNaN(+newValueFromInput)) {
+          deletePreviousMessage();
+
+          pushNotification(600, 10, 'ERROR',
+            'Введите Ваш возраст в числовом формате.', 'error');
+        } else if (+newValueFromInput < 18 || +newValueFromInput > 90) {
+          deletePreviousMessage();
+
+          pushNotification(600, 10, 'ERROR',
+            'Ваш возраст должен быть от 18 до 90 лет.', 'error');
+        }
+        break;
+      case 'Salary':
+        if (isNaN(+newValueFromInput)) {
+          deletePreviousMessage();
+
+          pushNotification(750, 10, 'ERROR',
+            'Введите Вашу заработную плату в числовом формате.', 'error');
+        } else {
+          deletePreviousMessage();
+
+          targetCell.innerText = '$' + new Intl.NumberFormat('en-EN').format(
+            +newValueFromInput);
+        }
+        break;
     }
   });
 
@@ -288,8 +371,73 @@ tableBody.addEventListener('dblclick', (e) => {
     if (ev.key === 'Enter' && newValueFromInput.length <= 0) {
       targetCell.innerText = prevTargetInner;
     } else if (ev.key === 'Enter' && newValueFromInput.length > 0) {
-      targetCell.innerText = newValueFromInput;
-      cellInput.remove();
+      switch (columnHeader.innerText) {
+        case 'Name':
+
+          /* не знаю как написать регулярку,
+            чтобы проверялось есть после буквы число или нет
+            (чтоб в имени вообще не было цифр) */
+
+          if ((/([A-Za-z])/g).test(newValueFromInput)
+              && newValueFromInput.length >= 4) {
+            targetCell.innerText = newValueFromInput;
+            cellInput.remove();
+            deletePreviousMessage();
+          } else if (!(/([A-Za-z])/g).test(newValueFromInput)
+              || newValueFromInput.length < 4) {
+            deletePreviousMessage();
+
+            pushNotification(450, 10, 'ERROR',
+              'Вводимые данны должны быть СТРОКОЙ \n '
+                + 'и содержать более 4-х символов', 'error');
+          }
+          break;
+        case 'Position':
+        case 'Office':
+          if ((/[A-Za-z]/g).test(newValueFromInput)) {
+            targetCell.innerText = newValueFromInput;
+            cellInput.remove();
+            deletePreviousMessage();
+          } else if (!(/[A-Za-z]/g).test(newValueFromInput)) {
+            deletePreviousMessage();
+
+            pushNotification(450, 10, 'ERROR',
+              'Вводимые данны должны быть СТРОКОЙ.', 'error');
+          }
+          break;
+
+        case 'Age':
+          if (!isNaN(+newValueFromInput)
+              && +newValueFromInput > 18 && +newValueFromInput < 90) {
+            targetCell.innerText = newValueFromInput;
+            cellInput.remove();
+            deletePreviousMessage();
+          } else if (isNaN(+newValueFromInput)) {
+            deletePreviousMessage();
+
+            pushNotification(600, 10, 'ERROR',
+              'Введите Ваш возраст в числовом формате.', 'error');
+          } else if (+newValueFromInput < 18 || +newValueFromInput > 90) {
+            deletePreviousMessage();
+
+            pushNotification(600, 10, 'ERROR',
+              'Ваш возраст должен быть от 18 до 90 лет.', 'error');
+          }
+          break;
+        case 'Salary':
+          if (isNaN(+newValueFromInput)) {
+            deletePreviousMessage();
+
+            pushNotification(750, 10, 'ERROR',
+              'Введите Вашу заработную плату в числовом формате.', 'error');
+          } else {
+            deletePreviousMessage();
+
+            targetCell.innerText = '$' + new Intl.NumberFormat('en-EN').format(
+              +newValueFromInput);
+          }
+          break;
+      }
     }
   });
 });
