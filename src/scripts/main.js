@@ -7,11 +7,14 @@ const counters = Array(headers.length).fill(0);
 
 document.addEventListener('click', e => {
   const rows = [...table.querySelectorAll('tr')];
+
   for (const element of headers) {
-    if (e.target === element){
+    if (e.target === element) {
       const i = headers.indexOf(e.target);
+
       if (counters[i] === 0) {
         counters[i] = 1;
+
         rows.sort(function(a, b) {
           if (a.cells[i].textContent.includes('$')) {
             return parseInt(a.cells[i].textContent.slice(1))
@@ -20,12 +23,13 @@ document.addEventListener('click', e => {
             return a.cells[i].textContent.localeCompare(b.cells[i].textContent);
           }
         });
-    
+
         for (const rowElement of rows) {
           table.append(rowElement);
         }
       } else {
         counters[i] = 0;
+
         rows.sort(function(a, b) {
           if (a.cells[i].textContent.includes('$')) {
             return parseInt(b.cells[i].textContent.slice(1))
@@ -34,7 +38,7 @@ document.addEventListener('click', e => {
             return b.cells[i].textContent.localeCompare(a.cells[i].textContent);
           }
         });
-    
+
         for (const rowElement of rows) {
           table.append(rowElement);
         }
@@ -46,6 +50,7 @@ document.addEventListener('click', e => {
     if (rows[j].classList.contains('active')) {
       rows[j].classList.remove('active');
     }
+
     for (let k = 0; k < rows[j].childElementCount; k++) {
       if (e.target === rows[j].cells[k]) {
         rows[j].classList.add('active');
@@ -55,6 +60,7 @@ document.addEventListener('click', e => {
 });
 
 const form = document.createElement('form');
+
 form.classList.add('new-employee-form');
 
 form.innerHTML = `
@@ -95,12 +101,15 @@ form.innerHTML = `
 `;
 
 body.append(form);
+
 const button = document.createElement('button');
+
 button.innerText = 'Save to table';
 form.append(button);
 
 button.addEventListener('click', ev => {
   const message = document.createElement('div');
+
   message.classList.add('notification');
   message.dataset.qa = 'notification';
   message.style.display = 'flex';
@@ -110,12 +119,14 @@ button.addEventListener('click', ev => {
   message.style.fontSize = '40px';
 
   const newRow = document.createElement('tr');
+
   newRow.innerHTML += `
     <td>${form.children[0].lastElementChild.value}</td>
     <td>${form.children[1].lastElementChild.value}</td>
     <td>${form.children[2].lastElementChild.value}</td>
     <td>${form.children[3].lastElementChild.value}</td>
-    <td>$${parseInt(form.children[4].lastElementChild.value).toLocaleString('en-US')}</td>
+    <td>$${parseInt(form.children[4].lastElementChild.value)
+    .toLocaleString('en-US')}</td>
   `;
 
   if (form.children[0].lastElementChild.value.length < 4) {
@@ -127,45 +138,55 @@ button.addEventListener('click', ev => {
     message.textContent = 'WARNING';
     body.append(message);
   } else if (form.children[3].lastElementChild.value < 18
-      || form.children[3].lastElementChild.value > 90) {
-        message.classList.add('error');
-        message.textContent = 'ERROR!';
-        body.append(message);
+    || form.children[3].lastElementChild.value > 90) {
+    message.classList.add('error');
+    message.textContent = 'ERROR!';
+    body.append(message);
   } else if (form.children[4].lastElementChild.value.length === 0) {
     message.classList.add('warning');
     message.textContent = 'WARNING!';
     body.append(message);
   } else {
-      table.appendChild(newRow);
-      message.classList.add('success');
-      message.textContent = 'SUCCESS!';
-      body.append(message);
+    table.appendChild(newRow);
+    message.classList.add('success');
+    message.textContent = 'SUCCESS!';
+    body.append(message);
   }
-    setTimeout(() => {
-      message.remove()
-    }, 1500);
-    ev.preventDefault();
+
+  setTimeout(() => {
+    message.remove();
+  }, 1500);
+  ev.preventDefault();
 });
 
 let clicked = false;
 
 table.addEventListener('dblclick', evt => {
   const cellCount = document.querySelectorAll('td');
+
   for (let x = 0; x < cellCount.length; x++) {
-      if (evt.target === cellCount[x] && clicked === false) {
-        clicked = true;
-        let oldValue = cellCount[x].textContent;
-        cellCount[x].innerHTML = `
+    if (evt.target === cellCount[x] && clicked === false) {
+      clicked = true;
+
+      const oldValue = cellCount[x].textContent;
+
+      cellCount[x].innerHTML = `
           <input class='cell-input'>
         `;
 
       table.addEventListener('keydown', enter => {
-        const newTD = document.createElement('td');
+        let newTD = document.createElement('td');
+
         if (enter.key === 'Enter') {
-          let cellValue = document.getElementsByClassName('cell-input')[0].value;
+          const cellValue
+            = document.getElementsByClassName('cell-input')[0].value;
 
           if (cellValue !== '') {
-            newTD.textContent = cellValue;
+            if (oldValue.includes('$')) {
+              newTD.textContent = `$${parseInt(cellValue).toLocaleString('en-US')}`;
+            } else {
+              newTD.textContent = cellValue;
+            }
             cellCount[x].replaceWith(newTD);
           } else {
             newTD.textContent = oldValue;
@@ -177,10 +198,15 @@ table.addEventListener('dblclick', evt => {
 
       table.addEventListener('blur', () => {
         const newTD = document.createElement('td');
-        let cellValue = document.getElementsByClassName('cell-input')[0].value;
+        const cellValue
+          = document.getElementsByClassName('cell-input')[0].value;
 
         if (cellValue !== '') {
-          newTD.textContent = cellValue;
+          if (oldValue.includes('$')) {
+            newTD.textContent = `$${parseInt(cellValue).toLocaleString('en-US')}`;
+          } else {
+            newTD.textContent = cellValue;
+          }
           cellCount[x].replaceWith(newTD);
         } else {
           newTD.textContent = oldValue;
@@ -191,4 +217,4 @@ table.addEventListener('dblclick', evt => {
       }, true);
     }
   }
-});
+}, true);
