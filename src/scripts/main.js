@@ -175,7 +175,7 @@ table.addEventListener('dblclick', evt => {
         `;
 
       table.addEventListener('keydown', enter => {
-        const newTD = document.createElement('td');
+        let newTD = document.createElement('td');
 
         if (enter.key === 'Enter') {
           const cellValue
@@ -183,9 +183,7 @@ table.addEventListener('dblclick', evt => {
 
           if (cellValue !== '') {
             if (oldValue.includes('$')) {
-              newTD.textContent = `
-                $${parseInt(cellValue).toLocaleString('en-US')}
-              `;
+              newTD.textContent = `$${parseInt(cellValue).toLocaleString('en-US')}`;
             } else {
               newTD.textContent = cellValue;
             }
@@ -205,9 +203,7 @@ table.addEventListener('dblclick', evt => {
 
         if (cellValue !== '') {
           if (oldValue.includes('$')) {
-            newTD.textContent = `
-              $${parseInt(cellValue).toLocaleString('en-US')}
-            `;
+            newTD.textContent = `$${parseInt(cellValue).toLocaleString('en-US')}`;
           } else {
             newTD.textContent = cellValue;
           }
