@@ -129,7 +129,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   function createNewElement(element, textOfElement) {
     const creatElem = document.createElement(element);
 
-    creatElem.textContent = textOfElement;
+    creatElem.innerHTML = `${textOfElement.replace('.', '. </br>')}`;
     creatElem.setAttribute('data-qa', 'notification');
     elementMessage.append(creatElem);
 
@@ -148,7 +148,8 @@ const pushNotification = (posTop, posRight, title, description, type) => {
     = `${parseFloat(getComputedStyle(elementMessage).right) + posRight}px`;
 
   elementMessage.style.top
-    = `${parseFloat(getComputedStyle(elementMessage).top) + posTop}px`;
+    = `${window.screen.height
+      - parseFloat(getComputedStyle(elementMessage).height) + posTop}px`;
   elementMessage.style.boxSizing = 'content-box';
 
   setTimeout(() => {
@@ -156,20 +157,28 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   }, 2000);
 };
 
+let textNotification = '';
+
 function checkValue(columnN, cellValue) {
-  if (columnN === 0 && cellValue.length >= 4) {
-    return true;
+  if (cellValue === '') {
+    textNotification
+      += 'Fill in all the details. ';
   }
 
-  if (columnN === 3 && cellValue >= 18 && cellValue <= 90) {
-    return true;
+  if (columnN === 0 && cellValue.length < 4) {
+    textNotification
+      += 'The number of letters in the name must be more than 4.';
+  }
+
+  if (columnN === 3 && (cellValue < 18 || cellValue > 90)) {
+    textNotification += ' Age must be between 18 and 90 years old. ';
   }
 
   if (columnN !== 0 && columnN !== 3) {
-    return true;
+    textNotification += '';
   }
 
-  return false;
+  return textNotification;
 }
 
 button.addEventListener('click', (e) => {
@@ -188,10 +197,10 @@ button.addEventListener('click', (e) => {
     if (objInput[element].dataset.qa === 'salary') {
       textValue
         = `$${Number(objInput[element]
-          .firstElementChild.value).toLocaleString()}`;
+          .firstElementChild.value).toLocaleString('en-US')}`;
     }
 
-    if (checkValue(count, textValue)) {
+    if (checkValue(count, textValue) === '') {
       cell.innerText = textValue;
       row.append(cell);
       checked++;
@@ -203,11 +212,13 @@ button.addEventListener('click', (e) => {
   if (count === checked) {
     personArray.append(row);
 
-    pushNotification(550, 10, 'Data entered correctly',
-      'Notification should contain title and description.', 'success');
+    pushNotification(10, 10, 'Data entered correctly',
+      'Data added to table.', 'success');
   } else {
-    pushNotification(550, 10, 'Data entered incorrectly',
-      'Notification should contain title and description.', 'error');
+    pushNotification(10, 10, 'Data entered incorrectly',
+      `${textNotification}`, 'error');
+
+    textNotification = '';
   }
 
   for (const element in objInput) {
@@ -216,6 +227,35 @@ button.addEventListener('click', (e) => {
 });
 
 // Editing of table cells by double-clicking on it (optional).
+
+function createNewCell(target, initialValue, newTextString) {
+  if ((target.parentElement.lastElementChild === target
+        && Number.isNaN(getNumberFromString(newTextString)))
+      || (target.parentElement.lastElementChild.previousElementSibling
+          === target
+        && Number.isNaN(Number(newTextString)))
+  ) {
+    return pushNotification(10, 10, 'Data entered incorrectly',
+      `Data must be a number`, 'error');
+  }
+
+  if (target.parentElement.firstElementChild === target
+    && newTextString.length < 4) {
+    return pushNotification(10, 10, 'Data entered incorrectly',
+      `The number of letters in the name must be more than 4.`, 'error');
+  }
+
+  if (target.parentElement.lastElementChild.previousElementSibling
+      === target
+    && (newTextString < 18 || newTextString > 90)) {
+    return pushNotification(10, 10, 'Data entered incorrectly',
+      `Age must be between 18 and 90 years old.`, 'error');
+  }
+
+  initialValue.remove();
+  target.classList.remove('cell-input');
+  target.innerText = newTextString;
+}
 
 personArray.addEventListener('dblclick', (e) => {
   const selectedCell = personArray.querySelector('input');
@@ -233,9 +273,7 @@ personArray.addEventListener('dblclick', (e) => {
   e.target.classList.add('cell-input');
 
   e.target.addEventListener('blur', () => {
-    cell.remove();
-    e.target.classList.remove('cell-input');
-    e.target.innerText = newText;
+    createNewCell(e.target, cell, newText);
   }, true);
 
   e.target.addEventListener('keydown', (ev) => {
@@ -244,13 +282,11 @@ personArray.addEventListener('dblclick', (e) => {
     }
 
     if (e.target.parentElement.lastElementChild === e.target) {
-      newText = `$${Number(newText).toLocaleString()}`;
+      newText = `$${Number(newText).toLocaleString('en-US')}`;
     }
 
     if (ev.code === 'Enter') {
-      cell.remove();
-      e.target.classList.remove('cell-input');
-      e.target.innerText = newText;
+      createNewCell(e.target, cell, newText);
     }
   });
 });
