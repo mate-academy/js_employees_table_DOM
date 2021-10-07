@@ -6,7 +6,7 @@ const tableBodyRows = [...tBody.rows];
 const tablesTitles = [...tHead.children[0].cells]
   .map(td => td.textContent.trim().toLowerCase());
 
-function sortedTable(index, typesSort, methodSort) {
+function sortedTable(index, typesSort, AscOrDesc) {
   const bodyRows = [...tBody.rows];
 
   bodyRows.sort((a, b) => {
@@ -14,13 +14,13 @@ function sortedTable(index, typesSort, methodSort) {
     let partB = b.children[index].innerHTML;
 
     if (typesSort) {
-      partA = partA.replace(/\D/g, '');
-      partB = partB.replace(/\D/g, '');
+      partA = getNumbers(partA);
+      partB = getNumbers(partB);
 
-      return methodSort ? partA - partB : partB - partA;
+      return AscOrDesc ? partA - partB : partB - partA;
     }
 
-    return methodSort ? partA.localeCompare(partB) : partB.localeCompare(partA);
+    return AscOrDesc ? partA.localeCompare(partB) : partB.localeCompare(partA);
   }).forEach(el => tBody.append(el));
 }
 
@@ -38,10 +38,13 @@ tHead.addEventListener('click', (e) => {
     e.target.classList.add('sort-asc');
   }
 
-  const methodSort = e.target.classList.value === 'sort-asc' ? 1 : 0;
-  const typesSort = index <= 2 ? 0 : 1;
+  const AscOrDesc = Math.sign(e.target.classList.value === 'sort-asc');
 
-  sortedTable(index, typesSort, methodSort);
+  const columnsWithCellIndexString = 2;
+
+  const typesSort = !Math.sign(index <= columnsWithCellIndexString);
+
+  sortedTable(index, typesSort, AscOrDesc);
 });
 
 tableBodyRows.forEach(row => {
@@ -190,19 +193,31 @@ function maskNewRow() {
 };
 
 function convertToCurrent(number) {
-  const numConvert = +number;
+  const numberResult = getNumbers(number);
 
-  return `$${number ? numConvert.toLocaleString('en-US') : 0}`;
+  return `$${number ? Number(numberResult).toLocaleString('en-US') : 0}`;
 };
+
+function getNumbers(number) {
+  return number.replace(/\D/g, '');
+}
 
 tBody.addEventListener('dblclick', (e) => {
   const elem = e.target;
 
   if (elem.tagName === 'TD') {
-    const elemValue = elem.textContent;
+    let elemValue = elem.textContent;
+
+    if (elem.dataset.qa === 'salary') {
+      elemValue = getNumbers(elemValue);
+    }
 
     elem.innerHTML = `
-      <input type="text" class="cell-input" value="${elemValue}">
+      <input
+        type="text"
+        class="cell-input"
+        value="${elemValue}"
+      >
     `;
 
     const input = elem.querySelector('.cell-input');
@@ -211,13 +226,23 @@ tBody.addEventListener('dblclick', (e) => {
     input.selectionStart = elemValue.length;
 
     input.addEventListener('blur', () => {
-      elem.innerHTML = input.value;
+      elem.innerHTML = elem.dataset.qa === 'salary'
+        ? convertToCurrent(input.value)
+        : input.value;
     });
 
     input.addEventListener('keydown', (event) => {
       if (event.code === 'Enter') {
-        elem.innerHTML = input.value;
+        elem.innerHTML = elem.dataset.qa === 'salary'
+          ? convertToCurrent(input.value)
+          : input.value;
       }
+    });
+
+    input.addEventListener('keyup', (event) => {
+      if (elem.dataset.qa === 'salary' || elem.dataset.qa === 'age') {
+        input.value = input.value.replace(/[^\d]/g, '');
+      };
     });
   };
 });
