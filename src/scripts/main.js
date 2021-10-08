@@ -148,7 +148,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
     = `${parseFloat(getComputedStyle(elementMessage).right) + posRight}px`;
 
   elementMessage.style.top
-    = `${window.screen.height
+    = `${window.innerHeight
       - parseFloat(getComputedStyle(elementMessage).height) + posTop}px`;
   elementMessage.style.boxSizing = 'content-box';
 
@@ -160,11 +160,6 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 let textNotification = '';
 
 function checkValue(columnN, cellValue) {
-  if (cellValue === '') {
-    textNotification
-      += 'Fill in all the details. ';
-  }
-
   if (columnN === 0 && cellValue.length < 4) {
     textNotification
       += 'The number of letters in the name must be more than 4.';
