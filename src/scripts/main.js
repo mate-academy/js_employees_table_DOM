@@ -5,14 +5,13 @@ const tHead = document.querySelector('thead');
 const tH = tHead.querySelectorAll('th');
 
 const tBody = document.querySelector('tbody');
-const tBodyData = [...tBody.rows];
 
-const offices = [...new Set(tBodyData
+const offices = [...new Set([...tBody.rows]
   .map(each => each.cells[2].outerHTML))]
   .sort().join('')
   .replaceAll('td', 'option');
 
-const officesHTML = [...new Set(tBodyData
+const officesHTML = [...new Set([...tBody.rows]
   .map(each => {
     const inText = each.cells[2].innerText;
 
@@ -28,6 +27,7 @@ let curSort = Number;
 
 tHead.addEventListener('click', (ev) => {
   const sortByIndex = [...tH].indexOf(ev.target);
+  const tBodyData = [...tBody.rows];
 
   // reverse sorting if same header clicked
   if (curSort === sortByIndex) {
