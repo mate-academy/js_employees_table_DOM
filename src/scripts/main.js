@@ -57,6 +57,7 @@ tableHeadColumns.forEach((tableHeadColum) => {
 
 tableHead.addEventListener('click', (events) => {
   tableContent = document.querySelector('tbody');
+  rows = tableContent.querySelectorAll('tr');
 
   const tableArr = [];
   const sortKey = events.target.textContent;
@@ -136,6 +137,8 @@ function rowSelect() {
     if (!activeCell) {
       const currentCell = events.target;
       const oldText = currentCell.textContent;
+      const columName = tableHeadColumns[events.target.cellIndex]
+        .textContent.toLowerCase();
 
       currentCell.textContent = '';
       activeCell = true;
@@ -143,17 +146,35 @@ function rowSelect() {
       const inputField = document.createElement('input');
 
       inputField.value = oldText;
+      inputField.dataset.qa = columName;
+
+      if (inputField.dataset.qa === 'salary') {
+        inputField.value = salaryToNumber(inputField.value);
+      };
+
       currentCell.append(inputField);
 
       inputField.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-          const newText = (inputField.value === '')
-            ? oldText
-            : inputField.value;
+          inputField.value = inputField.value.trim();
 
-          inputField.remove();
-          currentCell.textContent = newText;
-          activeCell = false;
+          let valid = true;
+
+          valid = validateValue(inputField.value, inputField.dataset.qa, valid);
+
+          if (valid) {
+            if (inputField.dataset.qa === 'salary') {
+              inputField.value = bitRate(inputField.value);
+            };
+
+            const newText = (inputField.value === '')
+              ? oldText
+              : inputField.value;
+
+            inputField.remove();
+            currentCell.textContent = newText;
+            activeCell = false;
+          }
         };
       });
     };
@@ -163,27 +184,13 @@ function rowSelect() {
 buttonForm.addEventListener('click', (events) => {
   events.preventDefault();
 
+  const formInputs = form.querySelectorAll('input');
+
   let valid = true;
 
-  if (form[0].value.length < 4) {
-    valid = false;
-    message(valid, 'Name', 'Name value has less than 4 letters');
-  }
-
-  if (valid && form[1].value === '') {
-    valid = false;
-    message(valid, 'Position', 'The field must be it is filled');
-  };
-
-  if (valid && (form[3].value < 18 || form[3].value > 90)) {
-    valid = false;
-    message(valid, 'Age', 'Age value is less than 18 or more than 90');
-  }
-
-  if (valid && form[4].value === '') {
-    valid = false;
-    message(valid, 'Salary', 'The field must be it is filled');
-  }
+  formInputs.forEach((formInput) => {
+    valid = validateValue(formInput.value, formInput.dataset.qa, valid);
+  });
 
   if (valid) {
     const newRow = document.createElement('tr');
@@ -193,7 +200,7 @@ buttonForm.addEventListener('click', (events) => {
       <td>${form[1].value}</td>
       <td>${form[2].value}</td>
       <td>${form[3].value}</td>
-      <td>$${bitRate(form[4].value)}</td>
+      <td>${bitRate(form[4].value)}</td>
     `);
 
     tableContent.append(newRow);
@@ -209,6 +216,42 @@ buttonForm.addEventListener('click', (events) => {
     message(valid, null, 'Add a new employee to the table');
   }
 });
+
+function validateValue(value, colum, validValue) {
+  if (!validValue) {
+    return;
+  };
+
+  let valid = validValue;
+
+  if (colum === 'name' && value.length < 4) {
+    valid = false;
+    message(valid, 'Name', 'Name value has less than 4 letters');
+  }
+
+  if (colum === 'position' && value === '') {
+    valid = false;
+    message(valid, 'Position', 'The field must be it is filled');
+  };
+
+  if (colum === 'age' && (value < 18 || value > 90)) {
+    valid = false;
+    message(valid, 'Age', 'Age value is less than 18 or more than 90');
+  };
+
+  if (colum === 'salary' && value === '') {
+    valid = false;
+    message(valid, 'Salary', 'The field must be it is filled');
+  };
+
+  if ((colum === 'age' || colum === 'salary')
+    && valid && isNaN(+value)) {
+    valid = false;
+    message(valid, colum, `${colum} must be number`);
+  };
+
+  return valid;
+}
 
 function message(type, stage = null, description) {
   const classMessage = (type) ? 'success' : 'error';
@@ -236,6 +279,10 @@ function message(type, stage = null, description) {
 
   body.append(messageBlock);
 
+  setTimeout(() => {
+    messageBlock.remove();
+  }, 3000);
+
   buttonForm.addEventListener('mouseout', () => {
     messageBlock.remove();
   });
@@ -254,5 +301,5 @@ function bitRate(sum) {
     arr.unshift(sum.toString().substr(j - step, step));
   };
 
-  return arr.join(',');
+  return `$${arr.join(',')}`;
 }
