@@ -1,6 +1,8 @@
 'use strict';
 
 // write code here
+let notifTop;
+let notifLeft;
 const tHead = document.querySelector('thead');
 const tH = tHead.querySelectorAll('th');
 
@@ -65,18 +67,18 @@ tBody.addEventListener('click', (ev) => {
 });
 
 // utility notifications
-const pushNotification = (posTop, posRight, title, description, type) => {
+const pushNotification = (title, description, type) => {
   const notification = document.createElement('div');
   const inTitle = document.createElement('h2');
   const inDescription = document.createElement('p');
 
-  document.body.append(notification);
+  document.body.insertAdjacentElement('beforeend', notification);
 
   notification.dataset.qa = 'notification';
-  notification.style.top = posTop + 'vh';
-  notification.style.right = posRight + 'vw';
+  notification.style.top = notifTop + 'px';
+  notification.style.left = notifLeft + 'px';
   notification.classList.add('notification', type);
-  notification.style.position = 'sticky';
+  notification.style.position = 'absolute';
 
   notification.append(inTitle);
   inTitle.classList.add('title');
@@ -90,26 +92,33 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   }, 2000);
 };
 
+const errorSalary = () => {
+  pushNotification('❌ Salary validation',
+    'salary must be [1...2,000,000]', 'error');
+};
 const errorAge = () => {
-  pushNotification(25, 25, '❌ Age validation',
+  pushNotification('❌ Age validation',
     'age must be [18...90]', 'error');
 };
 const errorInput = () => {
-  pushNotification(25, 25, '❌ input length',
+  pushNotification('❌ input length',
     'input shall be min 4 chars OR a positive integer', 'error');
 };
 const successEdit = () => {
-  pushNotification(25, 25, '✅ data changed', '🎉', 'success');
+  pushNotification('✅ data changed', '🎉', 'success');
 };
 const successSubmit = () => {
-  pushNotification(25, 25, '✅ data submitted', '🎉', 'success');
+  pushNotification('✅ data submitted', '🎉', 'success');
 };
 const warnNoEdit = () => {
-  pushNotification(25, 25, 'no data changed', '', 'warning');
+  pushNotification('no data changed', '', 'warning');
 };
 
 // edit table
 tBody.addEventListener('dblclick', (ev) => {
+  notifTop = ev.pageY;
+  notifLeft = ev.pageX;
+
   if (ev.target.classList.contains('cell-input')) {
     return;
   }
@@ -128,6 +137,7 @@ tBody.addEventListener('dblclick', (ev) => {
       cellEdit = document.createElement('input');
       cellEdit.type = 'number';
       cellEdit.max = '2000000';
+      cellEdit.style.width = '75%';
       cellEdit.value = usdNum(cellData);
       break;
     case 'Office':
@@ -164,6 +174,16 @@ tBody.addEventListener('dblclick', (ev) => {
     }
 
     switch (tH[cell.cellIndex].innerText) {
+      case 'Salary':
+        if (cellEdit.value < 1 || cellEdit.value > 2000000) {
+          cell.innerText = cellData;
+
+          return errorSalary();
+        }
+        cell.innerText = '$' + Number(cellEdit.value).toLocaleString('en-US');
+        successEdit();
+        break;
+
       case 'Age':
         if (cellEdit.value < 18 || cellEdit.value > 90) {
           cell.innerText = cellData;
@@ -176,15 +196,13 @@ tBody.addEventListener('dblclick', (ev) => {
 
       default:
         if (!cellEdit.value || +cellEdit.value <= 0
-          || cellEdit.value.length < 4) {
+          || cellEdit.value.trim().length < 4) {
           cell.innerText = cellData;
 
           return errorInput();
         }
 
-        cell.innerText = !+cellEdit.value
-          ? cellEdit.value
-          : '$' + Number(cellEdit.value).toLocaleString('en-US');
+        cell.innerText = cellEdit.value;
 
         return successEdit();
     }
@@ -202,7 +220,7 @@ document.body.insertAdjacentHTML('beforeend', `
       type="text"
       data-qa="name"
 
-      pattern="[\\w\\D]{4,}" title="min 4 chars, no digits"
+      pattern="[A-z]{4,}(?: [A-z]+)*" title="min 4 chars, no digits"
       placeholder="min 4 chars, no digits"
     >
   </label>
@@ -213,6 +231,9 @@ document.body.insertAdjacentHTML('beforeend', `
       name="position"
       type="text"
       data-qa="position"
+
+      pattern="[A-z]{4,}(?: [A-z]+)*" title="min 4 chars, no digits"
+      placeholder="min 4 chars, no digits"
     >
   </label>
   <label for="office">
@@ -234,6 +255,7 @@ document.body.insertAdjacentHTML('beforeend', `
 
       min="18"
       max="90"
+      step="1"
       title="age must be [18...90]"
       placeholder="[18...90]"
     >
@@ -246,6 +268,8 @@ document.body.insertAdjacentHTML('beforeend', `
       type="number"
       data-qa="salary"
 
+      min="100"
+      max="2000000"
       step="100"
     >
   </label>
@@ -267,6 +291,8 @@ form.addEventListener('submit', submit => {
   submit.preventDefault();
 
   const formData = new FormData(form);
+
+  notifTop = 450;
 
   tBody.insertAdjacentHTML('beforeend',
     `<tr>
