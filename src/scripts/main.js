@@ -1,12 +1,11 @@
 'use strict';
 
 // write code here
-let notifTop;
-let notifLeft;
 const tHead = document.querySelector('thead');
 const tH = tHead.querySelectorAll('th');
 
 const tBody = document.querySelector('tbody');
+let notifLeft;
 
 const offices = [...new Set([...tBody.rows]
   .map(each => each.cells[2].outerHTML))]
@@ -75,7 +74,7 @@ const pushNotification = (title, description, type) => {
   document.body.insertAdjacentElement('beforeend', notification);
 
   notification.dataset.qa = 'notification';
-  notification.style.top = notifTop + 'px';
+  notification.style.top = '450px';
   notification.style.left = notifLeft + 'px';
   notification.classList.add('notification', type);
   notification.style.position = 'absolute';
@@ -116,9 +115,6 @@ const warnNoEdit = () => {
 
 // edit table
 tBody.addEventListener('dblclick', (ev) => {
-  notifTop = ev.pageY;
-  notifLeft = ev.pageX;
-
   if (ev.target.classList.contains('cell-input')) {
     return;
   }
@@ -283,7 +279,12 @@ const form = document.querySelector('form');
 form.querySelector('#office')
   .insertAdjacentHTML('beforeend', officesHTML);
 
-// submit
+// set the notification.left === form.left
+window.addEventListener('resize', ev => {
+  notifLeft = form.getBoundingClientRect().left;
+});
+
+// form submit
 tBody.style.textTransform = 'capitalize';
 
 form.addEventListener('submit', submit => {
@@ -291,8 +292,6 @@ form.addEventListener('submit', submit => {
   submit.preventDefault();
 
   const formData = new FormData(form);
-
-  notifTop = 450;
 
   tBody.insertAdjacentHTML('beforeend',
     `<tr>
