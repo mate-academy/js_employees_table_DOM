@@ -256,7 +256,7 @@ function cellEdit(editableCell, enteredValue, previousText) {
     notification.notificationBlock.classList.add('error');
 
     notification.notificationBlock.insertAdjacentHTML('beforeend',
-      `<h2 class="title">Error!'</h2>
+      `<h2 class="title">Error!</h2>
      Cell can't be empty.
     `);
 
@@ -279,7 +279,7 @@ function cellEdit(editableCell, enteredValue, previousText) {
       notification.notificationBlock.classList.add('error');
 
       notification.notificationBlock.insertAdjacentHTML('beforeend',
-        `<h2 class="title">Error!'</h2>
+        `<h2 class="title">Error!</h2>
         Age must be between 18 and 90!</br>
         You entered <strong>${newText}</strong>.
         `);
@@ -295,7 +295,7 @@ function cellEdit(editableCell, enteredValue, previousText) {
       notification.notificationBlock.classList.add('error');
 
       notification.notificationBlock.insertAdjacentHTML('beforeend',
-        `<h2 class="title">Error!'</h2>
+        `<h2 class="title">Error!</h2>
         Age must be a number!</br>
         `);
       newText = innerText;
