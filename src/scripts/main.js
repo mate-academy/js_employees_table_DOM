@@ -112,26 +112,38 @@ document.body.append(form);
 
 // ------- form actions and notifications----------------
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-
+function createNotification() {
   if (document.querySelector('.notification')) {
     document.querySelector('.notification').remove();
   }
-
-  const data = new FormData(form);
-
-  const formData = Object.fromEntries(data.entries());
 
   const notification = {
     errors: [],
     typeOfNotification: 'success',
     title: 'Success!',
+    notificationBlock: document.createElement('div'),
   };
 
-  const notificationBlock = document.createElement('div');
+  notification.notificationBlock.classList.add(
+    'notification',
+  );
 
-  notificationBlock.setAttribute('data-qa', 'notification');
+  notification.notificationBlock.setAttribute('data-qa', 'notification');
+
+  document.body.append(notification.notificationBlock);
+
+  return notification;
+}
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const data = new FormData(form);
+
+  const formData = Object.fromEntries(data.entries());
+
+  const notification = createNotification();
+  const notificationBlock = notification.notificationBlock;
 
   formValidate(formData, notification);
 
@@ -147,15 +159,12 @@ form.addEventListener('submit', (e) => {
   }
 
   notificationBlock.classList.add(
-    'notification',
     notification.typeOfNotification
   );
 
   notificationBlock.insertAdjacentHTML('afterbegin',
     `<h2 class="title">${notification.title}</h2>`
   );
-
-  document.body.append(notificationBlock);
 
   if (notification.errors.length === 0) {
     const newRow = document.createElement('tr');
@@ -236,6 +245,96 @@ function formValidate(formData, notification) {
 
 // ------- table editing ----------------
 
+function cellEdit(editableCell, enteredValue, previousText) {
+  let newText = enteredValue;
+  const cell = editableCell;
+  const innerText = previousText;
+
+  if (newText.trim().length === 0) {
+    const notification = createNotification();
+
+    notification.notificationBlock.classList.add('error');
+
+    notification.notificationBlock.insertAdjacentHTML('beforeend',
+      `<h2 class="title">Error!'</h2>
+     Cell can't be empty.
+    `);
+
+    newText = innerText;
+
+    return newText;
+  }
+
+  cell.setAttribute('data-name', 'editable-cell');
+
+  const indexOfCell = [...cell.parentElement.querySelectorAll('td')]
+    .findIndex(elem => elem.dataset.name === 'editable-cell');
+
+  if (indexOfCell === 3) {
+    newText = +newText;
+
+    if (newText < 18 || newText > 90) {
+      const notification = createNotification();
+
+      notification.notificationBlock.classList.add('error');
+
+      notification.notificationBlock.insertAdjacentHTML('beforeend',
+        `<h2 class="title">Error!'</h2>
+        Age must be between 18 and 90!</br>
+        You entered <strong>${newText}</strong>.
+        `);
+
+      newText = innerText;
+
+      return newText;
+    }
+
+    if (!+newText) {
+      const notification = createNotification();
+
+      notification.notificationBlock.classList.add('error');
+
+      notification.notificationBlock.insertAdjacentHTML('beforeend',
+        `<h2 class="title">Error!'</h2>
+        Age must be a number!</br>
+        `);
+      newText = innerText;
+
+      return newText;
+    }
+  }
+
+  if (indexOfCell === 4) {
+    if (newText[0] === '$') {
+      newText = +newText.slice(1);
+    }
+
+    newText = +newText;
+
+    if (!+newText) {
+      const notification = createNotification();
+
+      notification.notificationBlock.classList.add('error');
+
+      notification.notificationBlock.insertAdjacentHTML('beforeend',
+        `<h2 class="title">Error!'</h2>
+        Salary must be a number!</br>
+        `);
+      newText = innerText;
+
+      return newText;
+    }
+
+    newText = '' + newText;
+
+    newText = newText.replace(',', '.');
+
+    newText = '$' + (+newText).toFixed(3).replace('.', ',');
+  }
+
+  return newText;
+}
+
 table.addEventListener('dblclick', (e) => {
   const cell = e.target;
   const cellText = cell.textContent;
@@ -265,11 +364,15 @@ table.addEventListener('dblclick', (e) => {
   };
 
   input.onblur = () => {
-    if (newText.length === 0) {
-      newText = innerText;
-    }
+    const resultedText = cellEdit(cell, newText, cellText);
 
-    cell.append(newText);
+    setTimeout(() => {
+      if (document.querySelector('.notification')) {
+        document.querySelector('.notification').remove();
+      }
+    }, 3000);
+
+    cell.append(resultedText);
 
     input.remove();
   };
