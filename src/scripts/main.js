@@ -191,6 +191,7 @@ function fillTable() {
       notification('Salary is undefined', 'error');
     }
   }
+  form.reset();
 }
 
 function notification(title, type) {
@@ -212,22 +213,47 @@ tbody.addEventListener('dblclick', e => {
   const el = e.target;
 
   input.setAttribute('class', 'cell-input');
+
+  if (el.cellIndex === 3) {
+    input.setAttribute('type', 'number');
+  }
+
+  if (el.cellIndex === 4) {
+    el.innerHTML = Number(el.innerHTML.split('$').join('').split(',').join(''));
+
+    input.value = el.innerHTML;
+    el.innerHTML = '';
+    input.setAttribute('type', 'number');
+    el.append(input.value);
+  }
+
   input.value = el.innerHTML;
+
   el.innerHTML = '';
   el.append(input);
   input.focus();
 
   input.addEventListener('keydown', ev => {
     if (ev.key === 'Enter') {
-      el.innerHTML = input.value;
-      input.blur();
+      if (el.cellIndex === 4) {
+        el.innerHTML = '$' + parseInt(input.value).toLocaleString('en-US');
+        input.blur();
+      } else {
+        el.innerHTML = input.value;
+        input.blur();
+      }
     }
   });
 
   tbody.addEventListener('click', (eve) => {
     if (eve.target !== undefined) {
-      el.innerHTML = input.value;
-      input.blur();
+      if (el.cellIndex === 4) {
+        el.innerHTML = '$' + parseInt(input.value).toLocaleString('en-US');
+        input.blur();
+      } else {
+        el.innerHTML = input.value;
+        input.blur();
+      }
     }
   });
 });
