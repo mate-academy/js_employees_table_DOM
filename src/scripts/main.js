@@ -110,7 +110,7 @@ form.insertAdjacentHTML('afterbegin',
 
 document.body.append(form);
 
-// ------- form actions and notifications----------------
+// ------- create notifications----------------
 
 function createNotification() {
   if (document.querySelector('.notification')) {
@@ -134,6 +134,98 @@ function createNotification() {
 
   return notification;
 }
+
+// ------- data validation ----------------
+
+function dataValidation(data, notification) {
+  for (const field in data) {
+    if (field === 'name') {
+      if (data[field].length < 4) {
+        notification.errors.push(
+          `The name must contain more than 4 letters!</br>
+          You entered <strong>${data[field].length}</strong>.`
+        );
+      }
+
+      if (/[0-9]/.test(data[field])) {
+        notification.errors.push(
+          `Name can't contain numbers!</br>
+          You entered <strong>${data[field]}</strong>.`
+        );
+      }
+    }
+
+    if (field === 'position') {
+      if (/[0-9]/.test(data[field])) {
+        notification.errors.push(
+          `Name can't contain numbers!</br>
+          You entered <strong>${data[field]}</strong>.`
+        );
+      }
+    }
+
+    if (field === 'age') {
+      if (data[field] < 18 || data[field] > 90) {
+        notification.errors.push(
+          `Age must be between 18 and 90!</br>
+          You entered <strong>${data[field]}</strong>.`
+        );
+      }
+
+      if (!+data[field]) {
+        notification.errors.push(
+          `Age must be a number!</br>
+          You entered <strong>${data[field]}</strong>.`
+        );
+      }
+    }
+
+    if (field === 'salary') {
+      data[field] = data[field].replace(',', '.');
+
+      if (data[field][0] === '$') {
+        data[field] = +data[field].slice(1);
+      }
+
+      if (!+data[field]) {
+        notification.errors.push(
+          `Salary must be a number!</br>
+          You entered <strong>${data[field]}</strong>.`
+        );
+      }
+
+      data[field] = '$' + (+data[field]).toFixed(3).replace('.', ',');
+    }
+  }
+}
+
+// ------- form validation ----------------
+
+function formValidate(formData, notification) {
+  if (formData.name.length === 0
+    || formData.position.length === 0
+    || formData.age.length === 0
+    || formData.salary.length === 0) {
+    notification.errors.push(
+      `All fields are required!</br>
+       Please fill out the form completely.`
+    );
+
+    notification.typeOfNotification = 'warning';
+    notification.title = 'Warning!';
+
+    return;
+  }
+
+  dataValidation(formData, notification);
+
+  if (notification.errors.length > 0) {
+    notification.typeOfNotification = 'error';
+    notification.title = 'Error!';
+  }
+}
+
+// ------- form actions ----------------
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -169,14 +261,12 @@ form.addEventListener('submit', (e) => {
   if (notification.errors.length === 0) {
     const newRow = document.createElement('tr');
 
-    const salary = '$' + (+formData.salary).toFixed(3).replace('.', ',');
-
     newRow.insertAdjacentHTML('afterbegin', `
       <td>${formData.name}</td>
       <td>${formData.position}</td>
       <td>${formData.office}</td>
       <td>${formData.age}</td>
-      <td>${salary}</td>
+      <td>${formData.salary}</td>
     `);
 
     const tbodyForAddNewRow = table.querySelector('tbody');
@@ -185,72 +275,15 @@ form.addEventListener('submit', (e) => {
   }
 });
 
-// ------- form validation ----------------
+// ------- editing the table ----------------
 
-function formValidate(formData, notification) {
-  notification.errors.length = 0;
-  notification.typeOfNotification = 'success';
-  notification.title = 'Success!';
-
-  if (formData.name.length === 0
-    || formData.position.length === 0
-    || formData.age.length === 0
-    || formData.salary.length === 0) {
-    notification.errors.push(
-      `All fields are required!</br>
-       Please fill out the form completely.`
-    );
-
-    notification.typeOfNotification = 'warning';
-    notification.title = 'Warning!';
-
-    return;
+function cellEdit(enteredValue, innerText, fieldIndex) {
+  if (enteredValue.length === 0) {
+    return innerText;
   }
 
-  if (formData.name.length < 4) {
-    notification.errors.push(
-      `The name must contain more than 4 letters!</br>
-      You entered <strong>${formData.name.length}</strong>.`
-    );
-  }
-
-  if (formData.age < 18 || formData.age > 90) {
-    notification.errors.push(
-      `Age must be between 18 and 90!</br>
-      You entered <strong>${formData.age}</strong>.`
-    );
-  }
-
-  if (!+formData.age) {
-    notification.errors.push(
-      `Age must be a number!</br>
-      You entered <strong>${formData.age}</strong>.`
-    );
-  }
-
-  formData.salary = formData.salary.replace(',', '.');
-
-  if (!+formData.salary) {
-    notification.errors.push(
-      `Salary must be a number!</br>
-      You entered <strong>${formData.salary}</strong>.`
-    );
-  }
-
-  if (notification.errors.length > 0) {
-    notification.typeOfNotification = 'error';
-    notification.title = 'Error!';
-  }
-}
-
-// ------- table editing ----------------
-
-function cellEdit(editableCell, enteredValue, previousText) {
-  let newText = enteredValue;
-  const cell = editableCell;
-  const innerText = previousText;
-
-  if (newText.trim().length === 0) {
+  if (enteredValue.trim().length === 0) {
+    /* eslint-disable-next-line */
     const notification = createNotification();
 
     notification.notificationBlock.classList.add('error');
@@ -260,83 +293,75 @@ function cellEdit(editableCell, enteredValue, previousText) {
      Cell can't be empty.
     `);
 
-    newText = innerText;
-
-    return newText;
+    return innerText;
   }
 
-  cell.setAttribute('data-name', 'editable-cell');
+  const fieldContent = {};
 
-  const indexOfCell = [...cell.parentElement.querySelectorAll('td')]
-    .findIndex(elem => elem.dataset.name === 'editable-cell');
+  switch (fieldIndex) {
+    case 0 :
+      fieldContent.name = enteredValue;
+      break;
 
-  if (indexOfCell === 3) {
-    newText = +newText;
+    case 1 :
+      fieldContent.position = enteredValue;
+      break;
 
-    if (newText < 18 || newText > 90) {
-      const notification = createNotification();
+    case 3 :
+      fieldContent.age = enteredValue;
+      break;
 
-      notification.notificationBlock.classList.add('error');
-
-      notification.notificationBlock.insertAdjacentHTML('beforeend',
-        `<h2 class="title">Error!</h2>
-        Age must be between 18 and 90!</br>
-        You entered <strong>${newText}</strong>.
-        `);
-
-      newText = innerText;
-
-      return newText;
-    }
-
-    if (!+newText) {
-      const notification = createNotification();
-
-      notification.notificationBlock.classList.add('error');
-
-      notification.notificationBlock.insertAdjacentHTML('beforeend',
-        `<h2 class="title">Error!</h2>
-        Age must be a number!</br>
-        `);
-      newText = innerText;
-
-      return newText;
-    }
+    case 4 :
+      fieldContent.salary = enteredValue;
   }
 
-  if (indexOfCell === 4) {
-    if (newText[0] === '$') {
-      newText = +newText.slice(1);
-    }
+  const notification = createNotification();
 
-    newText = +newText;
+  dataValidation(fieldContent, notification);
 
-    if (!+newText) {
-      const notification = createNotification();
+  if (notification.errors.length > 0) {
+    notification.typeOfNotification = 'error';
+    notification.title = 'Error!';
 
-      notification.notificationBlock.classList.add('error');
+    const p = document.createElement('p');
 
-      notification.notificationBlock.insertAdjacentHTML('beforeend',
-        `<h2 class="title">Error!'</h2>
-        Salary must be a number!</br>
-        `);
-      newText = innerText;
+    p.insertAdjacentHTML('beforeend',
+      `${notification.errors[0]}`);
 
-      return newText;
-    }
+    notification.notificationBlock.append(p);
 
-    newText = '' + newText;
+    notification.notificationBlock.classList.add(
+      notification.typeOfNotification
+    );
 
-    newText = newText.replace(',', '.');
+    notification.notificationBlock.insertAdjacentHTML('afterbegin',
+      `<h2 class="title">${notification.title}</h2>`
+    );
 
-    newText = '$' + (+newText).toFixed(3).replace('.', ',');
+    return innerText;
   }
 
-  return newText;
+  document.querySelector('.notification').remove();
+
+  return Object.values(fieldContent);
 }
+
+table.addEventListener('click', (e) => {
+  const select = table.querySelector('[name="office"]');
+
+  if (select && e.target !== select) {
+    select.parentElement.textContent = select.value;
+    select.remove();
+  }
+});
 
 table.addEventListener('dblclick', (e) => {
   const cell = e.target;
+
+  if (table.querySelector('[name="office"]')) {
+    return;
+  }
+
   const cellText = cell.textContent;
 
   const cellTag = cell.parentElement.parentElement.tagName;
@@ -345,41 +370,78 @@ table.addEventListener('dblclick', (e) => {
     return;
   }
 
-  const innerText = cell.firstChild;
+  const fieldIndex = [...cell.parentElement.querySelectorAll('td')]
+    .findIndex(i => i === cell);
 
-  let newText = '';
+  const innerText = cell.firstChild;
 
   innerText.remove();
 
-  const input = document.createElement('input');
+  let newText = '';
 
-  input.value = cellText;
-  input.classList.add('cell-input');
+  if (fieldIndex === 2) {
+    cell.innerText = '';
 
-  cell.append(input);
-  input.focus();
+    cell.insertAdjacentHTML('beforeend', `
+    <select name="office" type="text"
+    style="box-sizing: border-box; border: none; border-radius: 4px;
+    color: #808080; padding: 0; background: none;
+    font-family: sans-serif; font-size: 16px; outline: none;">
+          <option value='${cellText}'>${cellText}</option>
+          <option value='Tokyo'>Tokyo</option>
+          <option value='Singapore'>Singapore</option>
+          <option value='London'>London</option>
+          <option value='New York'>New York</option>
+          <option value='Edinburgh'>Edinburgh</option>
+          <option value='San Francisco'>San Francisco</option>
+    </select>
+  `);
 
-  input.oninput = () => {
-    newText = input.value;
-  };
+    const officeSelect = document.querySelector('[name="office"]');
 
-  input.onblur = () => {
-    const resultedText = cellEdit(cell, newText, cellText);
+    officeSelect.onblur = () => {
+      newText = officeSelect.value;
 
-    setTimeout(() => {
-      if (document.querySelector('.notification')) {
-        document.querySelector('.notification').remove();
+      cell.textContent = newText;
+      officeSelect.remove();
+    };
+
+    officeSelect.addEventListener('keydown', (even) => {
+      if (even.code === 'Enter') {
+        officeSelect.blur();
       }
-    }, 3000);
+    });
+  } else {
+    const input = document.createElement('input');
 
-    cell.append(resultedText);
+    input.value = cellText;
+    input.classList.add('cell-input');
 
-    input.remove();
-  };
+    cell.append(input);
+    input.focus();
 
-  input.addEventListener('keydown', (even) => {
-    if (even.code === 'Enter') {
-      input.blur();
-    }
-  });
+    input.oninput = () => {
+      newText = input.value;
+    };
+
+    input.onblur = () => {
+      const resultedText = cellEdit(newText, cellText, fieldIndex);
+
+      setTimeout(() => {
+        if (document.querySelector('.notification')) {
+          document.querySelector('.notification').remove();
+        }
+      }, 3000);
+
+      cell.append(resultedText);
+
+      input.remove();
+    };
+
+    input.addEventListener('keydown', (even) => {
+      if (even.code === 'Enter') {
+        input.blur();
+      }
+    });
+  }
 });
