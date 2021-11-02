@@ -14,11 +14,9 @@ function sortTable(e) {
   const clickedElement = e.target;
 
   if (previousClickedElement === e.target) {
-    table.setAttribute('sortDirection', 'DESC');
-  }
-
-  if (previousClickedElement !== e.target) {
-    table.removeAttribute('sortDirection');
+    table.classList.toggle('sortDirectionDESC');
+  } else {
+    table.classList.remove('sortDirectionDESC');
   }
 
   previousClickedElement = e.target;
@@ -42,18 +40,18 @@ function sortTable(e) {
     }
 
     if (isFinite(firsElem)) {
-      if (table.hasAttribute('sortDirection')) {
+      if (table.matches('.sortDirectionDESC')) {
         return +firsElem < +secondElem ? 1 : -1;
       }
 
       return +firsElem > +secondElem ? 1 : -1;
-    }
+    } else {
+      if (table.matches('.sortDirectionDESC')) {
+        return firsElem < secondElem ? 1 : -1;
+      }
 
-    if (table.hasAttribute('sortDirection')) {
-      return +firsElem < +secondElem ? 1 : -1;
+      return firsElem > secondElem ? 1 : -1;
     }
-
-    return firsElem > secondElem ? 1 : -1;
   });
 
   const tbodySorted = document.createElement('tbody');
@@ -181,20 +179,40 @@ function dataValidation(data, notification) {
     }
 
     if (field === 'salary') {
-      data[field] = data[field].replace(',', '.');
+      let salary = data[field].replace(',', '.');
 
-      if (data[field][0] === '$') {
-        data[field] = +data[field].slice(1);
+      if (salary[0] === '$') {
+        salary = +salary.slice(1);
       }
 
-      if (!+data[field]) {
-        notification.errors.push(
-          `Salary must be a number!</br>
-          You entered <strong>${data[field]}</strong>.`
-        );
+      if (!+salary) {
+        let dataInMessage = salary;
+
+        if (isNaN(salary)) {
+          dataInMessage = data[field];
+
+          const extraPunctuation = [...data[field]].filter(symbol => {
+            if (symbol === ',' || symbol === '.') {
+              return symbol;
+            }
+          });
+
+          if (extraPunctuation.length > 1) {
+            notification.errors.push(
+              `Salary must contain only one dot or comma!</br>
+              You entered too manyof them: <strong>${dataInMessage}</strong>.`
+            );
+          } else {
+            notification.errors.push(
+              `Salary must be a number!</br>
+              You entered <strong>${dataInMessage}</strong>.`
+            );
+          }
+        }
       }
 
-      data[field] = '$' + (+data[field]).toFixed(3).replace('.', ',');
+      salary = '$' + (+salary).toFixed(3).replace('.', ',');
+      data[field] = salary;
     }
   }
 }
