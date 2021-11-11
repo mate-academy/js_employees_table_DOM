@@ -18,12 +18,12 @@ const positionArray = [
   'Financial Controller',
   'Integration Specialist',
   'Javascript Developer',
+  'QA Engineer',
   'Marketing Designer',
   'Regional Director',
   'Regional Marketing',
   'Software Engineer',
   'Technical Author',
-  'QA Engineer',
 ];
 
 // table sorting by clicking on the title (in two directions)
@@ -120,7 +120,7 @@ const formAdd = `
         required
       >
       ${countryArray.map(country =>
-    `<option value="${country}">${country}</option>`).join()}
+    `<option value="${country}">${country}</option>`).join('')}
       </select>
     </label>
 
@@ -188,11 +188,6 @@ const notificationErrorName = () => {
 const notificationErrorPosition = () => {
   return pushNotification('Sorry! Position is invalid!',
     'Please specify your position.', 'error');
-};
-
-const notificationErrorOffice = () => {
-  return pushNotification('Sorry! Office is invalid!',
-    'Please, add the right place of work.', 'error');
 };
 
 const notificationErrorAge = () => {
@@ -268,19 +263,37 @@ addForm.addEventListener('keyup', (e) => {
 tableBody.addEventListener('dblclick', (cell) => {
   const editCell = cell.target;
   const input = document.createElement('input');
+  const select = document.createElement('select');
   const cellIndex = editCell.cellIndex;
 
   input.className = `cell-input`;
 
-  if (cellIndex <= 2) {
-    input.setAttribute('type', 'text');
-  } else {
-    input.setAttribute('type', 'number');
-  }
+  switch (cellIndex) {
+    case 1:
+      editCell.replaceWith(select);
 
-  editCell.replaceWith(input);
-  // input.focus();
+      select.innerHTML = `${positionArray.map(position =>
+        `<option value="${position}">${position}</option>`).join('')}`;
+      break;
+    case 2:
+      editCell.replaceWith(select);
+
+      select.innerHTML = `${countryArray.map(country =>
+        `<option value="${country}">${country}</option>`).join('')}`;
+      break;
+    case 3:
+    case 4:
+      editCell.replaceWith(input);
+      input.setAttribute('type', 'number');
+      break;
+
+    default:
+      editCell.replaceWith(input);
+      input.setAttribute('type', 'text');
+      break;
+  }
   input.focus(textHint(input, cellIndex));
+  select.focus();
 
   function text() {
     switch (cellIndex) {
@@ -290,14 +303,9 @@ tableBody.addEventListener('dblclick', (cell) => {
           : editCell.innerText = convertText(input.value);
         break;
       case 1:
-        (!positionArray.includes(convertText(input.value)))
-          ? notificationErrorPosition()
-          : editCell.innerText = convertText(input.value);
-        break;
       case 2:
-        (!countryArray.includes(convertText(input.value)))
-          ? notificationErrorOffice()
-          : editCell.innerText = convertText(input.value);
+        editCell.innerText = select.value;
+        select.replaceWith(editCell);
         break;
       case 3:
         (input.value < 18 || input.value > 90)
@@ -315,6 +323,10 @@ tableBody.addEventListener('dblclick', (cell) => {
   };
 
   input.addEventListener('blur', () => {
+    text();
+  });
+
+  select.addEventListener('blur', () => {
     text();
   });
 
@@ -338,12 +350,6 @@ const textHint = (item, index) => {
   switch (index) {
     case 0:
       span.innerText = 'Name must contain at least 4 letters.';
-      break;
-    case 1:
-      span.innerText = 'Please specify your position.';
-      break;
-    case 2:
-      span.innerText = 'Please, add the right place of work.';
       break;
     case 3:
       span.innerText = 'You age must be over 18 and under 90.';
