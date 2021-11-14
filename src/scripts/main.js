@@ -267,6 +267,12 @@ tableBody.addEventListener('dblclick', (cell) => {
   const cellIndex = editCell.cellIndex;
 
   input.className = `cell-input`;
+  select.style.border = `1px solid #808080`;
+  select.style.borderRadius = `4px`;
+  select.style.color = `#808080`;
+  select.style.marginTop = `4px`;
+  select.style.padding = `4px`;
+  select.style.outlineColor = `#808080`;
 
   switch (cellIndex) {
     case 1:
