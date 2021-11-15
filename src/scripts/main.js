@@ -267,10 +267,11 @@ tableBody.addEventListener('dblclick', (cell) => {
   const cellIndex = editCell.cellIndex;
 
   input.className = `cell-input`;
+  input.style.padding = `18px 18px 0`;
   select.style.border = `1px solid #808080`;
   select.style.borderRadius = `4px`;
   select.style.color = `#808080`;
-  select.style.marginTop = `4px`;
+  select.style.marginTop = `14px`;
   select.style.padding = `4px`;
   select.style.outlineColor = `#808080`;
 
@@ -298,8 +299,41 @@ tableBody.addEventListener('dblclick', (cell) => {
       input.setAttribute('type', 'text');
       break;
   }
-  input.focus(textHint(input, cellIndex));
+  input.focus();
   select.focus();
+
+  input.addEventListener('keyup', () => {
+    switch (cellIndex) {
+      case 0:
+        if (input.value.length > 0
+          && input.value.length < 4
+          && !input.parentElement.querySelector('span')) {
+          textHint(input, cellIndex);
+        } else if (input.value.length >= 4
+          && input.parentElement.querySelector('span')) {
+          input.parentElement.querySelector('span').remove();
+        }
+        break;
+      case 3:
+        if ((input.value < 18 || input.value > 90)
+        && !input.parentElement.querySelector('span')) {
+          textHint(input, cellIndex);
+        } else if (input.value >= 18
+          && input.value <= 90
+          && input.parentElement.querySelector('span')) {
+          input.parentElement.querySelector('span').remove();
+        }
+        break;
+      case 4:
+        if (input.value < 0 && !input.parentElement.querySelector('span')) {
+          textHint(input, cellIndex);
+        } else if (input.value > 0
+          && input.parentElement.querySelector('span')) {
+          input.parentElement.querySelector('span').remove();
+        }
+        break;
+    }
+  });
 
   function text() {
     switch (cellIndex) {
@@ -324,7 +358,10 @@ tableBody.addEventListener('dblclick', (cell) => {
           : editCell.innerText = convertSalary(input.value);
         break;
     }
-    input.parentElement.querySelector('span').remove();
+
+    if (input.parentElement.querySelector('span')) {
+      input.parentElement.querySelector('span').remove();
+    }
     input.replaceWith(editCell);
   };
 
@@ -332,11 +369,17 @@ tableBody.addEventListener('dblclick', (cell) => {
     text();
   });
 
+  input.addEventListener('keydown', (press) => {
+    if (press.key === 'Enter') {
+      text();
+    }
+  });
+
   select.addEventListener('blur', () => {
     text();
   });
 
-  window.addEventListener('keydown', (press) => {
+  select.addEventListener('keydown', (press) => {
     if (press.key === 'Enter') {
       text();
     }
