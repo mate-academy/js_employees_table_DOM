@@ -5,11 +5,25 @@ const headers = table.querySelectorAll('thead th');
 const tableBody = table.querySelector('tbody');
 const tableRows = [...tableBody.rows];
 
-// ===============  1 sort table  ===================
-
 const fromUsdToNumber = str => {
   return +str.replace('$', '').split(',').join('');
 };
+
+const fromStringToUsd = str => {
+  return '$' + (+str).toLocaleString();
+};
+
+const toCapitalLetters = str => {
+  const words = str.split(' ');
+
+  for (let i = 0; i < words.length; i++) {
+    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+  }
+
+  return words.join(' ');
+};
+
+// ===============  1 sort table  ===================
 
 let sortSwitch = 1;
 
@@ -118,10 +132,6 @@ document.body.append(form);
 
 // ===============  4 show notification  ===================
 
-const fromStringToUsd = str => {
-  return '$' + (+str).toLocaleString();
-};
-
 const pushNotification = (title, description, type) => {
   const message = document.createElement('div');
   const h4 = document.createElement('h4');
@@ -186,7 +196,7 @@ form.addEventListener('submit', e => {
 
   if (age < 18 || age > 90) {
     pushNotification('ERROR!!!',
-      'Employee must be between 18 and 90 years old.',
+      'Employee must be between 18 and 90 years old',
       'error'
     );
   }
@@ -212,50 +222,99 @@ tableBody.addEventListener('dblclick', e => {
   const input = document.createElement('input');
 
   input.className = 'cell-input';
-
-  if (elem.cellIndex === 0
-    || elem.cellIndex === 1) {
-    input.pattern = '[A-Za-z ]*';
-  }
+  input.value = elemValue;
+  input.setAttribute('value', elemValue);
 
   if (elem.cellIndex === 3) {
     input.type = 'number';
   }
 
   if (elem.cellIndex === 4) {
-    elem.innerText = fromUsdToNumber(elem.innerText);
+    input.value = fromUsdToNumber(elemValue);
+    input.type = 'number';
   }
 
-  input.setAttribute('value', elem.innerText);
   elem.innerText = '';
   elem.append(input);
   input.focus();
 
+  const select = document.createElement('select');
+
+  select.classList.add('cell-input');
+
+  for (const office of offices) {
+    const option = document.createElement('option');
+
+    option.value = office;
+    option.innerText = office;
+
+    select.append(option);
+  }
+
   if (elem.cellIndex === 2) {
-    elem.innerHTML = `
-      <select class="cell-input">
-        ${offices.map(office => `
-          <option>${office}</option>
-        `).join()}
-      </select>
-    `;
+    elem.innerText = '';
+    elem.append(select);
   }
 
   const saveData = () => {
-    if (elem.cellIndex === 4) {
-      elem.innerText = fromStringToUsd(input.value);
-    } else {
+    if (elem.cellIndex === 0 || elem.cellIndex === 1) {
+      if (!input.value) {
+        elem.innerText = elemValue;
+      }
+
+      for (const char of input.value) {
+        if (!isNaN(parseInt(char))) {
+          alert('Name should contain only letters');
+          input.value = elemValue;
+          break;
+        }
+      }
+      elem.innerText = toCapitalLetters(input.value);
+    }
+
+    if (elem.cellIndex === 2) {
+      /*
+      я не знаю, як у коді вище
+      зберегти у змінну значення обраного селекту (опції) так,
+      щоб потім цю змінну призначити в elem.innerText
+      */
+
+      elem.innerHTML = '';
+      elem.innerText = 'hello';
+
+      // if (!option.value) {
+      //   elem.innerHTML = elemValue;
+      // }
+    }
+
+    if (elem.cellIndex === 3) {
+      if (input.value < 18 || input.value > 90) {
+        alert('Employee must be between 18 and 90 years old');
+        input.value = elemValue;
+      }
       elem.innerText = input.value;
     }
 
-    if (elem.innerText.length < 1) {
-      elem.innerText = elemValue;
+    if (elem.cellIndex === 4) {
+      if (!input.value) {
+        elem.innerText = elemValue;
+      }
+
+      elem.innerText = fromStringToUsd(input.value);
     }
   };
 
   input.addEventListener('blur', saveData);
 
   input.addEventListener('keydown', ev => {
+    if (ev.code === 'Enter') {
+      saveData();
+    }
+  });
+
+  select.addEventListener('blur', saveData);
+
+  select.addEventListener('keydown', ev => {
     if (ev.code === 'Enter') {
       saveData();
     }
