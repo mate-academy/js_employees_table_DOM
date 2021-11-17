@@ -162,7 +162,6 @@ const pushNotification = (title, description, type) => {
   }
 
   message.append(h4, p);
-
   form.append(message);
   setTimeout(() => message.remove(), 2000);
 };
@@ -233,7 +232,6 @@ tableBody.addEventListener('dblclick', e => {
     input.value = fromUsdToNumber(elemValue);
     input.type = 'number';
   }
-
   elem.innerText = '';
   elem.append(input);
   input.focus();
@@ -245,9 +243,7 @@ tableBody.addEventListener('dblclick', e => {
   for (const office of offices) {
     const option = document.createElement('option');
 
-    option.value = office;
     option.innerText = office;
-
     select.append(option);
   }
 
@@ -273,18 +269,8 @@ tableBody.addEventListener('dblclick', e => {
     }
 
     if (elem.cellIndex === 2) {
-      /*
-      я не знаю, як у коді вище
-      зберегти у змінну значення обраного селекту (опції) так,
-      щоб потім цю змінну призначити в elem.innerText
-      */
-
       elem.innerHTML = '';
-      elem.innerText = 'hello';
-
-      // if (!option.value) {
-      //   elem.innerHTML = elemValue;
-      // }
+      elem.innerText = select.value;
     }
 
     if (elem.cellIndex === 3) {
@@ -299,7 +285,6 @@ tableBody.addEventListener('dblclick', e => {
       if (!input.value) {
         elem.innerText = elemValue;
       }
-
       elem.innerText = fromStringToUsd(input.value);
     }
   };
