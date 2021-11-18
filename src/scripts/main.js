@@ -251,6 +251,7 @@ tableBody.addEventListener('dblclick', e => {
     elem.innerText = '';
     elem.append(select);
   }
+  select.focus();
 
   const saveData = () => {
     if (elem.cellIndex === 0 || elem.cellIndex === 1) {
