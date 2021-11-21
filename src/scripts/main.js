@@ -184,6 +184,13 @@ btn.addEventListener('click', (add) => {
     return;
   }
 
+  if (!salary) {
+    pushNotification('salary Error',
+      'Please enter an age from 18 to 90', 'error');
+
+    return;
+  }
+
   list.insertAdjacentHTML('beforeend', `
     <tr>
       <td>${formatTest(formData.name)}</td>
@@ -238,17 +245,34 @@ list.addEventListener('dblclick', e => {
   inputCheck = e.target;
   oldText = saveText;
 
-  e.target.append(input);
+  if (e.target.cellIndex !== 2) {
+    e.target.append(input);
+  } else {
+    e.target.insertAdjacentHTML('beforeend', `
+      <select data-qa="office" name="office" size="1">
+        <option value="Tokyo">Tokyo</option>
+        <option value="Singapore">Singapore</option>
+        <option value="London">London</option>
+        <option value="New York">New York</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="San Francisco">San Francisco</option>
+      </select>
+    `);
+  }
+
+  const selectOfficeEdit = document.querySelector('td select');
 
   const inputLine = document.querySelector('td input');
 
   e.target.addEventListener('keydown', elem => {
     if (elem.key === 'Enter') {
-      if (inputLine.value.length === 0) {
-        e.target.textContent = saveText;
-        input.remove();
+      if (e.target.cellIndex !== 2) {
+        if (inputLine.value.length === 0) {
+          e.target.textContent = saveText;
+          input.remove();
 
-        return;
+          return;
+        }
       }
 
       switch (e.target.cellIndex) {
@@ -289,7 +313,7 @@ list.addEventListener('dblclick', e => {
           saveText = formatTest(inputLine.value);
           break;
         case 2:
-          saveText = formatTest(inputLine.value);
+          saveText = selectOfficeEdit.value;
           break;
         case 3:
           if (inputLine.value < 18 || inputLine.value > 90) {
