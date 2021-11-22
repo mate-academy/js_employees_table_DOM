@@ -117,6 +117,12 @@ function formatTest(text) {
 };
 
 const pushNotification = (title, description, type) => {
+  const checked = body.querySelector('.notification');
+
+  if (checked) {
+    checked.remove();
+  };
+
   const message = document.createElement('div');
   const titleMessage = document.createElement('h2');
   const textMessage = document.createElement('p');
@@ -131,6 +137,7 @@ const pushNotification = (title, description, type) => {
 
   message.append(titleMessage);
   message.append(textMessage);
+
   body.append(message);
 
   setTimeout(() => {
@@ -185,8 +192,8 @@ btn.addEventListener('click', (add) => {
   }
 
   if (!salary) {
-    pushNotification('salary Error',
-      'Please enter an age from 18 to 90', 'error');
+    pushNotification('Salary Error',
+      'Please enter an salary from 0', 'error');
 
     return;
   }
@@ -215,10 +222,16 @@ let inputCheck;
 let oldText;
 
 list.addEventListener('dblclick', e => {
+  const paddingElement = window.getComputedStyle(e.target)
+    .padding.slice(0, length - 2);
+  const widthInput = e.target.clientWidth - (+paddingElement * 2);
+  let selectOfficeEdit;
+
   let saveText = e.target.textContent;
   const input = document.createElement('input');
 
   input.value = saveText;
+
   input.classList.add('cell-input');
   e.target.textContent = '';
 
@@ -227,6 +240,10 @@ list.addEventListener('dblclick', e => {
       input.type = 'number';
       break;
     case 4:
+      const value = saveText.split('')
+        .filter(elem => '1234567890'.includes(elem)).join('');
+
+      input.value = value;
       input.type = 'number';
       break;
   }
@@ -246,6 +263,7 @@ list.addEventListener('dblclick', e => {
   oldText = saveText;
 
   if (e.target.cellIndex !== 2) {
+    input.style.width = `${widthInput}px`;
     e.target.append(input);
   } else {
     e.target.insertAdjacentHTML('beforeend', `
@@ -258,9 +276,11 @@ list.addEventListener('dblclick', e => {
         <option value="San Francisco">San Francisco</option>
       </select>
     `);
-  }
 
-  const selectOfficeEdit = document.querySelector('td select');
+    selectOfficeEdit = document.querySelector('td select');
+
+    selectOfficeEdit.style.width = `${widthInput}px`;
+  }
 
   const inputLine = document.querySelector('td input');
 
