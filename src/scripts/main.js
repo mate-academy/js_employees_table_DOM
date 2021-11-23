@@ -265,6 +265,7 @@ list.addEventListener('dblclick', e => {
   if (e.target.cellIndex !== 2) {
     input.style.width = `${widthInput}px`;
     e.target.append(input);
+    input.focus();
   } else {
     e.target.insertAdjacentHTML('beforeend', `
       <select data-qa="office" name="office" size="1">
@@ -278,11 +279,77 @@ list.addEventListener('dblclick', e => {
     `);
 
     selectOfficeEdit = document.querySelector('td select');
-
     selectOfficeEdit.style.width = `${widthInput}px`;
+    selectOfficeEdit.focus();
   }
 
   const inputLine = document.querySelector('td input');
+
+  const collbacks = () => {
+    switch (e.target.cellIndex) {
+      case 0:
+        if (inputLine.value.length < 4 || inputLine.value.length > 15) {
+          pushNotification('Name Error',
+            'Name length must be greater than 4', 'error');
+
+          return;
+        }
+
+        for (let i = 0; i <= inputLine.value.length; i++) {
+          if ('1234567890'.includes(inputLine.value[i])) {
+            pushNotification('Name Error',
+              'Enter only the letters', 'error');
+
+            return;
+          }
+        }
+        saveText = formatTest(inputLine.value);
+        break;
+      case 1:
+        if (inputLine.value.length < 4 || inputLine.value.length > 40) {
+          pushNotification('Position Error',
+            'Position length must be greater than 4', 'error');
+
+          return;
+        }
+
+        for (let i = 0; i <= inputLine.value.length; i++) {
+          if ('1234567890'.includes(inputLine.value[i])) {
+            pushNotification('Position Error',
+              'Enter only the letters', 'error');
+
+            return;
+          }
+        }
+        saveText = formatTest(inputLine.value);
+        break;
+      case 2:
+        saveText = selectOfficeEdit.value;
+        break;
+      case 3:
+        if (inputLine.value < 18 || inputLine.value > 90) {
+          pushNotification('Age Error',
+            'Please enter an age from 18 to 90', 'error');
+
+          return;
+        }
+        saveText = inputLine.value;
+        break;
+      case 4:
+        if (inputLine.value < 0) {
+          pushNotification('Salary Error',
+            'Please enter an salary > 0', 'error');
+
+          return;
+        }
+
+        saveText = `$${formatSalary(inputLine.value)}`;
+        break;
+    }
+
+    e.target.textContent = saveText;
+    input.remove();
+  };
 
   e.target.addEventListener('keydown', elem => {
     if (elem.key === 'Enter') {
@@ -295,69 +362,19 @@ list.addEventListener('dblclick', e => {
         }
       }
 
-      switch (e.target.cellIndex) {
-        case 0:
-          if (inputLine.value.length < 4 || inputLine.value.length > 15) {
-            pushNotification('Name Error',
-              'Name length must be greater than 4', 'error');
+      collbacks();
+    }
+  });
 
-            return;
-          }
-
-          for (let i = 0; i <= inputLine.value.length; i++) {
-            if ('1234567890'.includes(inputLine.value[i])) {
-              pushNotification('Name Error',
-                'Enter only the letters', 'error');
-
-              return;
-            }
-          }
-          saveText = formatTest(inputLine.value);
-          break;
-        case 1:
-          if (inputLine.value.length < 4 || inputLine.value.length > 40) {
-            pushNotification('Position Error',
-              'Position length must be greater than 4', 'error');
-
-            return;
-          }
-
-          for (let i = 0; i <= inputLine.value.length; i++) {
-            if ('1234567890'.includes(inputLine.value[i])) {
-              pushNotification('Position Error',
-                'Enter only the letters', 'error');
-
-              return;
-            }
-          }
-          saveText = formatTest(inputLine.value);
-          break;
-        case 2:
-          saveText = selectOfficeEdit.value;
-          break;
-        case 3:
-          if (inputLine.value < 18 || inputLine.value > 90) {
-            pushNotification('Age Error',
-              'Please enter an age from 18 to 90', 'error');
-
-            return;
-          }
-          saveText = inputLine.value;
-          break;
-        case 4:
-          if (inputLine.value < 0) {
-            pushNotification('Salary Error',
-              'Please enter an salary > 0', 'error');
-
-            return;
-          }
-
-          saveText = `$${formatSalary(inputLine.value)}`;
-          break;
+  body.addEventListener('click', elemClick => {
+    if (e.target.cellIndex === 2) {
+      if (!elemClick.target.closest('select')) {
+        collbacks();
       }
-
-      e.target.textContent = saveText;
-      input.remove();
+    } else {
+      if (!elemClick.target.closest('input')) {
+        collbacks();
+      }
     }
   });
 });
