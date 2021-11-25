@@ -35,6 +35,8 @@ function showNotification(error) {
 
 const people = [];
 
+let indexCounter = 0;
+
 for (const man of table.children) {
   people.push({
     name: man.children[0].textContent,
@@ -42,20 +44,26 @@ for (const man of table.children) {
     office: man.children[2].textContent,
     age: man.children[3].textContent,
     salary: man.children[4].textContent.replace(/[$,]/g, ''),
+    id: indexCounter,
   });
+
+  indexCounter++;
 }
+
+refreshTable();
 
 function refreshTable() {
   table.innerHTML = '';
 
   for (const man of people) {
     table.insertAdjacentHTML('beforeend', `
-      <tr>
-        <td>${man.name}</td>
-        <td>${man.position}</td>
-        <td>${man.office}</td>
-        <td>${man.age}</td>
-        <td>$${man.salary.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
+      <tr data-id="${man.id}">
+        <td data-index="0">${man.name}</td>
+        <td data-index="1">${man.position}</td>
+        <td data-index="2">${man.office}</td>
+        <td data-index="3">${man.age}</td>
+        <td data-index="4">$${man.salary.toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
       </tr>
     `);
   }
@@ -197,6 +205,7 @@ form.addEventListener('click', (e) => {
     office: officeValue,
     age: ageValue,
     salary: salaryValue,
+    id: people.length,
   });
 
   form.children[0].children[0].value = '';
@@ -227,5 +236,63 @@ table.addEventListener('click', (e) => {
 });
 
 table.addEventListener('dblclick', (e) => {
+  if (document.querySelector('.cell-input')) {
+    return;
+  }
 
+  const item = e.target;
+  const rowIndex = item.closest('tr').dataset.id;
+  const columnIndex = item.dataset.index;
+
+  const cellInput = document.createElement('input');
+
+  cellInput.className = 'cell-input';
+  cellInput.setAttribute('autofocus', true);
+
+  if (columnIndex > 2) {
+    cellInput.type = 'number';
+  } else {
+    cellInput.type = 'text';
+  }
+
+  if (columnIndex < 3) {
+    cellInput.setAttribute('value', item.textContent);
+  } else if (columnIndex === 3) {
+    cellInput.setAttribute('value', +item.textContent);
+  } else {
+    cellInput.setAttribute('value', +item.textContent.replace(/[$,]/g, ''));
+  }
+
+  item.innerHTML = '';
+  item.append(cellInput);
+
+  cellInput.addEventListener('keydown', (key) => {
+    if (key.key !== 'Enter') {
+      return;
+    }
+
+    const man = people[rowIndex];
+
+    if (cellInput.value) {
+      switch (columnIndex) {
+        case '0':
+          man.name = cellInput.value;
+          break;
+        case '1':
+          man.position = cellInput.value;
+          break;
+        case '2':
+          man.office = cellInput.value;
+          break;
+        case '3':
+          man.age = cellInput.value;
+          break;
+        case '4':
+          man.salary = cellInput.value;
+          break;
+      }
+    }
+
+    refreshTable();
+  });
 });
