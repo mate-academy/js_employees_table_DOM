@@ -247,7 +247,6 @@ table.addEventListener('dblclick', (e) => {
   const cellInput = document.createElement('input');
 
   cellInput.className = 'cell-input';
-  cellInput.setAttribute('autofocus', true);
 
   if (columnIndex > 2) {
     cellInput.type = 'number';
@@ -261,36 +260,46 @@ table.addEventListener('dblclick', (e) => {
     cellInput.setAttribute('value', +item.textContent);
   } else {
     cellInput.setAttribute('value', +item.textContent.replace(/[$,]/g, ''));
+    cellInput.step = 100;
   }
 
   item.innerHTML = '';
   item.append(cellInput);
+  cellInput.focus();
 
   cellInput.addEventListener('keydown', (key) => {
     if (key.key !== 'Enter') {
       return;
     }
 
-    const man = people[rowIndex];
+    const man = people.find(x => x.id === +rowIndex);
 
-    if (cellInput.value) {
-      switch (columnIndex) {
-        case '0':
-          man.name = cellInput.value;
-          break;
-        case '1':
-          man.position = cellInput.value;
-          break;
-        case '2':
-          man.office = cellInput.value;
-          break;
-        case '3':
+    switch (columnIndex) {
+      case '0':
+        if (cellInput.value.length > 3) {
+          man.name = cellInput.value.match(/[a-z]/gi).join('');
+        }
+        break;
+      case '1':
+        if (cellInput.value.length > 1) {
+          man.position = cellInput.value.match(/[a-z]/gi).join('');
+        }
+        break;
+      case '2':
+        if (cellInput.value.length > 1) {
+          man.office = cellInput.value.match(/[a-z]/gi).join('');
+        }
+        break;
+      case '3':
+        if (+cellInput.value > 0) {
           man.age = cellInput.value;
-          break;
-        case '4':
+        }
+        break;
+      case '4':
+        if (+cellInput.value > 0) {
           man.salary = cellInput.value;
-          break;
-      }
+        }
+        break;
     }
 
     refreshTable();
