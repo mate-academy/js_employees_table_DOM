@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /* eslint-disable max-len */
 /* eslint-disable padding-line-between-statements */
 /* eslint-disable no-multiple-empty-lines */
@@ -18,7 +19,6 @@ const countryArray = [
   `San Francisco`,
   `Kyiv`,
 ];
-
 let clickCount = 1;
 
 const sortTatble = (el) => {
@@ -93,7 +93,7 @@ const pushNotification = (title, description, type) => {
 
   setTimeout(() => {
     message.remove();
-  }, 4000);
+  }, 2000);
 };
 
 
@@ -118,3 +118,43 @@ const formAdd = `
   </form>
 `;
 doc.insertAdjacentHTML('beforeend', formAdd);
+
+// Save data to table
+const saveToTableBtn = document.querySelector('.js-add-employee');
+
+const addEmployee = (el) => {
+  el.preventDefault();
+
+  const newEmployeeName = document.querySelector('#name');
+  const newEmployeePosition = document.querySelector('#position');
+  const newEmployeeOffice = document.querySelector('#office');
+  const newEmployeeAge = document.querySelector('#age');
+  const newEmployeeSalary = document.querySelector('#salary');
+
+  function formatSalary(value) {
+    return `$${new Intl.NumberFormat().format(value)}`;
+  }
+
+  const tr = `
+    <td>${newEmployeeName.value}</td>
+    <td>${newEmployeePosition.value}</td>
+    <td>${newEmployeeOffice.value}</td>
+    <td>${newEmployeeAge.value}</td>
+    <td>${formatSalary(newEmployeeSalary.value)}</td>
+  `;
+
+  if (newEmployeeName.value.length < 4) {
+      pushNotification('Wrong', 'Name length less then 4 digits', 'error');
+  } else if (newEmployeeAge.value < 18 || newEmployeeAge.value > 90) {
+    pushNotification('Wrong', 'There is error in Age of Employee. Please check it.', 'error');
+  } else {
+    pushNotification('Success', `Look's everything is okay. Check table :)`, 'success');
+    table.insertAdjacentHTML('beforeend', tr);
+    newEmployeeName.value = '';
+    newEmployeePosition.value = '';
+    newEmployeeAge.value = '';
+    newEmployeeSalary.value = '';
+  }
+};
+
+saveToTableBtn.addEventListener('click', addEmployee);
