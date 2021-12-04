@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable padding-line-between-statements */
 /* eslint-disable no-multiple-empty-lines */
 'use strict';
@@ -7,10 +8,21 @@
 const table = document.querySelector('table');
 const headers = table.querySelectorAll('thead th');
 const rows = table.querySelectorAll('tbody tr');
-let count = 1;
+const doc = document.querySelector('body');
+const countryArray = [
+  `Tokyo`,
+  `Singapore`,
+  `London`,
+  `New York`,
+  `Edinburgh`,
+  `San Francisco`,
+  `Kyiv`,
+];
+
+let clickCount = 1;
 
 const sortTatble = (el) => {
-  count++;
+  clickCount++;
 
   const headerArr = [...headers];
   const rowArr = [...rows];
@@ -39,7 +51,7 @@ const sortTatble = (el) => {
     }
   });
 
-  if (count % 2 === 0) {
+  if (clickCount % 2 === 0) {
     rowArr.forEach((item) => table.append(item));
   } else {
     rowArr.forEach((item) => table.prepend(item));
@@ -50,3 +62,15 @@ for (const item of headers) {
   item.addEventListener('click', sortTatble);
 }
 
+
+// When user clicks on a row, it should become selected.
+
+for (const row of rows) {
+  row.addEventListener('click', (el) => {
+    const target = el.target.parentElement;
+    [...rows].forEach(item => {
+      item.classList.remove('active');
+    });
+    target.classList.add('active');
+  });
+}
