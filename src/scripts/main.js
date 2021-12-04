@@ -5,7 +5,7 @@
 
 // Table sorting in two directions
 
-const table = document.querySelector('table');
+const table = document.querySelector('tbody');
 const headers = table.querySelectorAll('thead th');
 const rows = table.querySelectorAll('tbody tr');
 const doc = document.querySelector('body');
@@ -64,7 +64,6 @@ for (const item of headers) {
 
 
 // When user clicks on a row, it should become selected.
-
 for (const row of rows) {
   row.addEventListener('click', (el) => {
     const target = el.target.parentElement;
@@ -74,3 +73,48 @@ for (const row of rows) {
     target.classList.add('active');
   });
 }
+
+// Notification function
+const pushNotification = (title, description, type) => {
+  const body = document.querySelector('body');
+  const message = document.createElement('div');
+  const h2 = document.createElement('h2');
+  const p = document.createElement('p');
+
+  message.classList.add('notification', `${type}`);
+  message.style.top = `10px`;
+  message.style.right = `10px`;
+  message.setAttribute('data-qa', 'notification');
+  h2.classList.add('title');
+  h2.textContent = title;
+  p.textContent = description;
+  message.append(h2, p);
+  body.append(message);
+
+  setTimeout(() => {
+    message.remove();
+  }, 4000);
+};
+
+
+// Write a script to add a form to the document. Form allows users to add new employees to the spreadsheet.
+const formAdd = `
+  <form action="/" method="post" class="new-employee-form">
+    <label for="name">Name:
+      <input name="name" type="text" data-qa="name" id="name" required></label>
+    <label for="position">Position:
+      <input name="position" type="text" data-qa="position" id="position" required></label>
+    <label for="office">
+      Office:
+      <select name="office" id="office" data-qa="office">
+      ${countryArray.map(country => `<option value='${country}'>${country}</option>`)}
+      </select>
+    </label>
+    <label for="age">Age:
+      <input name="age" type="number" min="18" max="90" step="1" data-qa="age" id="age" required></label>
+    <label for="salary">Salary:
+      <input name="salary" type="number" min="5000" max="5000000" step="500" data-qa="salary" id="salary" required></label>
+    <button type="submit" class="js-add-employee">Save to table</button>
+  </form>
+`;
+doc.insertAdjacentHTML('beforeend', formAdd);
