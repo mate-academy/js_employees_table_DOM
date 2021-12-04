@@ -6,9 +6,10 @@
 
 // Table sorting in two directions
 
-const table = document.querySelector('tbody');
+const table = document.querySelector('table');
+const tbody = document.querySelector('table tbody');
 const headers = table.querySelectorAll('thead th');
-const rows = table.querySelectorAll('tbody tr');
+let rows = table.querySelectorAll('tbody tr');
 const doc = document.querySelector('body');
 const countryArray = [
   `Tokyo`,
@@ -21,6 +22,7 @@ const countryArray = [
 ];
 let clickCount = 1;
 
+// Sort table in two ways
 const sortTatble = (el) => {
   clickCount++;
 
@@ -64,15 +66,18 @@ for (const item of headers) {
 
 
 // When user clicks on a row, it should become selected.
-for (const row of rows) {
-  row.addEventListener('click', (el) => {
-    const target = el.target.parentElement;
-    [...rows].forEach(item => {
-      item.classList.remove('active');
+tbody.addEventListener('click', function() {
+  rows = table.querySelectorAll('tbody tr');
+  for (const row of rows) {
+    row.addEventListener('click', (el) => {
+      const target = el.target.parentElement;
+      [...rows].forEach(item => {
+        item.classList.remove('active');
+      });
+      target.classList.add('active');
     });
-    target.classList.add('active');
-  });
-}
+  }
+});
 
 // Notification function
 const pushNotification = (title, description, type) => {
@@ -95,7 +100,6 @@ const pushNotification = (title, description, type) => {
     message.remove();
   }, 2000);
 };
-
 
 // Write a script to add a form to the document. Form allows users to add new employees to the spreadsheet.
 const formAdd = `
@@ -149,7 +153,7 @@ const addEmployee = (el) => {
     pushNotification('Wrong', 'There is error in Age of Employee. Please check it.', 'error');
   } else {
     pushNotification('Success', `Look's everything is okay. Check table :)`, 'success');
-    table.insertAdjacentHTML('beforeend', tr);
+    tbody.insertAdjacentHTML('beforeend', tr);
     newEmployeeName.value = '';
     newEmployeePosition.value = '';
     newEmployeeAge.value = '';
