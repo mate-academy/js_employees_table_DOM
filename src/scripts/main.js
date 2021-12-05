@@ -49,7 +49,8 @@ table.addEventListener('click', e => {
 // ------------form---------------- //
 const inputForm = document.createElement('form');
 const cities = ['Tokyo', 'Singapore', 'London',
-  'New York', 'Edinburgh', 'San Francisco'];
+  'New York', 'Edinburgh', 'San Francisco'
+];
 
 inputForm.classList.add('new-employee-form');
 
@@ -77,6 +78,12 @@ body.append(inputForm);
 inputForm.addEventListener('submit', e => {
   e.preventDefault();
 
+  const oldMessage = document.querySelector('div.notification');
+
+  if (oldMessage) {
+    oldMessage.remove();
+  }
+
   const formElements = inputForm.elements;
   const formName = formElements.name.value;
   const formPosition = formElements.position.value;
@@ -84,6 +91,7 @@ inputForm.addEventListener('submit', e => {
   const formAge = formElements.age.value;
   const formSalary = formElements.salary.value;
   const message = document.createElement('div');
+
 
   message.classList.add('notification');
   message.dataset.qa = 'notification';
@@ -108,6 +116,10 @@ inputForm.addEventListener('submit', e => {
 
   if (+formAge < 18 || +formAge > 90) {
     textM += '<p>Age cannot be less than 18 or more than 90</p>';
+  }
+
+  if (+formSalary <= 0) {
+    textM += '<p>Salary cannot be less than 0</p>';
   }
 
   if (textM.length === 0) {
@@ -141,11 +153,23 @@ table.addEventListener('dblclick', e => {
     return;
   }
 
-  const inputEl = document.createElement('input');
+  let inputEl;
 
-  inputEl.classList.add('cell-input');
-  inputEl.value = text;
   editCell.innerHTML = '';
+
+  if (editCell === editCell.parentElement.children[2]) {
+    inputEl = document.createElement('select');
+    inputEl.value = text;
+
+    inputEl.innerHTML = `
+      ${cities.map(el => `<option value='${el}'>${el}</option>`).join()}`;
+  } else {
+    inputEl = document.createElement('input');
+
+    inputEl.classList.add('cell-input');
+    inputEl.value = text;
+    
+  }
   editCell.append(inputEl);
   inputEl.focus();
 
@@ -166,13 +190,18 @@ table.addEventListener('dblclick', e => {
           if (toNum(inputEl.value) >= 18 && toNum(inputEl.value) <= 90) {
             editCell.textContent = toNum(inputEl.value);
           } else {
-            editCell.textContent = text;
+
           }
           break;
 
         case editCell.parentElement.children[4]:
-          editCell.textContent = '$' + toNum(inputEl.value)
-            .toLocaleString('en-US');
+
+          if (toNum(inputEl.value)) {
+            editCell.textContent = '$' + toNum(inputEl.value)
+              .toLocaleString('en-US');
+          } else {
+            editCell.textContent = text;
+          }
           break;
 
         default:
@@ -214,4 +243,5 @@ function addRow(nm, pos, off, age, sal) {
   `;
 
   table.append(rowForAdd);
+  inputForm.reset();
 }
