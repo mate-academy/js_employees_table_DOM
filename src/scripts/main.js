@@ -1,13 +1,7 @@
-/* eslint-disable indent */
-/* eslint-disable max-len */
-/* eslint-disable padding-line-between-statements */
-/* eslint-disable no-multiple-empty-lines */
 'use strict';
 
-// Table sorting in two directions
-
 const table = document.querySelector('table');
-const tbody = document.querySelector('table tbody');
+const tbody = document.querySelector('tbody');
 const headers = table.querySelectorAll('thead th');
 let rows = table.querySelectorAll('tbody tr');
 const doc = document.querySelector('body');
@@ -20,12 +14,10 @@ const countryArray = [
   `San Francisco`,
   `Kyiv`,
 ];
-let clickCount = 1;
+const headerIndexArr = Array(5).fill(0);
 
 // Sort table in two ways
 const sortTatble = (el) => {
-  clickCount++;
-
   const headerArr = [...headers];
   const rowArr = [...rows];
   const headerIndex = headerArr.indexOf(el.target);
@@ -53,10 +45,12 @@ const sortTatble = (el) => {
     }
   });
 
-  if (clickCount % 2 === 0) {
+  if (headerIndexArr[headerIndex] % 2 === 0) {
     rowArr.forEach((item) => table.append(item));
+    headerIndexArr[headerIndex]++;
   } else {
     rowArr.forEach((item) => table.prepend(item));
+    headerIndexArr[headerIndex]--;
   }
 };
 
@@ -64,13 +58,14 @@ for (const item of headers) {
   item.addEventListener('click', sortTatble);
 }
 
-
 // When user clicks on a row, it should become selected.
 tbody.addEventListener('click', function() {
   rows = table.querySelectorAll('tbody tr');
+
   for (const row of rows) {
     row.addEventListener('click', (el) => {
       const target = el.target.parentElement;
+
       [...rows].forEach(item => {
         item.classList.remove('active');
       });
@@ -85,10 +80,14 @@ const pushNotification = (title, description, type) => {
   const message = document.createElement('div');
   const h2 = document.createElement('h2');
   const p = document.createElement('p');
+  const coords = {
+    x: 10,
+    y: 10,
+  };
 
   message.classList.add('notification', `${type}`);
-  message.style.top = `10px`;
-  message.style.right = `10px`;
+  message.style.top = `${coords.x}px`;
+  message.style.right = `${coords.y}px`;
   message.setAttribute('data-qa', 'notification');
   h2.classList.add('title');
   h2.textContent = title;
@@ -98,37 +97,71 @@ const pushNotification = (title, description, type) => {
 
   setTimeout(() => {
     message.remove();
-  }, 2000);
+  }, 3000);
 };
 
-// Write a script to add a form to the document. Form allows users to add new employees to the spreadsheet.
+// Add a form to the document.
 const formAdd = `
   <form action="/" method="post" class="new-employee-form">
     <label for="name">Name:
-      <input name="name" type="text" data-qa="name" id="name" required></label>
+      <input
+        name="name"
+        type="text"
+        data-qa="name"
+        id="name"
+        required
+      >
+    </label>
     <label for="position">Position:
-      <input name="position" type="text" data-qa="position" id="position" required></label>
+      <input
+        name="position"
+        type="text"
+        data-qa="position"
+        id="position"
+        required
+      >
+    </label>
     <label for="office">
       Office:
       <select name="office" id="office" data-qa="office">
-      ${countryArray.map(country => `<option value='${country}'>${country}</option>`)}
+      ${countryArray.map(country => `
+        <option value='${country}'>${country}</option>
+      `)}
       </select>
     </label>
     <label for="age">Age:
-      <input name="age" type="number" min="18" max="90" step="1" data-qa="age" id="age" required></label>
+      <input name="age"
+        type="number"
+        min="18"
+        max="90"
+        step="1"
+        data-qa="age"
+        id="age"
+        required
+      >
+    </label>
     <label for="salary">Salary:
-      <input name="salary" type="number" min="5000" max="5000000" step="500" data-qa="salary" id="salary" required></label>
+      <input
+        name="salary"
+        type="number"
+        min="5000"
+        max="5000000"
+        step="500"
+        data-qa="salary"
+        id="salary"
+        required
+      >
+    </label>
     <button type="submit" class="js-add-employee">Save to table</button>
   </form>
 `;
+
 doc.insertAdjacentHTML('beforeend', formAdd);
 
 // Save data to table
 const saveToTableBtn = document.querySelector('.js-add-employee');
 
 const addEmployee = (el) => {
-  el.preventDefault();
-
   const newEmployeeName = document.querySelector('#name');
   const newEmployeePosition = document.querySelector('#position');
   const newEmployeeOffice = document.querySelector('#office');
@@ -150,9 +183,16 @@ const addEmployee = (el) => {
   if (newEmployeeName.value.length < 4) {
     pushNotification('Wrong', 'Name length less then 4 digits', 'error');
   } else if (newEmployeeAge.value < 18 || newEmployeeAge.value > 90) {
-    pushNotification('Wrong', 'There is error in Age of Employee. Please check it.', 'error');
+    pushNotification(
+      'Wrong',
+      'There is error in Age of Employee. Please check it.',
+      'error'
+    );
   } else {
-    pushNotification('Success', `Look's everything is okay. Check table :)`, 'success');
+    pushNotification('Success',
+      `Look's everything is okay. Check table :)`,
+      'success'
+    );
     tbody.insertAdjacentHTML('beforeend', tr);
     newEmployeeName.value = '';
     newEmployeePosition.value = '';
@@ -169,6 +209,7 @@ const changeTableCell = (cell) => {
   const prevTextContent = editCell.textContent;
   const cellIndex = editCell.cellIndex;
   const input = document.createElement('input');
+
   input.classList.add('cell-input');
   input.style.padding = `18px`;
 
@@ -215,8 +256,10 @@ const changeTableCell = (cell) => {
         }
         break;
       case 4:
-        if (+input.value < 0) {
-          unSuccessChange(`Salary can't be negative. Please try again.`);
+        if (+input.value < 0 || input.value.length === 0) {
+          unSuccessChange(
+            `Salary can't be negative or empty. Please try again.`
+          );
         } else {
           td.textContent = `$${new Intl.NumberFormat().format(input.value)}`;
           input.replaceWith(td);
