@@ -148,7 +148,7 @@ const addEmployee = (el) => {
   `;
 
   if (newEmployeeName.value.length < 4) {
-      pushNotification('Wrong', 'Name length less then 4 digits', 'error');
+    pushNotification('Wrong', 'Name length less then 4 digits', 'error');
   } else if (newEmployeeAge.value < 18 || newEmployeeAge.value > 90) {
     pushNotification('Wrong', 'There is error in Age of Employee. Please check it.', 'error');
   } else {
@@ -162,3 +162,76 @@ const addEmployee = (el) => {
 };
 
 saveToTableBtn.addEventListener('click', addEmployee);
+
+// Double click on the cell of the table
+const changeTableCell = (cell) => {
+  const editCell = cell.target;
+  const prevTextContent = editCell.textContent;
+  const cellIndex = editCell.cellIndex;
+  const input = document.createElement('input');
+  input.classList.add('cell-input');
+  input.style.padding = `18px`;
+
+  editCell.replaceWith(input);
+  input.focus();
+
+  const changeText = () => {
+    const td = document.createElement('td');
+
+    const successChange = () => {
+      td.textContent = input.value;
+      input.replaceWith(td);
+      pushNotification('Success', `Look's everything is okay. :)`, 'success');
+    };
+
+    const unSuccessChange = (errorText) => {
+      td.textContent = prevTextContent;
+      input.replaceWith(td);
+      pushNotification('Wrong', `${errorText}`, 'error');
+    };
+
+    switch (cellIndex) {
+      case 0:
+        if (input.value.length < 4) {
+          unSuccessChange('Name must be at least 4 digits');
+        } else {
+          successChange();
+        }
+        break;
+      case 1:
+      case 2:
+        if (input.value.length < 4) {
+          unSuccessChange(`This field can't be empty. Please try again.`);
+        } else {
+          successChange();
+        }
+        break;
+      case 3:
+        if (+input.value < 18 || +input.value > 90) {
+          unSuccessChange('Age must be from 18 to 90. Please try again.');
+        } else {
+          td.textContent = input.value;
+          successChange();
+        }
+        break;
+      case 4:
+        if (+input.value < 0) {
+          unSuccessChange(`Salary can't be negative. Please try again.`);
+        } else {
+          td.textContent = `$${new Intl.NumberFormat().format(input.value)}`;
+          input.replaceWith(td);
+        }
+        break;
+    }
+  };
+
+  input.addEventListener('blur', changeText);
+
+  input.addEventListener('keyup', (key) => {
+    if (key.key === 'Enter') {
+      changeText();
+    }
+  });
+};
+
+tbody.addEventListener('dblclick', changeTableCell);
