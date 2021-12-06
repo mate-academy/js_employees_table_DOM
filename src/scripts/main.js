@@ -14,6 +14,20 @@ const countryArray = [
   `San Francisco`,
   `Kyiv`,
 ];
+const positionArray = [
+  'Accountant',
+  'Data Coordinator',
+  'Developer',
+  'Financial Controller',
+  'Integration Specialist',
+  'Javascript Developer',
+  'QA Engineer',
+  'Marketing Designer',
+  'Regional Director',
+  'Regional Marketing',
+  'Software Engineer',
+  'Technical Author',
+];
 const headerIndexArr = Array(5).fill(0);
 
 // Sort table in two ways
@@ -173,7 +187,7 @@ const addEmployee = (el) => {
   }
 
   const tr = `
-    <td>${newEmployeeName.value}</td>
+    <td>${newEmployeeName.value.trim()}</td>
     <td>${newEmployeePosition.value}</td>
     <td>${newEmployeeOffice.value}</td>
     <td>${newEmployeeAge.value}</td>
@@ -182,23 +196,44 @@ const addEmployee = (el) => {
 
   if (newEmployeeName.value.length < 4) {
     pushNotification('Wrong', 'Name length less then 4 digits', 'error');
-  } else if (newEmployeeAge.value < 18 || newEmployeeAge.value > 90) {
+
+    return;
+  }
+
+  if (newEmployeePosition.value.length === 0
+    || !positionArray.includes(newEmployeePosition.value)) {
+    pushNotification('Wrong', `Position didn't match with existing position`,
+      'error'
+    );
+
+    return;
+  }
+
+  if (newEmployeeAge.value < 18 || newEmployeeAge.value > 90) {
     pushNotification(
       'Wrong',
       'There is error in Age of Employee. Please check it.',
       'error'
     );
-  } else {
-    pushNotification('Success',
-      `Look's everything is okay. Check table :)`,
-      'success'
-    );
-    tbody.insertAdjacentHTML('beforeend', tr);
-    newEmployeeName.value = '';
-    newEmployeePosition.value = '';
-    newEmployeeAge.value = '';
-    newEmployeeSalary.value = '';
+
+    return;
   }
+
+  if (newEmployeeSalary.value.length === 0) {
+    pushNotification('Wrong', `Salary can't be negative or zero.`, 'error');
+
+    return;
+  }
+
+  pushNotification('Success',
+    `Look's everything is okay. Check table :)`,
+    'success'
+  );
+  tbody.insertAdjacentHTML('beforeend', tr);
+  newEmployeeName.value = '';
+  newEmployeePosition.value = '';
+  newEmployeeAge.value = '';
+  newEmployeeSalary.value = '';
 };
 
 saveToTableBtn.addEventListener('click', addEmployee);
@@ -209,12 +244,34 @@ const changeTableCell = (cell) => {
   const prevTextContent = editCell.textContent;
   const cellIndex = editCell.cellIndex;
   const input = document.createElement('input');
+  const select = document.createElement('select');
 
   input.classList.add('cell-input');
   input.style.padding = `18px`;
 
-  editCell.replaceWith(input);
-  input.focus();
+  select.style.border = `1px solid #808080`;
+  select.style.borderRadius = `4px`;
+  select.style.color = `#808080`;
+  select.style.marginTop = `14px`;
+  select.style.padding = `4px`;
+  select.style.outlineColor = `#808080`;
+
+  if (cellIndex === 1) {
+    editCell.replaceWith(select);
+
+    select.innerHTML = `${positionArray.map(position =>
+      `<option value="${position}">${position}</option>`).join('')}`;
+    select.focus();
+  } else if (cellIndex === 2) {
+    editCell.replaceWith(select);
+
+    select.innerHTML = `${countryArray.map(position =>
+      `<option value="${position}">${position}</option>`).join('')}`;
+    select.focus();
+  } else {
+    editCell.replaceWith(input);
+    input.focus();
+  }
 
   const changeText = () => {
     const td = document.createElement('td');
@@ -240,12 +297,14 @@ const changeTableCell = (cell) => {
         }
         break;
       case 1:
+        td.textContent = select.value;
+        select.replaceWith(td);
+        pushNotification('Success', `Look's everything is okay. :)`, 'success');
+        break;
       case 2:
-        if (input.value.length < 4) {
-          unSuccessChange(`This field can't be empty. Please try again.`);
-        } else {
-          successChange();
-        }
+        td.textContent = select.value;
+        select.replaceWith(td);
+        pushNotification('Success', `Look's everything is okay. :)`, 'success');
         break;
       case 3:
         if (+input.value < 18 || +input.value > 90) {
@@ -256,9 +315,12 @@ const changeTableCell = (cell) => {
         }
         break;
       case 4:
-        if (+input.value < 0 || input.value.length === 0) {
+        if (+input.value < 0
+            || input.value.length === 0
+            || typeof input.value === 'string'
+        ) {
           unSuccessChange(
-            `Salary can't be negative or empty. Please try again.`
+            `Salary can't be negative / empty or word. Please try again.`
           );
         } else {
           td.textContent = `$${new Intl.NumberFormat().format(input.value)}`;
@@ -269,9 +331,16 @@ const changeTableCell = (cell) => {
   };
 
   input.addEventListener('blur', changeText);
+  select.addEventListener('blur', changeText);
 
-  input.addEventListener('keyup', (key) => {
+  input.addEventListener('keydown', (key) => {
     if (key.key === 'Enter') {
+      changeText();
+    }
+  });
+
+  select.addEventListener('keydown', (press) => {
+    if (press.key === 'Enter') {
       changeText();
     }
   });
