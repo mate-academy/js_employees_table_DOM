@@ -60,10 +60,10 @@ const sortTatble = (el) => {
   });
 
   if (headerIndexArr[headerIndex] % 2 === 0) {
-    rowArr.forEach((item) => table.append(item));
+    rowArr.forEach((item) => tbody.append(item));
     headerIndexArr[headerIndex]++;
   } else {
-    rowArr.forEach((item) => table.prepend(item));
+    rowArr.forEach((item) => tbody.prepend(item));
     headerIndexArr[headerIndex]--;
   }
 };
