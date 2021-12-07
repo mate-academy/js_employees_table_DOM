@@ -183,7 +183,9 @@ const addEmployee = (el) => {
   const newEmployeeSalary = document.querySelector('#salary');
 
   function formatSalary(value) {
-    return `$${new Intl.NumberFormat().format(value)}`;
+    const newValue = value.replace(/[^+\d]/g, '');
+
+    return `$${new Intl.NumberFormat('ja-JP').format(newValue)}`;
   }
 
   const tr = `
@@ -200,9 +202,8 @@ const addEmployee = (el) => {
     return;
   }
 
-  if (newEmployeePosition.value.length === 0
-    || !positionArray.includes(newEmployeePosition.value)) {
-    pushNotification('Wrong', `Position didn't match with existing position`,
+  if (newEmployeePosition.value.length === 0) {
+    pushNotification('Wrong', `Position field can't be empty!`,
       'error'
     );
 
@@ -268,6 +269,11 @@ const changeTableCell = (cell) => {
     select.innerHTML = `${countryArray.map(position =>
       `<option value="${position}">${position}</option>`).join('')}`;
     select.focus();
+  } else if (cellIndex === 3 || cellIndex === 4) {
+    editCell.replaceWith(input);
+    input.setAttribute('type', 'number');
+    input.setAttribute('max', '99999999999999999999999');
+    input.focus();
   } else {
     editCell.replaceWith(input);
     input.focus();
@@ -310,6 +316,7 @@ const changeTableCell = (cell) => {
         if (+input.value < 18 || +input.value > 90) {
           unSuccessChange('Age must be from 18 to 90. Please try again.');
         } else {
+          input.type = 'number';
           td.textContent = input.value;
           successChange();
         }
@@ -317,13 +324,12 @@ const changeTableCell = (cell) => {
       case 4:
         if (+input.value < 0
             || input.value.length === 0
-            || typeof input.value === 'string'
         ) {
           unSuccessChange(
             `Salary can't be negative / empty or word. Please try again.`
           );
         } else {
-          td.textContent = `$${new Intl.NumberFormat().format(input.value)}`;
+          td.textContent = `$${new Intl.NumberFormat('ja-JP').format(input.value)}`;
           input.replaceWith(td);
         }
         break;
