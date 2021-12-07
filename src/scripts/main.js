@@ -28,7 +28,7 @@ const positionArray = [
   'Software Engineer',
   'Technical Author',
 ];
-const headerIndexArr = Array(5).fill(0);
+const headerIndexArr = [0, 0, 0, 0, 0];
 
 // Sort table in two ways
 const sortTatble = (el) => {
