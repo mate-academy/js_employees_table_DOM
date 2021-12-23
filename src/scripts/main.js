@@ -100,13 +100,13 @@ function addForm() {
       </label>
       <label>Age: <input
           name='age'
-          type='text'
+          type='number'
           data-qa='age'
           required
         ></label>
       <label>Salary: <input
           name='salary'
-          type='text'
+          type='number'
           data-qa='salary'
           required
         ></label>
@@ -116,8 +116,6 @@ function addForm() {
   body.insertAdjacentHTML('beforeend', form);
 
   const formI = document.querySelector('.new-employee-form');
-
-  // const submitButton = document.querySelector('[type="submit"]');
 
   formI.addEventListener('click', (e) => {
     const item = e.target.closest('[type = "submit"]');
@@ -131,16 +129,15 @@ function addForm() {
     const namePerson = document.querySelector('[name = "name"]').value;
     const positionPerson = document.querySelector('[name = "position"]').value;
     const officePerson = document.querySelector('[name = "office"]').value;
-    const agePerson = +document.querySelector('[name = "age"]').value;
+    const agePerson = document.querySelector('[name = "age"]').value;
     const salaryPerson = document.querySelector('[name = "salary"]').value;
 
     if (namePerson.length < 4 || agePerson < 18 || agePerson > 90
       || positionPerson.length < 2) {
+      deleteNotification();
+
       pushNotification(150, 10, 'Error',
         'Please enter correct data', 'error');
-    } else if (typeof agePerson !== 'number') {
-      pushNotification(150, 10, 'Warning',
-        'Please enter correct age or salary', 'warning');
     } else {
       table.insertAdjacentHTML('beforeend',
         `<tr>
@@ -151,11 +148,20 @@ function addForm() {
       <td>$${parseInt(salaryPerson).toLocaleString('en-EN')}</td>
     </tr>`
       );
+      deleteNotification();
 
       pushNotification(150, 10, 'Success',
         'The person was successfully added to the table', 'success');
     }
   });
+
+  function deleteNotification() {
+    const notifications = document.querySelectorAll('.notification');
+
+    if (notifications.length > 0) {
+      notifications[0].remove();
+    }
+  }
 }
 
 function pushNotification(posTop, posRight, title, description, type) {
@@ -173,7 +179,6 @@ function pushNotification(posTop, posRight, title, description, type) {
   message.append(titleMessage);
   message.append(descriptionText);
   body.append(message);
-
   message.style.top = `${posTop}px`;
   message.style.right = `${posRight}px`;
 
@@ -184,9 +189,11 @@ function pushNotification(posTop, posRight, title, description, type) {
 
 function replaceText() {
   table.addEventListener('dblclick', (e) => {
-    const item = e.target.closest('td');
+    e.preventDefault();
 
-    if (!item || !table.contains(item)) {
+    const item = e.target;
+
+    if (item.tagName !== 'TD' || !table.contains(item)) {
       return;
     }
 
@@ -194,36 +201,54 @@ function replaceText() {
   });
 
   function editTd(td) {
-    const input = document.createElement('input');
-    const tdText = td.innerHTML;
+    const tdText = td.textContent;
 
-    input.className = 'cell-input';
-    input.value = tdText;
-    td.innerHTML = '';
-    td.append(input);
-    input.focus();
+    if (td.cellIndex === 2) {
+      const officePerson = document.querySelector('[name = "office"]');
+      const select = officePerson.cloneNode(true);
 
-    savedText();
+      td.innerHTML = '';
+      select.className = 'cell-input';
+      td.append(select);
+      select.focus();
+      savedText(select);
+    } else {
+      const input = document.createElement('input');
 
-    function savedText() {
-      input.addEventListener('blur', () => {
-        replaceValue();
+      if (td.cellIndex === 3 || td.cellIndex === 4) {
+        input.type = 'number';
+      }
+      input.className = 'cell-input';
+      input.value = tdText;
+      td.innerHTML = '';
+      td.append(input);
+      input.focus();
+      savedText(input);
+    }
+
+    function savedText(tag) {
+      tag.addEventListener('blur', () => {
+        replaceValue(tag);
       });
 
       table.addEventListener('keypress', (e) => {
         if (e.code === 'Enter') {
-          replaceValue();
+          replaceValue(tag);
         }
       });
     }
 
-    function replaceValue() {
-      if (input.value.length === 0) {
-        td.innerHTML = tdText;
+    function replaceValue(tag) {
+      if (tag.value.length === 0) {
+        td.textContent = tdText;
       } else {
-        td.innerHTML = input.value;
+        if (td.cellIndex === 4) {
+          td.textContent = `$${parseInt(tag.value).toLocaleString('en-EN')}`;
+        } else {
+          td.textContent = tag.value;
+        }
       }
-      input.remove();
+      tag.remove();
     }
   }
 }
