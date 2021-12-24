@@ -1,51 +1,54 @@
 'use strict';
 
-// write code here
+const form = document.createElement('form');
+const table = document.querySelector('table');
+const tBody = document.querySelector('tbody');
 
-const addForm = () => {
-  const form = document.createElement('form');
-
+const createForm = () => {
   form.classList = 'new-employee-form';
   document.body.append(form);
 
   form.insertAdjacentHTML('afterbegin', `
-    <label>Name: 
-      <input 
-        name="name" 
-        type="text"
-        >
-    </label>
-    <label>Position: 
-      <input 
-        name="position"
-        type="text"
-        >
-    </label>
-    <label for="office">Office:
-      <select name="office" id="office">
-        <option value="Tokyo">Tokyo</option>
-        <option value="London">London</option>
-        <option value="New York">New York</option>
-        <option value="Edinburgh">Edinburgh</option>
-        <option value="San Francisco">San Francisco</option>
-      </select>
-    </label>
-    <label>Age: 
-      <input name="age" type="number">
-    </label>
-    <label>Salary: 
-      <input name="salary" type="number">
-    </label>
-    <button>Save to table</button>`);
+  <label>Name: 
+    <input 
+      name="name" 
+      type="text"
+      >
+  </label>
+  <label>Position: 
+    <input 
+      name="position"
+      type="text"
+      >
+  </label>
+  <label for="office">Office:
+    <select name="office" id="office">
+      <option value="Tokyo">Tokyo</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    </select>
+  </label>
+  <label>Age: 
+    <input name="age" type="number">
+  </label>
+  <label>Salary: 
+    <input name="salary" type="number">
+  </label>
+  <button>Save to table</button>`);
 
   const allLabel = document.querySelectorAll('label');
-  const office = document.querySelector('select');
-
-  office.value = '';
 
   allLabel.forEach((dataSet) => {
     dataSet.children[0].dataset.qa = dataSet.children[0].name;
   });
+};
+
+const addDataAppending = () => {
+  const office = document.querySelector('select');
+
+  office.value = '';
 
   form.addEventListener('click', (e) => {
     e.preventDefault();
@@ -145,9 +148,7 @@ const addForm = () => {
   });
 };
 
-const table = document.querySelector('table');
-const tBody = document.querySelector('tbody');
-const addSort = () => {
+const addTableSorting = () => {
   const sortTable = (index, order) => {
     const collator = new Intl.Collator([], { numeric: true });
     const compare = (rowA, rowB) => {
@@ -160,7 +161,6 @@ const addSort = () => {
 
       return -(collator.compare(rowDataA, rowDataB));
     };
-
     const column = [].slice.call(tBody.rows);
 
     column.sort(compare);
@@ -177,6 +177,21 @@ const addSort = () => {
     const el = e.target;
 
     if (el.nodeName !== 'TH') {
+      return;
+    }
+
+    const order = (el.dataset.type = -(el.dataset.type || -1));
+    const index = el.cellIndex;
+
+    sortTable(index, order);
+  });
+};
+
+const addRowSelecting = () => {
+  table.addEventListener('click', (e) => {
+    const el = e.target;
+
+    if (el.nodeName !== 'TH') {
       for (const trBody of tBody.children) {
         if (trBody.classList.contains('active')) {
           trBody.classList.remove('active');
@@ -187,13 +202,66 @@ const addSort = () => {
 
       return rowClass.classList.toggle('active');
     }
-
-    const order = (el.dataset.type = -(el.dataset.type || -1));
-    const index = el.cellIndex;
-
-    sortTable(index, order);
   });
 };
 
-addForm();
-addSort();
+const addTableEditing = () => {
+  let td;
+
+  table.addEventListener('dblclick', function func(events) {
+    if (td) {
+      return;
+    };
+    td = events.target.closest('td');
+
+    if (!td) {
+      return;
+    };
+
+    const editInput = document.createElement('input');
+    const oldTD = td.innerHTML;
+
+    editInput.value = '';
+    editInput.classList.add('cell-input');
+    td.style.display = 'none';
+    td.after(editInput);
+    editInput.focus();
+
+    const keyUp = (e) => {
+      if (editInput && e.key === 'Enter') {
+        if (editInput.value !== '') {
+          td.classList.add('edit');
+          td.innerHTML = editInput.value;
+          editInput.remove();
+          td.style.display = '';
+          td = '';
+        }
+
+        if (editInput.value === '') {
+          td.classList.add('edit');
+          td.innerHTML = oldTD;
+          editInput.remove();
+          td.style.display = '';
+          td = '';
+        }
+      }
+    };
+    const blurFocus = () => {
+      if (td.className !== 'edit') {
+        td.innerHTML = editInput.value;
+        editInput.remove();
+        td.style.display = '';
+        td = '';
+      }
+    };
+
+    editInput.addEventListener('keyup', keyUp);
+    editInput.addEventListener('blur', blurFocus);
+  });
+};
+
+createForm();
+addTableSorting();
+addRowSelecting();
+addDataAppending();
+addTableEditing();
