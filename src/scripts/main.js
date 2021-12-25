@@ -3,6 +3,12 @@
 const table = document.querySelector('table');
 const body = document.querySelector('body');
 
+const minNameChars = 4;
+const minYear = 18;
+const maxYear = 90;
+const minPositionChars = 4;
+const minSalary = 0;
+
 sortList();
 highlight();
 addForm();
@@ -115,9 +121,11 @@ function addForm() {
 
   body.insertAdjacentHTML('beforeend', form);
 
-  const formI = document.querySelector('.new-employee-form');
+  const formI = body.querySelector('.new-employee-form');
 
   formI.addEventListener('click', (e) => {
+    deleteNotification();
+
     const item = e.target.closest('[type = "submit"]');
 
     e.preventDefault();
@@ -126,41 +134,65 @@ function addForm() {
       return;
     }
 
-    const namePerson = document.querySelector('[name = "name"]').value;
-    const positionPerson = document.querySelector('[name = "position"]').value;
-    const officePerson = document.querySelector('[name = "office"]').value;
-    const agePerson = document.querySelector('[name = "age"]').value;
-    const salaryPerson = document.querySelector('[name = "salary"]').value;
+    const namePerson = body.querySelector('[name = "name"]').value;
+    const positionPerson = body.querySelector('[name = "position"]').value;
+    const officePerson = body.querySelector('[name = "office"]').value;
+    const agePerson = body.querySelector('[name = "age"]').value;
+    const salaryPerson = body.querySelector('[name = "salary"]').value;
 
-    if (namePerson.length < 4 || agePerson < 18 || agePerson > 90
-      || positionPerson.length < 2) {
-      deleteNotification();
+    switch (true) {
+      case namePerson.length < minNameChars:
 
-      pushNotification(150, 10, 'Error',
-        'Please enter correct data', 'error');
-    } else {
-      table.insertAdjacentHTML('beforeend',
-        `<tr>
+        pushNotification(150, 10, 'Error',
+          `The name must contain at least ${minNameChars} letters`,
+          'error');
+        break;
+
+      case positionPerson.length < minPositionChars:
+
+        pushNotification(150, 10, 'Error',
+          'The name of the position must be'
+          + `contain at least ${minPositionChars} letters`,
+          'error');
+        break;
+
+      case agePerson < minYear || agePerson > maxYear:
+
+        pushNotification(150, 10, 'Error',
+          `Age must be over ${maxYear} and no more than ${maxYear}`,
+          'error');
+        break;
+
+      case salaryPerson < minSalary:
+
+        pushNotification(150, 10, 'Error',
+          `Salary cannot be less than ${minSalary}`,
+          'error');
+        break;
+
+      default:
+        table.insertAdjacentHTML('beforeend',
+          `<tr>
       <td>${namePerson[0].toUpperCase() + namePerson.slice(1)}</td>
       <td>${positionPerson[0].toUpperCase() + positionPerson.slice(1)}</td>
       <td>${officePerson}</td>
       <td>${agePerson}</td>
       <td>$${parseInt(salaryPerson).toLocaleString('en-EN')}</td>
     </tr>`
-      );
-      deleteNotification();
+        );
 
-      pushNotification(150, 10, 'Success',
-        'The person was successfully added to the table', 'success');
+        pushNotification(150, 10, 'Success',
+          'The person was successfully added to the table', 'success');
+        break;
     }
   });
+}
 
-  function deleteNotification() {
-    const notifications = document.querySelectorAll('.notification');
+function deleteNotification() {
+  const notifications = document.querySelectorAll('.notification');
 
-    if (notifications.length > 0) {
-      notifications[0].remove();
-    }
+  if (notifications.length > 0) {
+    notifications[0].remove();
   }
 }
 
@@ -203,21 +235,30 @@ function replaceText() {
   function editTd(td) {
     const tdText = td.textContent;
 
-    if (td.cellIndex === 2) {
-      const officePerson = document.querySelector('[name = "office"]');
+    const nameCell = td.cellIndex === 0;
+    const positionCell = td.cellIndex === 1;
+    const officeCell = td.cellIndex === 2;
+    const ageCell = td.cellIndex === 3;
+    const salaryCell = td.cellIndex === 4;
+
+    if (officeCell) {
+      const officePerson = body.querySelector('[name = "office"]');
       const select = officePerson.cloneNode(true);
 
+      select.value = td.innerHTML;
       td.innerHTML = '';
       select.className = 'cell-input';
       td.append(select);
+
       select.focus();
       savedText(select);
     } else {
       const input = document.createElement('input');
 
-      if (td.cellIndex === 3 || td.cellIndex === 4) {
+      if (ageCell || salaryCell) {
         input.type = 'number';
       }
+
       input.className = 'cell-input';
       input.value = tdText;
       td.innerHTML = '';
@@ -228,25 +269,101 @@ function replaceText() {
 
     function savedText(tag) {
       tag.addEventListener('blur', () => {
+        deleteNotification();
         replaceValue(tag);
       });
 
       table.addEventListener('keypress', (e) => {
         if (e.code === 'Enter') {
+          deleteNotification();
           replaceValue(tag);
         }
       });
     }
 
     function replaceValue(tag) {
-      if (tag.value.length === 0) {
+      const emptyValue = tag.value.length === 0;
+
+      if (emptyValue) {
         td.textContent = tdText;
-      } else {
-        if (td.cellIndex === 4) {
-          td.textContent = `$${parseInt(tag.value).toLocaleString('en-EN')}`;
-        } else {
+
+        pushNotification(150, 10, 'Error',
+          'The cell must not be empty!!! '
+          + 'The data are not changed!!!',
+          'error');
+
+        return;
+      }
+
+      switch (true) {
+        case nameCell:
+          if (tag.value.length < minNameChars) {
+            td.textContent = tdText;
+
+            pushNotification(150, 10, 'Error',
+              `The name must contain at least ${minNameChars} letters`,
+              'error');
+          } else {
+            pushNotification(150, 10, 'Success',
+              'The person\'s age has been successfully changed', 'success');
+            td.textContent = tag.value;
+          }
+          break;
+
+        case positionCell:
+          if (tag.value.length < minPositionChars) {
+            td.textContent = tdText;
+
+            pushNotification(150, 10, 'Error',
+              'The name of the position must be'
+              + `contain at least ${minPositionChars} letters`,
+              'error');
+          } else {
+            pushNotification(150, 10, 'Success',
+              'The person\'s position has been successfully changed',
+              'success');
+            td.textContent = `${tag.value}`;
+          }
+          break;
+
+        case ageCell:
+          if (tag.value < minYear || tag.value > maxYear) {
+            td.textContent = tdText;
+
+            pushNotification(150, 10, 'Error',
+              `Age must be over ${minYear} and no more than ${maxYear}`,
+              'error');
+          } else {
+            pushNotification(150, 10, 'Success',
+              'the person\'s age has been successfully changed', 'success');
+            td.textContent = `${tag.value}`;
+          }
+          break;
+
+        case salaryCell:
+          if (parseInt(tag.value) < minSalary) {
+            td.textContent = tdText;
+
+            pushNotification(150, 10, 'Error',
+              `Salary cannot be less than ${minSalary}`,
+              'error');
+          } else {
+            pushNotification(150, 10, 'Success',
+              'a person\'s salary has been successfully changed', 'success');
+            td.textContent = `$${parseInt(tag.value).toLocaleString('en-EN')}`;
+          }
+          break;
+
+        case officeCell:
+          pushNotification(150, 10, 'Success',
+            'The person\'s offoce has been successfully changed',
+            'success');
+          td.textContent = `${tag.value}`;
+          break;
+
+        default:
           td.textContent = tag.value;
-        }
+          break;
       }
       tag.remove();
     }
