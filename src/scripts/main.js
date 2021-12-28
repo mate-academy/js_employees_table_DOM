@@ -143,14 +143,14 @@ function addForm() {
     switch (true) {
       case namePerson.length < minNameChars:
 
-        pushNotification(150, 10, 'Error',
+        pushNotification(450, 190, 'Error',
           `The name must contain at least ${minNameChars} letters`,
           'error');
         break;
 
       case positionPerson.length < minPositionChars:
 
-        pushNotification(150, 10, 'Error',
+        pushNotification(450, 190, 'Error',
           'The name of the position must be'
           + `contain at least ${minPositionChars} letters`,
           'error');
@@ -158,14 +158,14 @@ function addForm() {
 
       case agePerson < minYear || agePerson > maxYear:
 
-        pushNotification(150, 10, 'Error',
-          `Age must be over ${maxYear} and no more than ${maxYear}`,
+        pushNotification(450, 190, 'Error',
+          `Age must be over ${minYear} and no more than ${maxYear}`,
           'error');
         break;
 
       case salaryPerson < minSalary:
 
-        pushNotification(150, 10, 'Error',
+        pushNotification(450, 190, 'Error',
           `Salary cannot be less than ${minSalary}`,
           'error');
         break;
@@ -181,7 +181,7 @@ function addForm() {
     </tr>`
         );
 
-        pushNotification(150, 10, 'Success',
+        pushNotification(450, 190, 'Success',
           'The person was successfully added to the table', 'success');
         break;
     }
@@ -201,6 +201,7 @@ function pushNotification(posTop, posRight, title, description, type) {
   const descriptionText = document.createElement('p');
   const message = document.createElement('div');
 
+  message.style.position = 'fixed';
   message.className = 'notification';
   message.classList.add(type);
   message.dataset.qa = 'notification';
@@ -287,7 +288,7 @@ function replaceText() {
       if (emptyValue) {
         td.textContent = tdText;
 
-        pushNotification(150, 10, 'Error',
+        pushNotification(450, 190, 'Error',
           'The cell must not be empty!!! '
           + 'The data are not changed!!!',
           'error');
@@ -300,11 +301,11 @@ function replaceText() {
           if (tag.value.length < minNameChars) {
             td.textContent = tdText;
 
-            pushNotification(150, 10, 'Error',
+            pushNotification(450, 190, 'Error',
               `The name must contain at least ${minNameChars} letters`,
               'error');
           } else {
-            pushNotification(150, 10, 'Success',
+            pushNotification(450, 190, 'Success',
               'The person\'s age has been successfully changed', 'success');
             td.textContent = tag.value;
           }
@@ -314,12 +315,12 @@ function replaceText() {
           if (tag.value.length < minPositionChars) {
             td.textContent = tdText;
 
-            pushNotification(150, 10, 'Error',
+            pushNotification(450, 190, 'Error',
               'The name of the position must be'
               + `contain at least ${minPositionChars} letters`,
               'error');
           } else {
-            pushNotification(150, 10, 'Success',
+            pushNotification(450, 190, 'Success',
               'The person\'s position has been successfully changed',
               'success');
             td.textContent = `${tag.value}`;
@@ -330,11 +331,11 @@ function replaceText() {
           if (tag.value < minYear || tag.value > maxYear) {
             td.textContent = tdText;
 
-            pushNotification(150, 10, 'Error',
+            pushNotification(450, 190, 'Error',
               `Age must be over ${minYear} and no more than ${maxYear}`,
               'error');
           } else {
-            pushNotification(150, 10, 'Success',
+            pushNotification(450, 190, 'Success',
               'the person\'s age has been successfully changed', 'success');
             td.textContent = `${tag.value}`;
           }
@@ -344,18 +345,18 @@ function replaceText() {
           if (parseInt(tag.value) < minSalary) {
             td.textContent = tdText;
 
-            pushNotification(150, 10, 'Error',
+            pushNotification(450, 190, 'Error',
               `Salary cannot be less than ${minSalary}`,
               'error');
           } else {
-            pushNotification(150, 10, 'Success',
+            pushNotification(450, 190, 'Success',
               'a person\'s salary has been successfully changed', 'success');
             td.textContent = `$${parseInt(tag.value).toLocaleString('en-EN')}`;
           }
           break;
 
         case officeCell:
-          pushNotification(150, 10, 'Success',
+          pushNotification(450, 190, 'Success',
             'The person\'s offoce has been successfully changed',
             'success');
           td.textContent = `${tag.value}`;
