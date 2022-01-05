@@ -1,5 +1,6 @@
 'use strict';
 
+// write code here
 const form = document.createElement('form');
 const table = document.querySelector('table');
 const tBody = document.querySelector('tbody');
@@ -282,7 +283,7 @@ const addTableEditing = () => {
         if (editInput && e.key === 'Enter') {
           if (editInput.value !== '') {
             td.classList.add('edit');
-            td.innerHTML = editInput.value;
+            td.innerHTML = editInput.value.replace(/[^A-z]+/ig, '');
             editInput.remove();
             td.style.display = '';
             td = '';
@@ -300,7 +301,7 @@ const addTableEditing = () => {
     };
     const blurFocus = () => {
       if (td.className !== 'edit') {
-        td.innerHTML = editInput.value;
+        td.innerHTML = editInput.value.replace(/[^A-z]+/ig, '');
         editInput.remove();
         td.style.display = '';
         td = '';
