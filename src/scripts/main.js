@@ -75,7 +75,7 @@ const addDataAppending = () => {
 
     if (fullName.value.length >= 4
       && (age.value >= 18 && age.value <= 90)
-      && position.value.length > 0 && salary.value > 0
+      && position.value.length > 0 && salary.value !== 0
       && office.value !== '' && target.tagName === 'BUTTON') {
       const colsLength = table.rows[0].cells.length;
       const newRow = table.insertRow(-1);
@@ -134,6 +134,7 @@ const addDataAppending = () => {
       || office.value === '')
       && target.tagName === 'BUTTON') {
       div.dataset.qa = 'notification';
+
       div.classList = 'notification warning';
       h2.classList = 'title';
       h2.textContent = 'Warning!!!';
@@ -218,6 +219,7 @@ const addTableEditing = () => {
       return;
     };
 
+    const tr = events.target.closest('tr');
     const editInput = document.createElement('input');
     const oldTD = td.innerHTML;
 
@@ -228,21 +230,71 @@ const addTableEditing = () => {
     editInput.focus();
 
     const keyUp = (e) => {
-      if (editInput && e.key === 'Enter') {
-        if (editInput.value !== '') {
-          td.classList.add('edit');
-          td.innerHTML = editInput.value;
-          editInput.remove();
-          td.style.display = '';
-          td = '';
-        }
+      if (td === tr.children[3]) {
+        editInput.type = 'number';
 
-        if (editInput.value === '') {
-          td.classList.add('edit');
-          td.innerHTML = oldTD;
-          editInput.remove();
-          td.style.display = '';
-          td = '';
+        if (editInput && e.key === 'Enter') {
+          if (editInput.value !== '') {
+            td.classList.add('edit');
+            td.innerHTML = editInput.value;
+            editInput.remove();
+            td.style.display = '';
+            td = '';
+          }
+
+          if (editInput.value === '') {
+            td.classList.add('edit');
+            td.innerHTML = oldTD;
+            editInput.remove();
+            td.style.display = '';
+            td = '';
+          }
+        }
+      }
+
+      if (td === tr.children[4]) {
+        editInput.type = 'number';
+
+        if (editInput && e.key === 'Enter') {
+          if (editInput.value !== '') {
+            td.classList.add('edit');
+
+            td.innerHTML = '$' + Intl.NumberFormat('en-US')
+              .format(editInput.value);
+            editInput.remove();
+            td.style.display = '';
+            td = '';
+          }
+
+          if (editInput.value === '') {
+            td.classList.add('edit');
+            td.innerHTML = oldTD;
+            editInput.remove();
+            td.style.display = '';
+            td = '';
+          }
+        }
+      }
+
+      if (td === tr.children[0]
+        || td === tr.children[1]
+        || td === tr.children[2]) {
+        if (editInput && e.key === 'Enter') {
+          if (editInput.value !== '') {
+            td.classList.add('edit');
+            td.innerHTML = editInput.value;
+            editInput.remove();
+            td.style.display = '';
+            td = '';
+          }
+
+          if (editInput.value === '') {
+            td.classList.add('edit');
+            td.innerHTML = oldTD;
+            editInput.remove();
+            td.style.display = '';
+            td = '';
+          }
         }
       }
     };
