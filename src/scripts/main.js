@@ -12,7 +12,7 @@ const createForm = () => {
   form.insertAdjacentHTML('afterbegin', `
   <label>Name: 
     <input 
-      name="name" 
+      name="name"
       type="text"
       >
   </label>
@@ -63,6 +63,7 @@ const addDataAppending = () => {
     const div = document.createElement('div');
     const h2 = document.createElement('h2');
     const p = document.createElement('p');
+    const regex = /[A-Za-z]/;
     const str = `${salary.value}`;
     const dig = str.split('');
     let newValue = '';
@@ -76,7 +77,7 @@ const addDataAppending = () => {
 
     if (fullName.value.length >= 4
       && (age.value >= 18 && age.value <= 90)
-      && position.value.length > 0 && salary.value !== 0
+      && position.value.length > 0 && salary.value > 0
       && office.value !== '' && target.tagName === 'BUTTON') {
       const colsLength = table.rows[0].cells.length;
       const newRow = table.insertRow(-1);
@@ -111,7 +112,8 @@ const addDataAppending = () => {
     };
 
     if (((fullName.value.length > 0 && fullName.value.length < 4)
-      || (age.value < 18 || age.value > 90))
+      || (age.value < 18 || age.value > 90)
+      || salary.value === '0')
       && target.tagName === 'BUTTON') {
       div.dataset.qa = 'notification';
       div.classList = 'notification error';
@@ -127,6 +129,30 @@ const addDataAppending = () => {
         div.remove();
       }, 2000);
     };
+
+    function validate(eve) {
+      const chars = eve.target.value.split('');
+      const char = chars.pop();
+
+      if (!regex.test(char)) {
+        eve.target.value = chars.join('');
+        div.dataset.qa = 'notification';
+        div.classList = 'notification error';
+        h2.classList = 'title';
+        h2.textContent = 'Error!';
+
+        p.textContent = 'Change the language to English!!!\n '
+        + 'Only for letters';
+        document.body.append(div);
+        div.append(h2, p);
+
+        setTimeout(() => {
+          div.remove();
+        }, 2000);
+      }
+    }
+    fullName.addEventListener('input', validate);
+    position.addEventListener('input', validate);
 
     if ((!fullName.value
       || !age.value.length
