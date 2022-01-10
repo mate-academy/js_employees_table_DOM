@@ -115,13 +115,21 @@ form.addEventListener('submit', (e) => {
 
   newDiv.dataset.qa = 'notification';
   newDiv.className = 'notification';
+  document.body.append(newDiv);
 
-  if ((data.get('Name').length < 4)
-    || (data.get('Age') < 18 || data.get('Age') > 90)
-    || (data.get('Position').length === 0)) {
-    document.body.append(newDiv);
+  if (data.get('Name').length < 4) {
     newDiv.classList.add('error');
-    newDiv.textContent = 'Error';
+    newDiv.textContent = 'Error. Please enter the right name!';
+  } else if (data.get('Age') < 18 || data.get('Age') > 90) {
+    newDiv.classList.add('error');
+    newDiv.textContent = 'Error. Please enter the right age!';
+  } else if (data.get('Position').length === 0) {
+    newDiv.classList.add('error');
+    newDiv.textContent = 'Error. Please fill the position!';
+  } else if (data.get('Salary').length === 0
+    || stringToNumber(data.get('Salary')) < 0) {
+    newDiv.classList.add('error');
+    newDiv.textContent = 'Error. Please enter the right salary!';
   } else {
     tBody.append(newTr);
 
@@ -148,59 +156,110 @@ form.addEventListener('submit', (e) => {
   once: false,
 });
 
-// doubleclick on the cell
+// doubleclick on the cell, enter, blur
 const td = tBody.querySelectorAll('td');
+let text;
 
 for (const element of td) {
   const input = document.createElement('input');
-  const text = element.textContent;
+  const select = document.createElement('select');
 
   // dblclick
   element.addEventListener('dblclick', (e) => {
+    text = element.textContent;
+
     const item = e.target;
 
     item.textContent = '';
-    item.append(input);
-    input.classList = 'cell-input';
-    input.value = text;
 
-    if (isNaN(stringToNumber(text))) {
-      input.type = 'text';
-    } else if (text.includes('$')) {
-      input.type = 'number';
-      input.value = stringToNumber(text);
+    if (element.cellIndex === 2) {
+      item.append(select);
+      select.name = text;
+
+      for (const officeLocation of officeLocations) {
+        const option = document.createElement('option');
+
+        select.append(option);
+
+        option.value = officeLocation;
+        option.textContent = officeLocation;
+      }
+      select.value = text;
     } else {
-      input.type = 'number';
+      item.append(input);
+      input.classList = 'cell-input';
+
+      if (stringToNumber(text) < 0) {
+        const newDiv = document.createElement('div');
+
+        newDiv.dataset.qa = 'notification';
+        newDiv.className = 'notification';
+        document.body.append(newDiv);
+      }
+      input.value = text;
+
+      if (isNaN(stringToNumber(text))) {
+        input.type = 'text';
+      } else if (text.includes('$')) {
+        input.type = 'number';
+        input.value = stringToNumber(text);
+      } else {
+        input.type = 'number';
+      }
     }
   }, {
     once: false,
   });
 
-  // blur
-  element.addEventListener('blur', (e) => {
-    element.textContent = input.value;
-    element.classList.remove();
-    input.remove();
-  }, true);
+  // blur and enter addEventListeners
+  text = element.textContent;
 
-  // enter
-  element.addEventListener('keypress', (e) => {
-    const key = e.key;
+  ['blur', 'keypress']
+    .forEach((action) => element.addEventListener(action, (e) => {
+      if (e.key === 'Enter' || e.type === 'blur') {
+        if ((input.value < 0 || input.value.length === 0)
+          && element.cellIndex !== 2) {
+          const newDiv = document.createElement('div');
 
-    if (key === 'Enter') {
-      if (input.value.length === 0) {
-        element.textContent = text;
-      } else {
-        element.textContent = input.value;
+          newDiv.dataset.qa = 'notification';
+          newDiv.className = 'notification';
+          document.body.append(newDiv);
+          newDiv.classList.add('error');
+
+          if (element.cellIndex === 3) {
+            newDiv.textContent = 'Error. Please enter the right age!';
+          } else if (element.cellIndex === 4) {
+            newDiv.textContent = 'Error. Please enter the right salary!';
+          } else if (element.cellIndex === 0 || element.cellIndex === 1) {
+            newDiv.textContent = 'Error. Please enter value!';
+          }
+
+          element.textContent = text;
+        } else if (input.value.length === 0 && element.cellIndex !== 2) {
+          element.textContent = text;
+        } else {
+          let cellValue;
+          const cellIndex = element.cellIndex;
+
+          if (cellIndex === 2) {
+            cellValue = select.value;
+          } else if (cellIndex === 4) {
+            cellValue = formatInputSalary(input.value);
+          } else {
+            cellValue = input.value;
+          }
+          element.textContent = cellValue;
+        }
+
+        element.classList.remove();
+        input.remove();
+        text = element.textContent;
       }
-
-      element.classList.remove();
-      input.remove();
-    }
-  },
-  {
-    once: false,
-  });
+    },
+    {
+      once: false,
+      capture: true,
+    }));
 }
 
 // functions
