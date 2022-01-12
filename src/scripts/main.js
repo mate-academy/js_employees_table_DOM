@@ -121,7 +121,8 @@ const addDataAppending = () => {
       h2.textContent = 'Error!';
 
       p.textContent = 'The name must be at least 4 characters long.\n '
-      + 'Age must be between 18 and 90 years old.';
+      + 'Age must be between 18 and 90 years old.\n '
+      + 'Salary should not be equal to zero.';
       document.body.append(div);
       div.append(h2, p);
 
@@ -248,44 +249,104 @@ const addTableEditing = () => {
 
     const tr = events.target.closest('tr');
     const editInput = document.createElement('input');
+    const editOffice = document.querySelector('select').cloneNode(true);
     const oldTD = td.innerHTML;
 
+    editOffice.value = '';
     editInput.value = '';
     editInput.classList.add('cell-input');
     td.style.display = 'none';
-    td.after(editInput);
-    editInput.focus();
+    td.classList.remove('edit');
 
-    const keyUp = (e) => {
-      if (td === tr.children[3]) {
-        editInput.type = 'number';
+    if (td !== tr.children[2]) {
+      td.after(editInput);
+      editInput.focus();
 
-        if (editInput && e.key === 'Enter') {
-          if (editInput.value !== '') {
-            td.classList.add('edit');
+      const keyUp = (e) => {
+        if (td === tr.children[3]) {
+          editInput.type = 'number';
+
+          if (editInput && e.key === 'Enter') {
+            if (editInput.value !== '') {
+              td.classList.add('edit');
+              td.innerHTML = editInput.value;
+              editInput.remove();
+              td.style.display = '';
+              td = '';
+            }
+
+            if (editInput.value === '') {
+              td.classList.add('edit');
+              td.innerHTML = oldTD;
+              editInput.remove();
+              td.style.display = '';
+              td = '';
+            }
+          }
+        }
+
+        if (td === tr.children[4]) {
+          editInput.type = 'number';
+
+          if (editInput && e.key === 'Enter') {
+            if (editInput.value !== '') {
+              td.classList.add('edit');
+
+              td.innerHTML = '$' + Intl.NumberFormat('en-US')
+                .format(editInput.value);
+              editInput.remove();
+              td.style.display = '';
+              td = '';
+            }
+
+            if (editInput.value === '') {
+              td.classList.add('edit');
+              td.innerHTML = oldTD;
+              editInput.remove();
+              td.style.display = '';
+              td = '';
+            }
+          }
+        }
+
+        if (td === tr.children[0]
+          || td === tr.children[1]) {
+          if (editInput && e.key === 'Enter') {
+            if (editInput.value !== '') {
+              td.classList.add('edit');
+              td.innerHTML = editInput.value;
+              editInput.remove();
+              td.style.display = '';
+              td = '';
+            }
+
+            if (editInput.value === '') {
+              td.classList.add('edit');
+              td.innerHTML = oldTD;
+              editInput.remove();
+              td.style.display = '';
+              td = '';
+            }
+          }
+        }
+      };
+      const blurFocus = () => {
+        if (td !== tr.children[4]) {
+          if (td.className !== 'edit' && editInput.value !== '') {
             td.innerHTML = editInput.value;
             editInput.remove();
             td.style.display = '';
             td = '';
           }
 
-          if (editInput.value === '') {
-            td.classList.add('edit');
+          if (td.className !== 'edit' && editInput.value === '') {
             td.innerHTML = oldTD;
             editInput.remove();
             td.style.display = '';
             td = '';
           }
-        }
-      }
-
-      if (td === tr.children[4]) {
-        editInput.type = 'number';
-
-        if (editInput && e.key === 'Enter') {
-          if (editInput.value !== '') {
-            td.classList.add('edit');
-
+        } else {
+          if (editInput.value !== '' && td.className !== 'edit') {
             td.innerHTML = '$' + Intl.NumberFormat('en-US')
               .format(editInput.value);
             editInput.remove();
@@ -293,49 +354,57 @@ const addTableEditing = () => {
             td = '';
           }
 
-          if (editInput.value === '') {
-            td.classList.add('edit');
+          if (editInput.value === '' && td.className !== 'edit') {
             td.innerHTML = oldTD;
             editInput.remove();
             td.style.display = '';
             td = '';
           }
         }
-      }
+      };
 
-      if (td === tr.children[0]
-        || td === tr.children[1]
-        || td === tr.children[2]) {
-        if (editInput && e.key === 'Enter') {
-          if (editInput.value !== '') {
-            td.classList.add('edit');
-            td.innerHTML = editInput.value.replace(/[^A-z]+/ig, '');
-            editInput.remove();
-            td.style.display = '';
-            td = '';
-          }
+      editInput.addEventListener('keyup', keyUp);
+      editInput.addEventListener('blur', blurFocus);
+    }
 
-          if (editInput.value === '') {
-            td.classList.add('edit');
-            td.innerHTML = oldTD;
-            editInput.remove();
-            td.style.display = '';
-            td = '';
-          }
+    if (td === tr.children[2]) {
+      td.after(editOffice);
+      editOffice.focus();
+
+      editOffice.addEventListener('change', () => {
+        if (editOffice.value !== '') {
+          td.classList.add('edit');
+          td.innerHTML = editOffice.value;
+          editOffice.remove();
+          td.style.display = '';
+          td = '';
         }
-      }
-    };
-    const blurFocus = () => {
-      if (td.className !== 'edit') {
-        td.innerHTML = editInput.value.replace(/[^A-z]+/ig, '');
-        editInput.remove();
-        td.style.display = '';
-        td = '';
-      }
-    };
 
-    editInput.addEventListener('keyup', keyUp);
-    editInput.addEventListener('blur', blurFocus);
+        if (editOffice.value === '') {
+          td.classList.add('edit');
+          td.innerHTML = oldTD;
+          editOffice.remove();
+          td.style.display = '';
+          td = '';
+        }
+      });
+
+      editOffice.addEventListener('blur', () => {
+        if (td.className !== 'edit' && editOffice.value !== '') {
+          td.innerHTML = editOffice.value;
+          editOffice.remove();
+          td.style.display = '';
+          td = '';
+        }
+
+        if (td.className !== 'edit' && editOffice.value === '') {
+          td.innerHTML = oldTD;
+          editOffice.remove();
+          td.style.display = '';
+          td = '';
+        }
+      });
+    }
   });
 };
 
