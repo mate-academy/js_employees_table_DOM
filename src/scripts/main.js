@@ -112,24 +112,29 @@ form.addEventListener('submit', (e) => {
 
   const newTr = document.createElement('tr');
   const newDiv = document.createElement('div');
+  const p = document.createElement('p');
 
   newDiv.dataset.qa = 'notification';
   newDiv.className = 'notification';
+  newDiv.style.display = 'flex';
+  newDiv.style.alignItems = 'center';
+  newDiv.style.justifyContent = 'center';
   document.body.append(newDiv);
+  newDiv.append(p);
 
   if (data.get('Name').length < 4) {
     newDiv.classList.add('error');
-    newDiv.textContent = 'Error. Please enter the right name!';
+    p.textContent = 'Error. Please enter the right name!';
   } else if (data.get('Age') < 18 || data.get('Age') > 90) {
     newDiv.classList.add('error');
-    newDiv.textContent = 'Error. Please enter the right age!';
+    p.textContent = 'Error. Please enter the right age!';
   } else if (data.get('Position').length === 0) {
     newDiv.classList.add('error');
-    newDiv.textContent = 'Error. Please fill the position!';
+    p.textContent = 'Error. Please fill the position!';
   } else if (data.get('Salary').length === 0
-    || stringToNumber(data.get('Salary')) < 0) {
+    || stringToNumber(data.get('Salary')) <= 0) {
     newDiv.classList.add('error');
-    newDiv.textContent = 'Error. Please enter the right salary!';
+    p.textContent = 'Error. Please enter the right salary!';
   } else {
     tBody.append(newTr);
 
@@ -146,8 +151,10 @@ form.addEventListener('submit', (e) => {
     }
     document.body.append(newDiv);
     newDiv.classList.add('success');
-    newDiv.textContent = 'Success';
+    p.textContent = 'Success';
   }
+
+  form.reset();
 
   setTimeout(() => {
     newDiv.remove();
