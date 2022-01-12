@@ -134,18 +134,14 @@ const form = `
 
 body.insertAdjacentHTML('beforeend', form);
 
-const pushNotification = (title, description, type) => {
+const pushNotification = (posTop, posRight, title, description, type) => {
   const div = document.createElement('div');
   const h2 = document.createElement('h2');
   const p = document.createElement('p');
-  const coords = {
-    x: 50,
-    y: 450,
-  };
 
   div.classList.add('notification', `${type}`);
-  div.style.top = `${coords.y}px`;
-  div.style.right = `${coords.x}px`;
+  div.style.top = posTop + 'px';
+  div.style.right = posRight + 'px';
   div.setAttribute('data-qa', 'notification');
 
   h2.classList.add('title');
@@ -157,19 +153,18 @@ const pushNotification = (title, description, type) => {
 
   setTimeout(() => {
     div.remove();
-  }, 5000);
+  }, 2000);
 };
 
 // Add new employees to the spreadsheet
 const formButton = document.querySelector('.form_button');
+const newEmployeeName = document.querySelector('#name');
+const newEmployeePosition = document.querySelector('#position');
+const newEmployeeOffice = document.querySelector('#office');
+const newEmployeeAge = document.querySelector('#age');
+const newEmployeeSalary = document.querySelector('#salary');
 
 const addEmployee = () => {
-  const newEmployeeName = document.querySelector('#name');
-  const newEmployeePosition = document.querySelector('#position');
-  const newEmployeeOffice = document.querySelector('#office');
-  const newEmployeeAge = document.querySelector('#age');
-  const newEmployeeSalary = document.querySelector('#salary');
-
   const newTr = `
   <td>${newEmployeeName.value.trim()}</td>
   <td>${newEmployeePosition.value.trim()}</td>
@@ -178,25 +173,39 @@ const addEmployee = () => {
   <td>${formSalary(+newEmployeeSalary.value)}</td>
   `;
 
-  if (newEmployeeName.value.length < 4) {
-    pushNotification('Wrong', 'Name has less then 4 digits', 'error');
-  } else if (newEmployeeName.value.length === 0) {
-    pushNotification('Wrong', 'Field is empty!', 'error');
+  if (newEmployeeName.value.length < 4 || newEmployeeName.value.length === 0) {
+    pushNotification(500,
+      30,
+      'Wrong',
+      'Name has less then 4 digits or empty',
+      'error'
+    );
+    newEmployeeName.value = '';
+  } else if (newEmployeePosition.value.length < 4
+    || newEmployeePosition.value.length === 0) {
+    pushNotification(
+      600,
+      30,
+      'Wrong',
+      'Position has less then 4 digits or empty',
+      'error'
+    );
+    newEmployeePosition.value = '';
   } else if (newEmployeeAge.value < 18 || newEmployeeAge.value > 90) {
-    pushNotification('Wrong', 'Please, check your age!', 'error');
+    pushNotification(700, 30, 'Wrong', 'Please, check your age!', 'error');
+    newEmployeeAge.value = '';
   } else if (newEmployeeSalary.value.length === 0) {
-    pushNotification('Wrong', 'Please, check your salary!', 'error');
+    pushNotification(800, 30, 'Wrong', 'Please, check your salary!', 'error');
+    newEmployeeSalary.value = '';
   } else {
-    pushNotification('Success', 'We are ready to add form', 'success');
+    pushNotification(900, 30, 'Success', 'We are ready to add form', 'success');
+    newEmployeeName.value = '';
+    newEmployeePosition.value = '';
+    newEmployeeAge.value = '';
+    newEmployeeSalary.value = '';
 
     tbody.insertAdjacentHTML('beforeend', newTr);
   }
-
-  newEmployeeName.value = '';
-  newEmployeePosition.value = '';
-  newEmployeeOffice.value = '';
-  newEmployeeAge.value = '';
-  newEmployeeSalary.value = '';
 };
 
 formButton.addEventListener('click', addEmployee);
@@ -227,6 +236,9 @@ for (const td of tds) {
   });
 
   td.addEventListener('blur', () => {
+    // eslint-disable-next-line no-console
+    console.log('hello');
+
     if (input.value.length === 0) {
       td.textContent = oldText;
     } else if (oldText.includes('$')) {
@@ -235,8 +247,20 @@ for (const td of tds) {
       td.textContent = input.value;
     }
 
+    notificationOnTd();
+
     input.remove();
-  }, true);
+  });
+
+  // td.addEventListener('focusout', () => {
+  //   if (oldText.includes('$')) {
+  //     td.textContent = formSalary(+input.value);
+  //   } else if (oldText.includes('$') && input.value.length === 0) {
+  //     td.textContent = formSalary(oldText);
+  //   }
+
+  //   input.remove();
+  // });
 
   td.addEventListener('keypress', (e) => {
     const key = e.key;
@@ -245,6 +269,8 @@ for (const td of tds) {
       return;
     }
 
+    // console.log('hello');
+
     if (input.value.length === 0) {
       td.textContent = oldText;
     } else if (oldText.includes('$')) {
@@ -253,18 +279,24 @@ for (const td of tds) {
       td.textContent = input.value;
     }
 
-    if (typeof +input.value === 'string' && input.value.length < 4) {
-      pushNotification('Wrong', 'Field has less then 4 digits', 'error');
-    } else if
-    (typeof +input.value === 'number'
-    && (input.value < 18 || input.value > 90)) {
-      pushNotification('Wrong', 'Please, check your age!', 'error');
-    } else {
-      pushNotification('Success', 'Everything looks fine', 'success');
-    }
+    notificationOnTd();
 
     input.remove();
   });
+
+  const notificationOnTd = () => {
+    if ((td.cellIndex === 0 || td.cellIndex === 1 || td.cellIndex === 2)
+    && input.value.length < 4) {
+      pushNotification(
+        500, 30, 'Wrong', 'Field has less then 4 digits', 'error'
+      );
+    } else if
+    ((input.value < 18 || input.value > 90) && !oldText.includes('$')) {
+      pushNotification(600, 30, 'Wrong', 'Please, check your age!', 'error');
+    } else {
+      pushNotification(700, 30, 'Success', 'Everything looks fine', 'success');
+    }
+  };
 }
 
 function stringToNumber(string) {
