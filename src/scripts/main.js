@@ -174,7 +174,7 @@ const addEmployee = () => {
   `;
 
   if (newEmployeeName.value.length < 4 || newEmployeeName.value.length === 0) {
-    pushNotification(500,
+    pushNotification(450,
       30,
       'Wrong',
       'Name has less then 4 digits or empty',
@@ -184,7 +184,7 @@ const addEmployee = () => {
   } else if (newEmployeePosition.value.length < 4
     || newEmployeePosition.value.length === 0) {
     pushNotification(
-      600,
+      550,
       30,
       'Wrong',
       'Position has less then 4 digits or empty',
@@ -192,13 +192,13 @@ const addEmployee = () => {
     );
     newEmployeePosition.value = '';
   } else if (newEmployeeAge.value < 18 || newEmployeeAge.value > 90) {
-    pushNotification(700, 30, 'Wrong', 'Please, check your age!', 'error');
+    pushNotification(650, 30, 'Wrong', 'Please, check your age!', 'error');
     newEmployeeAge.value = '';
   } else if (newEmployeeSalary.value.length === 0) {
-    pushNotification(800, 30, 'Wrong', 'Please, check your salary!', 'error');
+    pushNotification(750, 30, 'Wrong', 'Please, check your salary!', 'error');
     newEmployeeSalary.value = '';
   } else {
-    pushNotification(900, 30, 'Success', 'We are ready to add form', 'success');
+    pushNotification(800, 30, 'Success', 'We are ready to add form', 'success');
     newEmployeeName.value = '';
     newEmployeePosition.value = '';
     newEmployeeAge.value = '';
@@ -211,93 +211,86 @@ const addEmployee = () => {
 formButton.addEventListener('click', addEmployee);
 
 // Editing of table cells by double-clicking on it
-const tds = tbody.querySelectorAll('td');
 
-for (const td of tds) {
-  const input = document.createElement('input');
-  const oldText = td.textContent;
+tbody.addEventListener('dblclick', (e) => {
+  const target = e.target;
+  const oldValue = target.textContent;
 
-  td.addEventListener('dblclick', (e) => {
-    const item = e.target;
+  e.preventDefault();
+  target.textContent = '';
 
-    item.textContent = '';
-    item.append(input);
-    input.classList = 'cell-input';
-    input.value = oldText;
+  target.insertAdjacentHTML('afterbegin', `
+    <input type="text" class="cell-input" value ="${oldValue}">
+  `);
 
-    if (isNaN(stringToNumber(oldText))) {
-      input.type = 'text';
-    } else if (oldText.includes('$')) {
-      input.type = 'number';
-      input.value = stringToNumber(oldText);
-    } else {
-      input.type = 'number';
-    }
-  });
+  document.querySelector('.cell-input').focus();
 
-  td.addEventListener('blur', () => {
-    // eslint-disable-next-line no-console
-    console.log('hello');
+  document.querySelector('.cell-input').selectionStart
+    = document.querySelector('.cell-input').value.length;
 
-    if (input.value.length === 0) {
-      td.textContent = oldText;
-    } else if (oldText.includes('$')) {
-      td.textContent = formSalary(+input.value);
-    } else {
-      td.textContent = input.value;
-    }
+  document.querySelector('.cell-input').addEventListener('keydown',
+    function() {
+      if (event.keyCode === 13) {
+        if (document.querySelector('.cell-input').value === '') {
+          target.textContent = oldValue;
 
-    notificationOnTd();
+          pushNotification(
+            500, 30, 'Wrong', 'Field is empty', 'error'
+          );
+        } else if (target.cellIndex === 3) {
+          document.querySelector('.cell-input').type = 'number';
 
-    input.remove();
-  });
+          target.textContent
+          = stringToNumber(document.querySelector('.cell-input').value)
+          || oldValue;
+        } else if (target.cellIndex === 4) {
+          document.querySelector('.cell-input').value
+          = document.querySelector('.cell-input').value.replace(/[^0-9]/g, '');
 
-  // td.addEventListener('focusout', () => {
-  //   if (oldText.includes('$')) {
-  //     td.textContent = formSalary(+input.value);
-  //   } else if (oldText.includes('$') && input.value.length === 0) {
-  //     td.textContent = formSalary(oldText);
-  //   }
+          target.textContent
+          = formSalary(stringToNumber(document
+              .querySelector('.cell-input').value));
+        } else {
+          target.textContent = document.querySelector('.cell-input').value;
 
-  //   input.remove();
-  // });
+          pushNotification(
+            700,
+            30,
+            'Success',
+            'Everything looks fine',
+            'success');
+        }
+        document.querySelector('.cell-input').remove();
+      }
+    });
 
-  td.addEventListener('keypress', (e) => {
-    const key = e.key;
+  document.querySelector('.cell-input').addEventListener('blur', function() {
+    if (document.querySelector('.cell-input').value === '') {
+      document.querySelector('.cell-input').replaceWith(oldValue);
 
-    if (key !== 'Enter') {
-      return;
-    }
-
-    // console.log('hello');
-
-    if (input.value.length === 0) {
-      td.textContent = oldText;
-    } else if (oldText.includes('$')) {
-      td.textContent = formSalary(+input.value);
-    } else {
-      td.textContent = input.value;
-    }
-
-    notificationOnTd();
-
-    input.remove();
-  });
-
-  const notificationOnTd = () => {
-    if ((td.cellIndex === 0 || td.cellIndex === 1 || td.cellIndex === 2)
-    && input.value.length < 4) {
       pushNotification(
-        500, 30, 'Wrong', 'Field has less then 4 digits', 'error'
+        500, 30, 'Wrong', 'Field is empty', 'error'
       );
-    } else if
-    ((input.value < 18 || input.value > 90) && !oldText.includes('$')) {
-      pushNotification(600, 30, 'Wrong', 'Please, check your age!', 'error');
+    } else if (target.cellIndex === 3) {
+      document.querySelector('.cell-input').type = 'number';
+
+      target.textContent
+      = stringToNumber(document.querySelector('.cell-input').value)
+      || oldValue;
+    } else if (target.cellIndex === 4) {
+      document.querySelector('.cell-input').value
+      = document.querySelector('.cell-input').value.replace(/[^0-9]/g, '');
+
+      target.textContent
+      = formSalary(stringToNumber(document.querySelector('.cell-input').value));
     } else {
+      document.querySelector(
+        '.cell-input').replaceWith(document.querySelector('.cell-input').value);
+
       pushNotification(700, 30, 'Success', 'Everything looks fine', 'success');
     }
-  };
-}
+  });
+});
 
 function stringToNumber(string) {
   const resultNumber = string.split(',').join('').replace('$', '');
