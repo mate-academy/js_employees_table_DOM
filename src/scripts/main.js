@@ -181,7 +181,6 @@ addPersoneBtn.addEventListener('click', (e) => {
 function pushNotification(text) {
   const error = `
   <div class="notification error"
-    style="top :100px; right: 100px;">
   <h2 class="title">${text} not correct!</h2>
   <p>please write correct data</p>
   </div>
@@ -189,7 +188,7 @@ function pushNotification(text) {
 
   const success = `
   <div class="notification uccess"
-    style="top :100px; right: 100px;">
+    style="top :10px; right: 10px;">
     <h2 class="title">Data correct!</h2>
     <p>Person was add!</p>
   </div>
