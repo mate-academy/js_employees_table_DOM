@@ -188,7 +188,6 @@ function pushNotification(text) {
 
   const success = `
   <div class="notification uccess"
-    style="top :10px; right: 10px;">
     <h2 class="title">Data correct!</h2>
     <p>Person was add!</p>
   </div>
