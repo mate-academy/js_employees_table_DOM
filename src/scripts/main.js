@@ -4,10 +4,8 @@ let lastColumn = 10;
 let sortingASC = true;
 let currentRow = null;
 const tbody = document.querySelector('tbody');
-const rows = [...tbody.rows];
-const body = document.querySelector('body');
-// const table = document.querySelector('table');
-let editCell = false;
+let rows = [...tbody.rows];
+let body = document.querySelector('body');
 let startValue = '';
 
 /* -----------------sorting table------------------ */
@@ -46,7 +44,7 @@ const sortTable = (table, column) => {
   return table;
 };
 
-/* -----------------click event обработчик---------------- */
+/* -----------------click event handler---------------- */
 document.addEventListener('click', (e) => {
   hideNotif();
 
@@ -66,6 +64,9 @@ document.addEventListener('click', (e) => {
 
     sortTable(rows, column);
     tbody.append(...rows);
+    body = document.querySelector('body');
+
+    rows = [...tbody.rows];
   }
 
   if (e.target.tagName === 'BUTTON') {
@@ -87,40 +88,31 @@ document.addEventListener('click', (e) => {
   }
 });
 
-/* -----------------dblclick event обработчик---------------- */
+/* -----------------dblclick event handler---------------- */
 document.addEventListener('dblclick', (e) => {
-  if (!editCell) {
-    editCell = true;
+  if (e.target.tagName === 'TD') {
+    const parentTd = e.target.parentNode;
+    const newInput = document.createElement('input');
 
-    if (e.target.tagName === 'TD') {
-      const parentTd = e.target.parentNode;
-      const newInput = document.createElement('input');
+    startValue = e.target.innerHTML;
+    newInput.value = startValue;
+    newInput.className = `cell-input`;
+    newInput.style.paddingTop = '18px';
+    newInput.style.background = 'white';
 
-      startValue = e.target.innerHTML;
-      newInput.value = startValue;
-      newInput.className = `cell-input`;
-      newInput.style.paddingTop = '18px';
-      newInput.required = true;
-      parentTd.insertBefore(newInput, e.target);
-      e.target.remove();
-    }
-  } else {
-    showNotif('Another cell is editing', 'error');
-  }
-});
-
-/* -----------------input event обработчик (blur not work)--------- */
-/* Cell that hadn't been changed can't be saved */
-document.addEventListener('change', (e) => {
-  if (e.target.className === 'cell-input') {
-    const parentCell = e.target.parentNode;
-    const newItem = document.createElement('td');
-
-    newItem.innerHTML
-       = (e.target.value.length > 0) ? e.target.value : startValue;
-    parentCell.insertBefore(newItem, e.target);
+    newInput.required = true;
+    parentTd.insertBefore(newInput, e.target);
     e.target.remove();
-    editCell = false;
+
+    newInput.onblur = () => {
+      const newItem = document.createElement('td');
+
+      newItem.innerHTML
+        = (newInput.value.length > 0) ? newInput.value : startValue;
+      parentTd.insertBefore(newItem, newInput);
+      newInput.remove();
+    };
+    newInput.focus();
   }
 });
 
