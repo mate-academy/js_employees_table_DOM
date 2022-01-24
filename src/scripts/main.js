@@ -170,7 +170,7 @@ buttonSave.addEventListener('click', function addNewEmployee(action) {
       notification.append(paragraph);
 
       notification.style.position = 'absolute';
-      notification.style.top = 60 + '%';
+      notification.style.top = 0 + '%';
       notification.style.right = 0 + 'px';
 
       setTimeout(() =>
@@ -194,6 +194,11 @@ buttonSave.addEventListener('click', function addNewEmployee(action) {
 
       tBody.append(tr);
     }
+
+    nameInput.value = '';
+    positionInput.value = '';
+    ageInput.value = '';
+    salaryInput.value = '';
   }
 });
 
