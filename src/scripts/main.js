@@ -111,12 +111,10 @@ buttonSave.addEventListener('click', function addNewEmployee(action) {
   // Validation check of data and show Notifications
 
   // Mistake! Does not add a new person. User gets a Notification.
-  if ((nameInput.value.length <= 4)
-      || ((ageInput.value > 90 && ageInput.value < 18)
-        || ageInput.value === undefined)
-      || (salaryInput.value < 1 || salaryInput.value === undefined)
-      || (positionInput.value.length < 1
-        || positionInput.value === undefined)) {
+  if (nameInput.value.length < 4
+    || (ageInput.value > 90 || ageInput.value < 18)
+    || (+salaryInput.value < 1 || !salaryInput.value)
+    || (!positionInput.value)) {
     // Notification Classes
     notification.classList.add('notification');
     notification.classList.add('warning');
@@ -148,8 +146,8 @@ buttonSave.addEventListener('click', function addNewEmployee(action) {
     // Successful operation, validation is passed. User gets a Notification.
     if (target.tagName === 'BUTTON'
     && (nameInput.value.length > 4)
-      && (ageInput.value < 90 && ageInput.value > 18)
-      && salaryInput.value > 0
+      && (ageInput.value <= 90 && ageInput.value >= 18)
+      && +salaryInput.value > 0
       && positionInput.value.length > 1) {
       notification.classList.add('notification');
       notification.classList.add('warning');
