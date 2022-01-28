@@ -78,33 +78,35 @@ const makeActiveRow = (e) => {
   item.classList.add('active');
 };
 
-body.insertAdjacentHTML('beforeend', `<form class = "new-employee-form">
-  <label>Name:
-    <input name="name" type="text" data-qa="name" minlength = "4" id="name">
-  </label>
-  <label>Position:
-    <input name="position" type="text" data-qa="position" id="position">
-  </label>
-  <label>Office:
-    <select data-qa="office" id="office">
-      <option>Tokyo</option>
-      <option>Singapore</option>
-      <option>London</option>
-      <option>New York</option>
-      <option>Edinburgh</option>
-      <option>San Francisco</option>
-    </select>
-  </label>
-  <label>Age:
-    <input
-      name="age" type="number" data-qa="age" min = "18" max = "90" id="age"
-    >
-  </label>
-  <label>Salary:
-    <input name="salary" type="number" data-qa="salary" id="salary">
-  </label>
-  <button class="form-button" type="submit">Save to table</button>
-</form>`);
+body.insertAdjacentHTML('beforeend', `
+  <form class = "new-employee-form" novalidate>
+    <label>Name:
+      <input name="name" type="text" data-qa="name" minlength = "4" id="name">
+    </label>
+    <label>Position:
+      <input name="position" type="text" data-qa="position" id="position">
+    </label>
+    <label>Office:
+      <select data-qa="office" id="office">
+        <option>Tokyo</option>
+        <option>Singapore</option>
+        <option>London</option>
+        <option>New York</option>
+        <option>Edinburgh</option>
+        <option>San Francisco</option>
+      </select>
+    </label>
+    <label>Age:
+      <input
+        name="age" type="number" data-qa="age" min = "18" max = "90" id="age"
+      >
+    </label>
+    <label>Salary:
+      <input name="salary" type="number" data-qa="salary" id="salary">
+    </label>
+    <button class="form-button" type="submit">Save to table</button>
+  </form>
+`);
 
 const formNewEmployee = document.querySelector('.new-employee-form');
 const inputs = formNewEmployee.querySelectorAll('input');
@@ -119,10 +121,8 @@ body.insertAdjacentHTML('beforeend', `
     <h2 class='title'>Success message</h2>
     <p class='description'>New employee is successfully added to the table</p>
   </div>
-  <div class="notification error">
-    <h2 class='title'>Error message</h2>
-    <p class='description'>Correct the mistakes</p>
-  </div>
+  <div class="notification error"></div>
+  <div class="notification info"></div>
 `);
 
 const messages = document.querySelectorAll('.notification');
@@ -130,94 +130,134 @@ const messages = document.querySelectorAll('.notification');
 for (const message of messages) {
   message.setAttribute('hidden', true);
   message.setAttribute('data-qa', 'notification');
+  message.style.position = 'fixed';
 }
 
 const successNotification = document.querySelector('.success');
 const errorNotification = document.querySelector('.error');
+const infoNotification = document.querySelector('.info');
 
-function showError() {
+infoNotification.style.backgroundColor = 'yellowgreen';
+
+// Все ли поля заполнены?
+const checkFields = function() {
   for (const input of inputs) {
-    if (input.validity.valueMissing) {
-    // Если поле пустое, отображаем следующее сообщение об ошибке
-      if (!errorNotification.querySelector('.noValue')) {
-        errorNotification.insertAdjacentHTML('beforeend', `
-          <p class="noValue">All fields must be filled</p>
-        `);
-        break;
-      }
-    } else if (input.validity.tooShort) {
-    // Если имя слишком короткое
-      if (!errorNotification.querySelector('.tooShort')) {
-        errorNotification.insertAdjacentHTML('beforeend', `
-          <p class="tooShort">Name must contain at least 4 characters</p>
-        `);
-      }
-    } else if (input.validity.rangeUnderflow || input.validity.rangeOverflow) {
-    // Если возраст менее 18 лет или старше 90 лет
-      errorNotification.insertAdjacentHTML('beforeend', `<p class="description">
-        Age must be over 18 years old and less than 90 years
-      </p>`);
-    } else if (input.validity.typeMismatch) {
-      // Если тип не соответстует заявленному
-      errorNotification.insertAdjacentHTML('beforeend', `
-        <p class="description">Fields age and salary must be of numeric type</p>
-      `);
+    if (!input.value) {
+      counter++;
     }
-    errorNotification.removeAttribute('hidden');
   };
 
-  setTimeout(() => {
-    errorNotification.setAttribute('hidden', true);
-  }, 2000);
+  if (counter > 0) {
+    errorNotification.innerText += `\n
+      All fields must be filled`;
+    counter = 0;
+  }
+};
+
+function validation() {
+  errorNotification.innerText = `Error!`;
+
+  checkFields();
+
+  if (inputs[0].value.length > 0 && inputs[0].value.length < 4) {
+    errorNotification.innerText += `\n
+      Name must contain at least 4 characters`;
+  }
+
+  if (inputs[2].value > 0 && (inputs[2].value < 18 || inputs[2].value > 90)) {
+    errorNotification.innerText += `\n
+      Age must be over 18 years old and less than 90 years`;
+  }
+
+  hiddenNotification();
 }
+
+const inputAge = formNewEmployee.children[3];
+const inputSalary = formNewEmployee.children[4];
+let clickAge = 0;
+let clickSalary = 0;
+
+inputAge.onkeydown = function() {
+  if (clickAge === 0) {
+    infoNotification.innerText = 'Field age must be only numetic type';
+    infoNotification.removeAttribute('hidden');
+
+    setTimeout(() => {
+      infoNotification.setAttribute('hidden', true);
+    }, 1000);
+    clickAge++;
+  } else {
+
+  }
+};
+
+inputSalary.onkeydown = function() {
+  if (clickSalary === 0) {
+    infoNotification.innerText = 'Field salary must be only numetic type';
+    infoNotification.removeAttribute('hidden');
+
+    setTimeout(() => {
+      infoNotification.setAttribute('hidden', true);
+    }, 1000);
+    clickSalary++;
+  } else {
+
+  }
+};
 
 const saveToTable = (evForm) => {
   evForm.preventDefault();
+  validation();
+  clickAge = 0;
+  clickSalary = 0;
+};
 
-  formNewEmployee.noValidate = true;
-
-  for (const input of inputs) {
-    if (input.validity.valid) {
-      counter++;
-    } else {
-      showError();
-    };
+formNewEmployee.addEventListener('keydown', evSubmKey => {
+  if (evSubmKey.code === 'Enter') {
+    saveToTable();
   }
+});
 
-  if (counter === inputs.length) {
+submit.addEventListener('click', saveToTable);
+
+const hiddenNotification = function() {
+  if (errorNotification.innerText === `Error!`) {
     successNotification.removeAttribute('hidden');
-
-    setTimeout(() => {
-      successNotification.setAttribute('hidden', true);
-    }, 2000);
-
     tbody.append(getData());
 
     for (const input of inputs) {
       input.value = '';
     };
-  }
 
-  function getData() {
-    const newRows = tRows[0].cloneNode(true);
+    setTimeout(() => {
+      successNotification.setAttribute('hidden', true);
+    }, 3000);
+  } else {
+    errorNotification.removeAttribute('hidden');
 
-    newRows.cells[0].textContent = document.getElementById('name').value;
-    newRows.cells[1].textContent = document.getElementById('position').value;
-    newRows.cells[2].textContent = document.getElementById('office').value;
-    newRows.cells[3].textContent = document.getElementById('age').value;
-
-    const salaryValue = document.getElementById('salary').value;
-    const valueDollar = Number(salaryValue).toLocaleString('en-EN', {
-      style: 'currency', currency: 'USD',
-    });
-
-    newRows.cells[4].textContent = valueDollar.slice(0, valueDollar.length - 3);
-
-    return newRows;
+    setTimeout(() => {
+      errorNotification.setAttribute('hidden', true);
+    }, 3000);
   }
 };
 
-submit.addEventListener('click', saveToTable);
+function getData() {
+  const newRows = tRows[0].cloneNode(true);
+
+  newRows.cells[0].textContent = document.getElementById('name').value;
+  newRows.cells[1].textContent = document.getElementById('position').value;
+  newRows.cells[2].textContent = document.getElementById('office').value;
+  newRows.cells[3].textContent = document.getElementById('age').value;
+
+  const salaryValue = document.getElementById('salary').value;
+  const valueDollar = Number(salaryValue).toLocaleString('en-EN', {
+    style: 'currency', currency: 'USD',
+  });
+
+  newRows.cells[4].textContent = valueDollar.slice(0, valueDollar.length - 3);
+
+  return newRows;
+}
 
 const editCells = (cell) => {
   const activeCell = cell.target;
@@ -240,6 +280,18 @@ const editCells = (cell) => {
 
     activeCell.append(select);
     select.focus();
+
+    select.addEventListener('blur', function() {
+      activeCell.innerText = select.value;
+      select.remove();
+    });
+
+    select.addEventListener('keydown', evKey => {
+      if (evKey.code === 'Enter') {
+        activeCell.innerText = select.value;
+        select.remove();
+      };
+    });
   };
 
   const createInput = () => {
@@ -272,8 +324,8 @@ const editCells = (cell) => {
       };
 
       if (activeCell.classList.contains('salary')) {
-        for (const char of inputCell.value) {
-          if (typeof char !== 'number') {
+        for (let i = 0; i < inputCell.value.length; i++) {
+          if (isNaN(inputCell.value[i])) {
             errorNotification.innerText = 'Salary must be of numeric type';
 
             setTimeout(() => {
