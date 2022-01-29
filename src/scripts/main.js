@@ -80,7 +80,7 @@ table.insertAdjacentHTML('afterend', `
     <input name="age" type="number" min="18" max="90" data-qa="age">
   </label>
   <label>Salary:
-    <input name="salary" type="number" data-qa="salary">
+    <input name="salary" type="number" min="1" data-qa="salary">
   </label>
   <button type="submit">Save to table</button>
 </form>
@@ -108,6 +108,10 @@ button.addEventListener('click', (e) => {
     form.elements.age.value = '';
 
     pushNotification('Age should be between 18-90 years', 'error');
+  } else if (!form.elements.salary.validity.valid) {
+    form.elements.salary.value = '';
+
+    pushNotification('You must be kidding', 'error');
   } else {
     e.preventDefault();
 
@@ -120,9 +124,7 @@ button.addEventListener('click', (e) => {
       cell.classList.add(`${form.elements[index].name}`);
 
       if (cell.classList.contains('salary')) {
-        cell.innerHTML = (+cell.innerHTML).toLocaleString('en-EN', {
-          style: 'currency', currency: 'USD',
-        }).slice(0, -3);
+        cell.innerHTML = getDollars(cell.innerHTML);
       }
     });
 
@@ -133,42 +135,93 @@ button.addEventListener('click', (e) => {
 
 tbody.addEventListener('dblclick', (e) => {
   const target = e.target;
+  const startData = target.textContent;
+  const style = window.getComputedStyle(target);
+  const headCellName = table.rows[0].cells[target.cellIndex].textContent;
+  let editableField;
 
   if (!target || target.tagName !== 'TD') {
     return;
   }
 
-  const startData = target.textContent;
-  const input = document.createElement('input');
+  if (headCellName === 'Office') {
+    editableField = document.createElement('select');
 
-  input.className = 'cell-input';
-  input.type = 'text';
-  target.textContent = '';
+    const offices = document.querySelectorAll('option');
 
-  target.append(input);
-  input.focus();
+    for (const office of offices) {
+      const option = document.createElement('option');
 
-  input.addEventListener('blur', saveData);
-  input.addEventListener('keydown', saveData);
+      option.textContent = office.textContent;
 
-  function saveData(ev) {
-    if (ev.keyCode === 13 || ev.type === 'blur') {
-      const newData = target.children[0].value;
-
-      if (newData.length === 0) {
-        target.innerHTML = startData;
+      if (startData === office.textContent) {
+        option.selected = true;
       } else {
-        if (target.cellIndex) {
-          input.remove();
+        option.selected = false;
+      }
+
+      editableField.append(option);
+    }
+  } else {
+    editableField = document.createElement('input');
+    editableField.type = 'text';
+
+    if (headCellName === 'Age' || headCellName === 'Salary') {
+      editableField.pattern = '[0-9]+';
+    }
+  }
+
+  target.textContent = '';
+  editableField.value = startData.replace('$', '').replace(',', '');
+  editableField.style.width = style.width;
+  editableField.className = 'cell-input';
+
+  target.append(editableField);
+  editableField.focus();
+
+  editableField.addEventListener('blur', saveData);
+  editableField.addEventListener('keydown', saveData);
+
+  function saveData(evnt) {
+    if (evnt.keyCode === 13 || evnt.type === 'blur') {
+      const newData = editableField.value;
+
+      if (!newData) {
+        target.textContent = startData;
+        pushNotification('This field can not be empty', 'error');
+      } else if (headCellName === 'Name' && newData.length < 4) {
+        target.textContent = startData;
+        pushNotification('Name should contain at least 4 letters', 'error');
+      } else if ((headCellName === 'Age' && newData < 18)
+      || (headCellName === 'Age' && newData > 90)
+      || !editableField.validity.valid) {
+        target.textContent = startData;
+        pushNotification('Age should be a number between 18-90', 'error');
+      } else if ((headCellName === 'Salary' && newData < 1)
+      || !editableField.validity.valid) {
+        target.textContent = startData;
+        pushNotification('It should be positive number', 'error');
+      } else {
+        editableField.remove();
+
+        if (headCellName === 'Salary') {
+          target.textContent = getDollars(newData);
+        } else {
+          target.textContent = newData;
         }
-        target.innerHTML = newData;
       }
     }
   }
 });
 
 function pushNotification(text, type) {
-  const notification = document.createElement('div');
+  let notification = document.querySelector('.notification');
+
+  if (notification) {
+    notification.remove();
+  }
+  notification = document.createElement('div');
+
   const title = document.createElement('h1');
   const message = document.createElement('p');
   const titleText = type[0].toUpperCase() + type.slice(1);
@@ -184,4 +237,12 @@ function pushNotification(text, type) {
   form.insertAdjacentElement('afterend', notification);
 
   setTimeout(() => notification.remove(), 3000);
+}
+
+function getDollars(num) {
+  const result = (+num).toLocaleString('en-EN', {
+    style: 'currency', currency: 'USD',
+  }).slice(0, -3);
+
+  return result;
 }
