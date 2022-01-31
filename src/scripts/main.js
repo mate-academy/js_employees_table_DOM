@@ -95,11 +95,13 @@ for (const input of inputs) {
 }
 
 button.addEventListener('click', (e) => {
-  if (form.elements.name.value.length === 0
-    || form.elements.position.value.length === 0
+  e.preventDefault();
+
+  if (form.elements.name.value.trim().length === 0
+    || form.elements.position.value.trim().length === 0
     || form.elements.salary.value.length === 0) {
     pushNotification('All fields are required', 'error');
-  } else if (form.elements.name.value.length < 4
+  } else if (form.elements.name.value.trim().length < 4
     || !form.elements.name.validity.valid) {
     form.elements.name.value = '';
 
@@ -113,8 +115,6 @@ button.addEventListener('click', (e) => {
 
     pushNotification('You must be kidding', 'error');
   } else {
-    e.preventDefault();
-
     pushNotification('The new employee is added!', 'success');
 
     const newRow = table.rows[1].cloneNode(true);
@@ -184,7 +184,7 @@ tbody.addEventListener('dblclick', (e) => {
 
   function saveData(evnt) {
     if (evnt.keyCode === 13 || evnt.type === 'blur') {
-      const newData = editableField.value;
+      const newData = editableField.value.trim();
 
       if (!newData) {
         target.textContent = startData;
@@ -194,11 +194,11 @@ tbody.addEventListener('dblclick', (e) => {
         pushNotification('Name should contain at least 4 letters', 'error');
       } else if ((headCellName === 'Age' && newData < 18)
       || (headCellName === 'Age' && newData > 90)
-      || !editableField.validity.valid) {
+      || (headCellName === 'Age' && !editableField.validity.valid)) {
         target.textContent = startData;
         pushNotification('Age should be a number between 18-90', 'error');
       } else if ((headCellName === 'Salary' && newData < 1)
-      || !editableField.validity.valid) {
+      || (headCellName === 'Salary' && !editableField.validity.valid)) {
         target.textContent = startData;
         pushNotification('It should be positive number', 'error');
       } else {
