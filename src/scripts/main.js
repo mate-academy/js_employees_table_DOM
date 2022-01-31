@@ -3,7 +3,6 @@
 const body = document.querySelector('body');
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
-const tbodyRows = [ ...tbody.rows ];
 let clickedTitle = '';
 let activeRow;
 
@@ -21,7 +20,14 @@ function fillSelect(selector) {
 }
 
 function convertSalaryToTable(salary) {
-  return '$' + (+salary).toLocaleString('ru-RU', { minimumFractionDigits: 3 });
+  if (+salary >= 1000) {
+    const first = salary.slice(0, -3);
+    const second = salary.slice(-3);
+
+    return '$' + first + ',' + second;
+  }
+
+  return '$' + salary;
 }
 
 /* -----add a form to the document----- */
@@ -76,84 +82,111 @@ for (const el of form) {
 
 /* -----Show notification if form data is invalid and add new employee----- */
 
-const pushNotification = (employeeName, employeeAge) => {
-  const div = document.createElement('div');
-  let haveError = false;
-
+const pushNotification = (value, div) => {
   div.classList = `notification`;
 
-  if (employeeName && employeeName.length < 4) {
+  if (value === 'warning') {
     div.insertAdjacentHTML('afterbegin', `
-    <h2 class='title'>Error message</h2>
-    <p>Name can not be less then 4 chars</p>
+      <h2 class='title'>Warning message</h2>
+      <p>Invalid data type</p>
   `);
-    div.classList.add('error');
-
-    haveError = true;
+    div.classList.add('warning');
   }
 
-  if (employeeAge && (employeeAge < 18 || employeeAge > 90)) {
+  if (value === 'errorName') {
     div.insertAdjacentHTML('afterbegin', `
-    <h2 class='title'>Error message</h2>
-    <p>Age should be from 18 to 90 years old</p>
+      <h2 class='title'>Error message</h2>
+      <p>Name can not be less then 4 chars</p>
   `);
     div.classList.add('error');
-
-    haveError = true;
   }
 
-  if (haveError === false) {
+  if (value === 'errorAge') {
     div.insertAdjacentHTML('afterbegin', `
-    <h2 class='title'>Success message</h2>
-    <p>You have successfully added an employee</p>
+      <h2 class='title'>Error message</h2>
+      <p>Age should be from 18 to 90 years old</p>
+  `);
+    div.classList.add('error');
+  }
+
+  if (value === 'success') {
+    div.insertAdjacentHTML('afterbegin', `
+      <h2 class='title'>Success message</h2>
+      <p>You have successfully added an employee</p>
   `);
     div.classList.add('success');
   }
+};
 
-  body.append(div);
+function showNotification(element) {
+  body.append(element);
 
   setTimeout(() => {
-    div.remove();
+    element.remove();
   }, 2000);
-
-  return !haveError;
-};
+}
 
 form.addEventListener('click', (eventObj) => {
   eventObj.preventDefault();
 
   const target = eventObj.target.closest('button');
 
+  let hasError = false;
+
   if (!target) {
     return;
   }
 
-  pushNotification(form.elements.name.value, form.elements.age.value);
+  const div = document.createElement('div');
 
-  if (form.elements.name.value.length < 4
-      || form.elements.age.value < '18'
-      || form.elements.age.value > '90') {
+  if (form.elements.name.value === ''
+  || form.elements.position.value === ''
+  || form.elements.age.value === ''
+  || form.elements.salary.value === ''
+  || +form.elements.salary.value < 0) {
+    pushNotification('warning', div);
+
+    showNotification(div);
+
     return;
-  } else {
+  }
+
+  if (form.elements.name.value.length < 4) {
+    pushNotification('errorName', div);
+
+    hasError = true;
+  }
+
+  if (+form.elements.age.value < 18 || +form.elements.age.value > 90) {
+    pushNotification('errorAge', div);
+
+    hasError = true;
+  }
+
+  if (!hasError) {
+    pushNotification('success', div);
+
     const newRow = document.createElement('tr');
 
     newRow.insertAdjacentHTML('beforeend', `
-     <td>${form.elements.name.value}</td>
-     <td>${form.elements.position.value}</td>
-     <td>${form.elements.office.value}</td>
-     <td>${form.elements.age.value}</td>
-     <td>
-       ${convertSalaryToTable(form.elements.salary.value)}
-     </td>
-   `);
+    <td>${form.elements.name.value}</td>
+    <td>${form.elements.position.value}</td>
+    <td>${form.elements.office.value}</td>
+    <td>${form.elements.age.value}</td>
+    <td>
+      ${convertSalaryToTable(form.elements.salary.value)}
+    </td>
+  `);
 
     tbody.append(newRow);
+
+    form.elements.name.value = '';
+    form.elements.position.value = '';
+    form.elements.age.value = '';
+    form.elements.salary.value = '';
   }
 
-  form.elements.name.value = '';
-  form.elements.position.value = '';
-  form.elements.age.value = '';
-  form.elements.salary.value = '';
+  showNotification(div);
 });
 
 /* -----Implement editing of table cells by double-clicking on it----- */
@@ -165,7 +198,7 @@ tbody.addEventListener('dblclick', (eventObj) => {
     return;
   }
 
-  const saveData = target.textContent;
+  let saveData = target.textContent;
   let editor;
   const cellIndex = target.cellIndex;
 
@@ -177,17 +210,18 @@ tbody.addEventListener('dblclick', (eventObj) => {
   }
 
   editor.className = 'cell-input';
-  editor.style.width = (target.offsetWidth - 36) + 'px';
   target.textContent = '';
-  editor.value = saveData;
 
-  if (target.cellIndex === 3 || target.cellIndex === 4) {
+  if (cellIndex === 3 || cellIndex === 4) {
     editor.type = 'number';
   }
 
-  if (target.cellIndex === 4) {
-    editor.value = +saveData.slice(1).replace(',', '.');
+  if (cellIndex === 4) {
+    saveData = saveData.slice(1).replace(',', '');
   }
+
+  editor.value = saveData;
+  editor.style.width = (target.offsetWidth - 18) + 'px';
 
   target.append(editor);
   editor.focus();
@@ -197,23 +231,18 @@ tbody.addEventListener('dblclick', (eventObj) => {
 
   function action(e) {
     if (e.key === 'Enter' || e.type === 'blur') {
-      let inputValue = editor.value;
-      let isSuccess = true;
+      let inputValue = editor.value.trim();
 
-      switch (cellIndex) {
-        case 0:
-          isSuccess = pushNotification(inputValue);
-          break;
-
-        case 3:
-          isSuccess = pushNotification(undefined, inputValue);
-          break;
-
-        default:
-          pushNotification();
+      if ((cellIndex === 3 || cellIndex === 4)
+      && inputValue <= 0) {
+        inputValue = saveData;
       }
 
-      if (inputValue.length === 0 || !isSuccess) {
+      if (cellIndex === 3 && (+inputValue < 18 || +inputValue > 90)) {
+        inputValue = saveData;
+      }
+
+      if (inputValue.length === 0) {
         inputValue = saveData;
       } else {
         if (cellIndex === 4) {
@@ -231,6 +260,7 @@ tbody.addEventListener('dblclick', (eventObj) => {
 
 thead.addEventListener('click', (eventObj) => {
   const target = eventObj.target;
+  const tbodyRows = [ ...tbody.rows ];
 
   if (!target) {
     return;
