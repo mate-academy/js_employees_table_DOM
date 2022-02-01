@@ -85,36 +85,38 @@ for (const el of form) {
 const pushNotification = (value, div) => {
   div.classList = `notification`;
 
-  if (value === 'warning') {
-    div.insertAdjacentHTML('afterbegin', `
+  switch (value) {
+    case 'warning':
+      div.insertAdjacentHTML('afterbegin', `
       <h2 class='title'>Warning message</h2>
       <p>Invalid data type</p>
   `);
-    div.classList.add('warning');
-  }
+      div.classList.add('warning');
+      break;
 
-  if (value === 'errorName') {
-    div.insertAdjacentHTML('afterbegin', `
+    case 'errorName':
+      div.insertAdjacentHTML('afterbegin', `
       <h2 class='title'>Error message</h2>
       <p>Name can not be less then 4 chars</p>
   `);
-    div.classList.add('error');
-  }
+      div.classList.add('error');
+      break;
 
-  if (value === 'errorAge') {
-    div.insertAdjacentHTML('afterbegin', `
+    case 'errorAge':
+      div.insertAdjacentHTML('afterbegin', `
       <h2 class='title'>Error message</h2>
       <p>Age should be from 18 to 90 years old</p>
   `);
-    div.classList.add('error');
-  }
+      div.classList.add('error');
+      break;
 
-  if (value === 'success') {
-    div.insertAdjacentHTML('afterbegin', `
+    case 'success':
+      div.insertAdjacentHTML('afterbegin', `
       <h2 class='title'>Success message</h2>
       <p>You have successfully added an employee</p>
   `);
-    div.classList.add('success');
+      div.classList.add('success');
+      break;
   }
 };
 
@@ -140,10 +142,10 @@ form.addEventListener('click', (eventObj) => {
   const div = document.createElement('div');
 
   if (form.elements.name.value === ''
-  || form.elements.position.value === ''
-  || form.elements.age.value === ''
-  || form.elements.salary.value === ''
-  || +form.elements.salary.value < 0) {
+    || form.elements.position.value === ''
+    || form.elements.age.value === ''
+    || form.elements.salary.value === ''
+    || +form.elements.salary.value < 0) {
     pushNotification('warning', div);
 
     showNotification(div);
@@ -198,7 +200,7 @@ tbody.addEventListener('dblclick', (eventObj) => {
     return;
   }
 
-  let saveData = target.textContent;
+  let saveData = target.innerText;
   let editor;
   const cellIndex = target.cellIndex;
 
@@ -210,7 +212,7 @@ tbody.addEventListener('dblclick', (eventObj) => {
   }
 
   editor.className = 'cell-input';
-  target.textContent = '';
+  target.innerText = '';
 
   if (cellIndex === 3 || cellIndex === 4) {
     editor.type = 'number';
