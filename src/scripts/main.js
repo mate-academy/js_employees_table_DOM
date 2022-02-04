@@ -2,8 +2,18 @@
 
 // write code here
 const table = document.querySelector('table');
-const trList = [...table.querySelectorAll('tr')];
+let trList = [...table.querySelectorAll('tr')];
 const headList = [...trList[0].children];
+const selectHTML = `
+  <select name="office" data-qa="office" required>
+    <option value="Tokyo">Tokyo</option>
+    <option value="Singapore">Singapore</option>
+    <option value="London">London</option>
+    <option value="New York">New York</option>
+    <option value="Edinburgh">Edinburgh</option>
+    <option value="San Francisco">San Francisco</option>
+  </select>`;
+
 let secondClickTh = '';
 let reverseSort = -1;
 let previousActive = '';
@@ -53,46 +63,17 @@ table.addEventListener('click', ev => {
   }
 });
 
-table.addEventListener('dblclick', eDbl => {
-  if (eDbl.target.tagName === 'TD') {
-    const input = document.createElement('input');
-    const td = eDbl.target;
-    const tdInnerText = td.innerText;
+function createInput(type, td, innerHTML = '') {
+  const element = document.createElement(type);
 
-    input.className = 'cell-input';
-    input.value = td.innerText;
-    td.innerText = '';
-    td.append(input);
+  element.innerHTML = innerHTML;
+  element.classList.add('cell-input');
+  element.value = td.innerText;
+  td.innerText = '';
+  td.append(element);
 
-    const blurFocus = (eBlur) => {
-      if (input.value) {
-        td.innerText = input.value;
-      } else {
-        td.innerText = tdInnerText;
-      }
-
-      input.remove();
-    };
-
-    const enterPress = (eKey) => {
-      if (eKey.code === 'Enter') {
-        input.removeEventListener('blur', blurFocus);
-
-        if (input.value) {
-          td.innerText = input.value;
-        } else {
-          td.innerText = tdInnerText;
-        }
-
-        input.remove();
-      } else {
-        input.addEventListener('blur', blurFocus);
-      }
-    };
-
-    input.addEventListener('keydown', enterPress);
-  }
-});
+  return element;
+}
 
 const pushNotification = (title, description, type) => {
   const div = document.createElement('div');
@@ -111,6 +92,103 @@ const pushNotification = (title, description, type) => {
   }, 3000);
 };
 
+function checkInput(input, index) {
+  switch (index) {
+    case 0:
+      if (input.value.length < 4) {
+        pushNotification('Error', 'Name field must have more letters', 'error');
+
+        return false;
+      }
+      break;
+
+    case 3:
+      if (input.value < 18 || input.value > 90) {
+        pushNotification(
+          'Error',
+          'Age must be more than 18 and less than 90',
+          'error');
+
+        return false;
+      }
+      break;
+
+    case 4:
+      if (input.value && isFinite(input.value)) {
+        input.value = '$' + Number(input.value).toLocaleString('en-US');
+
+        return true;
+      } else {
+        pushNotification('Error',
+          'Salary field must have only numbers', 'error');
+
+        return false;
+      }
+  }
+
+  return true;
+}
+
+table.addEventListener('dblclick', eDbl => {
+  trList = [...table.querySelectorAll('tr')];
+
+  if (eDbl.target.matches('td')) {
+    const td = eDbl.target;
+    const tdInnerText = td.innerText;
+
+    const tr = trList.find(el =>
+      [...el.children].find(tE => tdInnerText === tE.innerText));
+    const tdIndex = [...tr.children].findIndex(e =>
+      e.innerText === tdInnerText);
+
+    let input;
+
+    switch (tdIndex) {
+      case 2:
+        input = createInput('select', td, selectHTML);
+        break;
+      case 3:
+        input = createInput('input', td);
+        input.type = 'number';
+        break;
+      case 4:
+        input = createInput('input', td);
+        input.value = input.value.replace(/[^0-9]/g, '');
+        break;
+      default:
+        input = createInput('input', td);
+        break;
+    }
+
+    const blurFocus = () => {
+      if (checkInput(input, tdIndex)) {
+        td.innerText = input.value;
+      } else {
+        td.innerText = tdInnerText;
+      }
+
+      input.remove();
+    };
+
+    const enterPress = (eKey) => {
+      if (eKey.code === 'Enter') {
+        input.removeEventListener('blur', blurFocus);
+
+        if (checkInput(input, tdIndex)) {
+          td.innerText = input.value;
+        } else {
+          td.innerText = tdInnerText;
+        }
+
+        input.remove();
+      }
+    };
+
+    input.addEventListener('blur', blurFocus);
+    input.addEventListener('keydown', enterPress);
+  }
+});
+
 document.body.insertAdjacentHTML('beforeend',
   `<form class="new-employee-form" action="/" method="GET">
     <label>Name:
@@ -120,14 +198,7 @@ document.body.insertAdjacentHTML('beforeend',
       <input name="position" data-qa="position" type="text" required>
     </label>
     <label>Office:
-      <select name="office" data-qa="office" required>
-        <option value="Tokyo">Tokyo</option>
-        <option value="Singapore">Singapore</option>
-        <option value="London">London</option>
-        <option value="New York">New York</option>
-        <option value="Edinburgh">Edinburgh</option>
-        <option value="San Francisco">San Francisco</option>
-      </select>
+      ${selectHTML}
     </label>
     <label>Age:
       <input name="age" data-qa="age" type="number" required>
@@ -152,17 +223,10 @@ form.addEventListener('submit', eSubmit => {
 
   eSubmit.preventDefault();
 
-  if (inputName.value.length < 4) {
+  if (!checkInput(inputName, 0)) {
     error = true;
-
-    pushNotification('Error', 'Name field must have more letters', 'error');
-  } else if (age.value < 18 || age.value > 90) {
+  } else if (!checkInput(age, 3)) {
     error = true;
-
-    pushNotification(
-      'Error',
-      'Age must be more than 18 and less than 90',
-      'error');
   } else {
     error = false;
   }
