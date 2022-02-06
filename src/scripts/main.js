@@ -146,6 +146,13 @@ formBtn.addEventListener('click', ev => {
       notification.hidden = false;
 
       tbody.append(newRow);
+
+      for (const child of form.children) {
+        if (child.firstElementChild
+            && child.firstElementChild.name !== 'office') {
+          child.firstElementChild.value = '';
+        }
+      }
       break;
   }
 
