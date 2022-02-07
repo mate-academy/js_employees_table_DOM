@@ -46,6 +46,7 @@ headRows.forEach(el => {
   switch (el.textContent) {
     case 'Name':
       label.firstElementChild.setAttribute('minlength', 4);
+      label.firstElementChild.pattern = '[0-9]+';
       break;
 
     case 'Age':
@@ -97,6 +98,22 @@ form.append(formBtn);
 
 document.body.lastElementChild.before(form);
 
+const timeOut = () => {
+  return setTimeout(() => {
+    notification.className = 'notification';
+    notification.hidden = true;
+  }, 2000);
+};
+
+function message(mess, tit) {
+  notification.classList.add(tit);
+  title.textContent = tit.toUpperCase();
+  notText.textContent = mess;
+  notification.hidden = false;
+
+  return notification;
+}
+
 formBtn.addEventListener('click', ev => {
   ev.preventDefault();
 
@@ -122,28 +139,16 @@ formBtn.addEventListener('click', ev => {
 
   switch (true) {
     case (!employeeName || !age || !salary):
-      notification.classList.add('warning');
-      title.textContent = 'WARNING';
-      notText.textContent = 'Invalid data type!';
-      notification.hidden = false;
+      message('Invalid data type!', 'warning');
       break;
     case employeeName.length < 4:
-      notification.classList.add('error');
-      title.textContent = 'ERROR';
-      notText.textContent = 'Name must be at least 4 characters long!';
-      notification.hidden = false;
+      message('Name must be at least 4 characters long!', 'error');
       break;
     case age > 90 || age < 18:
-      notification.classList.add('error');
-      title.textContent = 'ERROR';
-      notText.textContent = 'Age should be between 18 and 90!';
-      notification.hidden = false;
+      message('Age should be between 18 and 90!', 'error');
       break;
     case (true):
-      notification.classList.add('success');
-      title.textContent = 'SUCCESS';
-      notText.textContent = 'The employee is added to the list';
-      notification.hidden = false;
+      message('The employee is added to the list!', 'success');
 
       tbody.append(newRow);
 
@@ -156,10 +161,7 @@ formBtn.addEventListener('click', ev => {
       break;
   }
 
-  setTimeout(() => {
-    notification.className = 'notification';
-    notification.hidden = true;
-  }, 2000);
+  timeOut();
 });
 
 head.addEventListener('click', ev => {
@@ -204,30 +206,85 @@ tbody.addEventListener('click', ev => {
 
 tbody.addEventListener('dblclick', ev => {
   const item = ev.target.closest('td');
+  const clone = select.cloneNode(true);
   const cellText = item.textContent;
+  const input = document.createElement('input');
+  const group = headRows[item.cellIndex].textContent;
 
-  item.innerHTML = `
-  <input
-    class="cell-input"
-    value="${cellText}"
-   ></input>
-  `;
+  input.classList.add('cell-input');
+  input.value = cellText;
+  clone.classList.add('cell-input');
 
-  function changingFunction() {
-    if (item.firstElementChild.value) {
-      item.innerHTML = `<td>${item.firstElementChild.value}</td>`;
-    } else {
-      item.innerHTML = `<td>${cellText}</td>`;
+  item.textContent = '';
+  item.append(input);
+
+  if (group === 'Office') {
+    item.innerHTML = '';
+    item.append(clone);
+    item.firstElementChild.removeAttribute('id');
+  }
+
+  if (group === 'Age' || group === 'Salary') {
+    item.firstElementChild.pattern = '[0-9]+';
+  }
+
+  if (group === 'Salary') {
+    item.firstElementChild.value = cellText.replace(/\$|,/g, '');
+  }
+
+  const child = item.firstElementChild;
+
+  child.focus();
+
+  function changing(key) {
+    const newTextContent = child.value;
+
+    if (key.type === 'blur' || key.code === 'Enter') {
+      item.innerHTML = '';
+      item.textContent = cellText;
+
+      if (!newTextContent) {
+        message('The field must not be empty!', 'error');
+        timeOut();
+      }
+
+      if (group === 'Name') {
+        if (child.value.length < 4) {
+          message('Name must be at least 4 characters long!', 'error');
+          timeOut();
+        } else {
+          item.textContent = newTextContent;
+        }
+      }
+
+      if (group === 'Position' || group === 'Office') {
+        item.textContent = newTextContent;
+      }
+
+      if (group === 'Age') {
+        if (!child.validity.valid) {
+          message('The field must be numeric!', 'error');
+          timeOut();
+        }
+
+        if (child.value < 18 || child.value > 90) {
+          message('Age should be between 18 and 90!', 'error');
+          timeOut();
+        }
+      }
+
+      if (group === 'Salary') {
+        if (!child.validity.valid) {
+          message('The field must be numeric!', 'error');
+          timeOut();
+        } else {
+          item.textContent = '$'
+          + (+newTextContent).toLocaleString('en');
+        }
+      }
     }
   }
 
-  item.children[0].addEventListener('blur', key => {
-    changingFunction();
-  });
-
-  item.children[0].addEventListener('keydown', key => {
-    if (key.code === 'Enter') {
-      changingFunction();
-    }
-  });
+  child.addEventListener('blur', changing);
+  child.addEventListener('keydown', changing);
 });
