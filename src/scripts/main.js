@@ -270,7 +270,16 @@ tbody.addEventListener('dblclick', ev => {
         }
       }
 
-      if (group === 'Position' || group === 'Office') {
+      if (group === 'Position') {
+        if (child.value.length < 2) {
+          message('Such a position does not exist!', 'error');
+          timeOut();
+        } else {
+          item.textContent = newTextContent;
+        }
+      }
+
+      if (group === 'Office') {
         item.textContent = newTextContent;
       }
 
@@ -289,7 +298,7 @@ tbody.addEventListener('dblclick', ev => {
       }
 
       if (group === 'Salary') {
-        if (!child.validity.valid) {
+        if (!child.validity.valid || !child.value) {
           message('The field must be numeric!', 'error');
           timeOut();
         } else {
