@@ -219,6 +219,10 @@ tbody.addEventListener('dblclick', ev => {
     return;
   }
 
+  const style = getComputedStyle(item);
+  const width = style.width;
+
+  input.style.maxWidth = width;
   input.classList.add('cell-input');
   input.value = cellText;
   clone.classList.add('cell-input');
