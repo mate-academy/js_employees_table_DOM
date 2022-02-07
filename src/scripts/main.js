@@ -211,6 +211,14 @@ tbody.addEventListener('dblclick', ev => {
   const input = document.createElement('input');
   const group = headRows[item.cellIndex].textContent;
 
+  const textLength = [...clone.children].reduce((acc, el) => {
+    return acc + el.textContent.length;
+  }, 0);
+
+  if (!item.textContent || textLength === item.textContent.length) {
+    return;
+  }
+
   input.classList.add('cell-input');
   input.value = cellText;
   clone.classList.add('cell-input');
@@ -222,6 +230,7 @@ tbody.addEventListener('dblclick', ev => {
     item.innerHTML = '';
     item.append(clone);
     item.firstElementChild.removeAttribute('id');
+    item.firstElementChild.value = cellText;
   }
 
   if (group === 'Age' || group === 'Salary') {
@@ -270,6 +279,8 @@ tbody.addEventListener('dblclick', ev => {
         if (child.value < 18 || child.value > 90) {
           message('Age should be between 18 and 90!', 'error');
           timeOut();
+        } else {
+          item.textContent = newTextContent;
         }
       }
 
