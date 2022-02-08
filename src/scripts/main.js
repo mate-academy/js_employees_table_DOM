@@ -52,6 +52,8 @@ for (let i = 0; i < inputs.length; i++) {
 const button = document.querySelector('button');
 
 button.addEventListener('click', e => {
+  e.preventDefault();
+
   const employeeName = document.querySelector('input[name="name"]');
   const position = document.querySelector('input[name="position"]');
   const office = document.querySelector('select[name="office"]');
