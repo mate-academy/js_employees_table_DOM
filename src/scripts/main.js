@@ -52,8 +52,6 @@ for (let i = 0; i < inputs.length; i++) {
 const button = document.querySelector('button');
 
 button.addEventListener('click', e => {
-  e.preventDefault();
-
   const employeeName = document.querySelector('input[name="name"]');
   const position = document.querySelector('input[name="position"]');
   const office = document.querySelector('select[name="office"]');
@@ -79,6 +77,11 @@ button.addEventListener('click', e => {
     showMessage('error', 'Enter valid position');
   } else {
     showMessage('success', 'A new employee was added!');
+
+    inputs.forEach(function(input) {
+      input.value = '';
+    });
+    office.value = 'Tokyo';
     body.append(finalRow);
   }
 
