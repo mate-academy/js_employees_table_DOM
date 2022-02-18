@@ -18,17 +18,17 @@ const NOTIFICATIONS = {
     type: 'warning',
   },
   lowAge: {
-    title: 'Warning',
+    title: 'Warning!',
     description: `Age can't be less then 18`,
     type: 'warning',
   },
   tooOld: {
-    title: 'Warning',
+    title: 'Warning!',
     description: `Age can't be greater then 90`,
     type: 'warning',
   },
   wrongSalary: {
-    title: 'error',
+    title: 'Error!',
     description: 'Incorrect salary value',
     type: 'error',
   },
@@ -49,6 +49,7 @@ const CITIES = {
 };
 
 const body = document.querySelector('body');
+const table = document.querySelector('table');
 const tHead = document.querySelector('thead');
 const tBody = document.querySelector('tbody');
 let tr = [...tBody.querySelectorAll('tr')];
@@ -179,6 +180,11 @@ function addEmployeeAppending() {
     const notificationBlock = document.createElement('div');
     const h2 = document.createElement('h2');
     const p = document.createElement('p');
+    const notifications = document.querySelectorAll('.notification');
+
+    if (notifications.length > 0) {
+      notifications[0].remove();
+    }
 
     notificationBlock.classList.add('notification', type);
     h2.classList.add('title');
@@ -281,38 +287,77 @@ function addEmployeeAppending() {
 }
 
 function addTableEditing() {
-  function saveValue(td, input, defaultValue, dollar) {
-    if (!input.value) {
-      td.textContent = defaultValue;
-    }
+  function saveValue(td, input, defaultValue, headName) {
+    switch (true) {
+      case !input.value:
+      case defaultValue.length === 2 && isNaN(+input.value):
+      case defaultValue.length === 2
+        && (+input.value < 18 || +input.value > 90):
+      case isNaN(+defaultValue.replace(/(^\$)|,/g, ''))
+      && input.value.length < 4:
+      case !isNaN(+defaultValue.replace(/(^\$)|,/g, ''))
+      && isNaN(+input.value.replace(/(^\$)|,/g, '')):
+      case isNaN(+defaultValue.replace(/(^\$)|,/g, ''))
+      && !isNaN(+input.value.replace(/(^\$)|,/g, '')):
+        td.textContent = defaultValue;
+        break;
+      case (headName === 'Salary'):
+        td.textContent = input.value.toString()
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        break;
 
-    if (dollar === '$') {
-      td.textContent = `$${input.value.toString()
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
-    } else {
-      td.textContent = input.value;
+      default:
+        td.textContent = input.value;
     }
   }
 
   function handleCellEditing(e) {
     const td = e.target;
-    const dollar = e.target.textContent.charAt(0);
     const defaultValue = td.textContent;
-    const input = document.createElement('input');
+    const headName = table.rows[0].cells[td.cellIndex].textContent;
 
-    input.classList.add('cell-input');
-    input.value = defaultValue;
-    input.style.width = window.getComputedStyle(e.target).width;
-    td.textContent = '';
-    td.append(input);
-    input.focus();
+    let oldData;
+    let input;
+
+    if (headName === 'Office') {
+      input = document.createElement('select');
+
+      oldData = td.innerHTML;
+      td.innerHTML = '';
+
+      input.insertAdjacentHTML('afterbegin', `
+      <select data-qa="office" name="office">
+        <option value = "Tokyo">Tokyo</option>
+        <option value = "Singapore">Singapore</option>
+        <option value = "London">London</option>
+        <option value = "New York">New York</option>
+        <option value = "Edinburgh">Edinburgh</option>
+        <option value = "San Francisco">San Francisco</option>
+      </select>
+    `);
+      input.style.width = window.getComputedStyle(e.target).width;
+      input.classList.add('cell-input');
+      input.value = oldData;
+      td.append(input);
+      input.focus();
+    } else {
+      input = document.createElement('input');
+
+      input.style.width = window.getComputedStyle(e.target).width;
+      oldData = td.innerHTML;
+      input.classList.add('cell-input');
+      td.innerHTML = '';
+      input.value = oldData;
+      td.append(input);
+      input.focus();
+    }
 
     input.addEventListener('blur', () =>
-      saveValue(td, input, defaultValue, dollar));
+      saveValue(td, input, defaultValue, headName));
 
     input.addEventListener('keydown', (ev) => {
       if (ev.code === 'Enter') {
-        saveValue(td, input, defaultValue, dollar);
+        saveValue(td, input, defaultValue, headName);
       }
     });
   }
