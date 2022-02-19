@@ -3,7 +3,6 @@ body {
   background-attachment: fixed;
   display: flex;
   justify-content: center;
-  align-items: center;
   min-height: 100vh;
   padding: 100px;
   font-family: Roboto, sans-serif;
@@ -180,4 +179,21 @@ tr.active {
   &.error {
     background: rgba(253, 0, 0, 0.3);
   }
+}
+
+.update {
+  position: absolute;
+}
+
+.update > select {
+  height: 40px;
+  font-size: 16px;
+  transform: translateY(-50%);
+}
+
+.input__salary {
+  position: absolute;
+  height: 30px;
+  font-size: 16px;
+  transform: translate(-50%, -50%);
 }
