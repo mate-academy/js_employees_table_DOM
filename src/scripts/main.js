@@ -332,13 +332,15 @@ function makeChange(event) {
   if (event.target.classList.contains('salary')) {
     const input = document.createElement('input');
     input.classList.add('input__salary');
+    input.value = salaryFronString(cellToChange.textContent);
     cellToChange.textContent = '';
     cellToChange.append(input);
     input.focus();
 
     input.addEventListener('blur', () => {
-      if (!input.value) {
+      if (!input.value || isNaN(+input.value)) {
         notification('error', 'salary');
+        input.focus();
       } else {
         cellToChange.textContent = salaryInCorrectFormat(input.value);
         input.remove();
@@ -349,8 +351,9 @@ function makeChange(event) {
       if (e.key !== 'Enter') {
         return;
       };
-      if (!input.value) {
+      if (!input.value || isNaN(+input.value)) {
         notification('error', 'salary');
+        input.focus();
       } else {
         cellToChange.textContent = salaryInCorrectFormat((input.value).toString());
         input.remove();
@@ -431,4 +434,15 @@ function salaryInCorrectFormat(number) {
   }
 
   return `$${[...result].reverse().join('')}`;
+}
+
+function salaryFronString(string) {
+  let input = [...string].slice(1);
+  let salary = '';
+  for (let letter of input) {
+    if (!isNaN(+letter)) {
+      salary += letter;
+    }
+  }
+  return +salary;
 }
