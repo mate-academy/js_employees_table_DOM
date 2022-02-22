@@ -9,46 +9,28 @@ const form = document.createElement('form');
 
 form.className = 'new-employee-form';
 
-const mass = ['Name: ', 'Pozition: ', 'Office: ', 'Age: ', 'Salary: '];
-const mass1 = ['name', 'pozition', 'office', 'age', 'salary'];
+form.insertAdjacentHTML('beforeend', `
+  <label>Name: <input name="name" type="text" data-qa="name" required></label>
+  <label>Pozition:
+    <input name="name" type="text" data-qa="pozition" required>
+  </label>
+  <label>Office:
+    <select name="office" data-qa="office" required>
+      <option value = "Tokyo">Tokyo</option>
+      <option value = "Singapore">Singapore</option>
+      <option value = "London">London</option>
+      <option value = "New York">New York</option>
+      <option value = "Edinburgh">Edinburgh</option>
+      <option value = "San Francisco">San Francisco</option>
+    </select>
+  </label>
+  <label>Age: <input name="age" type="number" data-qa="age" required></label>
+  <label>Salary:
+    <input name="salary" type="number" data-qa="salary" required>
+  </label>
+  <button>Save to table</button>
+`);
 
-for (let i = 0; i < 5; i++) {
-  const label = document.createElement('label');
-  const input = document.createElement('input');
-
-  if (i === 2) {
-    const select = document.createElement('select');
-    const arr = ['Tokyo', 'Singapore', 'London', 'New York',
-      'Edinburgh', 'San Francisco'];
-
-    for (let j = 0; j < arr.length; j++) {
-      const option = document.createElement('option');
-
-      option.textContent = arr[j];
-      option.value = arr[j];
-      select.append(option);
-    }
-    select.name = mass1[2];
-    select.required = true;
-    label.textContent = mass[i];
-    label.append(select);
-    form.append(label);
-  } else {
-    input.name = mass1[i];
-    input.required = true;
-    input.dataset.qa = mass1[i];
-    label.textContent = mass[i];
-    label.append(input);
-    form.append(label);
-  }
-}
-
-const button = document.createElement('button');
-
-button.textContent = 'Save to table';
-form.append(button);
-form.children[3].children[0].type = 'number';
-form.children[4].children[0].type = 'number';
 document.body.append(form);
 
 const pushNotification = (title, description, type) => {
@@ -70,13 +52,13 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const data = new FormData(form);
-  const er = 'Имя должно содержать более 4 символов и возраст должен быть';
+  const dataName = data.get('name');
+  const dataAge = data.get('age');
 
-  if ((data.get('name').length < 5) || (+data.get('age') > 90
-    || +data.get('age') < 19)) {
-      
-    return (pushNotification('Ошибка',
-      `${er} больше 18 и меньше 90 лет`, 'error'));
+  if ((dataName.length < 5) || (+dataAge > 90
+    || +dataAge < 19)) {
+    return (pushNotification('Ошибка', `Имя должно содержать более 4 
+    символов и возраст должен быть больше 18 и меньше 90 лет`, 'error'));
   }
 
   const newTr = document.createElement('tr');
@@ -94,93 +76,39 @@ form.addEventListener('submit', (e) => {
   pushNotification('Рядок додано', ')))))))))))))', 'success');
 });
 
-let thead1 = 1; let thead2 = 1; let thead3 = 1; let thead4 = 1; let thead5 = 1;
+let asc = false;
 
-thead.children[0].children[0].addEventListener('click', (e) => {
-  let qwe = [];
+thead.addEventListener('click', (e) => {
+  const th = e.target.closest('th');
 
-  if (thead1 % 2 !== 0) {
-    qwe = [...tr].sort((a, b) =>
-      a.children[0].textContent.localeCompare(b.children[0].textContent));
-  } else {
-    qwe = [...tr].sort((a, b) =>
-      b.children[0].textContent.localeCompare(a.children[0].textContent));
+  if (!th || !thead.contains(th)) {
+    return;
   }
 
-  for (const i of qwe) {
-    tbody.append(i);
-  }
-  thead1++;
-});
+  asc = !asc;
 
-thead.children[0].children[1].addEventListener('click', (e) => {
-  let qwe = [];
+  const indexCell = e.target.cellIndex;
 
-  if (thead2 % 2 !== 0) {
-    qwe = [...tr].sort((a, b) =>
-      a.children[1].textContent.localeCompare(b.children[1].textContent));
-  } else {
-    qwe = [...tr].sort((a, b) =>
-      b.children[1].textContent.localeCompare(a.children[1].textContent));
-  }
+  const sorted = [...tr].sort((a, b) => {
+    const sortA = a.cells[indexCell].innerText.replace(/\$|,/g, '');
+    const sortB = b.cells[indexCell].innerText.replace(/\$|,/g, '');
 
-  for (const i of qwe) {
-    tbody.append(i);
-  }
-  thead2++;
-});
+    if (asc) {
+      if (isNaN(sortA)) {
+        return sortA.localeCompare(sortB);
+      } else {
+        return sortA - sortB;
+      }
+    } else {
+      if (isNaN(sortB)) {
+        return sortB.localeCompare(sortA);
+      } else {
+        return sortB - sortA;
+      }
+    }
+  });
 
-thead.children[0].children[2].addEventListener('click', (e) => {
-  let qwe = [];
-
-  if (thead3 % 2 !== 0) {
-    qwe = [...tr].sort((a, b) =>
-      a.children[2].textContent.localeCompare(b.children[2].textContent));
-  } else {
-    qwe = [...tr].sort((a, b) =>
-      b.children[2].textContent.localeCompare(a.children[2].textContent));
-  }
-
-  for (const i of qwe) {
-    tbody.append(i);
-  }
-  thead3++;
-});
-
-thead.children[0].children[3].addEventListener('click', (e) => {
-  let qwe = [];
-
-  if (thead4 % 2 !== 0) {
-    qwe = [...tr].sort((a, b) =>
-      a.children[3].textContent - b.children[3].textContent);
-  } else {
-    qwe = [...tr].sort((a, b) =>
-      b.children[3].textContent - a.children[3].textContent);
-  }
-
-  for (const i of qwe) {
-    tbody.append(i);
-  }
-  thead4++;
-});
-
-thead.children[0].children[4].addEventListener('click', (e) => {
-  let qwe = [];
-
-  if (thead5 % 2 !== 0) {
-    qwe = [...tr].sort((a, b) =>
-      parseFloat(a.children[4].textContent.replace(/^./, ''))
-      - parseFloat(b.children[4].textContent.replace(/^./, '')));
-  } else {
-    qwe = [...tr].sort((a, b) =>
-      parseFloat(b.children[4].textContent.replace(/^./, ''))
-      - parseFloat(a.children[4].textContent.replace(/^./, '')));
-  }
-
-  for (const i of qwe) {
-    tbody.append(i);
-  }
-  thead5++;
+  tbody.append(...sorted);
 });
 
 tbody.addEventListener('click', (e) => {
