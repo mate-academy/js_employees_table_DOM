@@ -142,9 +142,6 @@ btn.addEventListener('click', (e) => {
   }
 
   if (form.position.value.length < 4) {
-    form.position.classList.add('notification');
-    form.position.setAttribute('data-qa', 'notification');
-
     notEnoughText('warning',
       'Please, enter more than 4 characters to the field "Postion"');
 
