@@ -209,9 +209,10 @@ form.classList.add('new-employee-form');
 
 form.innerHTML = `
 <label> Name: 
-<input id="nameInput" name="name" type="text" data-qa="name"></label>
-<label> Position: <input 
-id="positionInput" name="position" type="text" data-qa="position"></label>
+<input type="text" id="nameInput" name="name" data-qa="name" 
+onkeypress="return /[a-z]/i.test(event.key)"></label>
+<label> Position: <input type="text" id="positionInput" name="position" 
+data-qa="position" onkeypress="return /[a-z]/i.test(event.key)"></label>
 <label>Office: 
         <select data-qa="office"  id="officeInput">
             <option> Tokyo </option>
@@ -264,4 +265,8 @@ submitButton.onclick = () => {
     pushNotification(450, 270,
       'Success message', 'Your data have been added', 'success');
   }
+  document.getElementById('nameInput').value = '';
+  document.getElementById('positionInput').value = '';
+  document.getElementById('ageInput').value = '';
+  document.getElementById('salaryInput').value = '';
 };
