@@ -5,33 +5,12 @@ let secondClickPosition = 0;
 let secondClickOffice = 0;
 let secondClickAge = 0;
 let secondClickSalary = 0;
-
 const tbody = document.querySelector('tbody');
-const body = document.querySelector('body');
+const thead = document.querySelector('thead');
 const form = document.createElement('form');
 const message = document.createElement('div');
 const titleOfMessage = document.createElement('h2');
 const text = document.createElement('p');
-
-form.setAttribute('class', 'new-employee-form');
-body.append(form);
-
-form.insertAdjacentHTML('afterbegin', `
-  <label>Name: <input name="name" type="text" data-qa="name"></label>
-  <label>Position:
-    <input name="position" type="text" data-qa="position"></label>
-    <label>Office: <select name="office" type="text" data-qa="office">
-    <option>Tokyo</option>
-    <option>Singapore</option>
-    <option>London</option>
-    <option>New York</option>
-    <option>Edinburgh</option>
-    <option>San Francisco</option>
-  </select></label>
-  <label>Age: <input name="age" type="number" data-qa="age"></label>
-  <label>Salary: <input name="salary" type="number" data-qa="salary"></label>
-  <button type="button">Save to table</button>
-`);
 
 const pushNotification = (title, description, type) => {
   message.className = `notification ${type}`;
@@ -40,84 +19,106 @@ const pushNotification = (title, description, type) => {
   titleOfMessage.textContent = title;
   text.textContent = description;
 
-  body.append(message);
-  message.append(titleOfMessage);
-  message.append(text);
+  message.append(titleOfMessage, text);
+  document.body.append(message);
 
   setTimeout(() => {
     message.remove();
   }, 3000);
 };
 
-document.addEventListener('click', (e) => {
-  const order = e.target;
+const createForm = () => {
+  form.setAttribute('class', 'new-employee-form');
+  document.body.append(form);
 
+  form.insertAdjacentHTML('afterbegin', `
+    <label>Name: <input name="name" type="text" data-qa="name"></label>
+    <label>Position:
+      <input name="position" type="text" data-qa="position"></label>
+    <label>Office: <select name="office" type="text" data-qa="office">
+      <option>Tokyo</option>
+      <option>Singapore</option>
+      <option>London</option>
+      <option>New York</option>
+      <option>Edinburgh</option>
+      <option>San Francisco</option>
+    </select></label>
+    <label>Age: <input name="age" type="number" data-qa="age"></label>
+    <label>Salary: <input name="salary" type="number" data-qa="salary"></label>
+    <button type="button">Save to table</button>
+  `);
+
+  form.addEventListener('click', (e) => {
+    if (e.target.closest('button')) {
+      const newPeson = document.createElement('tr');
+
+      for (let i = 0; i < form.length - 1; i++) {
+        if (form[i].value === '') {
+          message.remove();
+
+          pushNotification('Error', 'All fields are required.', 'error');
+
+          return;
+        };
+
+        if (form[0].value.length < 4) {
+          message.remove();
+
+          pushNotification('Error',
+            'Name value has less than 4 letters', 'error');
+
+          return;
+        };
+
+        if (form[3].value < 18 || form[3].value > 90) {
+          message.remove();
+
+          pushNotification('Error',
+            'Age value is less than 18 or more than 90.', 'error');
+
+          return;
+        };
+
+        if (i === form.length - 2) {
+          const td = document.createElement('td');
+
+          td.textContent = `$${(+form[i].value).toLocaleString('en-US')}`;
+
+          newPeson.append(td);
+        } else {
+          const td = document.createElement('td');
+
+          td.textContent = form[i].value;
+
+          newPeson.append(td);
+        };
+      };
+
+      message.remove();
+
+      for (let i = 0; i < form.length - 1; i++) {
+        if (i === 2) {
+          form[i].value = `${form[2].children[0].textContent}`;
+        } else {
+          form[i].value = '';
+        };
+      };
+
+      pushNotification('Success',
+        'A new employee is successfully added to the table.', 'success');
+
+      tbody.append(newPeson);
+    };
+  });
+};
+
+createForm();
+
+thead.addEventListener('click', (e) => {
+  const order = e.target;
   const newList = tbody.querySelectorAll('tr');
 
-  if (order.closest('button')) {
-    const input = document.querySelector('form');
-
-    const newPeson = document.createElement('tr');
-
-    for (let i = 0; i < input.length - 1; i++) {
-      if (input[i].value === '') {
-        message.remove();
-
-        pushNotification('Error', 'All fields are required.', 'error');
-
-        return;
-      };
-
-      if (input[0].value.length < 4) {
-        message.remove();
-
-        pushNotification('Error',
-          'Name value has less than 4 letters', 'error');
-
-        return;
-      };
-
-      if (input[3].value < 18 || input[3].value > 90) {
-        message.remove();
-
-        pushNotification('Error',
-          'Age value is less than 18 or more than 90.', 'error');
-
-        return;
-      };
-
-      if (i === input.length - 2) {
-        const td = document.createElement('td');
-
-        td.textContent = `$${(+input[i].value).toLocaleString('en-US')}`;
-
-        newPeson.append(td);
-      } else {
-        const td = document.createElement('td');
-
-        td.textContent = input[i].value;
-
-        newPeson.append(td);
-      };
-    };
-
-    message.remove();
-
-    pushNotification('Success',
-      'A new employee is successfully added to the table.', 'success');
-
-    tbody.append(newPeson);
-  };
-
-  if (order.closest('tbody')) {
-    for (let i = 0; i < newList.length; i++) {
-      newList[i].setAttribute('class', `notactive`);
-    };
-
-    order.closest('tr').setAttribute('class', `active`);
-  };
-
-  if (order.textContent === 'Name' && order.closest('thead')) {
+  if (order.textContent === 'Name') {
     if (secondClickPosition === 1
       || secondClickOffice === 1
       || secondClickAge === 1
@@ -157,7 +158,7 @@ document.addEventListener('click', (e) => {
     };
   };
 
-  if (order.textContent === 'Position' && order.closest('thead')) {
+  if (order.textContent === 'Position') {
     if (secondClickName === 1
       || secondClickOffice === 1
       || secondClickAge === 1
@@ -197,7 +198,7 @@ document.addEventListener('click', (e) => {
     };
   };
 
-  if (order.textContent === 'Office' && order.closest('thead')) {
+  if (order.textContent === 'Office') {
     if (secondClickName === 1
       || secondClickPosition === 1
       || secondClickAge === 1
@@ -237,7 +238,7 @@ document.addEventListener('click', (e) => {
     };
   };
 
-  if (order.textContent === 'Age' && order.closest('thead')) {
+  if (order.textContent === 'Age') {
     if (secondClickName === 1
       || secondClickPosition === 1
       || secondClickOffice === 1
@@ -279,7 +280,7 @@ document.addEventListener('click', (e) => {
     };
   };
 
-  if (order.textContent === 'Salary' && order.closest('thead')) {
+  if (order.textContent === 'Salary') {
     if (secondClickName === 1
       || secondClickPosition === 1
       || secondClickOffice === 1
@@ -322,27 +323,67 @@ document.addEventListener('click', (e) => {
   };
 });
 
+tbody.addEventListener('click', (e) => {
+  const newList = tbody.querySelectorAll('tr');
+
+  for (let i = 0; i < newList.length; i++) {
+    newList[i].className = '';
+  };
+
+  if (e.target.closest('tr')) {
+    e.target.closest('tr').className = 'active';
+  };
+});
+
 tbody.addEventListener('dblclick', (e) => {
   const dbl = e.target;
-  const newInput = document.createElement('input');
+
   const style = getComputedStyle(dbl);
   const copyName = dbl.textContent;
 
-  newInput.className = 'cell-input';
-  newInput.setAttribute('style', `width: ${style.width}`);
-  newInput.value = dbl.textContent;
-  newInput.setAttribute('type', `text`);
+  if (dbl === dbl.parentElement.children[2]) {
+    dbl.textContent = '';
 
-  dbl.textContent = '';
-  dbl.append(newInput);
+    dbl.insertAdjacentHTML('afterbegin', `
+    <select class ="cell-input" style ="width: ${style.width}">
+      <option value ="Tokyo">Tokyo</option>
+      <option value ="Singapore">Singapore</option>
+      <option value ="London">London</option>
+      <option value ="New York">New York</option>
+      <option value ="Edinburgh">Edinburgh</option>
+      <option value ="San Francisco">San Francisco</option>
+    </select>`);
 
-  let h = false;
+    const options = document.querySelector('select');
 
-  newInput.addEventListener('keydown', (ev) => {
+    for (const key of options) {
+      if (key.textContent === copyName) {
+        key.setAttribute('selected', `true`);
+      };
+    };
+
+    options.focus();
+  } else {
+    const newInput = document.createElement('input');
+
+    newInput.className = 'cell-input';
+    newInput.setAttribute('style', `width: ${style.width}`);
+    newInput.value = dbl.textContent;
+    newInput.setAttribute('type', `text`);
+
+    dbl.textContent = '';
+    dbl.append(newInput);
+
+    newInput.focus();
+  };
+
+  let isHandled = false;
+
+  dbl.children[0].addEventListener('keydown', (ev) => {
     const input = ev.target;
 
     if (ev.code === 'Enter' || ev.code === 'Tab') {
-      h = true;
+      isHandled = true;
 
       if (input.value === '') {
         dbl.textContent = copyName;
@@ -386,7 +427,7 @@ tbody.addEventListener('dblclick', (e) => {
 
             return;
           } else {
-            dbl.textContent = `$${(+newInput.value).toLocaleString('en-US')}`;
+            dbl.textContent = `$${(+input.value).toLocaleString('en-US')}`;
 
             return;
           };
@@ -397,10 +438,10 @@ tbody.addEventListener('dblclick', (e) => {
     };
   });
 
-  newInput.addEventListener('blur', (eve) => {
+  dbl.children[0].addEventListener('blur', (eve) => {
     const input = eve.target;
 
-    if (h === true) {
+    if (isHandled === true) {
       return;
     };
 
@@ -446,7 +487,7 @@ tbody.addEventListener('dblclick', (e) => {
 
           return;
         } else {
-          dbl.textContent = `$${(+newInput.value).toLocaleString('en-US')}`;
+          dbl.textContent = `$${(+input.value).toLocaleString('en-US')}`;
 
           return;
         };
