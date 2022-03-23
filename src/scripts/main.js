@@ -276,7 +276,7 @@ function convertSalary(receivedNumber) {
 function createNotification(className, title, description) {
   const notificationBlock = document.createElement('div');
 
-  notificationBlock.className = className;
+  notificationBlock.classList.add('notification', className);
 
   notificationBlock.setAttribute('data-qa', 'notification');
 
@@ -311,24 +311,23 @@ tableBody.addEventListener('dblclick', (e) => {
 });
 
 function createInputInsteadCell(targetCell) {
-  const formForReplace = document.createElement('form');
+  const inputForReplace = document.createElement('input');
 
-  formForReplace.classList.add('cell-input');
+  inputForReplace.classList.add('cell-input');
 
   tempContent = targetCell.innerHTML;
   targetCell.innerHTML = '';
-  targetCell.append(formForReplace);
+  targetCell.append(inputForReplace);
 
-  const newInput = document.createElement('input');
+  inputForReplace.focus();
 
-  formForReplace.append(newInput);
-  newInput.focus();
-
-  formForReplace.addEventListener('submit', e => {
-    newInput.blur();
+  inputForReplace.addEventListener('keydown', e => {
+    if (e.code === 'Enter') {
+      e.target.blur();
+    }
   });
 
-  newInput.addEventListener('blur', e => {
+  inputForReplace.addEventListener('blur', e => {
     saveChanges(e.target);
   });
 }
@@ -336,9 +335,9 @@ function createInputInsteadCell(targetCell) {
 function saveChanges(currentInput) {
   if (currentInput.value) {
     currentInput.closest('td').innerHTML = currentInput.value;
-    currentInput.closest('form').remove();
+    currentInput.remove();
   } else {
     currentInput.closest('td').innerHTML = tempContent;
-    currentInput.closest('form').remove();
+    currentInput.remove();
   }
 };
