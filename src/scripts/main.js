@@ -315,6 +315,16 @@ function createInputInsteadCell(targetCell) {
 
   inputForReplace.classList.add('cell-input');
 
+  let columnNumber;
+  const currentRowCells = targetCell.closest('tr').cells;
+
+  for (let i = 0; i < currentRowCells.length; i++) {
+    if (targetCell.innerHTML === currentRowCells[i].innerHTML) {
+      columnNumber = i + 1;
+      break;
+    }
+  }
+
   tempContent = targetCell.innerHTML;
   targetCell.innerHTML = '';
   targetCell.append(inputForReplace);
@@ -328,13 +338,127 @@ function createInputInsteadCell(targetCell) {
   });
 
   inputForReplace.addEventListener('blur', e => {
-    saveChanges(e.target);
+    saveChanges(e.target, columnNumber);
   });
 }
 
-function saveChanges(currentInput) {
+function saveChanges(currentInput, currentColumn) {
+  let valueToSave;
+
   if (currentInput.value) {
-    currentInput.closest('td').innerHTML = currentInput.value;
+    switch (currentColumn) {
+      case 1:
+        if (parseFloat(currentInput.value)) {
+          createNotification('error', 'Error',
+            'Wrong input: number instead text');
+          currentInput.value = '';
+          currentInput.focus();
+
+          return;
+        }
+
+        if (currentInput.value.length < 4) {
+          createNotification('error', 'Error!',
+            `Name should contain more letters!`);
+          currentInput.value = '';
+          currentInput.focus();
+
+          return;
+        } else {
+          valueToSave = currentInput.value[0].toUpperCase()
+            + currentInput.value.slice(1);
+        }
+        break;
+
+      case 2:
+        if (parseFloat(currentInput.value)) {
+          createNotification('error', 'Error',
+            'Wrong input: number instead text');
+          currentInput.value = '';
+          currentInput.focus();
+
+          return;
+        } else {
+          valueToSave = currentInput.value[0].toUpperCase()
+            + currentInput.value.slice(1);
+        }
+        break;
+
+      case 3:
+        let count = 0;
+
+        switch (currentInput.value) {
+          case 'Tokyo':
+          case 'Singapore':
+          case 'London':
+          case 'New York':
+          case 'Edinburgh':
+          case 'San Francisco':
+            count++;
+        }
+
+        if (count === 0) {
+          createNotification('error', 'Error',
+            'You should write existent office');
+          currentInput.value = '';
+          currentInput.focus();
+
+          return;
+        } else {
+          valueToSave = currentInput.value;
+        }
+        break;
+
+      case 4:
+        const age = toNumber(currentInput.value);
+
+        if (typeof (age) !== 'number') {
+          createNotification('error', 'Error!', 'You should write a number');
+
+          currentInput.value = '';
+          currentInput.focus();
+
+          return;
+        }
+
+        if (age < 18) {
+          createNotification('error', 'Error!', 'Age cannot be less than 18!');
+
+          currentInput.value = '';
+          currentInput.focus();
+
+          return;
+        }
+
+        if (age > 90) {
+          createNotification('error', 'Error!', 'Age cannot be more than 90!');
+
+          currentInput.value = '';
+          currentInput.focus();
+
+          return;
+        } else {
+          valueToSave = age;
+        }
+        break;
+
+      case 5:
+        const salaryAmount = toNumber(currentInput.value);
+
+        if (typeof (salaryAmount) !== 'number') {
+          createNotification('error', 'Error!', 'You should write a number');
+
+          currentInput.value = '';
+          currentInput.focus();
+
+          return;
+        } else {
+          valueToSave = convertSalary(salaryAmount);
+        }
+        break;
+    }
+
+    currentInput.closest('td').innerHTML = valueToSave;
     currentInput.remove();
   } else {
     currentInput.closest('td').innerHTML = tempContent;
