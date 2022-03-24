@@ -311,10 +311,7 @@ tableBody.addEventListener('dblclick', (e) => {
 });
 
 function createInputInsteadCell(targetCell) {
-  const inputForReplace = document.createElement('input');
-
-  inputForReplace.classList.add('cell-input');
-
+  let inputForReplace;
   let columnNumber;
   const currentRowCells = targetCell.closest('tr').cells;
 
@@ -324,6 +321,21 @@ function createInputInsteadCell(targetCell) {
       break;
     }
   }
+
+  if (columnNumber === 3) {
+    inputForReplace = document.createElement('select');
+
+    for (const elem of offices) {
+      const newOption = document.createElement('option');
+
+      newOption.innerHTML = elem;
+      inputForReplace.append(newOption);
+    }
+  } else {
+    inputForReplace = document.createElement('input');
+  }
+
+  inputForReplace.classList.add('cell-input');
 
   tempContent = targetCell.innerHTML;
   targetCell.innerHTML = '';
@@ -384,7 +396,10 @@ function saveChanges(currentInput, currentColumn) {
         }
         break;
 
-      case 3:
+        // this case could be used if we don't use select,
+        // but standard text input
+
+        /* case 3:
         let count = 0;
 
         switch (currentInput.value) {
@@ -407,6 +422,9 @@ function saveChanges(currentInput, currentColumn) {
         } else {
           valueToSave = currentInput.value;
         }
+        break; */
+      case 3:
+        valueToSave = currentInput.value;
         break;
 
       case 4:
