@@ -294,11 +294,11 @@ function validation(inputName, inputPosition, inputAge, inputSalary) {
   }
 
   if (inputPosition === '') {
-    result.description += '\n\nWhat is you job?';
+    result.description += '\n\nWhat is your job?';
 
     if (result.flag) {
       result.flag = false;
-      result.description = 'Error!!!\n\nWhat is you job?';
+      result.description = 'Error!!!\n\nWhat is your job?';
     }
   }
 
