@@ -1,27 +1,72 @@
 'use strict';
 
+const notifications = require('./notifications');
 const triplify = require('./triplify');
 
 let table = null;
 
 function bindToTable(tableReference) {
   table = tableReference;
+
+  notifications.create();
 }
 
 function checkFormValid(form) {
   const fields = [...form.elements].slice(0, -1);
 
-  return fields.every(f => f.value !== '');
+  if (fields.some(f => f.value.length <= 0)) {
+    notifications.push('Empty field',
+      'Fill all empty fields before adding',
+      notifications.types.error);
+
+    return false;
+  }
+
+  for (const field of fields) {
+    switch (field.name) {
+      case 'name': {
+        if (field.value.length < 4) {
+          notifications.push('Wrong name',
+            '"Name" field should have at least 4 characters',
+            notifications.types.error);
+
+          return false;
+        }
+
+        break;
+      }
+
+      case 'age': {
+        const age = parseInt(field.value);
+
+        if (age < 18 || age > 90) {
+          notifications.push('Age restriction',
+            'You are out of permissed age bounds',
+            notifications.types.error);
+
+          return false;
+        }
+
+        break;
+      }
+
+      default: {
+        break;
+      }
+    }
+  }
+
+  return true;
 }
 
 function addRecord(e) {
+  e.preventDefault();
+
   const formParent = e.target.form;
 
   if (!checkFormValid(formParent)) {
     return;
   }
-
-  e.preventDefault();
 
   const elements = [...formParent.elements].slice(0, -1);
   const newRecord = document.createElement('tr');
@@ -41,6 +86,10 @@ function addRecord(e) {
   }
 
   table.prepend(newRecord);
+
+  notifications.push('Employee added',
+    'New employee was added succesfully',
+    notifications.types.success);
 }
 
 module.exports = {
