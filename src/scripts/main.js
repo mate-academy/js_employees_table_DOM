@@ -1,8 +1,7 @@
 'use strict';
 
 // Create new form
-document.body.insertAdjacentHTML('beforeend',
-  `
+document.body.insertAdjacentHTML('beforeend', `
     <form class ="new-employee-form">
       <label>Name:
         <input
