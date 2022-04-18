@@ -146,6 +146,7 @@ const pushNotification = (title, description, type) => {
   notification.dataset.qa = 'notification';
   notification.style.top = '15px';
   notification.style.right = '15px';
+  notification.style.zIndex = 1;
 
   notification.innerHTML = `
     <h2 class="title">
@@ -158,7 +159,7 @@ const pushNotification = (title, description, type) => {
 
   body.append(notification);
 
-  setTimeout(() => notification.remove(), 2000);
+  setTimeout(() => notification.remove(), 200000);
 };
 
 const submitForm = e => {
