@@ -15,6 +15,8 @@ const ourOffices = [
   'San Francisco',
 ];
 
+table.style.userSelect = 'none';
+
 function pushNotification(type) {
   const errorBox = document.createElement('div');
   const h2 = document.createElement('h2');
@@ -57,30 +59,37 @@ function pushNotification(type) {
   }, 4000);
 };
 
+function sortStrColumns(type, a, z) {
+  return type === 'ASC'
+    ? a.localeCompare(z)
+    : z.localeCompare(a);
+}
+
+function sortNumColumns(type, zero, nine) {
+  return type === 'ASC'
+    ? zero.localeCompare(nine)
+    : nine.localeCompare(zero);
+}
+
+let prevTitle;
+
 function sortRows(rows, index, sortType) {
   const sorted = rows.sort((x, y) => {
     const first = x.children[index].textContent.replace(/[^a-zA-Z0-9 ]/g, '');
     const second = y.children[index].textContent.replace(/[^a-zA-Z0-9 ]/g, '');
 
-    if (isNaN(+first)) {
-      if (sortType === 'ASC') {
-        return first.localeCompare(second);
-      } else if (sortType === 'DESC') {
-        return second.localeCompare(first);
-      }
-    } else {
-      if (sortType === 'ASC') {
-        return first - second;
-      } else if (sortType === 'DESC') {
-        return second - first;
-      }
-    }
+    return isNaN(+first)
+      ? sortStrColumns(sortType, first, second)
+      : sortNumColumns(sortType, first, second);
   });
 
   sorted.forEach(x => tableBody.append(x));
 }
 
-let prevTitle;
+function toggleSortingTypes(element) {
+  element.classList.toggle('DESC');
+  element.classList.toggle('ASC');
+}
 
 tableHead.addEventListener('click', (ev) => {
   const columnIndex = ev.target.cellIndex;
@@ -88,13 +97,11 @@ tableHead.addEventListener('click', (ev) => {
 
   if (prevTitle === title) {
     if (prevTitle.classList.contains('ASC')) {
-      title.classList.toggle('ASC');
-      title.classList.toggle('DESC');
+      toggleSortingTypes(title);
 
       sortRows([...tableBodyRows], columnIndex, 'DESC');
     } else if (prevTitle.classList.contains('DESC')) {
-      title.classList.toggle('DESC');
-      title.classList.toggle('ASC');
+      toggleSortingTypes(title);
 
       sortRows([...tableBodyRows], columnIndex, 'ASC');
     }
@@ -110,20 +117,25 @@ tableHead.addEventListener('click', (ev) => {
   prevTitle = title;
 });
 
+function activateRow(row) {
+  row.classList.toggle('active');
+}
+
+function diactivateRow(row, prev) {
+  activateRow(row);
+  prevRow.classList.remove('active');
+}
+
 let prevRow;
 
 tableBody.addEventListener('click', (ev) => {
   const row = ev.target.parentElement;
 
-  if (prevRow === undefined || prevRow === row) {
-    row.classList.toggle('active');
-    prevRow = row;
-  } else {
-    row.classList.toggle('active');
-    prevRow.classList.remove('active');
+  prevRow === undefined || prevRow === row
+    ? activateRow(row)
+    : diactivateRow(row, prevRow);
 
-    prevRow = row;
-  }
+  prevRow = row;
 });
 
 const form = document.createElement('form');
