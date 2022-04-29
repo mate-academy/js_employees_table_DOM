@@ -51,16 +51,27 @@ const editorOfCells = (input, cell, initialValue) => {
     input.remove();
   }
 
+  const checkValue = input.value.split(' ');
   const index = cell.cellIndex;
   const headCell = tHead.querySelector('tr').cells[index].innerText;
 
   switch (headCell) {
     case 'Name':
-      if (input.value.length < 4) {
+      if (input.value.length < 4
+        || checkValue.length - 1 === input.value.length) {
         cell.innerText = initialValue;
 
         pushNotification('Warning!!!',
-          'Name should have min 4 letters', 'warning');
+          'Please, provide correct name', 'warning');
+      }
+      break;
+
+    case 'Position':
+      if (input.value.length === checkValue.length - 1) {
+        cell.innerText = initialValue;
+
+        pushNotification('Warning!!!',
+          'Please, provide correct position', 'warning');
       }
       break;
 
@@ -97,7 +108,8 @@ const editorOfCells = (input, cell, initialValue) => {
       break;
 
     case 'Salary':
-      if (isNaN(input.value)) {
+      if (isNaN(input.value)
+        || checkValue.length - 1 === input.value.length) {
         cell.innerText = initialValue;
 
         pushNotification('Warning!!!',
@@ -259,6 +271,8 @@ form.addEventListener('submit', eve => {
     pushNotification('Error!!!', 'Min Age 18', 'error');
   } else if (age > 90) {
     pushNotification('Error!!!', 'Max Age 90', 'error');
+  } else if (!offices.includes(office)) {
+    pushNotification('Error!!!', 'Choose correct location', 'error');
   } else {
     tBody.append(newPerson);
     form.reset();
