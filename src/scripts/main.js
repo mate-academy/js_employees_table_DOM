@@ -128,6 +128,24 @@ function convertNumberToSalary(salary) {
     : '$' + salary.match(/^\d{2}|\d{3}|\d+/g);
 }
 
+function convertString(inputString) {
+  let result = '';
+
+  if (inputString.indexOf('-') > -1) {
+    const arrString = inputString.split('-');
+
+    for (const word of arrString) {
+      result += word.charAt(0).toUpperCase()
+      + word.slice(1) + ' ';
+    }
+
+    return result;
+  }
+
+  return inputString.charAt(0).toUpperCase()
+    + inputString.slice(1);
+};
+
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -157,7 +175,7 @@ form.addEventListener('submit', (e) => {
         ${data.get('position')}
       </td>
       <td>
-        ${data.get('office')}
+        ${convertString(data.get('office'))}
       </td>
       <td>
         ${data.get('age')}
@@ -181,6 +199,37 @@ form.addEventListener('submit', (e) => {
   }, 2000);
 });
 
-table.addEventListener('dblclick', (e) => {
-  // something wrong
+tBody.addEventListener('dblclick', (e) => {
+  const td = e.target;
+  const initialValue = td.textContent;
+  const input = document.createElement('input');
+
+  input.className = 'cell-input';
+  input.value = initialValue;
+  input.style.width = window.getComputedStyle(td).width;
+
+  td.textContent = '';
+  td.append(input);
+
+  input.addEventListener('blur', () => {
+    editTableCell(td, input, initialValue);
+    input.remove();
+  });
+
+  input.addEventListener('keydown', (ev) => {
+    if (ev.code === 'Enter') {
+      editTableCell(td, input, initialValue);
+      input.remove();
+    }
+  });
 });
+
+function editTableCell(cell, input, cellValue) {
+  if (!input.value) {
+    cell.textContent = cellValue;
+
+    return;
+  }
+
+  cell.textContent = input.value;
+}
