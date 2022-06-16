@@ -2,8 +2,6 @@
 
 const table = document.querySelector('table');
 const tBody = table.querySelector('tbody');
-const tRows = tBody.querySelectorAll('tr');
-const rowsArr = [...tRows];
 const theaders = document.querySelector('tr');
 
 function convertSalaryToNumber(salary) {
@@ -11,6 +9,9 @@ function convertSalaryToNumber(salary) {
 }
 
 theaders.addEventListener('click', (e) => {
+  const tRows = tBody.querySelectorAll('tr');
+  const rowsArr = [...tRows];
+
   const header = [...theaders.children].indexOf(e.target);
 
   if (!e.target.dataset.sort) {
@@ -30,10 +31,12 @@ theaders.addEventListener('click', (e) => {
           - convertSalaryToNumber(y.children[header].innerText));
     } else if (e.target.innerText === 'Age') {
       rows = rowsArr.sort((x, y) =>
-        +x.children[header].innerText - +y.children[header].innerText);
+        parseInt(x.children[header].innerText)
+          - parseInt(y.children[header].innerText));
     } else {
       rows = rowsArr.sort((x, y) =>
-        x.children[header].innerText.localeCompare(y.children[header].innerText));
+        x.children[header].innerText
+          .localeCompare(y.children[header].innerText));
     }
   } else {
     if (e.target.innerText === 'Salary') {
@@ -46,7 +49,8 @@ theaders.addEventListener('click', (e) => {
           - parseInt(x.children[header].innerText));
     } else {
       rows = rowsArr.sort((x, y) =>
-        y.children[header].innerText.localeCompare(x.children[header].innerText));
+        y.children[header].innerText
+          .localeCompare(x.children[header].innerText));
     }
   }
 
@@ -58,6 +62,8 @@ theaders.addEventListener('click', (e) => {
 });
 
 tBody.addEventListener('click', (e) => {
+  const tRows = tBody.querySelectorAll('tr');
+
   for (const row of tRows) {
     if (row.classList.contains('active')) {
       row.classList.remove('active');
@@ -146,6 +152,11 @@ function convertString(inputString) {
     + inputString.slice(1);
 };
 
+const inputName = document.querySelector('.name');
+const inputPosition = document.querySelector('.position');
+const inputAge = document.querySelector('.age');
+const inputSalary = document.querySelector('.salary');
+
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -155,18 +166,26 @@ form.addEventListener('submit', (e) => {
   const h2 = document.createElement('h2');
   const desc = document.createElement('p');
 
-  if (data.get('name').length < 4
-       || data.get('age') < 18
-       || data.get('age') > 90) {
+  if (data.get('name').length < 4) {
     notification.classList.add('error');
-    h2.textContent = 'Error |x|_|x|';
-    desc.textContent = 'Houston, we have a problem!!!';
+    h2.textContent = 'Error';
+    desc.textContent = 'Name should have more characters (sorry asians)';
+  } else if (data.get('age') < 18 || data.get('age') > 90) {
+    notification.classList.add('error');
+    h2.textContent = 'Error';
+    desc.textContent = 'Age doesn`t meet required range 18-90';
+  } else if (data.get('salary')[0] == 0) {
+    notification.classList.add('error');
+    h2.textContent = 'Error';
+
+    desc.textContent = 'Unappropriate salary input value.\n '
+      + 'Salary can`t begins with 0';
   } else {
     notification.classList.add('success');
-    h2.textContent = 'Success <3';
-    desc.textContent = 'Smell all around, you know what is it? SUCCESS!!!';
+    h2.textContent = 'Success';
+    desc.textContent = 'The person has been added successfully';
 
-    table.insertAdjacentHTML('beforeend', `
+    tBody.insertAdjacentHTML('beforeend', `
     <tr>
       <td>
         ${data.get('name')}
@@ -185,6 +204,11 @@ form.addEventListener('submit', (e) => {
       </td>
     </tr>
   `);
+
+    inputName.value = '';
+    inputPosition.value = '';
+    inputAge.value = '';
+    inputSalary.value = '';
   }
 
   notification.classList.add('notification');
@@ -196,12 +220,19 @@ form.addEventListener('submit', (e) => {
 
   setTimeout(() => {
     notification.remove();
-  }, 2000);
+  }, 4000);
 });
 
 tBody.addEventListener('dblclick', (e) => {
   const td = e.target;
-  const initialValue = td.textContent;
+  const initialValue = td.innerText;
+
+  // if (td.cellIndex === 2) {
+  //   const select = document.querySelector('select');
+
+  //   td.parentElement.removeChild(td);
+  //   td.closest('tr').insertBefore(select, td.closest('tr').children[2]);
+  // } else {
   const input = document.createElement('input');
 
   input.className = 'cell-input';
@@ -222,6 +253,7 @@ tBody.addEventListener('dblclick', (e) => {
       input.remove();
     }
   });
+  // }
 });
 
 function editTableCell(cell, input, cellValue) {
