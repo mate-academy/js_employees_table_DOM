@@ -8,6 +8,36 @@ function convertSalaryToNumber(salary) {
   return parseInt(salary.substring(1).split(',').join(''));
 }
 
+function ascSortDirection(arr, indexHeader, columnName) {
+  if (columnName === 'Salary') {
+    arr.sort((x, y) => convertSalaryToNumber(x.children[indexHeader].innerText
+      - convertSalaryToNumber(y.children[indexHeader].innerText)));
+  } else if (columnName === 'Age') {
+    arr.sort((x, y) =>
+      parseInt(x.children[indexHeader].innerText)
+      - parseInt(y.children[indexHeader].innerText));
+  } else {
+    arr.sort((x, y) =>
+      x.children[indexHeader].innerText
+        .localeCompare(y.children[indexHeader].innerText));
+  }
+}
+
+function descSortDirection(arr, indexHeader, columnName = '') {
+  if (columnName === 'Salary') {
+    arr.sort((x, y) => convertSalaryToNumber(y.children[indexHeader].innerText
+      - convertSalaryToNumber(x.children[indexHeader].innerText)));
+  } else if (columnName === 'Age') {
+    arr.sort((x, y) =>
+      parseInt(y.children[indexHeader].innerText)
+      - parseInt(x.children[indexHeader].innerText));
+  } else {
+    arr.sort((x, y) =>
+      y.children[indexHeader].innerText
+        .localeCompare(x.children[indexHeader].innerText));
+  }
+}
+
 theaders.addEventListener('click', (e) => {
   const tRows = tBody.querySelectorAll('tr');
   const rowsArr = [...tRows];
@@ -27,36 +57,24 @@ theaders.addEventListener('click', (e) => {
   if (e.target.dataset.sort === 'asc') {
     switch (e.target.innerText) {
       case 'Salary':
-        rows = rowsArr.sort((x, y) =>
-          convertSalaryToNumber(x.children[header].innerText)
-          - convertSalaryToNumber(y.children[header].innerText));
+        ascSortDirection(rowsArr, header, 'Salary');
         break;
       case 'Age':
-        rows = rowsArr.sort((x, y) =>
-          parseInt(x.children[header].innerText)
-          - parseInt(y.children[header].innerText));
+        ascSortDirection(rowsArr, header, 'Age');
         break;
       default:
-        rows = rowsArr.sort((x, y) =>
-          x.children[header].innerText
-            .localeCompare(y.children[header].innerText));
+        ascSortDirection(rowsArr, header);
     }
   } else {
     switch (e.target.innerText) {
       case 'Salary':
-        rows = rowsArr.sort((x, y) =>
-          convertSalaryToNumber(y.children[header].innerText)
-          - convertSalaryToNumber(x.children[header].innerText));
+        descSortDirection(rowsArr, header, 'Salary');
         break;
       case 'Age':
-        rows = rowsArr.sort((x, y) =>
-          parseInt(y.children[header].innerText)
-          - parseInt(x.children[header].innerText));
+        descSortDirection(rowsArr, header, 'Age');
         break;
       default:
-        rows = rowsArr.sort((x, y) =>
-          y.children[header].innerText
-            .localeCompare(x.children[header].innerText));
+        descSortDirection(rowsArr, header);
     }
   }
 
