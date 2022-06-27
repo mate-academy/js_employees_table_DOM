@@ -25,32 +25,38 @@ theaders.addEventListener('click', (e) => {
   let rows;
 
   if (e.target.dataset.sort === 'asc') {
-    if (e.target.innerText === 'Salary') {
-      rows = rowsArr.sort((x, y) =>
-        convertSalaryToNumber(x.children[header].innerText)
+    switch (e.target.innerText) {
+      case 'Salary':
+        rows = rowsArr.sort((x, y) =>
+          convertSalaryToNumber(x.children[header].innerText)
           - convertSalaryToNumber(y.children[header].innerText));
-    } else if (e.target.innerText === 'Age') {
-      rows = rowsArr.sort((x, y) =>
-        parseInt(x.children[header].innerText)
+        break;
+      case 'Age':
+        rows = rowsArr.sort((x, y) =>
+          parseInt(x.children[header].innerText)
           - parseInt(y.children[header].innerText));
-    } else {
-      rows = rowsArr.sort((x, y) =>
-        x.children[header].innerText
-          .localeCompare(y.children[header].innerText));
+        break;
+      default:
+        rows = rowsArr.sort((x, y) =>
+          x.children[header].innerText
+            .localeCompare(y.children[header].innerText));
     }
   } else {
-    if (e.target.innerText === 'Salary') {
-      rows = rowsArr.sort((x, y) =>
-        convertSalaryToNumber(y.children[header].innerText)
+    switch (e.target.innerText) {
+      case 'Salary':
+        rows = rowsArr.sort((x, y) =>
+          convertSalaryToNumber(y.children[header].innerText)
           - convertSalaryToNumber(x.children[header].innerText));
-    } else if (e.target.innerText === 'Age') {
-      rows = rowsArr.sort((x, y) =>
-        parseInt(y.children[header].innerText)
+        break;
+      case 'Age':
+        rows = rowsArr.sort((x, y) =>
+          parseInt(y.children[header].innerText)
           - parseInt(x.children[header].innerText));
-    } else {
-      rows = rowsArr.sort((x, y) =>
-        y.children[header].innerText
-          .localeCompare(x.children[header].innerText));
+        break;
+      default:
+        rows = rowsArr.sort((x, y) =>
+          y.children[header].innerText
+            .localeCompare(x.children[header].innerText));
     }
   }
 
@@ -227,33 +233,28 @@ tBody.addEventListener('dblclick', (e) => {
   const td = e.target;
   const initialValue = td.innerText;
 
-  // if (td.cellIndex === 2) {
-  //   const select = document.querySelector('select');
+  if (td.cellIndex === 2) {
+    const input = document.createElement('input');
 
-  //   td.parentElement.removeChild(td);
-  //   td.closest('tr').insertBefore(select, td.closest('tr').children[2]);
-  // } else {
-  const input = document.createElement('input');
+    input.className = 'cell-input';
+    input.value = initialValue;
+    input.style.width = window.getComputedStyle(td).width;
 
-  input.className = 'cell-input';
-  input.value = initialValue;
-  input.style.width = window.getComputedStyle(td).width;
+    td.textContent = '';
+    td.append(input);
 
-  td.textContent = '';
-  td.append(input);
-
-  input.addEventListener('blur', () => {
-    editTableCell(td, input, initialValue);
-    input.remove();
-  });
-
-  input.addEventListener('keydown', (ev) => {
-    if (ev.code === 'Enter') {
+    input.addEventListener('blur', () => {
       editTableCell(td, input, initialValue);
       input.remove();
-    }
-  });
-  // }
+    });
+
+    input.addEventListener('keydown', (ev) => {
+      if (ev.code === 'Enter') {
+        editTableCell(td, input, initialValue);
+        input.remove();
+      }
+    });
+  };
 });
 
 function editTableCell(cell, input, cellValue) {
@@ -264,4 +265,4 @@ function editTableCell(cell, input, cellValue) {
   }
 
   cell.textContent = input.value;
-}
+};
