@@ -20,24 +20,24 @@ thead.addEventListener('click', (click) => {
     const text2 = tr2.children[index].innerText;
     let result = null;
 
-    switch (index) {
-      case 0:
-      case 1:
-      case 2:
+    switch (colHead[index]) {
+      case 'Name':
+      case 'Position':
+      case 'Office':
         if (sortStatus[index]) {
           result = text2.localeCompare(text1);
         } else {
           result = text1.localeCompare(text2);
         }
         break;
-      case 3:
+      case 'Age':
         if (sortStatus[index]) {
           result = Number(text2) - Number(text1);
         } else {
           result = Number(text1) - Number(text2);
         }
         break;
-      case 4:
+      case 'Salary':
         const salary1 = text1.split(',').join('').slice(1);
         const salary2 = text2.split(',').join('').slice(1);
 
@@ -73,23 +73,23 @@ for (let i = 0; i <= 4; i++) {
 
   input.required = true;
 
-  switch (i) {
-    case 0:
+  switch (colHead[i]) {
+    case 'Name':
       input.minLength = '4';
       break;
-    case 2:
+    case 'Office':
       input = document.createElement('select');
 
       for (const office of offices) {
         input.append(new Option(office, office));
       }
       break;
-    case 3:
+    case 'Age':
       input.type = 'number';
       input.min = 18;
       input.max = 90;
       break;
-    case 4:
+    case 'Salary':
       input.type = 'number';
   }
 
