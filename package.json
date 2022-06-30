@@ -37,7 +37,8 @@
     "parcel": "^1.12.4",
     "stylelint": "^13.5.0",
     "stylelint-config-recommended-scss": "^3.3.0",
-    "stylelint-scss": "^3.17.2"
+    "stylelint-scss": "^3.17.2",
+    "typescript": "^4.7.4"
   },
   "browserslist": [
     "last 2 versions"

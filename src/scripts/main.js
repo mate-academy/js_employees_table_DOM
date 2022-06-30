@@ -8,6 +8,8 @@ function convertSalaryToNumber(salary) {
   return parseInt(salary.substring(1).split(',').join(''));
 }
 
+// Help me to get these two sorting functions to work bcs I tried and I failed :(
+
 function ascSortDirection(arr, indexHeader, columnName) {
   if (columnName === 'Salary') {
     arr.sort((x, y) => convertSalaryToNumber(x.children[indexHeader].innerText
@@ -23,7 +25,7 @@ function ascSortDirection(arr, indexHeader, columnName) {
   }
 }
 
-function descSortDirection(arr, indexHeader, columnName = '') {
+function descSortDirection(arr, indexHeader, columnName) {
   if (columnName === 'Salary') {
     arr.sort((x, y) => convertSalaryToNumber(y.children[indexHeader].innerText
       - convertSalaryToNumber(x.children[indexHeader].innerText)));
@@ -57,24 +59,36 @@ theaders.addEventListener('click', (e) => {
   if (e.target.dataset.sort === 'asc') {
     switch (e.target.innerText) {
       case 'Salary':
-        ascSortDirection(rowsArr, header, 'Salary');
+        rows = rowsArr.sort((x, y) =>
+          convertSalaryToNumber(x.children[header].innerText)
+          - convertSalaryToNumber(y.children[header].innerText));
         break;
       case 'Age':
-        ascSortDirection(rowsArr, header, 'Age');
+        rows = rowsArr.sort((x, y) =>
+          parseInt(x.children[header].innerText)
+          - parseInt(y.children[header].innerText));
         break;
       default:
-        ascSortDirection(rowsArr, header);
+        rows = rowsArr.sort((x, y) =>
+          x.children[header].innerText
+            .localeCompare(y.children[header].innerText));
     }
   } else {
     switch (e.target.innerText) {
       case 'Salary':
-        descSortDirection(rowsArr, header, 'Salary');
+        rows = rowsArr.sort((x, y) =>
+          convertSalaryToNumber(y.children[header].innerText)
+          - convertSalaryToNumber(x.children[header].innerText));
         break;
       case 'Age':
-        descSortDirection(rowsArr, header, 'Age');
+        rows = rowsArr.sort((x, y) =>
+          parseInt(y.children[header].innerText)
+          - parseInt(x.children[header].innerText));
         break;
       default:
-        descSortDirection(rowsArr, header);
+        rows = rowsArr.sort((x, y) =>
+          y.children[header].innerText
+            .localeCompare(x.children[header].innerText));
     }
   }
 
