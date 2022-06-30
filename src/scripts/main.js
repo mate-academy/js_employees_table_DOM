@@ -3,7 +3,6 @@
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 
-// 1
 const obj = {
   name: null,
   position: null,
@@ -13,145 +12,131 @@ const obj = {
 };
 
 thead.addEventListener('click', (e) => {
-  const name1 = thead.children[0].children[0];
-  const position = thead.children[0].children[1];
-  const office = thead.children[0].children[2];
-  const age = thead.children[0].children[3];
-  const salary = thead.children[0].children[4];
   const rows = document.querySelectorAll('tr');
 
-  function sortDESC() {
-    let number = null;
-    let callback = (a, b) => b.childNodes[number]
-      .textContent.localeCompare(a.childNodes[number].textContent);
+  const nameHeader = thead.children[0].children[0];
+  const positionHeader = thead.children[0].children[1];
+  const officeHeader = thead.children[0].children[2];
+  const ageHeader = thead.children[0].children[3];
+  const salaryHeader = thead.children[0].children[4];
+
+  let node = null;
+  const nameValue = 1;
+  const positionValue = 3;
+  const officeValue = 5;
+  const ageValue = 7;
+  const salaryValue = 9;
+
+  const sortAscCallback = (a, b) => a.childNodes[node].textContent
+    .localeCompare(b.childNodes[node].textContent);
+
+  const sortDescCallback = (a, b) => b.childNodes[node]
+    .textContent.localeCompare(a.childNodes[node].textContent);
+
+  const sortSalaryAscCallback = (a, b) => a.childNodes[node].textContent
+    .slice(1).split(',').join('')
+        - b.childNodes[node].textContent
+          .slice(1).split(',').join('');
+
+  const sortSalaryDescCallback = (a, b) => b.childNodes[node].textContent
+    .slice(1).split(',').join('')
+        - a.childNodes[node].textContent
+          .slice(1).split(',').join('');
+
+  function sortColumn(sortCallback, sortSalaryCallback) {
+    let callback = sortCallback;
 
     switch (e.target) {
-      case name1:
-        number = 1;
+      case nameHeader:
+        node = nameValue;
         break;
-      case position:
-        number = 3;
+      case positionHeader:
+        node = positionValue;
         break;
-      case office:
-        number = 5;
+      case officeHeader:
+        node = officeValue;
         break;
-      case age:
-        number = 7;
+      case ageHeader:
+        node = ageValue;
         break;
-      case salary:
-        number = 9;
+      case salaryHeader:
+        node = salaryValue;
 
-        callback = (a, b) => b.childNodes[number].textContent
-          .slice(1).split(',').join('')
-                - a.childNodes[number].textContent
-                  .slice(1).split(',').join('');
+        callback = sortSalaryCallback;
         break;
     }
 
     const result = [...rows].sort(callback);
 
-    for (const tr in result) {
-      if (result[tr].parentElement === tbody) {
-        tbody.append(result[tr]);
+    for (const tableRow in result) {
+      if (result[tableRow].parentElement === tbody) {
+        tbody.append(result[tableRow]);
       }
     }
   }
 
-  function sortASC() {
-    let number = null;
-    let callback = (a, b) => a.childNodes[number].textContent
-      .localeCompare(b.childNodes[number].textContent);
-
-    switch (e.target) {
-      case name1:
-        number = 1;
-        break;
-      case position:
-        number = 3;
-        break;
-      case office:
-        number = 5;
-        break;
-      case age:
-        number = 7;
-        break;
-      case salary:
-        number = 9;
-
-        callback = (a, b) => a.childNodes[number].textContent
-          .slice(1).split(',').join('')
-                - b.childNodes[number].textContent
-                  .slice(1).split(',').join('');
-        break;
-    }
-
-    const result = [...rows].sort(callback);
-
-    for (const tr in result) {
-      if (result[tr].parentElement === tbody) {
-        tbody.append(result[tr]);
+  switch (e.target) {
+    case nameHeader:
+      if (obj.name === 'ASC') {
+        sortColumn(sortDescCallback, sortSalaryDescCallback);
+        obj.name = 'DESC';
+      } else if (obj.name === 'DESC' || obj.name === null) {
+        sortColumn(sortAscCallback, sortSalaryAscCallback);
+        obj.name = 'ASC';
       }
-    }
-  }
-
-  if (e.target === name1) {
-    if (obj.name === 'ASC') {
-      sortDESC();
-      obj.name = 'DESC';
-    } else if (obj.name === 'DESC' || obj.name === null) {
-      sortASC();
-      obj.name = 'ASC';
-    }
-  } else if (e.target === position) {
-    if (obj.position === 'ASC') {
-      sortDESC();
-      obj.position = 'DESC';
-    } else if (obj.position === 'DESC' || obj.position === null) {
-      sortASC();
-      obj.position = 'ASC';
-    }
-  } else if (e.target === office) {
-    if (obj.office === 'ASC') {
-      sortDESC();
-      obj.office = 'DESC';
-    } else if (obj.office === 'DESC' || obj.office === null) {
-      sortASC();
-      obj.office = 'ASC';
-    }
-  } else if (e.target === age) {
-    if (obj.age === 'ASC') {
-      sortDESC();
-      obj.age = 'DESC';
-    } else if (obj.age === 'DESC' || obj.age === null) {
-      sortASC();
-      obj.age = 'ASC';
-    }
-  } else if (e.target === salary) {
-    if (obj.salary === 'ASC') {
-      sortDESC();
-      obj.salary = 'DESC';
-    } else if (obj.salary === 'DESC' || obj.salary === null) {
-      sortASC();
-      obj.salary = 'ASC';
-    }
+      break;
+    case positionHeader:
+      if (obj.position === 'ASC') {
+        sortColumn(sortDescCallback, sortSalaryDescCallback);
+        obj.position = 'DESC';
+      } else if (obj.position === 'DESC' || obj.position === null) {
+        sortColumn(sortAscCallback, sortSalaryAscCallback);
+        obj.position = 'ASC';
+      }
+      break;
+    case officeHeader:
+      if (obj.office === 'ASC') {
+        sortColumn(sortDescCallback, sortSalaryDescCallback);
+        obj.office = 'DESC';
+      } else if (obj.office === 'DESC' || obj.office === null) {
+        sortColumn(sortAscCallback, sortSalaryAscCallback);
+        obj.office = 'ASC';
+      }
+      break;
+    case ageHeader:
+      if (obj.age === 'ASC') {
+        sortColumn(sortDescCallback, sortSalaryDescCallback);
+        obj.age = 'DESC';
+      } else if (obj.age === 'DESC' || obj.age === null) {
+        sortColumn(sortAscCallback, sortSalaryAscCallback);
+        obj.age = 'ASC';
+      }
+      break;
+    case salaryHeader:
+      if (obj.salary === 'ASC') {
+        sortColumn(sortDescCallback, sortSalaryDescCallback);
+        obj.salary = 'DESC';
+      } else if (obj.salary === 'DESC' || obj.salary === null) {
+        sortColumn(sortAscCallback, sortSalaryAscCallback);
+        obj.salary = 'ASC';
+      }
+      break;
   }
 });
 
-// 2
 tbody.addEventListener('click', (e) => {
-  const tr = e.target.parentElement;
-  const all = tbody.querySelectorAll('tr');
+  const tableRow = e.target.parentElement;
+  const allTableRows = tbody.querySelectorAll('tr');
 
-  for (const currentTr of all) {
-    if (currentTr.className === 'active') {
-      currentTr.classList.remove('active');
+  for (const currentRow of allTableRows) {
+    if (currentRow.className === 'active') {
+      currentRow.classList.remove('active');
     }
   }
 
-  tr.classList.toggle('active');
+  tableRow.classList.toggle('active');
 });
 
-// 3
 const form = document.createElement('form');
 
 form.className = 'new-employee-form';
@@ -159,20 +144,20 @@ form.className = 'new-employee-form';
 const body = document.querySelector('body');
 const data = ['name', 'position', 'office', 'age', 'salary'];
 
-for (const i of data) {
+for (const header of data) {
   const label = document.createElement('label');
   const input = document.createElement('input');
 
-  if (i === 'office') {
+  if (header === 'office') {
     const cities = ['Tokyo', 'Singapore', 'London', 'New York',
       'Edinburgh', 'San Francisco'];
 
     const select = document.createElement('select');
 
-    select.name = i;
-    select.dataset.qa = i;
+    select.name = header;
+    select.dataset.qa = header;
 
-    label.textContent = i[0].toUpperCase() + i.slice(1) + ':';
+    label.textContent = header[0].toUpperCase() + header.slice(1) + ':';
 
     for (const city of cities) {
       const option = document.createElement('option');
@@ -187,15 +172,15 @@ for (const i of data) {
     label.append(select);
     form.append(label);
   } else {
-    label.textContent = i[0].toUpperCase() + i.slice(1) + ':';
-    input.name = i;
+    label.textContent = header[0].toUpperCase() + header.slice(1) + ':';
+    input.name = header;
     input.type = 'text';
 
-    if (i === 'age' || i === 'salary') {
+    if (header === 'age' || header === 'salary') {
       input.type = 'number';
     }
 
-    input.dataset.qa = i;
+    input.dataset.qa = header;
 
     input.setAttribute('required', '');
 
@@ -210,7 +195,6 @@ button.textContent = 'Save to table';
 form.append(button);
 body.append(form);
 
-// 4)
 const titleError = 'Error!';
 const titleSuccess = 'Success';
 const descriptionError = 'The employee has not been added to the table.';
@@ -286,34 +270,32 @@ button.addEventListener('click', (e) => {
     }
 
     tbody.append(tr);
-
     pushNotification('success', titleSuccess, descriptionSuccess);
   }
 
   e.preventDefault();
 });
 
-// 5)
-const tds = tbody.querySelectorAll('td');
+const cells = tbody.querySelectorAll('td');
 
-for (let i = 0; i < tds.length; i++) {
-  tds[i].addEventListener('dblclick', () => {
+for (let i = 0; i < cells.length; i++) {
+  cells[i].addEventListener('dblclick', () => {
     const input = document.createElement('input');
 
     input.classList.add('.cell-input');
 
-    input.value = tds[i].innerHTML;
-    tds[i].innerHTML = '';
-    tds[i].appendChild(input);
+    input.value = cells[i].innerHTML;
+    cells[i].innerHTML = '';
+    cells[i].appendChild(input);
     input.focus();
 
     function updateValue(inputParam, startValueParam) {
       const newValue = inputParam.value;
 
       if (newValue === '') {
-        tds[i].textContent = startValueParam;
+        cells[i].textContent = startValueParam;
       } else {
-        tds[i].textContent = newValue;
+        cells[i].textContent = newValue;
       }
     }
 
