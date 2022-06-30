@@ -165,6 +165,10 @@ tbody.addEventListener('dblclick', (et) => {
   const tdInput = document.createElement('input');
   const td = et.target;
 
+  if (td.cellIndex === 2) {
+    return;
+  }
+
   text = td.textContent;
 
   tdInput.className = 'cell-input';
