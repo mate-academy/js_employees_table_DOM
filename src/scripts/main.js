@@ -163,12 +163,10 @@ let text = '';
 
 tbody.addEventListener('dblclick', (et) => {
   const tdInput = document.createElement('input');
+  let tdSelect = document.createElement('select');
   const td = et.target;
 
-  if (td.cellIndex === 2) {
-    return;
-  }
-
+  tdSelect = document.querySelector('select').cloneNode(true);
   text = td.textContent;
 
   tdInput.className = 'cell-input';
@@ -179,6 +177,22 @@ tbody.addEventListener('dblclick', (et) => {
   if (td.cellIndex === 3 || td.cellIndex === 4) {
     tdInput.type = 'number';
   }
+
+  if (td.cellIndex === 2) {
+    td.innerHTML = '';
+    td.append(tdSelect);
+  }
+
+  tdSelect.addEventListener('blur', () => {
+    td.innerHTML = tdSelect.value;
+  });
+
+  tdSelect.addEventListener('keydown', (e) => {
+    if (e.code !== 'Enter') {
+      return;
+    }
+    td.innerHTML = tdSelect.value;
+  });
 
   tdInput.addEventListener('blur', () => {
     td.innerHTML = tdInput.value;
