@@ -68,3 +68,14 @@ const transform = (type, content) => {
     sortColumn(index);
   });
 });
+
+const rowss = [...tbody.querySelectorAll('tr')];
+
+rowss.forEach(row => {
+  row.addEventListener('click', () => {
+    rowss.forEach(el => {
+      el.style.background = '';
+      row.style.background = '#cbcbcb';
+    });
+  });
+});
