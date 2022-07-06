@@ -156,6 +156,10 @@ function addEmployee() {
 
   pushNotification(10, 10, 'Success',
     'A new employee added to the table.', 'success');
+
+  [...form.elements].map(el => {
+    el.value = '';
+  });
 };
 
 // double-clicking
