@@ -121,20 +121,21 @@ button.addEventListener('click', (et) => {
 });
 
 function validateForm() {
-  if (form.elements[0].textLength < 4) {
+  if (form.elements[0].value.length < 4) {
     return pushNotification(10, 310, 'Error',
-      'Fill in the field.', 'error');
+      'Fill in the field min 4 letter.', 'error');
+  }
+
+  if (form.elements[1].value.length <= 0
+    || form.elements[3].value.length <= 0
+    || form.elements[4].value.length <= 0) {
+    return pushNotification(10, 310, 'Error',
+      'All fields are required.', 'error');
   }
 
   if (form.elements[3].value < 18 || form.elements[3].value > 90) {
     return pushNotification(10, 310, 'Error',
       'Age value is less than 18 or more than 90.', 'error');
-  }
-
-  if (!form.elements[0].textLength || !form.elements[1].textLength
-    || !form.elements[3].textLength || !form.elements[4].textLength) {
-    return pushNotification(10, 310, 'Error',
-      'All fields are required.', 'error');
   }
 
   addEmployee();
