@@ -129,8 +129,6 @@ form.addEventListener('submit', (e) => {
 
   // Check INPUT_NAME ==================================================
   if (newEmployee.name.length <= 4) {
-    // div.classList.add('error');
-
     notification('error',
       'Attention', 'Name string length is less than 5 letters');
 
@@ -239,12 +237,27 @@ tbody.addEventListener('dblclick', (e) => {
 
       if (target.cellIndex <= 2) {
         if (myNewInput.value.length < 4) {
+          target.textContent = textBeforCorect;
+
           notification('warning',
             'Attention', 'Name string length is less than 5 letters');
-
-          target.textContent = textBeforCorect;
         } else {
           target.textContent = myNewInput.value;
+        }
+      }
+
+      if (target.cellIndex === 1) {
+        const inputPosition = [...myNewInput.value];
+
+        for (const ch of inputPosition) {
+          if (ch === ' ') {
+            continue;
+          } else if (isNaN(Number(ch)) === false) {
+            notification('error',
+              'Attention', 'The POSITION has numbers, it is impossible');
+
+            target.textContent = textBeforCorect;
+          }
         }
       }
 
@@ -264,7 +277,21 @@ tbody.addEventListener('dblclick', (e) => {
             target.textContent = textBeforCorect;
             break;
         }
-        target.textContent = myNewInput.value;
+
+        const inputAge = [...myNewInput.value];
+
+        for (const ch of inputAge) {
+          if (ch === ' ') {
+            continue;
+          } else if (isNaN(Number(ch)) === true) {
+            notification('error',
+              'Attention', 'The AGE has STRING, it is impossible');
+
+            target.textContent = textBeforCorect;
+          } else {
+            target.textContent = myNewInput.value;
+          }
+        }
       }
 
       if (target.cellIndex === 4) {
@@ -298,6 +325,21 @@ tbody.addEventListener('dblclick', (e) => {
       }
     }
 
+    if (target.cellIndex === 1) {
+      const inputPosition = [...myNewInput.value];
+
+      for (const ch of inputPosition) {
+        if (ch === ' ') {
+          continue;
+        } else if (isNaN(Number(ch)) === false) {
+          notification('error',
+            'Attention', 'The POSITION has numbers, it is impossible');
+
+          target.textContent = textBeforCorect;
+        }
+      }
+    }
+
     if (target.cellIndex === 3) {
       if (myNewInput.value <= 18) {
         target.textContent = textBeforCorect;
@@ -315,6 +357,21 @@ tbody.addEventListener('dblclick', (e) => {
           'Attention', 'You are enough old for this statistic table');
 
         return;
+      }
+
+      const inputAge = [...myNewInput.value];
+
+      for (const ch of inputAge) {
+        if (ch === ' ') {
+          continue;
+        } else if (isNaN(Number(ch)) === true) {
+          notification('error',
+            'Attention', 'The AGE has STRING, it is impossible');
+
+          target.textContent = textBeforCorect;
+        } else {
+          target.textContent = myNewInput.value;
+        }
       }
     }
 
