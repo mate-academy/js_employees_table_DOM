@@ -1,17 +1,24 @@
 'use strict';
-// отримуємо таблицю
 
 const table = document.querySelector('table');
 const headers = table.querySelectorAll('th');
 const tbody = table.querySelector('tbody');
+
+tbody.addEventListener('click', (ev) => {
+  const target = ev.target.closest('tr');
+
+  if (!target.classList.contains('active')) {
+    target.classList.toggle('active');
+  } else {
+    target.classList.toggle('active');
+  }
+});
 
 headers[0].setAttribute('data-type', 'text');
 headers[1].setAttribute('data-type', 'text');
 headers[2].setAttribute('data-type', 'text');
 headers[3].setAttribute('data-type', 'age');
 headers[4].setAttribute('data-type', 'salary');
-
-// створюю пустий масив і обхожу всі заголовки
 
 const directions = Array.from(headers).map(() => '');
 
@@ -50,7 +57,6 @@ const sortColumn = (index) => {
   });
 };
 
-// функція для конвертування
 const transform = (type, content) => {
   switch (type) {
     case 'age':
@@ -66,16 +72,5 @@ const transform = (type, content) => {
 [].forEach.call(headers, (header, index) => {
   header.addEventListener('click', () => {
     sortColumn(index);
-  });
-});
-
-const rowss = [...tbody.querySelectorAll('tr')];
-
-rowss.forEach(row => {
-  row.addEventListener('click', () => {
-    rowss.forEach(el => {
-      el.style.background = '';
-      row.style.background = '#cbcbcb';
-    });
   });
 });

@@ -54,12 +54,15 @@ nameInput.setAttribute('placeholder', 'Name');
 nameInput.setAttribute('required', true);
 
 nameInput.classList.add('req');
+nameInput.classList.add('numberless');
 
 positionInput.setAttribute('name', 'position');
 positionInput.setAttribute('type', 'text');
 positionInput.setAttribute('data-qa', 'position');
 positionInput.setAttribute('placeholder', 'Position');
+
 positionInput.classList.add('req');
+positionInput.classList.add('numberless');
 
 const ageLabel = document.createElement('label');
 const ageInput = document.createElement('input');
@@ -114,6 +117,17 @@ form.append(
 document.addEventListener('DOMContentLoaded', () => {
   const formData = document.getElementById('form');
   const tbody = document.querySelector('tbody');
+  const inputs = document.querySelectorAll('input');
+
+  const reg = /[0-9]/g;
+
+  for (const input of inputs) {
+    if (input.classList.contains('numberless')) {
+      input.oninput = () => {
+        input.value = input.value.replace(reg, '');
+      };
+    }
+  }
 
   const getValue = (e) => {
     e.preventDefault();
@@ -123,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const office = formData.querySelector('[data-qa="office"]');
     const age = formData.querySelector('[data-qa="age"]');
     const salary = formData.querySelector('[data-qa="salary"]');
-    const inputs = [...formData.querySelectorAll('.req')];
+    const req = [...formData.querySelectorAll('.req')];
 
     const values = {
       name: nameof.value,
@@ -135,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const tr = document.createElement('tr');
 
-    for (const input of inputs) {
+    for (const input of req) {
       if (input.value === '' && input.value.length < 4) {
         erro();
 
@@ -152,6 +166,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     tbody.append(tr);
+
+    formData.reset();
   };
 
   formData.addEventListener('submit', getValue);
