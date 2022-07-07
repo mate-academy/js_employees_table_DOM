@@ -176,7 +176,7 @@ const formHandler = () => {
     </label>
     <label>
       Position:
-      <input type="text" name ="position" data-qa="position" >
+      <input type="text" name ="position" data-qa="position"  >
     </label>
     <label>
       Office:
