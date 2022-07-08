@@ -249,13 +249,62 @@ tbody.addEventListener('dblclick', e => {
   }
 
   const cell = e.target;
-  const input = document.createElement('input');
+  let input = document.createElement('input');
   const initialText = cell.innerText;
+  let index;
+
+  for (let i = 0; i < cell.closest('tr').children.length; ++i) {
+    if (cell.closest('tr').children[i] === cell) {
+      index = i;
+
+      break;
+    }
+  }
 
   cell.innerText = '';
   input.type = 'text';
   input.classList.add('cell-input');
   input.value = initialText;
+
+  if (index === 2) {
+    input = document.createElement('select');
+    input.classList.add('cell-input');
+
+    input.insertAdjacentHTML('beforeend', `
+      <option value="Tokyo" ${initialText === 'Tokyo' ? 'selected' : ''}>
+        Tokyo
+      </option>
+
+      <option value="Singapore" ${initialText
+        === 'Singapore' ? 'selected' : ''}>
+        Singapore
+      </option>
+
+      <option value="London" ${initialText === 'London' ? 'selected' : ''}>
+        London
+      </option>
+
+      <option value="New York" ${initialText === 'New York' ? 'selected' : ''}>
+        New York
+      </option>
+
+      <option value="Edinburgh" ${initialText
+        === 'Edinburgh' ? 'selected' : ''}>
+        Edinburgh
+      </option>
+
+      <option value="San Francisco" ${initialText
+        === 'San Francisco' ? 'selected' : ''}>
+        San Francisco
+      </option>
+    `);
+  } else if (index > 2) {
+    input.type = 'number';
+
+    if (index > 3) {
+      input.value = initialText.replace(/\$|,/g, '');
+    }
+  }
 
   cell.append(input);
 
@@ -266,7 +315,16 @@ tbody.addEventListener('dblclick', e => {
   });
 
   input.addEventListener('blur', () => {
-    cell.innerText = input.value || initialText;
+    if (!input.value || (index === 0 && input.value.length < 4)
+      || (index === 3 && (+input.value < 18 || +input.value > 90))) {
+      cell.innerText = initialText;
+    } else {
+      if (index === 4) {
+        cell.innerText = `$${(+input.value).toLocaleString('en-US')}`;
+      } else {
+        cell.innerText = input.value;
+      }
+    }
 
     input.remove();
   });
