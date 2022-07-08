@@ -227,6 +227,65 @@ tbody.addEventListener('dblclick', (e) => {
 
   const myNewInput = document.querySelector('.cell-input');
 
+  // HELP_FUNCTION_FIND_NUMBER_IN_1,2,3_CELL_FORM===============================
+
+  function checkOnString(text) {
+    const inputPosition = [...text];
+
+    for (const letterInCell of inputPosition) {
+      if (letterInCell === ' ') {
+        continue;
+      } else if (isNaN(Number(letterInCell)) === false) {
+        notification('error',
+          'Attention', 'The input CELL has NUMBERS, it is impossible');
+
+        target.textContent = textBeforCorect;
+
+        return;
+      } else {
+        target.textContent = myNewInput.value;
+      }
+    }
+  }
+
+  // HELP_FUNCTION_FIND_STRING_IN_AGE_FORM===================================
+  function checkOnNumberSalaryAge(text) {
+    const inputAge = [...text];
+
+    for (const letterAge of inputAge) {
+      if (isNaN(Number(letterAge)) === true) {
+        notification('error',
+          'Attention', 'The AGE has LETTER(s), it is impossible');
+
+        target.textContent = textBeforCorect;
+
+        return;
+      } else {
+        target.textContent = myNewInput.value;
+      }
+    }
+  }
+
+  // HELP_FUNCTION_FIND_STRING_IN_SALARY_FORM===================================
+
+  function checkOnNumberSalary(text) {
+    const lettersArr = [...text];
+
+    for (const letter of lettersArr) {
+      if (isNaN(letter) === true) {
+        target.textContent = textBeforCorect;
+
+        notification('error',
+          'Attention', 'The SALARY has LETTER(s), it is impossible');
+
+        return;
+      } else {
+        target.textContent = '$'
+          + myNewInput.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
+    }
+  }
+
   // EFFECT_KEYDOWN===============================================
 
   newInput.addEventListener('keydown', (action) => {
@@ -244,21 +303,7 @@ tbody.addEventListener('dblclick', (e) => {
         } else {
           target.textContent = myNewInput.value;
         }
-      }
-
-      if (target.cellIndex === 1) {
-        const inputPosition = [...myNewInput.value];
-
-        for (const ch of inputPosition) {
-          if (ch === ' ') {
-            continue;
-          } else if (isNaN(Number(ch)) === false) {
-            notification('error',
-              'Attention', 'The POSITION has numbers, it is impossible');
-
-            target.textContent = textBeforCorect;
-          }
-        }
+        checkOnString(myNewInput.value);
       }
 
       if (target.cellIndex === 3) {
@@ -278,20 +323,7 @@ tbody.addEventListener('dblclick', (e) => {
             break;
         }
 
-        const inputAge = [...myNewInput.value];
-
-        for (const ch of inputAge) {
-          if (ch === ' ') {
-            continue;
-          } else if (isNaN(Number(ch)) === true) {
-            notification('error',
-              'Attention', 'The AGE has STRING, it is impossible');
-
-            target.textContent = textBeforCorect;
-          } else {
-            target.textContent = myNewInput.value;
-          }
-        }
+        checkOnNumberSalaryAge(myNewInput.value);
       }
 
       if (target.cellIndex === 4) {
@@ -304,6 +336,7 @@ tbody.addEventListener('dblclick', (e) => {
           target.textContent = '$'
             + myNewInput.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
+        checkOnNumberSalary(myNewInput.value);
       }
     }
   });
@@ -320,24 +353,8 @@ tbody.addEventListener('dblclick', (e) => {
           'Attention', 'Name string length is less than 5 letters');
 
         target.textContent = textBeforCorect;
-      } else {
-        target.textContent = myNewInput.value;
       }
-    }
-
-    if (target.cellIndex === 1) {
-      const inputPosition = [...myNewInput.value];
-
-      for (const ch of inputPosition) {
-        if (ch === ' ') {
-          continue;
-        } else if (isNaN(Number(ch)) === false) {
-          notification('error',
-            'Attention', 'The POSITION has numbers, it is impossible');
-
-          target.textContent = textBeforCorect;
-        }
-      }
+      checkOnString(myNewInput.value);
     }
 
     if (target.cellIndex === 3) {
@@ -359,20 +376,7 @@ tbody.addEventListener('dblclick', (e) => {
         return;
       }
 
-      const inputAge = [...myNewInput.value];
-
-      for (const ch of inputAge) {
-        if (ch === ' ') {
-          continue;
-        } else if (isNaN(Number(ch)) === true) {
-          notification('error',
-            'Attention', 'The AGE has STRING, it is impossible');
-
-          target.textContent = textBeforCorect;
-        } else {
-          target.textContent = myNewInput.value;
-        }
-      }
+      checkOnNumberSalaryAge(myNewInput.value);
     }
 
     if (target.cellIndex === 4) {
@@ -385,6 +389,7 @@ tbody.addEventListener('dblclick', (e) => {
         target.textContent = '$'
           + myNewInput.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       }
+      checkOnNumberSalary(myNewInput.value);
     }
   });
 });
