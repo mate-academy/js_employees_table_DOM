@@ -161,8 +161,6 @@ form.addEventListener('click', (e) => {
 });
 
 // Implement editing of table
-let currentInput = null;
-
 body.addEventListener('dblclick', (e) => {
   if (e.target.tagName !== 'TD') {
     return;
@@ -175,23 +173,17 @@ body.addEventListener('dblclick', (e) => {
   `;
 
   const input = cell.querySelector('input');
-
-  if (currentInput) {
-    currentInput.dispatchEvent(new KeyboardEvent('blur'));
-  }
-  currentInput = input;
+  input.focus();
 
   input.addEventListener('blur', () => {
     input.remove();
     cell.textContent = input.value;
-    currentInput = null;
   });
 
-  input.addEventListener('keydown', () => {
-    if (e.key === 'Enter') {
+  input.addEventListener('keydown', (el) => {
+    if (el.key === 'Enter') {
       input.remove();
       cell.textContent = input.value;
-      currentInput = null;
     }
   });
 });
