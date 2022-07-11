@@ -51,7 +51,6 @@ nameInput.setAttribute('name', 'name');
 nameInput.setAttribute('type', 'text');
 nameInput.setAttribute('data-qa', 'name');
 nameInput.setAttribute('placeholder', 'Name');
-nameInput.setAttribute('required', true);
 
 nameInput.classList.add('req');
 nameInput.classList.add('numberless');
@@ -61,7 +60,6 @@ positionInput.setAttribute('type', 'text');
 positionInput.setAttribute('data-qa', 'position');
 positionInput.setAttribute('placeholder', 'Position');
 
-positionInput.classList.add('req');
 positionInput.classList.add('numberless');
 
 const ageLabel = document.createElement('label');
@@ -71,9 +69,10 @@ const ageText = document.createTextNode('Age');
 ageInput.setAttribute('name', 'age');
 ageInput.setAttribute('type', 'number');
 ageInput.setAttribute('data-qa', 'age');
+ageInput.setAttribute('placeholder', 'Age');
 ageInput.setAttribute('min', 18);
 ageInput.setAttribute('max', 90);
-ageInput.setAttribute('placeholder', 'Age');
+
 ageInput.classList.add('req');
 
 ageLabel.append(ageText, ageInput);
@@ -87,7 +86,6 @@ salaryInput.setAttribute('name', 'salary');
 salaryInput.setAttribute('type', 'number');
 salaryInput.setAttribute('data-qa', 'salary');
 salaryInput.setAttribute('placeholder', 'Salary');
-salaryInput.classList.add('req');
 
 salaryInput.style.cssText = 'appearance: textfield';
 
@@ -119,6 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const tbody = document.querySelector('tbody');
   const inputs = document.querySelectorAll('input');
 
+  inputs.forEach(input => input.setAttribute('required', true));
+
   const reg = /[0-9]/g;
 
   for (const input of inputs) {
@@ -137,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const office = formData.querySelector('[data-qa="office"]');
     const age = formData.querySelector('[data-qa="age"]');
     const salary = formData.querySelector('[data-qa="salary"]');
-    const req = [...formData.querySelectorAll('.req')];
 
     const values = {
       name: nameof.value,
@@ -147,27 +146,22 @@ document.addEventListener('DOMContentLoaded', () => {
       salary: salary.value,
     };
 
-    const tr = document.createElement('tr');
+    if (nameof.value.length < 4) {
+      return erro();
+    } else {
+      const tr = document.createElement('tr');
 
-    for (const input of req) {
-      if (input.value === '' && input.value.length < 4) {
-        erro();
+      tr.innerHTML = `<td>${values.name}</td>
+      <td>${values.position}</td>
+      <td>${values.office}</td>
+      <td>${values.age}</td>
+      <td>$${new Intl.NumberFormat('en-En').format(values.salary)}</td>
+      `;
 
-        return;
-      } else if (input.value !== '' && input.value.length > 4) {
-        tr.innerHTML = `<td>${values.name}</td>
-        <td>${values.position}</td>
-        <td>${values.office}</td>
-        <td>${values.age}</td>
-        <td>$${new Intl.NumberFormat('en-En').format(values.salary)}</td>
-        `;
-        sucsess();
-      }
+      tbody.append(tr);
+
+      return sucsess();
     }
-
-    tbody.append(tr);
-
-    formData.reset();
   };
 
   formData.addEventListener('submit', getValue);
@@ -181,7 +175,7 @@ const erro = () => {
 
   const description = document.createElement('p');
 
-  description.textContent = 'Name shold be not less than 4 sumbols';
+  description.textContent = 'Name should not be less than 4 sumbols';
 
   error.append(title, description);
 
