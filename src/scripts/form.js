@@ -159,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
       tbody.append(tr);
+      formData.reset();
 
       return sucsess();
     }
