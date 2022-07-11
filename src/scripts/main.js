@@ -4,14 +4,15 @@ const table = document.querySelector('table');
 const headers = table.querySelectorAll('th');
 const tbody = table.querySelector('tbody');
 
-tbody.addEventListener('click', (ev) => {
-  const target = ev.target.closest('tr');
+tbody.addEventListener('click', () => {
+  const tr = tbody.querySelectorAll('tr');
 
-  if (!target.classList.contains('active')) {
-    target.classList.toggle('active');
-  } else {
-    target.classList.toggle('active');
-  }
+  tr.forEach(row => {
+    row.addEventListener('click', () => {
+      tr.forEach(item => item.classList.remove('active'));
+      row.classList.add('active');
+    });
+  });
 });
 
 headers[0].setAttribute('data-type', 'text');
