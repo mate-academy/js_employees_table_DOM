@@ -18,21 +18,8 @@ function stringToSalary(string) {
   return '$' + string.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
 }
 
-tableHeader.addEventListener('click', (e) => {
-  const element = e.target.closest('th');
-  const cols = table.querySelectorAll('thead th');
-  const index = [...cols].indexOf(element);
-  const sortedRows = [...tableBody.querySelectorAll('tr')];
-
-  clickCounter++;
-
-  if (checkElement !== element) {
-    clickCounter = 1;
-  }
-
-  checkElement = element;
-
-  sortedRows.sort((a, b) => {
+function sortRow(sortingRow, element, index) {
+  sortingRow.sort((a, b) => {
     const elementA = a.children[index].innerText;
     const elementB = b.children[index].innerText;
 
@@ -48,6 +35,23 @@ tableHeader.addEventListener('click', (e) => {
         : elementB.localeCompare(elementA);
     }
   });
+}
+
+tableHeader.addEventListener('click', (e) => {
+  const element = e.target.closest('th');
+  const cols = table.querySelectorAll('thead th');
+  const index = [...cols].indexOf(element);
+  const sortedRows = [...tableBody.querySelectorAll('tr')];
+
+  clickCounter++;
+
+  if (checkElement !== element) {
+    clickCounter = 1;
+  }
+
+  checkElement = element;
+
+  sortRow(sortedRows, element, index);
 
   tableBody.append(...sortedRows);
 });
