@@ -4,6 +4,15 @@ const tableHeader = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
 let sorted = false;
 
+const formOptions = `
+  <option value="Tokyo">Tokyo</option>
+  <option value="Singapore">Singapore</option>
+  <option value="London">London</option>
+  <option value="New York">New York</option>
+  <option value="Edinburgh">Edinburgh</option>
+  <option value="San Francisco">San Francisco</option>
+`;
+
 const sortRows = function(index) {
   const sortedRows = [...tableBody.rows].sort((rowA, rowB) => {
     const cellA = rowA.cells[index].innerText;
@@ -84,12 +93,7 @@ document.body.insertAdjacentHTML('beforeend', `
         data-qa="office"
         required
       >
-        <option value="Tokyo">Tokyo</option>
-        <option value="Singapore">Singapore</option>
-        <option value="London">London</option>
-        <option value="New York">New York</option>
-        <option value="Edinburgh">Edinburgh</option>
-        <option value="San Francisco">San Francisco</option>
+        ${formOptions}
       </select>
     </label>
 
@@ -182,4 +186,67 @@ form.addEventListener('submit', e => {
     'Employee has been added successfully!', 'success');
   tableBody.append(newRow);
   form.reset();
+});
+
+tableBody.addEventListener('dblclick', e => {
+  const cell = e.target;
+  const index = e.target.cellIndex;
+  const initialText = cell.innerText;
+  const input = index === 2
+    ? document.createElement('select')
+    : document.createElement('input');
+
+  cell.innerText = '';
+  input.classList.add('cell-input');
+  input.value = initialText;
+
+  switch (index) {
+    case 2:
+      const options = `<option value="${initialText}">${initialText}</option>`
+       + formOptions;
+
+      input.insertAdjacentHTML('beforeend', options);
+      break;
+    case 3:
+      input.type = 'number';
+      break;
+    case 4:
+      input.value = initialText.replace(/[^0-9]/g, '');
+      input.type = 'number';
+      break;
+  }
+
+  cell.append(input);
+  input.focus();
+
+  input.addEventListener('keypress', (keyEvent) => {
+    if (keyEvent.code === 'Enter') {
+      input.blur();
+    }
+  });
+
+  input.addEventListener('blur', () => {
+    let valid;
+
+    switch (index) {
+      case 0:
+        valid = isValid('name', input.value);
+        break;
+      case 3:
+        valid = isValid('age', input.value);
+        break;
+      default:
+        valid = true;
+    }
+
+    if (!valid) {
+      cell.innerText = initialText;
+    } else {
+      cell.innerText = index === 4
+        ? `$${(+input.value).toLocaleString('en-US')}`
+        : input.value;
+    }
+
+    input.remove();
+  });
 });
