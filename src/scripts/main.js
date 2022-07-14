@@ -212,6 +212,8 @@ form.innerHTML = `
   <button type="submit">Save to table</button>
 `;
 
+body.insertBefore(form, body.lastElementChild);
+
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
