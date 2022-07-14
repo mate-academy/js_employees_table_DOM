@@ -8,6 +8,14 @@ const body = document.querySelector('body');
 const offices = ['Tokyo', 'Singapore',
   'London', 'New York', 'Edinburgh', 'San Francisco'];
 
+let ascOrder = true;
+let currentTitle;
+let currentRow;
+
+for (const header of headers) {
+  header.className = 'header';
+}
+
 const pushNotification = (title, description, type) => {
   const message = document.createElement('div');
 
@@ -33,12 +41,66 @@ const convertToNumber = (string) => {
   return +string.split('$').join('').split(',').join('');
 };
 
-for (const header of headers) {
-  header.className = 'header';
-}
+const convertToCorrectFormat = (string) => {
+  return (+string).toFixed(3).split('.').join(',');
+};
 
-let ascOrder = true;
-let currentTitle;
+const editorOfCell = (cell, input, initialValue) => {
+  if (!input.value.length) {
+    cell.innerText = initialValue;
+    input.remove();
+  } else if (input.value[0] === ' ') {
+    pushNotification('Warning!!!', 'Provide correct data', 'warning');
+    cell.innerText = initialValue;
+    input.remove();
+  } else {
+    cell.innerText = input.value;
+    input.remove();
+  }
+
+  switch (headers[cell.cellIndex].innerText) {
+    case 'Name':
+      if (input.value.length < 4 && !input.value.includes(' ')) {
+        pushNotification('Warning!!!',
+          'Name should contain min 4 letter', 'warning');
+
+        cell.innerText = initialValue;
+      }
+      break;
+
+    case 'Age':
+      if ((isNaN(input.value) && !input.value.includes(' ')) || !input.value) {
+        pushNotification('Warning!!!', 'Provide correct age', 'warning');
+        cell.innerText = initialValue;
+      } else if (input.value < 18 && !input.value.includes(' ')) {
+        pushNotification('Warning!!!', 'Min age is 18', 'warning');
+        cell.innerText = initialValue;
+      } else if (input.value > 90 && !input.value.includes(' ')) {
+        pushNotification('Warning!!!', 'Max age is 90', 'warning');
+        cell.innerText = initialValue;
+      }
+      break;
+
+    case 'Office':
+      if (!offices.includes(input.value) && !input.value.includes(' ')) {
+        pushNotification('Warning!!!', 'Provide correct location', 'warning');
+        cell.innerText = initialValue;
+      }
+      break;
+
+    case 'Salary':
+      if (((isNaN(input.value) && !input.value.includes(' '))
+        || input.value === '0')) {
+        pushNotification('Warning!!!', 'Provide correct salary', 'warning');
+        cell.innerText = initialValue;
+      } else if (input.value.includes(' ')) {
+        break;
+      } else {
+        cell.innerText = `$${convertToCorrectFormat(input.value)}`;
+      }
+      break;
+  }
+};
 
 table.addEventListener('click', (e) => {
   const header = e.target.closest('.header');
@@ -75,8 +137,6 @@ table.addEventListener('click', (e) => {
   tbody.innerHTML = '';
   rows.forEach(row => tbody.append(row));
 });
-
-let currentRow;
 
 tbody.addEventListener('click', (e) => {
   const row = e.target.closest('tr');
@@ -145,14 +205,12 @@ form.innerHTML = `
       name="salary"
       type="number"
       data-qa="salary"
-      placeholder="in US dollar"
+      placeholder="thousand US dollar"
       required>
   </label>
 
   <button type="submit">Save to table</button>
 `;
-
-body.insertBefore(form, body.lastElementChild);
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -168,7 +226,7 @@ form.addEventListener('submit', (e) => {
     <td>${position}</td>
     <td>${office}</td>
     <td>${age}</td>
-    <td>$${salary.toLocaleString('en-US').split('.').join(',')}</td>
+    <td>$${convertToCorrectFormat(salary)}</td>
   `;
 
   if (entries.name.length < 4) {
@@ -187,63 +245,6 @@ form.addEventListener('submit', (e) => {
     form.reset();
   }
 });
-
-const editorOfCell = (cell, input, initialValue) => {
-  if (!input.value.length) {
-    cell.innerText = initialValue;
-    input.remove();
-  } else if (input.value[0] === ' ') {
-    pushNotification('Warning!!!', 'Provide correct data', 'warning');
-    cell.innerText = initialValue;
-    input.remove();
-  } else {
-    cell.innerText = input.value;
-    input.remove();
-  }
-
-  switch (headers[cell.cellIndex].innerText) {
-    case 'Name':
-      if (input.value.length < 4 && !input.value.includes(' ')) {
-        pushNotification('Warning!!!',
-          'Name should contain min 4 letter', 'warning');
-
-        cell.innerText = initialValue;
-      }
-      break;
-
-    case 'Age':
-      if ((isNaN(input.value) && !input.value.includes(' ')) || !input.value) {
-        pushNotification('Warning!!!', 'Provide correct age', 'warning');
-        cell.innerText = initialValue;
-      } else if (input.value < 18 && !input.value.includes(' ')) {
-        pushNotification('Warning!!!', 'Min age is 18', 'warning');
-        cell.innerText = initialValue;
-      } else if (input.value > 90 && !input.value.includes(' ')) {
-        pushNotification('Warning!!!', 'Max age is 90', 'warning');
-        cell.innerText = initialValue;
-      }
-      break;
-
-    case 'Office':
-      if (!offices.includes(input.value) && !input.value.includes(' ')) {
-        pushNotification('Warning!!!', 'Provide correct location', 'warning');
-        cell.innerText = initialValue;
-      }
-      break;
-
-    case 'Salary':
-      if (((isNaN(input.value) && !input.value.includes(' '))
-        || input.value === '0')) {
-        pushNotification('Warning!!!', 'Provide correct salary', 'warning');
-        cell.innerText = initialValue;
-      } else if (input.value.includes(' ')) {
-        break;
-      } else {
-        cell.innerText = `$${(+input.value).toFixed(3).split('.').join(',')}`;
-      }
-      break;
-  }
-};
 
 tbody.addEventListener('dblclick', (e) => {
   const cell = e.target.closest('td');
