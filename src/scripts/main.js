@@ -226,32 +226,24 @@ tbody.addEventListener('dblclick', (eventClick) => {
   });
 
   newInput.addEventListener('blur', () => {
-    switch (true) {
-      case newInput.value.length === 0:
-        pushNotification(10, 10, 'Error',
-          'Name must be at least 4 letters', 'error');
-        eventClick.target.innerText = tdInnerText;
-        break;
+    if (newInput.value.length === 0) {
+      pushNotification(10, 10, 'Error',
+        'Name must be at least 4 letters', 'error');
+      eventClick.target.innerText = tdInnerText;
+    } else if (cellIndex === 0 && newInput.value.length < 4) {
+      pushNotification(10, 10, 'Error',
+        'Name must be at least 4 letters', 'error');
+      eventClick.target.innerText = tdInnerText;
+    } else if (cellIndex === 3 && (newInput.value < 18
+      || newInput.value > 90)) {
+      pushNotification(10, 10, 'Error',
+        'Age can\'t be less than 18 or more than 90', 'error');
+      eventClick.target.innerText = tdInnerText;
+    } else {
+      eventClick.target.innerText = newInput.value;
 
-      case cellIndex === 0 && newInput.value.length < 4:
-        pushNotification(10, 10, 'Error',
-          'Name must be at least 4 letters', 'error');
-        eventClick.target.innerText = tdInnerText;
-        break;
-
-      case cellIndex === 3 && (newInput.value < 18
-        || newInput.value > 90):
-        pushNotification(10, 10, 'Error',
-          'Age can\'t be less than 18 or more than 90', 'error');
-        eventClick.target.innerText = tdInnerText;
-        break;
-
-      default:
-        eventClick.target.innerText = newInput.value;
-
-        pushNotification(10, 10, 'Congratulations',
-          'Employee has been changed successfully!', 'success');
-        break;
+      pushNotification(10, 10, 'Congratulations',
+        'Employee has been changed successfully!', 'success');
     }
 
     newInput.remove();
