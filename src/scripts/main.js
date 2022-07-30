@@ -134,6 +134,10 @@ form.addEventListener('click', (e) => {
       return el.value;
     });
 
+  if (inputValues.some(el => !el.length)) {
+    pushNotification('ERROR', 'All fields are required', 'error');
+  }
+
   if (inputValues.every(el => el.length)) {
     e.preventDefault();
 
@@ -173,6 +177,7 @@ body.addEventListener('dblclick', (e) => {
   `;
 
   const input = cell.querySelector('input');
+
   input.focus();
 
   input.addEventListener('blur', () => {
