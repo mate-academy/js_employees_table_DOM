@@ -7,6 +7,7 @@ const tBody = document.querySelector('tbody');
 const form = document.querySelector('.new-employee-form');
 
 let order = true;
+let prevColumnName = null;
 
 tHead.addEventListener('click', e => {
   const rows = [...tBody.rows];
@@ -23,20 +24,88 @@ tBody.addEventListener('dblclick', e => {
   const target = e.target.closest('td');
   const prevText = target.innerText;
   const input = document.createElement('input');
+  const select = document.createElement('select');
+  const nameCell = e.target.closest('tr').cells[0];
+  const positionCell = e.target.closest('tr').cells[1];
+  const officeCell = e.target.closest('tr').cells[2];
+  const ageCell = e.target.closest('tr').cells[3];
+  const salaryCell = e.target.closest('tr').cells[4];
 
-  input.classList.add('cell-input');
-  input.value = target.innerText;
-  target.innerText = '';
-  target.append(input);
-  input.focus();
+  if (officeCell === target) {
+    const optTokyo = new Option('Tokyo', 'Tokyo');
+    const optSingapore = new Option('Singapore', 'Singapore');
+    const optLondon = new Option('London', 'London');
+    const optNewYork = new Option('New York', 'New York');
+    const optEdinburgh = new Option('Edinburgh', 'Edinburgh');
+    const optSanFrancisco = new Option('San Francisco', 'San Francisco');
+
+    select.append(optTokyo, optSingapore, optLondon,
+      optNewYork, optEdinburgh, optSanFrancisco);
+
+    select.classList.add('cell-input');
+    select.selectedIndex = -1;
+    target.append(select);
+  } else {
+    input.classList.add('cell-input');
+    input.value = target.innerText;
+    target.innerText = '';
+    target.append(input);
+    input.focus();
+  }
+
+  select.addEventListener('change', (ev) => {
+    target.innerText = select.value;
+
+    select.blur();
+  });
 
   input.addEventListener('blur', () => {
+    // No empty or whitespaces regex
     if (/^\s*$/.test(input.value)) {
+      pushNotification('Invalid data', 'Field must contain data', 'error');
       target.innerText = prevText;
       input.remove();
 
       return;
     }
+
+    if (nameCell === target || positionCell === target) {
+      // Letters and whitespaces regex
+      if (!/^[a-zA-Z\s]*$/.test(input.value)) {
+        pushNotification('Invalid data',
+          'Field must contain just letters and whitespaces', 'error');
+        target.innerText = prevText;
+        input.remove();
+
+        return;
+      }
+    }
+
+    if (ageCell === target) {
+      // Numbers 18 - 90 range regex
+      if (!/^(18|[2-8][0-9]|90)$/.test(input.value)) {
+        pushNotification('Invalid data',
+          'Field must contain just numbers from 18 to 90', 'error');
+        target.innerText = prevText;
+        input.remove();
+
+        return;
+      }
+    }
+
+    if (salaryCell === target) {
+      // Just numbers regex
+      if (!/^\d+$/.test(input.value)) {
+        pushNotification('Invalid data',
+          'Field must contain just numbers without "$" and ","', 'error');
+        target.innerText = prevText;
+        input.remove();
+
+        return;
+      }
+      input.value = convertToCustomString(input.value);
+    }
+
     target.innerText = input.value;
     input.remove();
   });
@@ -111,7 +180,12 @@ function sortRows(arr, columnName) {
       break;
   }
 
+  if (columnName !== prevColumnName) {
+    order = true;
+  }
+
   order ? tBody.append(...sortedRows) : tBody.append(...sortedRows.reverse());
+  prevColumnName = columnName;
 }
 
 // Function converts salary string to number
