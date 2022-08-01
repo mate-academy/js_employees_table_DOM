@@ -120,15 +120,19 @@ const form = document.querySelector('.new-employee-form');
 
 function addNotification(type, description) {
   form.insertAdjacentHTML('afterend', `
-    <div class="notification" data-qa="notification">
+    <div class="notification">
       <h1 class="title"></h1>
       <p></p>
     </div>
   `);
 
+  // data-qa="notification"
+
   const notification = document.querySelector('.notification');
   const notificationTitle = notification.querySelector('.title');
   const notificationDescription = notification.querySelector('p');
+
+  notification.setAttribute('data-qa', 'notification');
 
   switch (type) {
     case 'error':
@@ -170,7 +174,7 @@ function validation(key, value) {
 
 function normalize(key, value) {
   return key === 'salary'
-    ? `$${(Number(value)).toLocaleString()}`
+    ? `$${(Number(value)).toLocaleString('en-US')}`
     : value;
 }
 
