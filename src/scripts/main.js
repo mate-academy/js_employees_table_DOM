@@ -92,8 +92,6 @@ table.insertAdjacentHTML('afterend', `
       </select>
     </label>
 
-
-
     <label>Age: <input
       name="age"
       type="number"
@@ -120,19 +118,15 @@ const form = document.querySelector('.new-employee-form');
 
 function addNotification(type, description) {
   form.insertAdjacentHTML('afterend', `
-    <div class="notification">
+    <div class="notification" data-qa="notification">
       <h1 class="title"></h1>
       <p></p>
     </div>
   `);
 
-  // data-qa="notification"
-
   const notification = document.querySelector('.notification');
   const notificationTitle = notification.querySelector('.title');
   const notificationDescription = notification.querySelector('p');
-
-  notification.setAttribute('data-qa', 'notification');
 
   switch (type) {
     case 'error':
