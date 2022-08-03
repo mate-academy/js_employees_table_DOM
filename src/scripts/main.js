@@ -87,127 +87,109 @@ list.addEventListener('click', (e) => {
 
 // form
 
-const form = document.createElement('form');
-
-document.body.append(form);
-form.classList.add('new-employee-form');
-
-const formFields = [
-  `<label>
-    Name:
-    <input
-      name="name"
-      type="text"
-      data-qa="name"
-      required
-    >
-  </label>`,
-  `<label>
-    Position:
-    <input
-      name="position"
-      type="text"
-      data-qa="position"
-      required
-    >
-  </label>`,
-  `<label>
-    Office:
-    <select
-      name="office"
-      data-qa="office"
-      required
-    >
-      <option value="Tokyo" selected>Tokyo</option>
-      <option value="Tokyo">Tokyo</option>
-      <option value="London">London</option>
-      <option value="New York">New York</option>
-      <option value="Edinburgh">Edinburgh</option>
-      <option value="San Francisco">San Francisco</option>
-    </select>
-  </label>`,
-  `<label>
-    Age:
-    <input
-      name="age"
-      type="number"
-      data-qa="age"
-      required
-    >
-  </label>`,
-  `<label>
-    Salary:
-    <input
-      name="salary"
-      type="number"
-      data-qa="salary"
-      required
-    >
-  </label>`,
-  `<button type="button">
-    Save to table
-  </button>`,
-];
-
-formFields.forEach(field => form.insertAdjacentHTML('beforeend', field));
+document.body.insertAdjacentHTML('beforeend', `
+  <form
+    action="#"
+    method="get"
+    class="new-employee-form"
+  >
+    <label>Name:
+      <input name="name" type="text" data-qa="name">
+    </label>
+    <label>Position:
+      <input name="position" type="text" data-qa="position">
+    </label>
+    <label>Office:
+      <select name="office" data-qa="office">
+        <option value="Tokyo">Tokyo</option>
+        <option value="Singapore">Singapore</option>
+        <option value="London">London</option>
+        <option value="New York">New York</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="San Francisco">San Francisco</option>
+      </select>
+    </label>
+    <label>Age:
+      <input
+        name="age"
+        type="number"
+        data-qa="age"
+        min=0
+      >
+    </label>
+    <label>Salary:
+      <input
+        name="salary"
+        type="number"
+        data-qa="salary"
+        min=0
+      >
+    </label>
+    <button type="submit">Save to table</button>
+  </form>
+`);
 
 // add new employees and validation
 
 const pushNotification = (title, description, type) => {
-  const h2 = document.createElement('h2');
-
-  h2.classList.add('title');
-  h2.textContent = title;
-
-  const p = document.createElement('p');
-
-  p.textContent = description;
-
-  const message = document.createElement('div');
-
-  message.setAttribute('data-qa', 'notification');
-  message.classList.add('notification', type);
-  message.append(h2, p);
-
-  document.body.append(message);
+  document.body.insertAdjacentHTML('beforeend', `
+    <div class="notification ${type}" data-qa="notification">
+      <h2 class="title">${title}</h2>
+      <p>${description}</p>
+  </div>
+  `);
 
   setTimeout(() => {
-    message.remove();
-  }, 6000);
+    document.body.removeChild(document.querySelector('.notification'));
+  }, 5000);
 };
 
-form.lastElementChild.addEventListener('click', (e) => {
-  if (form.elements.name.value.length < 4) {
-    pushNotification('ERROR!',
-      '`Name` input has less than 4 letters', 'error');
+function validationForm(key, value) {
+  if (!value) {
+    pushNotification('ERROR!', 'Empty field value', 'error');
 
-    return;
+    return false;
   }
 
-  if (form.elements.position.value.length === 0) {
-    pushNotification('ERROR!',
-      '`Enter position', 'error');
+  if (key === 'name' && value.length < 4) {
+    pushNotification('ERROR!', 'Invalid name value', 'error');
 
-    return;
+    return false;
   }
 
-  if (form.elements.age.value < 18
-    || form.elements.age.value > 90) {
-    pushNotification('ERROR!',
-      '`Age` input is less than 18 or more than 90', 'error');
+  if (key === 'age' && ((+value < 18 || +value > 90) || isNaN(+value))) {
+    pushNotification('ERROR!', 'Invalid age value', 'error');
 
-    return;
+    return false;
   }
 
-  list.insertAdjacentHTML('beforeend', `
-    <tr>
-      <td>${form.elements.name.value}</td>
-      <td>${form.elements.position.value}</td>
-      <td>${form.elements.office.value}</td>
-      <td>${form.elements.age.value}</td>
-      <td>$${(+form.elements.salary.value).toLocaleString()}</td>
-    </tr>
-  `);
+  return true;
+}
+
+const form = document.body.querySelector('.new-employee-form');
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const data = new FormData(e.target);
+
+  const newNode = document.createElement('tr');
+
+  for (const [key, value] of data) {
+    if (!validationForm(key, value)) {
+      return;
+    }
+
+    if (key === 'salary') {
+      newNode.insertAdjacentHTML('beforeend', `
+        <td>$${(+value).toLocaleString()}</td>
+      `);
+    } else {
+      newNode.insertAdjacentHTML('beforeend', `<td>${value}</td>`);
+    }
+  }
+
+  list.append(newNode);
 
   pushNotification('SUCCESS!',
     'New employee is successfully added to the table', 'success');
@@ -217,4 +199,35 @@ form.lastElementChild.addEventListener('click', (e) => {
 
 // editing of table cells
 
-// coming soon...
+list.addEventListener('dblclick', (e) => {
+  const target = e.target.closest('td');
+  const parentElement = target.parentElement;
+  const input = document.createElement('input');
+  const cellIndex = target.cellIndex;
+
+  input.classList.add('cell-input');
+  input.type = 'text';
+  parentElement.replaceChild(input, target);
+  input.focus();
+  input.value = target.innerText;
+
+  input.addEventListener('blur', (handler) => {
+    const key = header[cellIndex]
+      .innerText.toLowerCase();
+
+    if (validationForm(key, input.value)) {
+      target.innerText = input.value;
+    }
+
+    parentElement.replaceChild(target, input);
+    input.remove();
+  });
+
+  input.addEventListener('keydown', (handler) => {
+    if (handler.type === 'keydown' && handler.code !== 'Enter') {
+      return;
+    }
+
+    input.blur();
+  });
+});
