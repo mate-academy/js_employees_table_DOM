@@ -1,188 +1,189 @@
 'use strict';
 
-const table = document.querySelector('table');
-const tabBody = document.querySelector('tbody');
 const body = document.querySelector('body');
-
-table.addEventListener('click', eve => {
-  const item = eve.target.closest('th');
-  const idx = item.cellIndex;
-  let sortArr = [];
-
-  if (!('direction' in item)) {
-    item.direction = 'ASC';
-  }
-
-  if (item.direction === 'ASC') {
-    item.direction = 'DESC';
-
-    sortArr = [...tabBody.rows].sort((a, b) => {
-      const valueA = a.cells[idx].innerText.replace(/[$,]/g, '');
-      const valueB = b.cells[idx].innerText.replace(/[$,]/g, '');
-
-      if (isNaN(valueA)) {
-        return valueB.localeCompare(valueA);
-      } else {
-        return valueB - valueA;
-      };
-    });
-  }
-  tabBody.append(...sortArr);
-});
-
-tabBody.addEventListener('click', eve => {
-  eve.stopPropagation();
-
-  const row = eve.target.closest('tr');
-  const rowIsActive = document.querySelector('.active');
-
-  if (!rowIsActive) {
-    row.classList.add('active');
-  } else {
-    rowIsActive.classList.remove('active');
-    row.classList.add('active');
-  }
-});
-
-const addNotifications = (title, description, type) => {
-  const div = document.createElement('div');
-  const h2 = document.createElement('h2');
-  const p = document.createElement('p');
-
-  div.classList = 'notification';
-  div.dataset.qa = 'notification';
-  div.classList.add(type);
-  h2.classList = 'title';
-  h2.textContent = title;
-  p.textContent = description;
-  div.append(h2);
-  div.append(p);
-
-  h2.style.marginTop = '10px';
-  h2.style.marginBottom = '0';
-  p.style.marginTop = '10px';
-  p.style.marginBottom = '10px';
-
-  body.append(div);
-
-  setTimeout(() => {
-    div.remove();
-  }, 2000);
-};
+const table = body.querySelector('table');
+const tHead = table.querySelector('thead');
+const tBody = table.querySelector('tbody');
 
 body.insertAdjacentHTML('beforeend', `
-<form class="new-employee-form">
-  <label>Name: 
-    <input name="name"
-           type="text"
-           data-qa="name"
-           class="name"
-           required
-    >
-  </label>
-  <label>Position: 
-    <input name="position"
-           type="text"
-           data-qa="position"
-           class="position"
-           required
-    >
-  </label>
-  <label>Office: 
-    <select name="office"
-           data-qa="office"
-           class="office"
-           required
-    >
-    <option value="Tokyo">Tokyo</option>
-    <option value="Singapore">Singapore</option>
-    <option value="London">London</option>
-    <option value="New York">New York</option>
-    <option value="Edinburgh">Edinburgh</option>
-    <option value="San Francisco">San Francisco</option>
-    </select>
-  </label>
-  <label>Age: 
-    <input name="age"
-           type="number"
-           data-qa="age"
-           class="age"
-           required
-    >
-  </label>
-  <label>Salary: 
-    <input name="salary"
-           type="number"
-           data-qa="salary"
-           class="salary"
-           required
-    >
-  </label>
-  <button class="button" type="submit">Save to table</button>
-</form>
+  <form 
+    action="#"
+    method="get"
+    class="new-employee-form"
+  >
+    <label>Name:
+      <input name="name" type="text" data-qa="name">
+    </label>
+    <label>Position:
+      <input name="position" type="text" data-qa="position">
+    </label>
+    <label>Office:
+      <select name="office" data-qa="office">
+        <option value="Tokyo">Tokyo</option>
+        <option value="Singapore">Singapore</option>
+        <option value="London">London</option>
+        <option value="New York">New York</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="San Francisco">San Francisco</option>
+      </select>
+    </label>
+    <label>Age:
+      <input
+        name="age"
+        type="number"
+        data-qa="age"
+        min=0
+      >
+    </label>
+    <label>Salary:
+      <input
+        name="salary"
+        type="number"
+        data-qa="salary"
+        min=0
+      >
+    </label>
+    <button type="submit">Save to table</button>
+  </form>
 `);
 
-const forms = document.querySelector('form');
-const inputs = forms.querySelectorAll('input');
+function pushNotification(title, description, type) {
+  body.insertAdjacentHTML('beforeend', `
+    <div class="notification ${type}" data-qa="notification">
+      <h2 class="title">${title}</h2>
+      <p>${description}</p>
+  </div>
+  `);
 
-forms.addEventListener('submit', even => {
-  even.preventDefault();
+  setTimeout(() => {
+    body.removeChild(document.querySelector('.notification'));
+  }, 2000);
+}
 
-  const formData = new FormData(forms);
-  const tr = document.createElement('tr');
-  const formDataArr = [
-    formData.get('name'),
-    formData.get('position'),
-    formData.get('office'),
-    formData.get('age'),
-    formData.get('salary'),
-  ];
+function checkFormData(key, value) {
+  if (!value) {
+    pushNotification('An error occured', 'Empty field value', 'error');
 
-  if (formData.get('name').length < 4) {
-    addNotifications('Name is too short!',
-      'Name should have at least 4 letters.',
-      'error');
+    return false;
+  }
 
+  if (key === 'name' && value.length < 4) {
+    pushNotification('An error occured', 'Invalid name value', 'error');
+
+    return false;
+  }
+
+  if (key === 'age' && ((+value < 18 || +value > 90) || isNaN(+value))) {
+    pushNotification('An error occured', 'Invalid age value', 'error');
+
+    return false;
+  }
+
+  return true;
+}
+
+tHead.addEventListener('click', (e) => {
+  const index = e.target.cellIndex;
+  const isSorted = e.target.matches('.sorted');
+  const isSalary = e.target.innerText === 'Salary';
+
+  [...tBody.children]
+    .sort((a, b) => {
+      const aValue = isSalary
+        ? +(a.children[index].innerText.replaceAll(/\$|,/g, ''))
+        : a.children[index].innerText;
+      const bValue = isSalary
+        ? +(b.children[index].innerText.replaceAll(/\$|,/g, ''))
+        : b.children[index].innerText;
+
+      return aValue > bValue
+        ? isSorted ? -1 : 1
+        : aValue < bValue
+          ? isSorted ? 1 : -1
+          : 0;
+    })
+    .forEach(item => tBody.append(item));
+
+  e.target.classList.toggle('sorted', !isSorted);
+
+  [...tHead.firstElementChild.children].forEach(item => {
+    if (item !== e.target) {
+      item.classList.remove('sorted');
+    }
+  });
+});
+
+tBody.addEventListener('click', (e) => {
+  if (e.target.closest('tr').matches('.active')) {
     return;
   }
 
-  if (!formData.get('name') || !formData.get('position')
-    || !formData.get('age') || !formData.get('salary')) {
-    addNotifications('Something wrong...',
-      'All fields must be filled',
-      'error');
+  [...tBody.children].forEach(item => {
+    item.classList.remove('active');
+  });
 
-    return;
-  }
+  e.target.closest('tr').classList.toggle('active');
+});
 
-  if (formData.get('age') < 18 || formData.get('age') > 90) {
-    addNotifications('Age is incorrect',
-      'Age must be between 18 and 90',
-      'error');
+body.querySelector('.new-employee-form').addEventListener('submit', (e) => {
+  e.preventDefault();
 
-    return;
-  }
+  const data = new FormData(e.target);
 
-  for (let i = 0; i < formDataArr.length; i++) {
-    const td = document.createElement('td');
+  const newNode = document.createElement('tr');
 
-    if (i === formDataArr.length - 1) {
-      const num = parseInt(formDataArr[i]);
-
-      td.textContent = `$${num.toLocaleString('en-US')}`;
-    } else {
-      td.textContent = formDataArr[i];
+  for (const [key, value] of data) {
+    if (!checkFormData(key, value)) {
+      return;
     }
 
-    tr.append(td);
-  };
+    if (key === 'salary') {
+      newNode.insertAdjacentHTML('beforeend', `
+        <td>$${Intl.NumberFormat('en-US').format(+value)}</td>
+      `);
+    } else {
+      newNode.insertAdjacentHTML('beforeend', `<td>${value}</td>`);
+    }
+  }
 
-  tabBody.append(tr);
+  tBody.append(newNode);
+  e.target.reset();
+  pushNotification('Success', 'New data added', 'success');
+});
 
-  addNotifications('Success',
-    'New data is already in table', 'success');
+tBody.addEventListener('dblclick', (e) => {
+  const element = e.target.closest('td');
+  const parentElement = element.parentElement;
+  const input = document.createElement('input');
+  const cellIndex = element.cellIndex;
 
-  inputs.forEach(input => {
-    input.value = null;
+  input.classList.add('cell-input');
+  input.type = 'text';
+  parentElement.replaceChild(input, element);
+  input.focus();
+  input.value = element.innerText;
+
+  input.addEventListener('blur', (handler) => {
+
+  });
+
+  input.addEventListener('blur', (handler) => {
+    const key = tHead.firstElementChild.children[cellIndex]
+      .innerText.toLowerCase();
+
+    if (checkFormData(key, input.value)) {
+      element.innerText = input.value;
+    }
+
+    parentElement.replaceChild(element, input);
+    input.remove();
+  });
+
+  input.addEventListener('keydown', (handler) => {
+    if (handler.type === 'keydown' && handler.code !== 'Enter') {
+      return;
+    }
+
+    input.blur();
   });
 });
