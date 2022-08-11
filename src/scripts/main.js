@@ -134,6 +134,16 @@ form.addEventListener('submit', (e) => {
     return;
   };
 
+  console.log(isNaN(dataObj.salary));
+
+  if (isNaN(dataObj.salary)) {
+    pushNotification('Error',
+      'Invalid salary',
+      'error');
+
+    return;
+  }
+
   const newPerson = document.createElement('tr');
 
   newPerson.innerHTML = `
