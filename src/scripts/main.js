@@ -3,6 +3,7 @@
 const table = document.querySelector('.employees-table');
 const headings = document.querySelector('.employees-table__headings');
 const tableData = document.querySelector('.employees-table__content');
+
 const TABLE_COLUMNS = [
   'Name',
   'Position',
@@ -256,67 +257,167 @@ function appendEmployee(employee) {
 function validateInput(input) {
   const { value } = input;
 
-  if (input.name === 'name' && value.length < 4) {
-    pushNotification(
-      'A short name',
-      `Minimum length of the name is 4 symbols`,
-      'error',
-    );
+  switch (input.name) {
+    case 'name' : {
+      if (value.length === 0) {
+        pushNotification(
+          'Empty field',
+          'Name field is empty',
+          'error',
+        );
 
-    return false;
+        return false;
+      }
+
+      if (value.length < 4) {
+        pushNotification(
+          'A short name',
+          'Minimum length of the name is 4 symbols',
+          'error',
+        );
+
+        return false;
+      }
+
+      if (!isNaN(value)) {
+        pushNotification(
+          'Error',
+          'Name should start with a letter',
+          'error',
+        );
+
+        return false;
+      }
+
+      return true;
+    }
+
+    case 'position' : {
+      if (value.length === 0) {
+        pushNotification(
+          'Empty field',
+          'Position field is empty',
+          'error',
+        );
+
+        return false;
+      }
+
+      if (value.length < 2) {
+        pushNotification(
+          'The shortest one is HR',
+          'Minimum length of the position is 2 symbols',
+          'error',
+        );
+
+        return false;
+      }
+
+      if (!isNaN(value)) {
+        pushNotification(
+          'Not a position',
+          'Position can\'t start with a number',
+          'error',
+        );
+
+        return false;
+      }
+
+      return true;
+    }
+
+    case 'age' : {
+      if (value.length === 0) {
+        pushNotification(
+          'Empty field',
+          'Age field is empty',
+          'error',
+        );
+
+        return false;
+      }
+
+      if (isNaN(value)) {
+        pushNotification(
+          'Not a number',
+          'Age should be a number',
+          'error',
+        );
+
+        return false;
+      }
+
+      if (value < 0) {
+        pushNotification(
+          'wuuuut?',
+          'Age can\'t be negative',
+          'error',
+        );
+
+        return false;
+      }
+
+      if (+value < 18) {
+        pushNotification(
+          'Too Young',
+          'Minimum age is 18',
+          'error',
+        );
+
+        return false;
+      }
+
+      if (+value > 90) {
+        pushNotification(
+          'Too old',
+          'Maximum age is 90',
+          'error',
+        );
+
+        return false;
+      }
+
+      return true;
+    }
+
+    case 'salary' : {
+      if (value.length === 0) {
+        pushNotification(
+          'Empty field',
+          'Salary field is empty',
+          'error',
+        );
+
+        return false;
+      }
+
+      if (isNaN(value)) {
+        pushNotification(
+          'Not a number',
+          'Salary should be a number',
+          'error',
+        );
+
+        return false;
+      }
+
+      if (value < 0) {
+        pushNotification(
+          'We don\' need your money',
+          'Salary can\'t be negative',
+          'error',
+        );
+
+        return false;
+      }
+
+      return true;
+    }
+
+    default: {
+      return true;
+    }
   }
-
-  if (input.name === 'name' && !isNaN(value)) {
-    pushNotification(
-      'Error',
-      `Name should start with a letter`,
-      'error',
-    );
-
-    return false;
-  }
-
-  if (input.name === 'position' && value.length < 2) {
-    pushNotification(
-      'The shortest one is HR',
-      `Minimum length of the position is 2 symbols`,
-      'error',
-    );
-
-    return false;
-  }
-
-  if (input.name === 'age' && input.value === '') {
-    pushNotification(
-      'Wrong age',
-      `Pease review your age number`,
-      'error',
-    );
-
-    return false;
-  }
-
-  if (input.name === 'age' && (value < 18 || value > 90)) {
-    pushNotification(
-      'The perfect age is from 18 to 90',
-      `You are either too young or too old`,
-      'error',
-    );
-
-    return false;
-  }
-
-  if (input.name === 'salary' && input.value === '') {
-    pushNotification(
-      'Wrong entry',
-      `Please provide correct salary`,
-      'error',
-    );
-
-    return false;
-  }
-
-  return true;
 }
 
 function editCell() {
@@ -331,23 +432,27 @@ function editCell() {
     const target = clickEvent.target.closest('td');
     let input;
 
-    if (OFFICES.includes(target.textContent)) {
+    target.textContent += '';
+
+    if (target.cellIndex === 2) {
       input = document.createElement('select');
 
       const options = OFFICES.map(office => {
-        if (office === target.textContent) {
-          return `<option selected="selected">${office}</option>`;
+        if (target.textContent.trim() === office) {
+          return `<option selected>${office}</option>`;
         }
 
         return `<option>${office}</option>`;
       }).join('/n');
 
-      input.innerHTML = options;
+      setTimeout(() => {
+        input.innerHTML = options;
+      }, 0);
     } else {
       input = document.createElement('input');
     }
 
-    input.oldValue = target.textContent;
+    input.oldValue = target.textContent.trim();
     input.placeholder = TABLE_COLUMNS[target.cellIndex];
     input.name = TABLE_COLUMNS[target.cellIndex].toLowerCase();
 
@@ -364,8 +469,8 @@ function editCell() {
     input.classList.add('cell-input');
     input.style.position = 'absolute';
     input.style.inset = 0;
-    input.style.paddingLeft = '20px';
     input.style.margin = 'auto';
+    input.style.paddingLeft = '20px';
     input.focus();
 
     input.addEventListener('keyup', (keyEvent) => {
