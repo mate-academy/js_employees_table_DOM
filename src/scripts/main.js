@@ -15,10 +15,8 @@ document.addEventListener('click', event => {
 
   const row = item.closest('tr');
 
-  if (row) {
+  if (row && !row.closest('tfoot')) {
     selectTableRow(row);
-
-    return;
   }
 });
 
