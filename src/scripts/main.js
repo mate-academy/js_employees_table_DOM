@@ -2,7 +2,6 @@
 
 const table = document.querySelector('table');
 
-// SORTING COLUMNS
 // eslint-disable-next-line no-shadow
 document.addEventListener('click', event => {
   const item = event.target;
@@ -13,8 +12,17 @@ document.addEventListener('click', event => {
 
     return;
   }
+
+  const row = item.closest('tr');
+
+  if (row) {
+    selectTableRow(row);
+
+    return;
+  }
 });
 
+// SORTING COLUMNS
 function sortTableColumns(item, head) {
   const sortedOrder = item.dataset.sorted;
   const colIndex = item.cellIndex;
@@ -58,4 +66,17 @@ function sortTableColumns(item, head) {
   });
 
   rows.forEach(row => tBody.appendChild(row));
+}
+
+// SELECT ROW
+function selectTableRow(row) {
+  if (row.classList.contains('active')) {
+    return;
+  }
+
+  table
+    .querySelectorAll('tr.active')
+    .forEach(active => active.classList.remove('active'));
+
+  row.classList.add('active');
 }
