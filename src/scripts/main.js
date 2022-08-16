@@ -8,9 +8,19 @@ const TABLE_FIELDS = [
     input: {
       name: 'name',
       type: 'text',
-      required: 'true',
     },
     validate(value) {
+      if (typeof value === 'undefined' || value === '') {
+        pushNotification(
+          10, 10,
+          'Form data error',
+          'Employee\'s name is required!',
+          'error',
+        );
+
+        return false;
+      }
+
       if (value.length < 4) {
         pushNotification(
           10, 10,
@@ -31,7 +41,20 @@ const TABLE_FIELDS = [
     input: {
       name: 'position',
       type: 'text',
-      required: 'true',
+    },
+    validate(value) {
+      if (typeof value === 'undefined' || value === '') {
+        pushNotification(
+          10, 10,
+          'Form data error',
+          'Employee\'s position is required!',
+          'error',
+        );
+
+        return false;
+      }
+
+      return true;
     },
   },
   {
@@ -39,7 +62,6 @@ const TABLE_FIELDS = [
     type: 'select',
     select: {
       name: 'office',
-      required: 'true',
     },
     options: [
       'Tokyo',
@@ -56,9 +78,19 @@ const TABLE_FIELDS = [
     input: {
       name: 'age',
       type: 'number',
-      required: 'true',
     },
     validate(value) {
+      if (typeof value === 'undefined' || value === '') {
+        pushNotification(
+          10, 10,
+          'Form data error',
+          'Employee\'s age is required!',
+          'error',
+        );
+
+        return false;
+      }
+
       if (value < 18 || value > 90) {
         pushNotification(
           10, 10,
@@ -79,7 +111,6 @@ const TABLE_FIELDS = [
     input: {
       name: 'salary',
       type: 'number',
-      required: 'true',
     },
     formatForView(number) {
       let numberAsString = String(number);
@@ -98,11 +129,11 @@ const TABLE_FIELDS = [
       return String(value).replace(/\D/g, '');
     },
     validate(number) {
-      if (number < 0) {
+      if (number <= 0) {
         pushNotification(
           10, 10,
           'Form data error',
-          'Employee\'s salary needs to start from 0!',
+          'Employee\'s salary needs to be larger than 0!',
           'error',
         );
 
@@ -115,7 +146,7 @@ const TABLE_FIELDS = [
 ];
 
 // INITIALIZATION
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
   addForm();
 
   // LISTEN TO DOUBLECLICK
@@ -353,7 +384,6 @@ function addCellEditInput(cell) {
   cellInput.value = field.formatForEdit
     ? field.formatForEdit(cellValue)
     : cellValue;
-  cellInput.removeAttribute('required');
   delete cellInput.dataset.qa;
 
   cell.textContent = '';
