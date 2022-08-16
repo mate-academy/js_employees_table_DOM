@@ -184,6 +184,7 @@ function addForm() {
       'success',
     );
 
+    addEmployeeToTable(formData);
     form.reset();
   });
 }
@@ -214,4 +215,34 @@ function pushNotification(posTop, posRight, title, description, type) {
   setTimeout(() => {
     messageContainer.remove();
   }, 2000);
+};
+
+// ADD NEW EMPLOYEE
+function addEmployeeToTable(formData) {
+  const table = document.querySelector('table');
+  const tBody = table.tBodies[0];
+  const lastRow = tBody.lastElementChild;
+  const newRow = lastRow.cloneNode(true);
+
+  newRow.cells[0].textContent = formData.get('name');
+  newRow.cells[1].textContent = formData.get('position');
+  newRow.cells[2].textContent = formData.get('office');
+  newRow.cells[3].textContent = formData.get('age');
+  newRow.cells[4].textContent = formatSalary(formData.get('salary'));
+
+  lastRow.after(newRow);
+}
+
+const formatSalary = number => {
+  let numberAsString = String(number);
+  const parts = [];
+
+  do {
+    const part = numberAsString.slice(-3);
+
+    parts.unshift(part);
+    numberAsString = numberAsString.slice(0, -3);
+  } while (numberAsString);
+
+  return '$' + parts.join();
 };
