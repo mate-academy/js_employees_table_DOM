@@ -1,5 +1,65 @@
 'use strict';
 
+const TABLE_FIELDS = [
+  {
+    title: 'Name',
+    type: 'input',
+    input: {
+      name: 'name',
+      type: 'text',
+      required: 'true',
+      pattern: '.{4,}',
+    },
+  },
+  {
+    title: 'Position',
+    type: 'input',
+    input: {
+      name: 'position',
+      type: 'text',
+      required: 'true',
+    },
+  },
+  {
+    title: 'Office',
+    type: 'select',
+    select: {
+      name: 'office',
+      required: 'true',
+    },
+    options: [
+      'Tokyo',
+      'Singapore',
+      'London',
+      'New York',
+      'Edinburgh',
+      'San Francisco',
+    ],
+  },
+  {
+    title: 'Age',
+    type: 'input',
+    input: {
+      name: 'age',
+      type: 'number',
+      required: 'true',
+      min: '18',
+      max: '90',
+      step: '1',
+    },
+  },
+  {
+    title: 'Salary',
+    type: 'input',
+    input: {
+      name: 'salary',
+      type: 'number',
+      required: 'true',
+      min: '0',
+    },
+  },
+];
+
 // LISTEN TO DOUBLECLICK
 // eslint-disable-next-line no-shadow
 document.addEventListener('dblclick', event => {
@@ -98,69 +158,47 @@ function selectTableRow(row) {
 function addForm() {
   const table = document.querySelector('table');
   const form = document.createElement('form');
-  const offices = [
-    'Tokyo',
-    'Singapore',
-    'London',
-    'New York',
-    'Edinburgh',
-    'San Francisco',
-  ];
 
   form.className = 'new-employee-form';
 
-  form.innerHTML = `
-    <label>Name:
-      <input
-        name="name"
-        type="text"
-        data-qa="name"
-        pattern=".{4,}"
-        required
-      >
-    </label>
-    <label>Position:
-      <input
-        name="position"
-        type="text"
-        data-qa="position"
-        required
-      >
-    </label>
-    <label>Office:
-      <select
-        name="office"
-        data-qa="office"
-        required
-      >
-        ${offices.map(city => `
-          <option value="${city}">${city}</option>
-        `).join('')}
-      </select>
-    </label>
-    <label>Age:
-      <input
-        name="age"
-        type="number"
-        min="18"
-        max="90"
-        step="1"
-        data-qa="age"
-        required
-      >
-    </label>
-    <label>Salary:
-      <input
-        name="salary"
-        type="number"
-        min="0"
-        data-qa="salary"
-        required
-      >
-    </label>
-    <button>Save to table</button>
-  `;
+  TABLE_FIELDS.forEach(field => {
+    const wrapper = document.createElement('label');
 
+    wrapper.innerText = field.title;
+
+    switch (field.type) {
+      case 'input':
+        const input = document.createElement('input');
+
+        Object.assign(input, field.input);
+        input.dataset.qa = field.input.name;
+        wrapper.appendChild(input);
+        break;
+
+      case 'select':
+        const select = document.createElement('select');
+
+        Object.assign(select, field.select);
+        select.dataset.qa = field.select.name;
+        wrapper.appendChild(select);
+
+        field.options.forEach(value => {
+          const option = document.createElement('option');
+
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        });
+        break;
+    }
+
+    form.appendChild(wrapper);
+  });
+
+  const button = document.createElement('button');
+
+  button.innerText = 'Save to table';
+  form.appendChild(button);
   table.after(form);
 
   // eslint-disable-next-line no-shadow
