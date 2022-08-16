@@ -1,7 +1,5 @@
 'use strict';
 
-const table = document.querySelector('table');
-
 // eslint-disable-next-line no-shadow
 document.addEventListener('click', event => {
   const item = event.target;
@@ -22,6 +20,7 @@ document.addEventListener('click', event => {
 
 // SORTING COLUMNS
 function sortTableColumns(item, head) {
+  const table = document.querySelector('table');
   const sortedOrder = item.dataset.sorted;
   const colIndex = item.cellIndex;
   const tBody = table.tBodies[0];
@@ -68,6 +67,8 @@ function sortTableColumns(item, head) {
 
 // SELECT ROW
 function selectTableRow(row) {
+  const table = document.querySelector('table');
+
   if (row.classList.contains('active')) {
     return;
   }
