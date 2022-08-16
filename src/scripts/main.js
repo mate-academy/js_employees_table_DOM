@@ -113,36 +113,41 @@ const TABLE_FIELDS = [
   },
 ];
 
-// LISTEN TO DOUBLECLICK
-// eslint-disable-next-line no-shadow
-document.addEventListener('dblclick', event => {
-  const item = event.target;
-  const cell = item.closest('td');
+// INITIALIZATION
+document.addEventListener('DOMContentLoaded', () => {
+  addForm();
 
-  if (!cell) {
-    return;
-  }
+  // LISTEN TO DOUBLECLICK
+  // eslint-disable-next-line no-shadow
+  document.addEventListener('dblclick', event => {
+    const item = event.target;
+    const cell = item.closest('td');
 
-  addCellEditInput(cell);
-});
+    if (!cell) {
+      return;
+    }
 
-// LISTEN TO CLICK
-// eslint-disable-next-line no-shadow
-document.addEventListener('click', event => {
-  const item = event.target;
-  const head = item.closest('thead');
+    addCellEditInput(cell);
+  });
 
-  if (head) {
-    sortTableColumns(item, head);
+  // LISTEN TO CLICK
+  // eslint-disable-next-line no-shadow
+  document.addEventListener('click', event => {
+    const item = event.target;
+    const head = item.closest('thead');
 
-    return;
-  }
+    if (head) {
+      sortTableColumns(item, head);
 
-  const row = item.closest('tr');
+      return;
+    }
 
-  if (row && !row.closest('tfoot')) {
-    selectTableRow(row);
-  }
+    const row = item.closest('tr');
+
+    if (row && !row.closest('tfoot')) {
+      selectTableRow(row);
+    }
+  });
 });
 
 // SORTING COLUMNS
@@ -290,8 +295,6 @@ function createFormField(field) {
       return select;
   }
 }
-
-addForm();
 
 // NOTIFICATIONS
 function pushNotification(posTop, posRight, title, description, type) {
