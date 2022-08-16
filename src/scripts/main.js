@@ -1,19 +1,5 @@
 'use strict';
 
-const formatSalary = number => {
-  let numberAsString = String(number);
-  const parts = [];
-
-  do {
-    const part = numberAsString.slice(-3);
-
-    parts.unshift(part);
-    numberAsString = numberAsString.slice(0, -3);
-  } while (numberAsString);
-
-  return '$' + parts.join();
-};
-
 const TABLE_FIELDS = [
   {
     title: 'Name',
@@ -99,7 +85,19 @@ const TABLE_FIELDS = [
       required: 'true',
       min: '0',
     },
-    formatForView: formatSalary,
+    formatForView(number) {
+      let numberAsString = String(number);
+      const parts = [];
+
+      do {
+        const part = numberAsString.slice(-3);
+
+        parts.unshift(part);
+        numberAsString = numberAsString.slice(0, -3);
+      } while (numberAsString);
+
+      return '$' + parts.join();
+    },
     formatForEdit(value) {
       return String(value).replace(/\D/g, '');
     },
