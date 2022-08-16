@@ -8,7 +8,6 @@ const TABLE_FIELDS = [
       name: 'name',
       type: 'text',
       required: 'true',
-      // pattern: '.{4,}',
     },
     validate(value) {
       if (value.length < 4) {
@@ -57,9 +56,6 @@ const TABLE_FIELDS = [
       name: 'age',
       type: 'number',
       required: 'true',
-      // min: '18',
-      // max: '90',
-      // step: '1',
     },
     validate(value) {
       if (value < 18 || value > 90) {
@@ -83,7 +79,6 @@ const TABLE_FIELDS = [
       name: 'salary',
       type: 'number',
       required: 'true',
-      min: '0',
     },
     formatForView(number) {
       let numberAsString = String(number);
@@ -100,6 +95,20 @@ const TABLE_FIELDS = [
     },
     formatForEdit(value) {
       return String(value).replace(/\D/g, '');
+    },
+    validate(number) {
+      if (number < 0) {
+        pushNotification(
+          10, 10,
+          'Form data error',
+          'Employee\'s salary needs to start from 0!',
+          'error',
+        );
+
+        return false;
+      }
+
+      return true;
     },
   },
 ];
