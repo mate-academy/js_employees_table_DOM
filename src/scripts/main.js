@@ -1,5 +1,19 @@
 'use strict';
 
+// LISTEN TO DOUBLECLICK
+// eslint-disable-next-line no-shadow
+document.addEventListener('dblclick', event => {
+  const item = event.target;
+  const cell = item.closest('td');
+
+  if (!cell) {
+    return;
+  }
+
+  addCellEditInput(cell);
+});
+
+// LISTEN TO CLICK
 // eslint-disable-next-line no-shadow
 document.addEventListener('click', event => {
   const item = event.target;
@@ -246,3 +260,23 @@ const formatSalary = number => {
 
   return '$' + parts.join();
 };
+
+// EDIT CELL
+function addCellEditInput(cell) {
+  const cellValue = cell.textContent;
+  const cellInput = document.createElement('input');
+
+  cellInput.className = 'cell-input';
+  cellInput.value = cellValue;
+
+  cell.textContent = '';
+  cell.appendChild(cellInput);
+  cellInput.focus();
+
+  cellInput.addEventListener('blur', () => {
+    const newValue = cellInput.value;
+
+    cell.innerHTML = '';
+    cell.textContent = newValue !== '' ? newValue : cellValue;
+  });
+}
