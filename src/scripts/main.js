@@ -191,14 +191,11 @@ function sortTableColumns(item, head) {
   const rows = [...tBody.rows];
 
   rows.sort((a, b) => {
-    const cellA = !sortedOrder || sortedOrder === 'desc'
-      ? a.cells[colIndex].textContent
-      : b.cells[colIndex].textContent;
-    const cellB = !sortedOrder || sortedOrder === 'desc'
-      ? b.cells[colIndex].textContent
-      : a.cells[colIndex].textContent;
+    const sortDirection = !sortedOrder || sortedOrder === 'desc' ? 1 : -1;
+    const cellA = a.cells[colIndex].textContent;
+    const cellB = b.cells[colIndex].textContent;
 
-    item.dataset.sorted = !sortedOrder || sortedOrder === 'desc'
+    item.dataset.sorted = sortDirection === 1
       ? 'asc'
       : 'desc';
 
@@ -207,14 +204,14 @@ function sortTableColumns(item, head) {
       case 1:
       case 2:
       default:
-        return cellA.localeCompare(cellB);
+        return cellA.localeCompare(cellB) * sortDirection;
 
       case 3:
       case 4:
         const numA = +cellA.replace(/\D/g, '');
         const numB = +cellB.replace(/\D/g, '');
 
-        return numA - numB;
+        return (numA - numB) * sortDirection;
     }
   });
 
