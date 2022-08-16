@@ -79,3 +79,139 @@ function selectTableRow(row) {
 
   row.classList.add('active');
 }
+
+// ADD FORM
+function addForm() {
+  const table = document.querySelector('table');
+  const form = document.createElement('form');
+  const offices = [
+    'Tokyo',
+    'Singapore',
+    'London',
+    'New York',
+    'Edinburgh',
+    'San Francisco',
+  ];
+
+  form.className = 'new-employee-form';
+
+  form.innerHTML = `
+    <label>Name:
+      <input
+        name="name"
+        type="text"
+        data-qa="name"
+        pattern=".{4,}"
+        required
+      >
+    </label>
+    <label>Position:
+      <input
+        name="position"
+        type="text"
+        data-qa="position"
+        required
+      >
+    </label>
+    <label>Office:
+      <select
+        name="office"
+        data-qa="office"
+        required
+      >
+        ${offices.map(city => `
+          <option value="${city}">${city}</option>
+        `).join('')}
+      </select>
+    </label>
+    <label>Age:
+      <input
+        name="age"
+        type="number"
+        min="18"
+        max="90"
+        step="1"
+        data-qa="age"
+        required
+      >
+    </label>
+    <label>Salary:
+      <input
+        name="salary"
+        type="number"
+        min="0"
+        data-qa="salary"
+        required
+      >
+    </label>
+    <button>Save to table</button>
+  `;
+
+  table.after(form);
+
+  // eslint-disable-next-line no-shadow
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const formData = new FormData(form);
+
+    if (formData.get('age') < 18 || formData.get('age') > 90) {
+      pushNotification(
+        10, 10,
+        'Form data error',
+        'Employee\'s age needs to be in range between 18 and 90!',
+        'error',
+      );
+
+      return;
+    }
+
+    if (formData.get('name').length < 4) {
+      pushNotification(
+        10, 10,
+        'Form data error',
+        'Employee\'s name needs to be at least 4 characters long!',
+        'error',
+      );
+
+      return;
+    }
+
+    pushNotification(
+      10, 10,
+      'Added to table',
+      `${formData.get('name')} is successfully added to table`,
+      'success',
+    );
+
+    form.reset();
+  });
+}
+
+addForm();
+
+// NOTIFICATIONS
+function pushNotification(posTop, posRight, title, description, type) {
+  const messageContainer = document.createElement('div');
+  const titleElement = document.createElement('h2');
+  const descriptionElement = document.createElement('p');
+
+  messageContainer.className = `notification ${type}`;
+  messageContainer.dataset.qa = `notification`;
+
+  titleElement.className = 'title';
+  titleElement.textContent = title;
+
+  descriptionElement.textContent = description;
+
+  messageContainer.appendChild(titleElement);
+  messageContainer.appendChild(descriptionElement);
+  document.body.appendChild(messageContainer);
+
+  messageContainer.style.top = `${posTop}px`;
+  messageContainer.style.right = `${posRight}px`;
+
+  setTimeout(() => {
+    messageContainer.remove();
+  }, 2000);
+};
