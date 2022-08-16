@@ -1,5 +1,6 @@
 'use strict';
 
+// GLOBAL TABLE FIELDS ARRAY
 const TABLE_FIELDS = [
   {
     title: 'Name',
