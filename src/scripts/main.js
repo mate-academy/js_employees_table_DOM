@@ -22,7 +22,21 @@ const TABLE_FIELDS = [
       name: 'name',
       type: 'text',
       required: 'true',
-      pattern: '.{4,}',
+      // pattern: '.{4,}',
+    },
+    validate(value) {
+      if (value.length < 4) {
+        pushNotification(
+          10, 10,
+          'Form data error',
+          'Employee\'s name needs to be at least 4 characters long!',
+          'error',
+        );
+
+        return false;
+      }
+
+      return true;
     },
   },
   {
@@ -57,9 +71,23 @@ const TABLE_FIELDS = [
       name: 'age',
       type: 'number',
       required: 'true',
-      min: '18',
-      max: '90',
-      step: '1',
+      // min: '18',
+      // max: '90',
+      // step: '1',
+    },
+    validate(value) {
+      if (value < 18 || value > 90) {
+        pushNotification(
+          10, 10,
+          'Form data error',
+          'Employee\'s age needs to be in range between 18 and 90!',
+          'error',
+        );
+
+        return false;
+      }
+
+      return true;
     },
   },
   {
@@ -203,25 +231,15 @@ function addForm() {
 
     const formData = new FormData(form);
 
-    if (formData.get('age') < 18 || formData.get('age') > 90) {
-      pushNotification(
-        10, 10,
-        'Form data error',
-        'Employee\'s age needs to be in range between 18 and 90!',
-        'error',
-      );
+    const isValidData = TABLE_FIELDS.every(({ type, ...field }) => {
+      if (!field.validate) {
+        return true;
+      }
 
-      return;
-    }
+      return field.validate(formData.get(field[type].name));
+    });
 
-    if (formData.get('name').length < 4) {
-      pushNotification(
-        10, 10,
-        'Form data error',
-        'Employee\'s name needs to be at least 4 characters long!',
-        'error',
-      );
-
+    if (!isValidData) {
       return;
     }
 
@@ -331,12 +349,26 @@ function addCellEditInput(cell) {
   cell.appendChild(cellInput);
   cellInput.focus();
 
+  // eslint-disable-next-line no-shadow
+  cellInput.addEventListener('keyup', event => {
+    if (event.code === 'Enter' || event.code === 'NumpadEnter') {
+      cellInput.blur();
+    }
+  });
+
   cellInput.addEventListener('blur', () => {
+    const isValid = field.validate
+      ? field.validate(cellInput.value)
+      : true;
+
     const newValue = field.formatForView
       ? field.formatForView(cellInput.value)
       : cellInput.value;
 
     cell.innerHTML = '';
-    cell.textContent = newValue !== '' ? newValue : cellValue;
+
+    cell.textContent = newValue !== '' && isValid
+      ? newValue
+      : cellValue;
   });
 }
