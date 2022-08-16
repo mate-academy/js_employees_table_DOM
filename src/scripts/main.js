@@ -1,5 +1,19 @@
 'use strict';
 
+const formatSalary = number => {
+  let numberAsString = String(number);
+  const parts = [];
+
+  do {
+    const part = numberAsString.slice(-3);
+
+    parts.unshift(part);
+    numberAsString = numberAsString.slice(0, -3);
+  } while (numberAsString);
+
+  return '$' + parts.join();
+};
+
 const TABLE_FIELDS = [
   {
     title: 'Name',
@@ -56,6 +70,10 @@ const TABLE_FIELDS = [
       type: 'number',
       required: 'true',
       min: '0',
+    },
+    formatForView: formatSalary,
+    formatForEdit(value) {
+      return String(value).replace(/\D/g, '');
     },
   },
 ];
@@ -166,31 +184,9 @@ function addForm() {
 
     wrapper.innerText = field.title;
 
-    switch (field.type) {
-      case 'input':
-        const input = document.createElement('input');
+    const fieldElement = createFormField(field);
 
-        Object.assign(input, field.input);
-        input.dataset.qa = field.input.name;
-        wrapper.appendChild(input);
-        break;
-
-      case 'select':
-        const select = document.createElement('select');
-
-        Object.assign(select, field.select);
-        select.dataset.qa = field.select.name;
-        wrapper.appendChild(select);
-
-        field.options.forEach(value => {
-          const option = document.createElement('option');
-
-          option.value = value;
-          option.textContent = value;
-          select.appendChild(option);
-        });
-        break;
-    }
+    wrapper.appendChild(fieldElement);
 
     form.appendChild(wrapper);
   });
@@ -241,6 +237,35 @@ function addForm() {
   });
 }
 
+// CREATE FIELD ELEMENT
+function createFormField(field) {
+  switch (field.type) {
+    case 'input':
+      const input = document.createElement('input');
+
+      Object.assign(input, field.input);
+      input.dataset.qa = field.input.name;
+
+      return input;
+
+    case 'select':
+      const select = document.createElement('select');
+
+      Object.assign(select, field.select);
+      select.dataset.qa = field.select.name;
+
+      field.options.forEach(value => {
+        const option = document.createElement('option');
+
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+
+      return select;
+  }
+}
+
 addForm();
 
 // NOTIFICATIONS
@@ -276,43 +301,40 @@ function addEmployeeToTable(formData) {
   const lastRow = tBody.lastElementChild;
   const newRow = lastRow.cloneNode(true);
 
-  newRow.cells[0].textContent = formData.get('name');
-  newRow.cells[1].textContent = formData.get('position');
-  newRow.cells[2].textContent = formData.get('office');
-  newRow.cells[3].textContent = formData.get('age');
-  newRow.cells[4].textContent = formatSalary(formData.get('salary'));
+  TABLE_FIELDS.forEach(({ type, ...field }, i) => {
+    const content = formData.get(field[type].name);
+
+    newRow.cells[i].textContent = field.formatForView
+      ? field.formatForView(content)
+      : content;
+  });
 
   lastRow.after(newRow);
 }
 
-const formatSalary = number => {
-  let numberAsString = String(number);
-  const parts = [];
-
-  do {
-    const part = numberAsString.slice(-3);
-
-    parts.unshift(part);
-    numberAsString = numberAsString.slice(0, -3);
-  } while (numberAsString);
-
-  return '$' + parts.join();
-};
-
 // EDIT CELL
 function addCellEditInput(cell) {
   const cellValue = cell.textContent;
-  const cellInput = document.createElement('input');
+  const cellIndex = cell.cellIndex;
+  const field = TABLE_FIELDS[cellIndex];
+  const cellInput = createFormField(field);
 
   cellInput.className = 'cell-input';
-  cellInput.value = cellValue;
+
+  cellInput.value = field.formatForEdit
+    ? field.formatForEdit(cellValue)
+    : cellValue;
+  cellInput.removeAttribute('required');
+  delete cellInput.dataset.qa;
 
   cell.textContent = '';
   cell.appendChild(cellInput);
   cellInput.focus();
 
   cellInput.addEventListener('blur', () => {
-    const newValue = cellInput.value;
+    const newValue = field.formatForView
+      ? field.formatForView(cellInput.value)
+      : cellInput.value;
 
     cell.innerHTML = '';
     cell.textContent = newValue !== '' ? newValue : cellValue;
