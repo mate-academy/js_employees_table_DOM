@@ -34,6 +34,9 @@ const TABLE_FIELDS = [
 
       return true;
     },
+    sort(a, b) {
+      return a.localeCompare(b);
+    },
   },
   {
     title: 'Position',
@@ -56,6 +59,9 @@ const TABLE_FIELDS = [
 
       return true;
     },
+    sort(a, b) {
+      return a.localeCompare(b);
+    },
   },
   {
     title: 'Office',
@@ -71,6 +77,9 @@ const TABLE_FIELDS = [
       'Edinburgh',
       'San Francisco',
     ],
+    sort(a, b) {
+      return a.localeCompare(b);
+    },
   },
   {
     title: 'Age',
@@ -103,6 +112,9 @@ const TABLE_FIELDS = [
       }
 
       return true;
+    },
+    sort(a, b) {
+      return a - b;
     },
   },
   {
@@ -141,6 +153,12 @@ const TABLE_FIELDS = [
       }
 
       return true;
+    },
+    sort(a, b) {
+      const numA = +String(a).replace(/\D/g, '');
+      const numB = +String(b).replace(/\D/g, '');
+
+      return numA - numB;
     },
   },
 ];
@@ -189,6 +207,7 @@ function sortTableColumns(item, head) {
   const colIndex = item.cellIndex;
   const tBody = table.tBodies[0];
   const rows = [...tBody.rows];
+  const field = TABLE_FIELDS[colIndex];
 
   rows.sort((a, b) => {
     const sortDirection = !sortedOrder || sortedOrder === 'desc' ? 1 : -1;
@@ -199,20 +218,9 @@ function sortTableColumns(item, head) {
       ? 'asc'
       : 'desc';
 
-    switch (colIndex) {
-      case 0:
-      case 1:
-      case 2:
-      default:
-        return cellA.localeCompare(cellB) * sortDirection;
-
-      case 3:
-      case 4:
-        const numA = +cellA.replace(/\D/g, '');
-        const numB = +cellB.replace(/\D/g, '');
-
-        return (numA - numB) * sortDirection;
-    }
+    return field.sort
+      ? field.sort(cellA, cellB) * sortDirection
+      : cellA.localeCompare(cellB) * sortDirection;
   });
 
   head.querySelectorAll('[data-sorted]').forEach(title => {
