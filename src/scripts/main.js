@@ -100,6 +100,7 @@ function createWindow() {
 
     label.innerText = item.dataset.qa;
     input.name = item.dataset.qa;
+    input.classList = 'inputPlace'
 
     if (item.dataset.qa === 'Office') {
       const datalist = document.createElement('datalist');
@@ -148,7 +149,7 @@ function createButton() {
   left: ${innerWidth / 2 + thead.clientWidth / 2}px;
   top: ${distanceToThead.top - window.pageYOffset}px;
   padding-bottom: 5px;
-  Height: ${allData[0].clientHeight}px;
+  height: ${allData[0].clientHeight}px;
   background: #e25644;
   color: white;
   border: none;
@@ -191,7 +192,6 @@ function checkInnerText(item, index) {
 
 buttonCreate.addEventListener('click', (even) => {
   createWindow();
-  even.target.style.height = '0px';
   even.target.hidden = true;
 
   const form = document.querySelector('form');
@@ -235,12 +235,13 @@ buttonCreate.addEventListener('click', (even) => {
     }
     tbody.append(outerForm);
     pushNotification(10, 10, 'Success', 'Added to form', 'success');
-
-    // elem.target.style.height = allData[0].clientHeight;
-    // elem.target.hidden = true;
-    // const button = document.body.querySelector('button');
-    // button.hidden = false;
+    // const inputPlace = form.querySelectorAll('.inputPlace')
+    
+    // inputPlace.forEach((forInput) => forInput.value = '')
+    form.remove()
+    even.target.hidden = false;
   });
+  
 });// вызов уведомлений и передача данных в таблицу
 
 const pushNotification = (
