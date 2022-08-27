@@ -4,6 +4,16 @@
 const tbody = document.querySelector('tbody');
 const thead = document.querySelector('thead');
 const allData = thead.querySelectorAll('th');
+const head = document.querySelector('head');
+const table = document.querySelector('table');
+const countries = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
 
 allData.forEach((item) => {
   item.dataset.qa = item.innerText;
@@ -87,7 +97,9 @@ function createWindow() {
   button.innerText = 'Save to table';
   button.getAttribute('type');
   button.type = 'submit';
-
+  form.style.position = 'absolute';
+  form.style.left = `${innerWidth / 2 + thead.clientWidth / 2}px`;
+  form.style.top = `${table.offsetTop}px`;
   form.classList.add('new-employee-form');
   form.getAttribute('action');
   form.getAttribute('metod');
@@ -100,18 +112,11 @@ function createWindow() {
 
     label.innerText = item.dataset.qa;
     input.name = item.dataset.qa;
-    input.classList = 'inputPlace'
+    input.classList = 'inputPlace';
 
     if (item.dataset.qa === 'Office') {
+      input.placeholder = 'Select office';
       const datalist = document.createElement('datalist');
-      const countries = [
-        'Tokyo',
-        'Singapore',
-        'London',
-        'New York',
-        'Edinburgh',
-        'San Francisco',
-      ];
 
       label.for = item.dataset.qa;
 
@@ -135,6 +140,9 @@ function createWindow() {
   });
   document.body.append(form);
   form.append(button);
+  window.addEventListener('resize', (e) => {
+    form.style.left = `${innerWidth / 2 + thead.clientWidth / 2}px`;
+  });
 }; // создание окна формы
 
 function createButton() {
@@ -146,9 +154,10 @@ function createButton() {
 
   button.style.cssText = `
   position: fixed;
-  left: ${innerWidth / 2 + thead.clientWidth / 2}px;
+  left: ${innerWidth / 2 + table.clientWidth / 2}px;
   top: ${distanceToThead.top - window.pageYOffset}px;
   padding-bottom: 5px;
+  margin-left: 25px;
   height: ${allData[0].clientHeight}px;
   background: #e25644;
   color: white;
@@ -157,28 +166,29 @@ function createButton() {
     `;
 
   window.addEventListener('resize', (e) => {
-    button.style.left = `${innerWidth / 2 + thead.clientWidth / 2}px`;
+    button.style.left = `${innerWidth / 2 + table.clientWidth / 2}px`;
   });
   document.body.append(button);
-} // создание кнопки для открытия окна формы
+  head.insertAdjacentHTML('beforeend', `
+  <style>
+  .createWindow:hover h3 {
+      color: yellow;
+    }
+    </style>
+  `) // поведение кнопки при прохождении мышки
+} // создание кнопки для открытия окна формы и её поведения
 createButton();
 
 const buttonCreate = document.querySelector('button');
-
-buttonCreate.addEventListener('mouseenter', (even) => {
-  even.target.style.color = 'yellow';
-}); // поведение кнопки при наведении на неё
-
-buttonCreate.addEventListener('mouseleave', (even) => {
-  even.target.style.color = 'white';
-}); // поведение кнопки при снятии мышки с неё
 
 function checkInnerText(item, index) {
   const numbers = parseInt(item, 10);
 
   if (index <= 2 && isNaN(numbers)) {
     const statusItem = index === 0 ? item.length >= 4 : item.length > 0;
-
+    if (index === 2) {
+      return countries.includes(item);
+    }
     return statusItem;
   } else if (index > 2 && typeof numbers === 'number') {
     const statusItem
@@ -191,8 +201,8 @@ function checkInnerText(item, index) {
 } // проверка текста для заполнения
 
 buttonCreate.addEventListener('click', (even) => {
+  even.target.parentElement.hidden = true;
   createWindow();
-  even.target.hidden = true;
 
   const form = document.querySelector('form');
 
@@ -224,29 +234,57 @@ buttonCreate.addEventListener('click', (even) => {
           itemElement.innerText = data.get(item);
         }
         outerForm.append(itemElement);
+      } else if (!checkInnerText(data.get(item), index)) {
+        let message = '';
+        if (index < 2) {
+          message = `Wrong text in ${item}. 
+          You must use more then 4 letter. Dont use numbers.`;
+        }
+        else if (index === 2) {
+          message = `You dont select option in ${item}.`;
+        }
+        else if (index === 3) {
+          message = `Wrong data in ${item}.
+          Age must be more then 18. Dont use text.`;
+        }
+        else if (index === 4) {
+          message = `Wrong data in ${item}. Use only numbers.`;
+        }
+        pushNotification('Warning', message, 'warning');
+        return;
       } else {
-        const message = `Wrong text in ${item}. 
-        Maybe you write empty or not correct type text/number`;
+        const message = `You do somthing wrong. Try reload page`;
 
-        pushNotification(10, 10, 'Error', message, 'error');
-
+        pushNotification('Error', message, 'error');
         return;
       }
     }
     tbody.append(outerForm);
-    pushNotification(10, 10, 'Success', 'Added to form', 'success');
-    // const inputPlace = form.querySelectorAll('.inputPlace')
-    
-    // inputPlace.forEach((forInput) => forInput.value = '')
-    form.remove()
-    even.target.hidden = false;
+    pushNotification('Success', 'Added to form', 'success');
+    form.remove();
+    even.target.parentElement.hidden = false;
   });
-  
 });// вызов уведомлений и передача данных в таблицу
 
+
+  const colectNotifications = document.createElement('div');
+
+  colectNotifications.classList = 'colectNotifications';
+  colectNotifications.score = 0;
+  colectNotifications.style.zIndex = 1;
+
+  document.body.append(colectNotifications);
+
+  const clear = () => {
+    colectNotifications.score = 0
+    colectNotifications
+    .querySelectorAll('div')
+    .forEach((el) => {el.remove()})
+  } //очистка ошибок
+
+
+
 const pushNotification = (
-  posTop = 0,
-  posRight = 0,
   title,
   description,
   type
@@ -254,27 +292,23 @@ const pushNotification = (
   function message() {
     const core = document.createElement('div');
 
+    if(colectNotifications.score * 200 >= innerHeight) {
+      colectNotifications.score = 0;
+      clear();
+    } else {
+      core.style.top = `${colectNotifications.score * 150}px`;
+    }
     core.className = `notification ${type}`;
     core.dataset.qa = 'notification';
-
     core.innerHTML = `
     <h2 class='title'>${title}</h2>
     <p>${description}</p>
     `;
 
-    document.body.append(core);
-
-    const alarmPosition = document.querySelector(`.${type}`);
-
-    alarmPosition.style.top = `${posTop}px`;
-    alarmPosition.style.right = `${posRight}px`;
-
-    const clear = () => {
-      alarmPosition.remove(core);
-    };
-
-    setTimeout(clear, 4000);
+    colectNotifications.score += 1;
+    colectNotifications.append(core);
+    setTimeout(clear, 3000);
   }
 
-  setTimeout(message, 0);
+  message()
 };// создание окон уведомлений
