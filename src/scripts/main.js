@@ -24,10 +24,14 @@ tableHead.addEventListener('click', e => {
       if (!convertToNumber(a.cells[columnIndex].innerText)) {
         return a.cells[columnIndex].innerText
           .localeCompare(b.cells[columnIndex].innerText);
+      } else if (parseInt(a.cells[columnIndex].innerText) >= 0
+        || parseInt(a.cells[columnIndex].innerText) <= 0) {
+        return a.cells[columnIndex].innerText
+        - b.cells[columnIndex].innerText;
+      } else {
+        return convertToNumber(a.cells[columnIndex].innerText)
+        - convertToNumber(b.cells[columnIndex].innerText);
       }
-
-      return convertToNumber(a.cells[columnIndex].innerText)
-    - convertToNumber(b.cells[columnIndex].innerText);
     });
   }
 
