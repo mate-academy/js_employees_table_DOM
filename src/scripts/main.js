@@ -18,45 +18,18 @@ arr.shift();
 arr.pop();
 
 let oldTarget = null;
+let clickCount = 0;
 
-const handler = e => {
+const sortingHandler = e => {
   const targetItem = e.target.closest('th');
 
   if (!targetItem || !heading.contains(targetItem)) {
     return;
   }
 
-  let index = null;
-
-  switch (targetItem.innerText) {
-    case 'Name':
-      index = 0;
-      break;
-
-    case 'Position':
-      index = 1;
-      break;
-
-    case 'Office':
-      index = 2;
-      break;
-
-    case 'Age':
-      index = 3;
-      break;
-
-    case 'Salary':
-      index = 4;
-      break;
-  }
-
   arr.sort((a, b) => {
-    let aElement = a.children[index].innerText;
-    let bElement = b.children[index].innerText;
-
-    if (targetItem === oldTarget) {
-      [aElement, bElement] = [bElement, aElement];
-    };
+    const aElement = a.children[targetItem.cellIndex].innerText;
+    const bElement = b.children[targetItem.cellIndex].innerText;
 
     if (targetItem.innerText === 'Salary' || targetItem.innerText === 'Age') {
       return toNum(aElement) - toNum(bElement);
@@ -64,6 +37,16 @@ const handler = e => {
 
     return aElement.localeCompare(bElement);
   });
+
+  if (targetItem === oldTarget) {
+    clickCount += 1;
+
+    if (clickCount % 2 !== 0) {
+      arr.reverse();
+    }
+  } else {
+    clickCount = 0;
+  };
 
   tbody.innerHTML = arr.map(item => `
     <tr>
@@ -235,7 +218,7 @@ const doubleClickHandler = e => {
 
 /* End handler */
 
-heading.addEventListener('click', handler);
+heading.addEventListener('click', sortingHandler);
 tbody.addEventListener('click', rowHandler);
 form.addEventListener('submit', submitHandler);
 tbody.addEventListener('dblclick', doubleClickHandler);
