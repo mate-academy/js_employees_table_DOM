@@ -3,7 +3,7 @@
 const table = document.querySelector('table');
 const tableBody = table.querySelector('tbody');
 const arr = Array.from(tableBody.rows);
-let count = 0;
+let isAsc = true;
 let target;
 
 // Active row
@@ -26,15 +26,15 @@ table.addEventListener('click', e => {
 
   if (target !== e.target) {
     target = e.target;
-    count = 0;
-  } else {
-    count++;
+    isAsc = true;
   }
 
-  if (count % 2) {
-    sortDESC(e.target.cellIndex);
-  } else {
+  if (isAsc) {
     sortASC(e.target.cellIndex);
+    isAsc = false;
+  } else {
+    sortDESC(e.target.cellIndex);
+    isAsc = true;
   }
 });
 
