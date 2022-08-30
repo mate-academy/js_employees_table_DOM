@@ -211,17 +211,17 @@ form.addEventListener('submit', (e) => {
 
     document.body.appendChild(container);
 
-    setTimeout(() => container.remove(), 1000);
+    setTimeout(() => container.remove(), 3000);
   }
 
   if (tr.children[0].innerHTML.length < 4
      || tr.children[3].innerHTML < 18
      || tr.children[3].innerHTML > 90) {
-    spawnNotification('Error', '123', 'error');
+    spawnNotification('Error', 'Please enter correct values', 'error');
   } else {
     main.append(tr);
 
-    spawnNotification('Success', '456', 'success');
+    spawnNotification('Success', 'Employee is successfully added', 'success');
   }
 });
 
@@ -237,12 +237,19 @@ main.addEventListener('dblclick', (e) => {
       if (e.target.parentNode === rows[i]) {
         const input = document.createElement('input');
         const item = e.target;
+        const index = item.cellIndex;
         const itemWidth = item.clientWidth;
 
         input.style.width = `${itemWidth}px`;
         input.id = item.innerHTML;
         input.name = item.innerHTML;
-        input.type = 'text';
+
+        if (index === 3 || index === 4) {
+          input.type = 'number';
+        } else {
+          input.type = 'text';
+        }
+
         input.classList.add('cell-input');
 
         rows[i].replaceChild(input, item);
@@ -254,8 +261,27 @@ main.addEventListener('dblclick', (e) => {
             return;
           }
 
-          if (input.value !== '') {
-            item.innerHTML = input.value;
+          if (input.value === '') {
+            input.value = item.innerHTML;
+          }
+
+          switch (index) {
+            case 0:
+            case 1:
+            case 2:
+              item.innerHTML = input.value;
+              break;
+
+            case 3:
+              item.innerHTML = input.value;
+              break;
+
+            case 4:
+              if (input.value !== '') {
+                item.innerHTML
+                = `$${(Number(input.value)).toLocaleString('en')}`;
+              }
+              break;
           }
 
           rows[i].replaceChild(item, input);
