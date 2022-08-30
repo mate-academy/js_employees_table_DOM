@@ -20,6 +20,7 @@ table {
 tr {
   background: #fff;
   color: #808080;
+  position: relative;
 }
 
 tr:nth-child(2n + 1) {
@@ -39,6 +40,7 @@ td,
 th {
   text-align: left;
   padding: 18px;
+  
 }
 
 thead th:hover {
@@ -142,12 +144,15 @@ tr.active {
 }
 
 .cell-input {
-  border: none;
   color: #808080;
   font-size: 16px;
-  background: transparent;
+  background: white;
+  border: 1px solid #e25644;
   padding: 0;
   outline: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
 }
 
 .notification {
