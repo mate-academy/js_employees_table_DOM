@@ -134,8 +134,6 @@ form.addEventListener('submit', (e) => {
     return;
   };
 
-  console.log(isNaN(dataObj.salary));
-
   if (isNaN(dataObj.salary)) {
     pushNotification('Error',
       'Invalid salary',
@@ -177,7 +175,7 @@ tbody.addEventListener('dblclick', (e) => {
     input.setAttribute('value', e.target.innerText);
     input.classList.add('cell-input');
     e.target.replaceWith(input);
-
+    input.focus();
   }
 });
 
