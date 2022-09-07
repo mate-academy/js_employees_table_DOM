@@ -231,7 +231,7 @@ function editCell(e) {
     const input = document.createElement('input');
 
     input.setAttribute('value', e.target.innerText);
-    input.classList.add('cell-input2');
+    input.classList.add('cell-input');
 
     e.target.innerText = '';
     e.target.append(input);
