@@ -1,16 +1,8 @@
 'use strict';
 drawNewEmployeerForm();
 
-// const table = document.querySelector('table');
 const tHead = document.querySelector('table thead');
-const tHeadItems = [...document.querySelectorAll('table thead tr th')];
 const tBody = document.querySelector('table tbody');
-
-// tHeadItems.forEach(attr => {
-//   attr.dataset.sorted = 'false';
-// });
-
-// let counterForSorting = 0;
 
 tHead.addEventListener('click', e => {
   function sortElements(arrOfElements, i, isNum = false) {
@@ -40,64 +32,51 @@ tHead.addEventListener('click', e => {
   }
 
   const allTr = [...document.querySelectorAll('tbody tr')];
-
   const item = e.target;
 
   const allTh = [...document.querySelectorAll(
     'table thead tr th'
   )].map(category => category.innerText);
+
   const index = allTh.findIndex(a => a === item.innerText);
+
+  const sortedElemsArr = [];
 
   switch (item.innerText) {
     case 'Name' :
 
-      if (item.dataset.sorted === 'false') {
-        sortElements(allTr, index).forEach(a => tBody.append(a));
-
-        tHeadItems.forEach(attr => {
-          attr.dataset.sorted = 'true';
-        });
+      if (item.dataset.sorted === 'true') {
+        reverseSortElements(allTr, index).forEach(a => tBody.append(a));
+        item.removeAttribute('data-sorted');
         break;
       }
+      item.dataset.sorted = 'true';
 
-      tHeadItems.forEach(attr => {
-        attr.dataset.sorted = 'false';
-      });
-      reverseSortElements(allTr, index).forEach(a => tBody.append(a));
+      sortElements(allTr, index).forEach(a => tBody.append(a));
       break;
 
     case 'Position' :
 
-      if (item.dataset.sorted === 'false') {
-        sortElements(allTr, index).forEach(a => tBody.append(a));
-
-        tHeadItems.forEach(attr => {
-          attr.dataset.sorted = 'true';
-        });
+      if (item.dataset.sorted === 'true') {
+        reverseSortElements(allTr, index).forEach(a => tBody.append(a));
+        item.removeAttribute('data-sorted');
         break;
       }
+      item.dataset.sorted = 'true';
 
-      tHeadItems.forEach(attr => {
-        attr.dataset.sorted = 'false';
-      });
-      reverseSortElements(allTr, index).forEach(a => tBody.append(a));
+      sortElements(allTr, index).forEach(a => tBody.append(a));
       break;
 
     case 'Office' :
 
-      if (item.dataset.sorted === 'false') {
-        sortElements(allTr, index).forEach(a => tBody.append(a));
-
-        tHeadItems.forEach(attr => {
-          attr.dataset.sorted = 'true';
-        });
+      if (item.dataset.sorted === 'true') {
+        reverseSortElements(allTr, index).forEach(a => tBody.append(a));
+        item.removeAttribute('data-sorted');
         break;
       }
+      item.dataset.sorted = 'true';
 
-      tHeadItems.forEach(attr => {
-        attr.dataset.sorted = 'false';
-      });
-      reverseSortElements(allTr, index).forEach(a => tBody.append(a));
+      sortElements(allTr, index).forEach(a => tBody.append(a));
       break;
 
     case 'Salary' :
@@ -107,10 +86,9 @@ tHead.addEventListener('click', e => {
         item.removeAttribute('data-sorted');
         break;
       }
-
       item.dataset.sorted = 'true';
-      sortElements(allTr, index, true).forEach(a => tBody.append(a));
 
+      sortElements(allTr, index, true).forEach(a => tBody.append(a));
       break;
 
     case 'Age' :
@@ -126,7 +104,21 @@ tHead.addEventListener('click', e => {
       break;
   };
 
-  // counterForSorting++;
+  [...document.querySelectorAll(
+    'table thead tr th'
+  )].forEach(isSorted => {
+    if (isSorted.dataset.sorted === 'true') {
+      sortedElemsArr.push(isSorted);
+    };
+  });
+
+  if (sortedElemsArr.length > 1) {
+    [...document.querySelectorAll(
+      'table thead tr th'
+    )].forEach(el => {
+      el.dataset.sorted = 'false';
+    });
+  }
 });
 
 tBody.addEventListener('click', e => {
@@ -142,23 +134,30 @@ tBody.addEventListener('click', e => {
 tBody.addEventListener('dblclick', e => {
   const item = e.target;
 
-  const textArea = document.createElement('textarea');
+  [...document.querySelectorAll('tbody tr td')].forEach(attr => {
+    attr.removeAttribute('contentEditable');
+    attr.removeAttribute('style');
+  });
 
-  textArea.style.cssText = `
+  item.style.cssText = `
+  user-select: none;
   border: none;
   overflow: auto;
   outline: none;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  resize: none;
-  color: inherit;
-  font-family: inherit;
-  font-weight: inherit;
-  font-size: inherit;
 `;
 
-  item.append(textArea);
+  item.addEventListener('keydown', () => {
+    if (event.code === 'Enter') {
+      item.removeAttribute('contentEditable');
+      item.removeAttribute('style');
+    }
+  });
+
+  item.setAttribute('contentEditable', '');
+  item.focus();
 });
 
 function drawNewEmployeerForm() {
@@ -205,8 +204,6 @@ function drawNewEmployeerForm() {
 
 const sendFormButton = document.querySelector('#sendForm');
 const formForNewEmployee = document.querySelector('.new-employee-form');
-
-// Making firstletter into uppercase
 
 [...document.querySelectorAll('input')].forEach(a => {
   a.addEventListener('input', function() {
