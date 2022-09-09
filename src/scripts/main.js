@@ -150,6 +150,10 @@ tBody.addEventListener('dblclick', e => {
   box-shadow: none;
 `;
 
+  item.addEventListener('blur', handler => {
+    handler.target.innerText = initialText;
+  });
+
   item.addEventListener('keydown', a => {
     if (a.code === 'Enter') {
       if (a.target.innerText === '') {
