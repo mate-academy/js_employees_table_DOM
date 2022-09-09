@@ -133,6 +133,7 @@ tBody.addEventListener('click', e => {
 
 tBody.addEventListener('dblclick', e => {
   const item = e.target;
+  const initialText = item.innerText;
 
   [...document.querySelectorAll('tbody tr td')].forEach(attr => {
     attr.removeAttribute('contentEditable');
@@ -149,8 +150,11 @@ tBody.addEventListener('dblclick', e => {
   box-shadow: none;
 `;
 
-  item.addEventListener('keydown', () => {
-    if (event.code === 'Enter') {
+  item.addEventListener('keydown', a => {
+    if (a.code === 'Enter') {
+      if (a.target.innerText === '') {
+        a.target.innerText = initialText;
+      }
       item.removeAttribute('contentEditable');
       item.removeAttribute('style');
     }
@@ -165,12 +169,12 @@ function drawNewEmployeerForm() {
     <form method="post" class="new-employee-form">
       <label for="name">
         Name:
-        <input name="name" data-qa="name" type="text">
+        <input required name="name" data-qa="name" type="text">
       </label>
 
       <label for="position">
         Position:
-        <input name="position" data-qa="position" type="text">
+        <input required name="position" data-qa="position" type="text">
       </label>
 
       <label for="office">
@@ -187,7 +191,7 @@ function drawNewEmployeerForm() {
 
       <label for="age">
         Age:
-        <input name="age" data-qa="age" type="number">
+        <input required name="age" data-qa="age" type="number">
       </label>
 
       <label for="salary">
@@ -250,9 +254,6 @@ formForNewEmployee.addEventListener('click', e => {
 
   document.querySelector('option').setAttribute('selected', '');
 
-  inputs.forEach(value => {
-    value.value = '';
-  });
   document.querySelector('option').removeAttribute('selected');
 
   if (data.get(
@@ -260,9 +261,27 @@ formForNewEmployee.addEventListener('click', e => {
   ) {
     container.className = 'error';
 
-    pushNotification(10, 10, 'Title of Error message',
-      'Message example.\n '
-      + 'Notification should contain title and description.', 'error');
+    pushNotification(10, 10, 'Error',
+      `Invalid form. Please review what did you write`, 'error');
+
+    setTimeout(() => {
+      container.remove();
+    }, 2000);
+
+    return;
+  }
+
+  const arrForValidation = [];
+
+  inputs.map(valid => {
+    if (valid.value === '') {
+      arrForValidation.push(1);
+    }
+  });
+
+  if (arrForValidation.length > 0) {
+    pushNotification(10, 10, 'Error',
+      `Invalid form. Please review what did you write`, 'error');
 
     setTimeout(() => {
       container.remove();
@@ -279,15 +298,18 @@ formForNewEmployee.addEventListener('click', e => {
       <td>${data.get('position')}</td>
       <td>${data.get('office')}</td>
       <td>${data.get('age')}</td>
-      <td>$${salaryNum.toLocaleString('en-IN')}</td>
+      <td>$${salaryNum.toLocaleString('en-US')}</td>
     </tr>
   `;
 
   tBody.insertAdjacentHTML('beforeend', result);
 
-  pushNotification(10, 10, 'Title of Success message',
-    'Message example.\n '
-    + 'Notification should contain title and description.', 'success');
+  pushNotification(10, 10, 'Success! You added a new employeer into table',
+    `Congratulation! You added a new employeer! `, 'success');
+
+  inputs.forEach(value => {
+    value.value = '';
+  });
   container.className = 'success';
 
   setTimeout(() => {
