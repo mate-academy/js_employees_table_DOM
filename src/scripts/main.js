@@ -1,6 +1,5 @@
 'use strict';
-// sort on click
-
+/*  eslint-disable */
 const theadRow = document.querySelector('thead tr');
 const bodyTable = document.querySelector('tbody');
 let toggle = true;
@@ -37,7 +36,6 @@ theadRow.addEventListener('click', (e) => {
   });
 });
 
-// select active
 bodyTable.addEventListener('click', (e) => {
   const activeRow = document.querySelector('.active');
 
@@ -50,8 +48,6 @@ bodyTable.addEventListener('click', (e) => {
   row.classList.toggle('active');
 });
 
-// form
-
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
@@ -59,7 +55,7 @@ form.classList.add('new-employee-form');
 form.innerHTML = `
   <label>Name: <input name="name" type="text" data-qa="name" required></label>
   <label>Position:
-    <input name="position" type="text" data-qa="position">
+    <input name="position" type="text" data-qa="position" required>
   </label>
   <label>Office:
     <select name="office" data-qa="office" required>
@@ -79,9 +75,17 @@ form.innerHTML = `
 `;
 document.body.append(form);
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
+const inputs = document.querySelectorAll('input');
+inputs.forEach(input => {
+  input.addEventListener('invalid', (e) => {
+    e.preventDefault();
+    pushNotification('Error',
+    'Some inputs are incorrect', 'error');
+  });
+});
 
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
   const data = new FormData(form);
   const dataValues = Object.fromEntries(data.entries());
 
@@ -90,14 +94,14 @@ form.addEventListener('submit', (e) => {
   dataValues.salary = '$' + nf.format(dataValues.salary);
 
   if (dataValues.name.length < 4
-      || dataValues.position.length < 4
-      || dataValues.age < 18
-      || dataValues.age > 90) {
+    || dataValues.position.length < 4
+    || dataValues.age < 18
+    || dataValues.age > 90) {
     pushNotification('Error',
-      'Some inputs are incorrect', 'error');
+    'Some inputs are incorrect', 'error');
 
-    return;
-  }
+  return;
+}
 
   pushNotification('Success',
     'Data added to the table', 'success');
@@ -113,8 +117,6 @@ form.addEventListener('submit', (e) => {
   `;
   bodyTable.append(tr);
 });
-
-// notifications
 
 const pushNotification = (title, description, type) => {
   const div = document.createElement('div');
@@ -132,8 +134,6 @@ const pushNotification = (title, description, type) => {
     document.body.removeChild(div);
   }, 2000);
 };
-
-// doubleClick
 
 bodyTable.addEventListener('dblclick', (e) => {
   const item = e.target;
