@@ -227,15 +227,15 @@ table.addEventListener('dblclick', (e) => {
     return;
   };
 
-  if (document.querySelector('.cell3-input')) {
+  if (document.querySelector('.cell-input')) {
     saveValue();
-    document.querySelector('.cell3-input').remove();
+    document.querySelector('.cell-input').remove();
   }
 
   const input = document.createElement('input');
 
   input.setAttribute('value', e.target.innerText);
-  input.classList.add('cell3-input');
+  input.classList.add('cell-input');
   e.target.innerText = '';
   e.target.append(input);
   input.focus();
@@ -249,7 +249,7 @@ table.addEventListener('keypress', (e) => {
 });
 
 function saveValue() {
-  const lastInput = document.querySelector('.cell3-input');
+  const lastInput = document.querySelector('.cell-input');
   const lastValue = lastInput.value;
 
   if (lastValue.length === 0) {
