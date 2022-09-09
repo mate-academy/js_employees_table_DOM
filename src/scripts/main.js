@@ -222,40 +222,41 @@ function addRow(e) {
 
 form.addEventListener('submit', addRow);
 
-function editCell(e) {
-  if (e.target.tagName === 'TD') {
-    if (table.querySelector('input')) {
-      saveText();
-    };
+table.addEventListener('dblclick', (e) => {
+  if (e.target.tagName !== 'TD') {
+    return;
+  };
 
-    const input = document.createElement('input');
-
-    input.setAttribute('value', e.target.innerText);
-    input.classList.add('cell-input');
-
-    e.target.innerText = '';
-    e.target.append(input);
-
-    input.focus();
-
-    input.addEventListener('blur', () => {
-      saveText();
-    });
-
-    input.addEventListener('keypress', () => {
-      if (e.key === 'Enter') {
-        input.blur();
-      }
-    });
+  if (document.querySelector('.cell3-input')) {
+    saveValue();
+    document.querySelector('.cell3-input').remove();
   }
 
-  function saveText() {
-    const lastEditingInput = table.querySelector('input');
+  const input = document.createElement('input');
 
-    lastEditingInput.parentElement.innerHTML = `
-      ${lastEditingInput.value}
-    `;
+  input.setAttribute('value', e.target.innerText);
+  input.classList.add('cell3-input');
+  e.target.innerText = '';
+  e.target.append(input);
+  input.focus();
+});
+
+table.addEventListener('keypress', (e) => {
+  if (e.key !== 'Enter') {
+    return;
   }
+  saveValue();
+});
+
+function saveValue() {
+  const lastInput = document.querySelector('.cell3-input');
+  const lastValue = lastInput.value;
+
+  if (lastValue.length === 0) {
+    lastInput.parentElement.innerText = lastInput.getAttribute('value');
+  } else {
+    lastInput.parentElement.innerText = lastValue;
+  }
+
+  lastInput.blur();
 }
-
-table.addEventListener('dblclick', editCell);
