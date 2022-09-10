@@ -1,5 +1,5 @@
 body {
-  background-image: linear-gradient(45deg, #4ebd36, #7e7cf9);
+  background-image: linear-gradient(180deg, #e67297, #6c4783);
   background-attachment: fixed;
   display: flex;
   justify-content: center;
@@ -27,7 +27,7 @@ tr:nth-child(2n + 1) {
 }
 
 thead tr:first-child {
-  background: #e25644;
+  background: #9590d5;
   color: #fff;
 }
 
@@ -39,6 +39,10 @@ td,
 th {
   text-align: left;
   padding: 18px;
+}
+
+thead * {
+  color: rgb(0, 0, 0);
 }
 
 thead th:hover {
@@ -142,12 +146,12 @@ tr.active {
 }
 
 .cell-input {
-  border: none;
   color: #808080;
   font-size: 16px;
   background: transparent;
   padding: 0;
   outline: none;
+  width: fit-content;
 }
 
 .notification {
@@ -181,3 +185,5 @@ tr.active {
     background: rgba(253, 0, 0, 0.3);
   }
 }
+
+
