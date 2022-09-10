@@ -29,11 +29,11 @@ thead.addEventListener('click', (event) => {
       return isNaN(prev)
         ? prev.localeCompare(next)
         : prev - next;
-    } else {
-      return isNaN(prev)
-        ? next.localeCompare(prev)
-        : next - prev;
     }
+
+    return isNaN(prev)
+      ? next.localeCompare(prev)
+      : next - prev;
   });
 
   tbody.append(...sorted);
