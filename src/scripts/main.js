@@ -260,13 +260,17 @@ formForNewEmployee.addEventListener('click', e => {
 
   document.querySelector('option').removeAttribute('selected');
 
-  if (data.get(
-    'name').length < 4 || data.get('age') < 18 || data.get('age') > 90
-  ) {
-    container.className = 'error';
+  const arrForValidation = [];
 
+  inputs.map(valid => {
+    if (valid.value === '') {
+      arrForValidation.push(valid.getAttribute('name'));
+    }
+  });
+
+  if (arrForValidation.length > 0) {
     pushNotification(10, 10, 'Error',
-      `Invalid form. Please review what did you write`, 'error');
+      `Invalid form. Please fill ${arrForValidation[0]}`, 'error');
 
     setTimeout(() => {
       container.remove();
@@ -275,17 +279,24 @@ formForNewEmployee.addEventListener('click', e => {
     return;
   }
 
-  const arrForValidation = [];
+  if (data.get(
+    'name').length < 4 || data.get('age') < 18 || data.get('age') > 90
+  ) {
+    container.className = 'error';
 
-  inputs.map(valid => {
-    if (valid.value === '') {
-      arrForValidation.push(1);
+    if (data.get('name').length < 4) {
+      pushNotification(10, 10, 'Error',
+        `Invalid form. Name must have more then 3 letter`, 'error');
+
+      setTimeout(() => {
+        container.remove();
+      }, 2000);
+
+      return;
     }
-  });
 
-  if (arrForValidation.length > 0) {
     pushNotification(10, 10, 'Error',
-      `Invalid form. Please review what did you write`, 'error');
+      `Invalid form. You age must be more then 18 or less 90`, 'error');
 
     setTimeout(() => {
       container.remove();
