@@ -2,10 +2,11 @@
 
 const body = document.querySelector('body');
 const tbody = document.querySelector('tbody');
-const error = document.createElement('div');
 const savingObject = {
   state: true,
 };
+
+const error = document.createElement('div');
 
 error.classList.add('error');
 error.classList.add('notification');
@@ -59,27 +60,20 @@ function tableSort(element, order) {
   const trs = document.querySelectorAll('tbody tr');
   const parentNode = element.parentNode;
   const position = [...parentNode.children].indexOf(element);
+  let sorted;
 
-  let sorted = [...trs]
-    .sort((a, b) => a.children[position]
+  (position === 4)
+    ? sorted = [...trs].sort((a, b) => converter(a.children[position]
+      .innerHTML) - converter(b.children[position].innerHTML))
+    : sorted = [...trs].sort((a, b) => a.children[position]
       .innerHTML > b.children[position].innerHTML ? 1 : -1);
 
-  if (position === 4) {
-    sorted = [...trs]
-      .sort((a, b) => converter(a.children[position]
-        .innerHTML) - converter(b.children[position].innerHTML));
-  }
-
-  if (order === false) {
-    sorted = [...trs]
-      .sort((a, b) => b.children[position]
+  if (!order) {
+    (position === 4)
+      ? sorted = [...trs].sort((a, b) => converter(b.children[position]
+        .innerHTML) - converter(a.children[position].innerHTML))
+      : sorted = [...trs].sort((a, b) => b.children[position]
         .innerHTML > a.children[position].innerHTML ? 1 : -1);
-
-    if (position === 4) {
-      sorted = [...trs]
-        .sort((a, b) => converter(b.children[position]
-          .innerHTML) - converter(a.children[position].innerHTML));
-    }
   }
 
   tbody.innerHTML = '';
@@ -115,21 +109,33 @@ document.addEventListener('click', e => {
     const inputs = document.querySelectorAll('.new-employee-form label input');
     const select = document.querySelector('.new-employee-form label select');
 
+    for (const index of [...inputs]) {
+      index.style.backgroundColor = '';
+    }
+
     if ([...inputs].find(el => el.value.length === 0)) {
-      error.innerHTML = 'Some field are empty';
+      const incorrect = [...inputs].filter(el => el.value.length === 0);
+
+      for (const input of incorrect) {
+        input.style.backgroundColor = '#bed7dc';
+      }
+
+      error.innerHTML = 'Some fields are empty';
       body.append(error);
 
       return;
     }
 
     if ([...inputs][0].value.length < 4) {
-      error.innerHTML = 'Name must contain al least 4 letters';
+      [...inputs][0].style.backgroundColor = '#bed7dc';
+      error.innerHTML = 'Name must contain al least 4 characters';
       body.append(error);
 
       return;
     }
 
     if ([...inputs][2].value < 18 || [...inputs][2].value > 90) {
+      [...inputs][2].style.backgroundColor = '#bed7dc';
       error.innerHTML = 'Age cannot be less than 18 or older than 90';
       body.append(error);
 
@@ -149,7 +155,7 @@ document.addEventListener('click', e => {
     body.append(success);
   }
 
-  if (e.target.closest('tbody tr')) {
+  if (item.closest('tbody tr')) {
     const trs = document.querySelectorAll('tr');
 
     for (const char of [...trs]) {
