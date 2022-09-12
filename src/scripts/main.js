@@ -151,7 +151,11 @@ tBody.addEventListener('dblclick', e => {
 `;
 
   item.addEventListener('blur', handler => {
-    handler.target.innerText = initialText;
+    if (handler.target.innerText === '') {
+      handler.target.innerText = initialText;
+    }
+    item.removeAttribute('contentEditable');
+    item.removeAttribute('style');
   });
 
   item.addEventListener('keydown', a => {
@@ -331,3 +335,12 @@ formForNewEmployee.addEventListener('click', e => {
     container.remove();
   }, 2000);
 });
+
+const section = document.createElement('section');
+
+section.append(document.querySelector('table'));
+section.append(document.querySelector('form'));
+
+section.style.display = 'flex';
+
+document.querySelector('body').append(section);
