@@ -52,32 +52,16 @@ head.addEventListener('click', (event) => {
   }
 });
 
-let rowAlreadyActive = 0;
-let indexToRemove = 0;
-
 tbody.addEventListener('click', (event) => {
-  const tr = tbody.querySelectorAll('tr');
-  let index = 0;
-
-  for (let i = 0; i < tr.length; i++) {
-    const td = tr[i].querySelectorAll('td');
-
-    if (td[event.target.cellIndex] === event.target) {
-      index = i;
-    }
+  if (event.target.closest('tr').matches('.active')) {
+    return;
   }
 
-  if (rowAlreadyActive === 0) {
-    rowAlreadyActive = 1;
-    indexToRemove = index;
+  [...tbody.children].forEach(item => {
+    item.classList.remove('active');
+  });
 
-    return tbody.rows[index].classList.add('active');
-  }
-
-  tbody.rows[indexToRemove].classList.remove('active');
-  indexToRemove = index;
-
-  return tbody.rows[index].classList.add('active');
+  event.target.closest('tr').classList.toggle('active');
 });
 
 body.insertAdjacentHTML('beforeend', `
