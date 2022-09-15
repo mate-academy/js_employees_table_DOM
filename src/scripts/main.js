@@ -7,7 +7,7 @@ const body = document.querySelector('body');
 const minNameChars = 4;
 const minYear = 18;
 const maxYear = 90;
-const minPositionChars = 4;
+const minPositionChars = 3;
 const minSalary = 0;
 
 sortList();
@@ -164,7 +164,7 @@ function addForm() {
           'error');
         break;
 
-      case salaryPerson < minSalary:
+      case salaryPerson < minSalary || !salaryPerson:
 
         pushNotification(450, 190, 'Error',
           `Salary cannot be less than ${minSalary}`,
@@ -343,7 +343,7 @@ function replaceText() {
           break;
 
         case salaryCell:
-          if (parseInt(tag.value) < minSalary) {
+          if (tag.value < minSalary) {
             td.textContent = tdText;
 
             pushNotification(450, 190, 'Error',
