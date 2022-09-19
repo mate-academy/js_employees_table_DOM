@@ -47,7 +47,6 @@ body.insertAdjacentHTML('beforeend', `
   </form>
 `);
 
-// just NOTIFICATION(function with errors for it)
 function pushNotification(title, description, type) {
   body.insertAdjacentHTML('beforeend', `
     <div class="notification ${type}" data-qa="notification">
@@ -61,7 +60,6 @@ function pushNotification(title, description, type) {
   }, 2000);
 }
 
-// just VALIDATION
 function checkFormData(key, value) {
   if (!value) {
     pushNotification('An error occured', 'Empty field value', 'error');
@@ -84,7 +82,6 @@ function checkFormData(key, value) {
   return true;
 }
 
-// just ROW SORTING
 tHead.addEventListener('click', (e) => {
   const index = e.target.cellIndex;
   const isSorted = e.target.matches('.sorted');
@@ -116,7 +113,6 @@ tHead.addEventListener('click', (e) => {
   });
 });
 
-// just ROW SELECTING
 tBody.addEventListener('click', (e) => {
   if (e.target.closest('tr').matches('.active')) {
     return;
@@ -129,7 +125,6 @@ tBody.addEventListener('click', (e) => {
   e.target.closest('tr').classList.toggle('active');
 });
 
-// just FORM VALIDATION
 body.querySelector('.new-employee-form').addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -156,40 +151,103 @@ body.querySelector('.new-employee-form').addEventListener('submit', (e) => {
   pushNotification('Success', 'New data added', 'success');
 });
 
-// just RAW
-tBody.addEventListener('dblclick', (e) => {
-  const element = e.target.closest('td');
-  const parentElement = element.parentElement;
+tBody.addEventListener('dblclick', ev => {
+  const targeted = ev.target;
+
+  const originalText = targeted.textContent;
+
   const input = document.createElement('input');
-  const cellIndex = element.cellIndex;
 
-  input.classList.add('cell-input');
+  input.className = 'cell-input';
+  input.name = 'text';
   input.type = 'text';
-  parentElement.replaceChild(input, element);
+
+  targeted.textContent = '';
+
+  targeted.append(input);
   input.focus();
-  input.value = element.innerText;
 
-  input.addEventListener('blur', (elem) => {
+  const textInput = document.querySelector('.cell-input');
 
+  input.addEventListener('keydown', e => {
+    if (e.code === 'Enter') {
+      if (textInput.value.length === 0) {
+        targeted.textContent = originalText;
+      }
+
+      if (targeted.cellIndex === 0) {
+        if (textInput.value.length < 4) {
+          targeted.textContent = originalText;
+
+          pushNotification('Error', 'Invalid Name', 'error');
+        } else {
+          targeted.textContent = textInput.value;
+
+          pushNotification('Success', 'Successfully changed', 'success');
+        }
+      } else if (targeted.cellIndex === 3) {
+        if (+textInput.value < 18 || +textInput.value > 90) {
+          targeted.textContent = originalText;
+
+          pushNotification('Error', 'Invalid Age', 'error');
+        } else {
+          targeted.textContent = textInput.value;
+
+          pushNotification('Success', 'Successfully changed', 'success');
+        }
+      } else if (targeted.cellIndex === 4) {
+        if (isNaN(textInput.value)) {
+          targeted.textContent = originalText;
+
+          pushNotification('Error', 'Not a number', 'error');
+        } else {
+          targeted.textContent = `
+            $${parseInt(textInput.value).toLocaleString('en-US')}
+          `;
+
+          pushNotification('Success', 'Successfully changed', 'success');
+        }
+      }
+    }
   });
 
-  input.addEventListener('blur', (elem) => {
-    const key = tHead.firstElementChild.children[cellIndex]
-      .innerText.toLowerCase();
-
-    if (checkFormData(key, input.value)) {
-      element.innerText = input.value;
+  input.addEventListener('blur', e2 => {
+    if (textInput.value.length === 0) {
+      targeted.textContent = originalText;
     }
 
-    parentElement.replaceChild(element, input);
-    input.remove();
-  });
+    if (targeted.cellIndex === 0) {
+      if (textInput.value.length < 4) {
+        targeted.textContent = originalText;
 
-  input.addEventListener('keydown', (elem) => {
-    if (elem.type === 'keydown' && elem.code !== 'Enter') {
-      return;
+        pushNotification('Error', 'Invalid Name', 'error');
+      } else {
+        targeted.textContent = textInput.value;
+
+        pushNotification('Success', 'Successfully changed', 'success');
+      }
+    } else if (targeted.cellIndex === 3) {
+      if (+textInput.value < 18 || +textInput.value > 90) {
+        targeted.textContent = originalText;
+
+        pushNotification('Error', 'Invalid Age', 'error');
+      } else {
+        targeted.textContent = textInput.value;
+
+        pushNotification('Success', 'Successfully changed', 'success');
+      }
+    } else if (targeted.cellIndex === 4) {
+      if (isNaN(textInput.value)) {
+        targeted.textContent = originalText;
+
+        pushNotification('Error', 'Not a number', 'error');
+      } else {
+        targeted.textContent = `
+          $${parseInt(textInput.value).toLocaleString('en-US')}
+        `;
+
+        pushNotification('Success', 'Successfully changed', 'success');
+      }
     }
-
-    input.blur();
   });
 });
