@@ -163,17 +163,17 @@ tbody.addEventListener('dblclick', (events) => {
    value="${events.target.textContent = ''}" class="cell-input">
   `;
 
-  const input = events.target.querySelector('input');
+  const clickCounter = events.target.querySelector('input');
 
-  input.focus();
+  clickCounter.focus();
 
-  input.addEventListener('blur', () => {
-    events.target.textContent = input.value;
+  clickCounter.addEventListener('blur', () => {
+    events.target.textContent = clickCounter.value;
   });
 
-  input.addEventListener('keydown', (e) => {
+  clickCounter.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-      events.target.textContent = input.value;
+      events.target.textContent = clickCounter.value;
     }
   });
 });
