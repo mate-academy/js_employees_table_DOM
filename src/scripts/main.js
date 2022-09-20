@@ -4,7 +4,6 @@ const tableHeader = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
 const employeesList = [];
 
-// CREATE ARRAY OF OBJECTS FROM TABLE FIELDS
 function getEmployees(list) {
   const employee = {
     name: list[0],
@@ -24,7 +23,6 @@ for (const child of tableBody.children) {
   employeesList.push(employeeRow);
 }
 
-// CREATE FORM AND ADD ITS CONTENT TO TABLE + MESSAGE
 document.body.insertAdjacentHTML('beforeend', `
   <form class="new-employee-form">
     <label>Name:
@@ -121,8 +119,6 @@ function capitalizePhrase(word) {
 function createSalary(number) {
   return `$${parseFloat(number).toLocaleString('en-US')}`;
 }
-
-// SORT TABLE BY HEADER
 
 let sortedList = false;
 
@@ -254,7 +250,6 @@ function createNumber(string) {
   }
 }
 
-// ACTIVE SELECTED ROW
 tableBody.addEventListener('click', e => {
   const row = e.target.closest('tr');
   const choosenRow = tableBody.querySelector('.active');
@@ -266,7 +261,6 @@ tableBody.addEventListener('click', e => {
   row.classList.add('active');
 });
 
-// EDIT CHOOSEN CELL
 tableBody.addEventListener('dblclick', e => {
   const choosenCell = e.target.innerText;
   let input = document.createElement('input');
