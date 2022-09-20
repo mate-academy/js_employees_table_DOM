@@ -156,3 +156,24 @@ tbody.addEventListener('click', events => {
     row.classList.add('active');
   }
 });
+
+tbody.addEventListener('dblclick', (events) => {
+  events.target.innerHTML = `
+   <input type="text"
+   value="${events.target.textContent = ''}" class="cell-input">
+  `;
+
+  const input = events.target.querySelector('input');
+
+  input.focus();
+
+  input.addEventListener('blur', () => {
+    events.target.textContent = input.value;
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      events.target.textContent = input.value;
+    }
+  });
+});
