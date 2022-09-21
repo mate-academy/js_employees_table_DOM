@@ -3,21 +3,23 @@
 const { pushNotification } = require('./pushNotification.js');
 
 let positionNotification = 10;
-const errorTitle = `Title of Error message`;
-const errorMessage = `Notification should contain title and description.`;
-const successTitle = `Title of Success message`;
-const successMessage = `Notification should contain title and description.`;
+const errorTitle = `Validation error`;
+const errorMessage = `Please check your data and try again.`;
+const successTitle = `New employee added`;
+const successMessage = `Congrats! Info about the new employee was added.`;
 
 function formHandlerFunc(form, tbody) {
-  const nameInput = form.querySelector('#name-input');
-  const positionInput = form.querySelector('#position-input');
-  const officeInput = form.querySelector('#office-input');
-  const ageInput = form.querySelector('#age-input');
-  const salaryInput = form.querySelector('#salary-input');
+  const inputs = [
+    form.querySelector('#name-input'),
+    form.querySelector('#position-input'),
+    form.querySelector('#office-input'),
+    form.querySelector('#age-input'),
+    form.querySelector('#salary-input'),
+  ];
 
-  if (nameInput.value.length < 4
-    || ageInput.value < 18
-    || ageInput.value > 90
+  if (inputs[0].value.length < 4
+    || inputs[3].value < 18
+    || inputs[3].value > 90
   ) {
     pushNotification(positionNotification, 10, errorTitle,
       errorMessage, 'error');
@@ -33,21 +35,12 @@ function formHandlerFunc(form, tbody) {
 
   const newRowForForm = document.createElement('tr');
 
-  newRowForForm.innerHTML = `
-    <td>${nameInput.value}</td>
-    <td>${positionInput.value}</td>
-    <td>${officeInput.value}</td>
-    <td>${ageInput.value}</td>
-    <td>${salaryInput.value}</td>
-  `;
+  newRowForForm.innerHTML = inputs
+    .reduce((prev, input) => (prev + `<td>${input.value}</td>`), '');
 
   tbody.appendChild(newRowForForm);
 
-  nameInput.value = '';
-  positionInput.value = '';
-  officeInput.value = '';
-  ageInput.value = '';
-  salaryInput.value = '';
+  inputs.forEach(input => (input.value = ''));
 
   pushNotification(positionNotification, 10, successTitle,
     successMessage, 'success');

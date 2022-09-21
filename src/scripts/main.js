@@ -43,7 +43,7 @@ tableBody.addEventListener('dblclick', (dblClkEve) => {
 
   // Blur listener:
   newInput.addEventListener('blur', () => {
-    rowItemDBL.innerText = newInput.value;
+    rowItemDBL.innerHTML = newInput.value;
     newInput.value = '';
     newInput.remove();
   });
