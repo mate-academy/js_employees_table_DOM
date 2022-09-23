@@ -196,7 +196,7 @@ function createInput(target, previousValue) {
 
 function saveInputValueToTable(tableDataItem, input, previousValue) {
   if (input.value.trim() === '') {
-    tableDataItem.innerHTML = previousValue;
+    tableDataItem.innerHTML = previousValue || 'Empty!';
 
     return;
   }
