@@ -165,13 +165,14 @@ form.addEventListener('submit', e => {
       <td>${valueName}</td>
       <td>${valuePosition}</td>
       <td>${valueOffice}</td>
-      <td>${valueAge}3</td>
-      <td>$${valueSalary}</td>
+      <td>${valueAge}</td>
+      <td>$${valueSalary},000</td>
     </tr>
   `);
 
     pushNotification(10, 10, 'Success!!!',
       'You add a row.', 'success');
+    form.reset();
 
     return;
   }
