@@ -274,7 +274,7 @@ form.addEventListener('submit', (e) => {
     name: form.elements.name.value,
     position: form.elements.position.value,
     office: form.elements.office.value,
-    age: form.elements.age.value,
+    age: Number(form.elements.age.value),
     salary: formatSalaryToNumber(form.elements.salary.value),
   };
 
