@@ -47,27 +47,41 @@ function notification(type, title, description) {
 
 function isValid(value, key) {
   if (!value) {
-    notification('error', 'Error', 'You must complete every field');
+    notification(
+      'error',
+      'Error',
+      'You must complete every field'
+    );
 
     return false;
   }
 
   if (key === 'name' && value.length < 4) {
-    notification('error', 'Error',
-      'Name field must be at least 4 characters length');
+    notification(
+      'error',
+      'Error',
+      'Name field must be at least 4 characters length'
+    );
 
     return false;
   }
 
   if (key === 'position' && value.length < 3) {
-    notification('error', 'Error',
-      'Position field must be at least 3 characters length');
+    notification(
+      'error',
+      'Error',
+      'Position field must be at least 3 characters length'
+    );
 
     return false;
   }
 
   if (key === 'age' && (+value < 18 || +value > 90)) {
-    notification('error', 'Error', 'Age must be between 18 and 90');
+    notification(
+      'error',
+      'Error',
+      'Age must be between 18 and 90'
+    );
 
     return false;
   }
@@ -164,11 +178,19 @@ form.addEventListener('submit', e => {
       tr.insertAdjacentHTML('beforeend',
         `<td>$${(+value).toLocaleString('en')}</td>`);
     } else {
-      tr.insertAdjacentHTML('beforeend', `<td>${value}</td>`);
+      tr.insertAdjacentHTML(
+        'beforeend',
+        `<td>${value}</td>`
+      );
     }
   }
 
-  notification('success', 'Success', 'Employee has been added successfully!');
+  notification(
+    'success',
+    'Success',
+    'Employee has been added successfully!'
+  );
+
   list.append(tr);
   form.reset();
 });
@@ -187,9 +209,9 @@ list.addEventListener('dblclick', e => {
 
   switch (index) {
     case 2:
-      input.insertAdjacentHTML('beforeend', `
-        <option value="${innerText}">${innerText}</option>
-        ${options}
+      input.insertAdjacentHTML(
+        'beforeend',
+        `${options}
       `);
 
       break;
