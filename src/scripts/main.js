@@ -159,7 +159,31 @@ form.addEventListener('submit', e => {
   const valueAge = data.get('age');
   const valueSalary = data.get('salary');
 
-  if ((valueName.length > 4) && (valueAge < 90) && (valueAge > 18)) {
+  if ((!valuePosition) || (!valueSalary) || (!valueName) || (!valueAge)) {
+    pushNotification(10, 10, 'Error!!!',
+      'You have to fill all places.', 'error');
+  } else
+  if (valueName.length < 4) {
+    pushNotification(120, 10, 'Error!!!',
+      'You have to fill all places.', 'error');
+
+    pushNotification(10, 10, 'Error!!!',
+      'You name must be more 4!', 'error');
+  } else
+  if (valueAge > 90) {
+    pushNotification(120, 10, 'Error!!!',
+      'You have to fill all places.', 'error');
+
+    pushNotification(10, 10, 'Error!!!',
+      'You age must be less 90!', 'error');
+  } else
+  if (valueAge < 18) {
+    pushNotification(120, 10, 'Error!!!',
+      'You have to fill all places.', 'error');
+
+    pushNotification(10, 10, 'Error!!!',
+      'You age must be more 18!', 'error');
+  } else {
     body.insertAdjacentHTML(`beforeend`, `
     <tr>
       <td>${valueName}</td>
@@ -173,10 +197,5 @@ form.addEventListener('submit', e => {
     pushNotification(10, 10, 'Success!!!',
       'You add a row.', 'success');
     form.reset();
-
-    return;
   }
-
-  pushNotification(10, 10, 'Error!!!',
-    'You cannot add a row.', 'error');
 });
