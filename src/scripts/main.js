@@ -238,34 +238,34 @@ list.addEventListener('dblclick', e => {
   });
 
   input.addEventListener('blur', eventBlur => {
-    let isTrue;
+    let isInputValid;
 
     switch (index) {
       case 0:
-        isTrue = isValid(input.value, 'name');
+        isInputValid = isValid(input.value, 'name');
 
         break;
 
       case 1:
-        isTrue = isValid(input.value, 'position');
+        isInputValid = isValid(input.value, 'position');
 
         break;
 
       case 3:
-        isTrue = isValid(input.value, 'age');
+        isInputValid= isValid(input.value, 'age');
 
         break;
 
       case 4:
-        isTrue = input.value >= 0;
+        isInputValid = input.value >= 0;
 
         break;
 
       default:
-        isTrue = true;
+        isInputValid = true;
     }
 
-    if (!isTrue) {
+    if (!isInputValid) {
       element.innerText = innerText;
     } else {
       element.innerText = index === 4
