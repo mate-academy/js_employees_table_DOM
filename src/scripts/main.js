@@ -156,27 +156,24 @@ body.insertAdjacentHTML('beforeend', `
   </form>
 `);
 
-const notificationE = document.createElement('div');
+function callNotification(title, type, text) {
+  const notification = document.createElement('div');
 
-notificationE.classList.add('notification', 'error');
-notificationE.dataset.qa = 'notification';
+  notification.dataset.qa = 'notification';
 
-notificationE.innerHTML = `
-  <h2 class="title">Error</h2>
-    <p>You need to fill all fields</p>
-    <p>Length of name must be not less than 4 letters</p>
-    <p>Age must be not less than 18 and not more than 90 years old</p>
+  notification.classList.add('notification', type);
+
+  notification.innerHTML = `
+    <h2 class="title">${title}</h2>
+    ${text}
   `;
 
-const notificationS = document.createElement('div');
+  body.append(notification);
 
-notificationS.classList.add('notification', 'success');
-notificationS.dataset.qa = 'notification';
-
-notificationS.innerHTML = `
-  <h2 class="title">Success</h2>
-  <p>Information added to the table</p>
-`;
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+};
 
 const form = document.querySelector('form');
 
@@ -218,32 +215,29 @@ form.addEventListener('submit', () => {
     || formValues.age < 18
     || formValues.age > 90
     || formValues.position.length === 0
+    || isNaN(formValues.position) === false
     || formValues.salary === 0
   ) {
-    body.append(notificationE);
-
-    setTimeout(() => {
-      notificationE.remove();
-    }, 5000);
+    callNotification('Error', 'error', `
+      <p>You need to fill all fields</p>
+      <p>Length of name must be not less than 4 letters</p>
+      <p>You don't need to use numbers in Name and Position fields</p>
+      <p>Age must be not less than 18 and not more than 90 years old</p>
+    `);
   } else {
-    body.append(notificationS);
+    callNotification('Success', 'success', `
+      <p>Information added to the table</p>
+    `);
 
-    setTimeout(() => {
-      notificationE.remove();
-    }, 5000);
     bodyOfTable.insertAdjacentHTML('beforeend', newRow);
   }
 });
 
-let cellInitialValue;
-let row;
-let position;
-let input;
-
 bodyOfTable.addEventListener('dblclick', () => {
-  cellInitialValue = event.target.innerHTML;
-  row = event.target.parentElement;
-  position = event.target.cellIndex;
+  const cellInitialValue = event.target.innerHTML;
+  const row = event.target.parentElement;
+  const position = event.target.cellIndex;
+  const currentCell = row.children[position];
 
   if (position === 2) {
     event.target.innerHTML = `
@@ -271,7 +265,7 @@ bodyOfTable.addEventListener('dblclick', () => {
   `;
   }
 
-  input = document.getElementsByClassName('cell-input')[0];
+  const input = document.getElementsByClassName('cell-input')[0];
 
   if (position === 3) {
     input.type = 'number';
@@ -285,111 +279,61 @@ bodyOfTable.addEventListener('dblclick', () => {
 
   input.focus();
 
+  const success = `<p>Information has added to the cell</p>`;
+
   input.addEventListener('blur', () => {
     const value = input.value;
 
     if (position === 0 || position === 1) {
       if (isNaN(value) === true && value.length >= 4) {
-        row.children[position].innerHTML = value;
+        currentCell.innerHTML = value;
 
-        body.append(notificationS);
-
-        setTimeout(() => {
-          notificationS.remove();
-        }, 5000);
+        callNotification('Success', 'success', success);
       } else {
-        row.children[position].innerHTML = cellInitialValue;
+        currentCell.innerHTML = cellInitialValue;
 
-        notificationE.innerHTML = `
-        <h2 class="title">Error</h2>
+        callNotification('Error', 'error', `
           <p>Length of name must be not less than 4</p>
           <p>You don't need to use numbers in this field</p>
-        `;
-
-        body.append(notificationE);
-
-        setTimeout(() => {
-          notificationE.innerHTML = `
-          <h2 class="title">Error</h2>
-            <p>You need to fill all fields</p>
-            <p>Length of name must be not less than 4 letters</p>
-            <p>Age must be not less than 18 and not more than 90 years old</p>
-          `;
-          notificationE.remove();
-        }, 5000);
+        `);
       }
     }
 
     if (position === 2) {
-      body.append(notificationS);
+      callNotification('Success', 'success', success);
 
-      setTimeout(() => {
-        notificationS.remove();
-      }, 5000);
-      row.children[position].innerHTML = value;
+      currentCell.innerHTML = value;
     }
 
     if (position === 3) {
       if (value >= 18
         && value <= 99
         && isNaN(value) === false) {
-        body.append(notificationS);
+        callNotification('Success', 'success', success);
 
-        setTimeout(() => {
-          notificationS.remove();
-        }, 5000);
-        row.children[position].innerHTML = value;
+        currentCell.innerHTML = value;
       } else {
-        row.children[position].innerHTML = cellInitialValue;
+        currentCell.innerHTML = cellInitialValue;
 
-        notificationE.innerHTML = `
-          <h2 class="title">Error</h2>
-            <p>Age must be not less than 18 and not more than 90 years old</p>
-        `;
-
-        body.append(notificationE);
-
-        setTimeout(() => {
-          notificationE.innerHTML = `
-          <h2 class="title">Error</h2>
-            <p>You need to fill all fields</p>
-            <p>Length of name must be not less than 4 letters</p>
-            <p>Age must be not less than 18 and not more than 90 years old</p>
-          `;
-          notificationE.remove();
-        }, 5000);
+        callNotification('Error', 'error', `
+          <p>Age must be not less than 18 and not more than 90 years old</p>
+          <p>You don't need to use letters in this field</p>
+        `);
       }
     }
 
     if (position === 4) {
       if (isNaN(value) === false && value.length !== 0) {
-        body.append(notificationS);
+        callNotification('Success', 'success', success);
 
-        setTimeout(() => {
-          notificationS.remove();
-        }, 5000);
-
-        row.children[position].innerHTML
+        currentCell.innerHTML
         = `$${(+value).toLocaleString('en-US')}`;
       } else {
-        row.children[position].innerHTML = cellInitialValue;
+        currentCell.innerHTML = cellInitialValue;
 
-        notificationE.innerHTML = `
-          <h2 class="title">Error</h2>
-            <p>You need to enter a number</p>
-        `;
-
-        body.append(notificationE);
-
-        setTimeout(() => {
-          notificationE.innerHTML = `
-          <h2 class="title">Error</h2>
-            <p>You need to fill all fields</p>
-            <p>Length of name must be not less than 4 letters</p>
-            <p>Age must be not less than 18 and not more than 90 years old</p>
-          `;
-          notificationE.remove();
-        }, 5000);
+        callNotification('Error', 'error', `
+          <p>You don't need to use letters in this field</p>
+        `);
       }
     }
   });
@@ -400,106 +344,54 @@ bodyOfTable.addEventListener('dblclick', () => {
     if (event.key === 'Enter') {
       if (position === 0 || position === 1) {
         if (isNaN(value) === true && value.length >= 4) {
-          row.children[position].innerHTML = value;
+          currentCell.innerHTML = value;
 
-          body.append(notificationS);
-
-          setTimeout(() => {
-            notificationS.remove();
-          }, 5000);
+          callNotification('Success', 'success', success);
         } else {
-          row.children[position].innerHTML = cellInitialValue;
+          currentCell.innerHTML = cellInitialValue;
 
-          notificationE.innerHTML = `
-          <h2 class="title">Error</h2>
+          callNotification('Error', 'error', `
             <p>Length of name must be not less than 4</p>
             <p>You don't need to use numbers in this field</p>
-          `;
-
-          body.append(notificationE);
-
-          setTimeout(() => {
-            notificationE.innerHTML = `
-            <h2 class="title">Error</h2>
-              <p>You need to fill all fields</p>
-              <p>Length of name must be not less than 4 letters</p>
-              <p>Age must be not less than 18 and not more than 90 years old</p>
-            `;
-            notificationE.remove();
-          }, 5000);
+          `);
         }
       }
 
       if (position === 2) {
-        body.append(notificationS);
+        callNotification('Success', 'success', success);
 
-        setTimeout(() => {
-          notificationS.remove();
-        }, 5000);
-        row.children[position].innerHTML = value;
+        currentCell.innerHTML = value;
       }
 
       if (position === 3) {
         if (value >= 18
           && value <= 99
           && isNaN(value) === false) {
-          body.append(notificationS);
+          callNotification('Success', 'success', success);
 
-          setTimeout(() => {
-            notificationS.remove();
-          }, 5000);
-          row.children[position].innerHTML = value;
+          currentCell.innerHTML = value;
         } else {
-          row.children[position].innerHTML = cellInitialValue;
+          currentCell.innerHTML = cellInitialValue;
 
-          notificationE.innerHTML = `
-            <h2 class="title">Error</h2>
-              <p>Age must be not less than 18 and not more than 90 years old</p>
-          `;
-
-          body.append(notificationE);
-
-          setTimeout(() => {
-            notificationE.innerHTML = `
-            <h2 class="title">Error</h2>
-              <p>You need to fill all fields</p>
-              <p>Length of name must be not less than 4 letters</p>
-              <p>Age must be not less than 18 and not more than 90 years old</p>
-            `;
-            notificationE.remove();
-          }, 5000);
+          callNotification('Error', 'error', `
+            <p>Age must be not less than 18 and not more than 90 years old</p>
+            <p>You don't need to use letters in this field</p>
+          `);
         }
       }
 
       if (position === 4) {
         if (isNaN(value) === false && value.length !== 0) {
-          body.append(notificationS);
+          callNotification('Success', 'success', success);
 
-          setTimeout(() => {
-            notificationS.remove();
-          }, 5000);
-
-          row.children[position].innerHTML
+          currentCell.innerHTML
           = `$${(+value).toLocaleString('en-US')}`;
         } else {
-          row.children[position].innerHTML = cellInitialValue;
+          currentCell.innerHTML = cellInitialValue;
 
-          notificationE.innerHTML = `
-            <h2 class="title">Error</h2>
-              <p>You need to enter a number</p>
-          `;
-
-          body.append(notificationE);
-
-          setTimeout(() => {
-            notificationE.innerHTML = `
-            <h2 class="title">Error</h2>
-              <p>You need to fill all fields</p>
-              <p>Length of name must be not less than 4 letters</p>
-              <p>Age must be not less than 18 and not more than 90 years old</p>
-            `;
-            notificationE.remove();
-          }, 5000);
+          callNotification('Error', 'error', `
+            <p>You don't need to use letters in this field</p>
+          `);
         }
       }
     }
