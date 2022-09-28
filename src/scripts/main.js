@@ -4,6 +4,8 @@
 const headers = document.querySelector('thead tr');
 const tableBody = document.querySelector('tbody');
 const list = [...tableBody.querySelectorAll('tr')];
+let lastChoise;
+let x = 1;
 
 // [1] sorting
 headers.addEventListener('click', action => {
@@ -36,9 +38,6 @@ headers.addEventListener('click', action => {
   }
 
   // DESC or ASC order
-  let lastChoise;
-  let x = 1;
-
   if (lastChoise === index) {
     x *= -1;
   } else {
