@@ -138,6 +138,9 @@ labelForSelect.innerHTML = `
 
 form.insertBefore(labelForSelect, form.children[2]);
 
+const formInputs = document.querySelectorAll('input');
+const selectInput = document.querySelector('select');
+
 const idSelectors = ['name', 'position', 'office', 'age', 'salary'];
 const tBody = document.querySelector('tbody');
 
@@ -170,6 +173,11 @@ function addData(e) {
 
     tableRow.appendChild(cell);
   });
+
+  [ ...formInputs ].forEach(input => {
+    input.value = '';
+  });
+  selectInput.selectedIndex = 0;
 }
 
 const submitButton = document.querySelector('button');
