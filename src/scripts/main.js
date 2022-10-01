@@ -1,6 +1,7 @@
 'use strict';
 
 const thead = document.querySelector('thead').querySelector('tr');
+const tbody = document.querySelector('tbody');
 let workerData;
 const clickCounts = {};
 
@@ -68,7 +69,7 @@ function sortSalary(list, sortLine, direction) {
     : list
       .sort((personA, personB) => (
         fromDollars(personB[sortLine]) - fromDollars(personA[sortLine])
-  ));
+      ));
 }
 
 function sortNumbers(list, sortLine, direction) {
@@ -111,8 +112,6 @@ function changeData(allWorkers, theadElements, list) {
 
 // #region selection
 
-const tbody = document.querySelector('tbody');
-
 tbody.addEventListener('click', (e) => {
   for (const child of tbody.children) {
     child.className = '';
@@ -128,12 +127,11 @@ tbody.addEventListener('click', (e) => {
 const body = document.querySelector('body');
 
 const form = `
-  <form class='new-employee-form'>
+  <form action='#' method='post' class='new-employee-form'>
     <label>Name:
       <input
         name="name"
         type="text"
-        minlength=4
         data-qa="name"
         required
       >
@@ -143,20 +141,23 @@ const form = `
       <input
         name="position"
         type="text"
-        minlength=6
         data-qa="position"
         required
       >
     </label>
 
     <label>Office:
-      <select data-qa="office" required>
-        <option>Tokyo</option>
-        <option>Singapore</option>
-        <option>London</option>
-        <option>New York</option>
-        <option>Edinburgh</option>
-        <option>San Francisco</option>
+      <select
+        name="office"
+        data-qa="office"
+        required
+      >
+        <option value='Tokyo'>Tokyo</option>
+        <option value='Singapore'>Singapore</option>
+        <option value='London'>London</option>
+        <option value='New York'>New York</option>
+        <option value='Edinburgh'>Edinburgh</option>
+        <option value='San Francisco'>San Francisco</option>
       </select>
     </label>
 
@@ -164,8 +165,6 @@ const form = `
       <input
         name="age"
         type="number"
-        max=90
-        min=18
         data-qa="age"
         required
       >
@@ -179,10 +178,92 @@ const form = `
         required
       >
     </label>
-    <button>Save to table</button>
+    <button type='submit'>Save to table</button>
   </form>
 `;
 
 body.insertAdjacentHTML('beforeend', form);
+
+// #endregion
+
+// #region collect data
+
+const formField = document.querySelector('form');
+let data;
+
+formField.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  data = new FormData(formField);
+
+  if (data.get('name').replace(/[\d\s]/g, '').length < 4) {
+    pushNotification(10, 10, 'Incorrect name input',
+      'Worker name\n '
+      + 'has less than 4 letters', 'error');
+    document.querySelector('input[data-qa="name"]').value = '';
+
+    return;
+  }
+
+  if (+data.get('age') < 18 || +data.get('age') > 90) {
+    pushNotification(10, 10, 'Incorrect age input',
+      'Worker age\n '
+      + 'need to be between 18 and 90', 'error');
+    document.querySelector('input[data-qa="age"]').value = '';
+
+    return;
+  }
+
+  const newEmployer = `
+  <tr>
+    <td>${data.get('name')}</td>
+    <td>${data.get('position')}</td>
+    <td>${data.get('office')}</td>
+    <td>${data.get('age')}</td>
+    <td>${numberToDollars(data.get('salary'))}</td>
+  </tr>
+  `;
+
+  tbody.insertAdjacentHTML('afterbegin', newEmployer);
+
+  pushNotification(10, 10, 'New worker card was added',
+    '', 'success');
+
+  document.querySelectorAll('input').forEach(input => {
+    input.value = '';
+  });
+
+  document.querySelector('select').value = 'Tokyo';
+});
+
+function numberToDollars(salary) {
+  return `$${(+salary).toLocaleString('en')}`;
+}
+
+// #endregion
+
+// #region notifications
+
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const messageBody = document.createElement('div');
+  const messageTitle = document.createElement('h2');
+  const messageText = document.createElement('p');
+
+  messageBody.className = `notification ${type}`;
+  messageBody.dataset.qa = `notification`;
+  messageTitle.className = 'title';
+  messageBody.style.top = `${posTop}px`;
+  messageBody.style.right = `${posRight}px`;
+  messageTitle.style.letterSpacing = '-1px';
+  messageTitle.innerText = title;
+  messageText.innerText = description;
+  messageBody.append(messageTitle, messageText);
+
+  body.append(messageBody);
+
+  setTimeout(() => {
+    messageBody.remove();
+  }, 3500);
+};
 
 // #endregion
