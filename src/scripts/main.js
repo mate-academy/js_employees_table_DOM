@@ -3,11 +3,11 @@
 const body = document.querySelector('body');
 const tableHead = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
-const rows = [...tableBody.rows];
 let orderASC = true;
 let lastIndex;
 
 tableHead.addEventListener('click', e => {
+  const rows = [...tableBody.rows];
   const index = e.target.closest('th').cellIndex;
 
   rows.sort((a, b) => {
@@ -46,13 +46,15 @@ body.insertAdjacentHTML('beforeend', `
     <label>Name:
       <input 
         name="name" 
-        data-qa="name">
+        data-qa="name"
+      >
     </label>
 
     <label>Position:
       <input 
         name="position" 
-        data-qa="position">
+        data-qa="position"
+      >
     </label>
 
     <label>Office:
@@ -70,14 +72,16 @@ body.insertAdjacentHTML('beforeend', `
       <input 
         name="age" 
         type="number" 
-        data-qa="age">
+        data-qa="age"
+      >
     </label>
 
     <label>Salary:
       <input 
         name="salary" 
         type="number" 
-        data-qa="salary">
+        data-qa="salary"
+      >
     </label>
     
     <button type="submit" value="Submit">
@@ -86,7 +90,7 @@ body.insertAdjacentHTML('beforeend', `
   </form>
 `);
 
-const pushNotification = (posTop, posRight, title, description, type) => {
+const pushNotification = ({ title, description, type }) => {
   const message = document.createElement('div');
 
   message.className = `notification ${type}`;
@@ -96,14 +100,45 @@ const pushNotification = (posTop, posRight, title, description, type) => {
     <p>${description}</p>
   `;
 
-  message.style.top = `${posTop}px`;
-  message.style.right = `${posRight}px`;
-  message.style.boxSizing = 'content-box';
   message.dataset.qa = 'notification';
-
   body.append(message);
-
   setTimeout(() => message.remove(), 2000);
+};
+
+const wrongNameNotification = {
+  title: 'Wrong Name!',
+  description: 'The Name should have more than 4 letters!',
+  type: 'error',
+};
+
+const wrongPositionNameNotification = {
+  title: 'Wrong Position Name!',
+  description: 'The position name should have more than 2 letters!',
+  type: 'error',
+};
+
+const wrongOfficeNameNotification = {
+  title: 'Wrong Office Name!',
+  description: 'The office name should have more than 2 letters!',
+  type: 'error',
+};
+
+const wrongAgeNotification = {
+  title: 'Wrong Age!',
+  description: 'The employee should be an adult and younger than 90 years!',
+  type: 'error',
+};
+
+const wrongSalaryNotification = {
+  title: 'Wrong Salary!',
+  description: 'The salary should be a positive number!',
+  type: 'error',
+};
+
+const successNotification = {
+  title: 'Success!',
+  description: 'A new employee was added to the table!',
+  type: 'success',
 };
 
 const form = document.querySelector('.new-employee-form');
@@ -117,29 +152,25 @@ form.addEventListener('submit', e => {
   const formattedSalary = '$' + parseInt(salary).toLocaleString('en-US');
 
   if (dataObject.name.length < 4) {
-    pushNotification(10, 10, 'Wrong Name!',
-      'The Name should have more than 4 letters!', 'error');
+    pushNotification(wrongNameNotification);
 
     return;
   }
 
   if (position.length < 2) {
-    pushNotification(10, 10, 'Wrong Position!',
-      'The position should have more than 2 letters!', 'error');
+    pushNotification(wrongPositionNameNotification);
 
     return;
   }
 
   if (age < 18 || age > 90) {
-    pushNotification(10, 10, 'Wrong Age!',
-      'The employee should be an adult and younger than 90 years!', 'error');
+    pushNotification(wrongAgeNotification);
 
     return;
   }
 
   if (salary < 0 || salary === '') {
-    pushNotification(10, 10, 'Wrong Salary!',
-      'The salary should be a positive number!', 'error');
+    pushNotification(wrongSalaryNotification);
 
     return;
   }
@@ -154,8 +185,133 @@ form.addEventListener('submit', e => {
     </tr>
   `);
 
-  pushNotification(10, 10, 'Success!',
-    'A new employee was added to the table!', 'success');
+  pushNotification(successNotification);
 
   form.reset();
+});
+
+let initialCellValue;
+let inputForEditing;
+
+function editTableCell(e) {
+  const cellForEditing = e.target.closest('td');
+
+  if (!e.target.matches('td') || !tableBody.contains(cellForEditing)) {
+    return;
+  }
+
+  cellForEditing.contenteditable = true;
+  initialCellValue = cellForEditing.textContent;
+
+  switch (cellForEditing.cellIndex) {
+    case 3:
+    case 4:
+      cellForEditing.innerHTML = `
+        <input 
+          class="cell-input"
+          name="cell-for-editing" 
+          type="number" 
+        >
+      `;
+
+      break;
+
+    default:
+      cellForEditing.innerHTML = `
+        <input 
+          class="cell-input"
+          name="cell-for-editing" 
+          type="text" 
+        >
+      `;
+  }
+
+  inputForEditing = document.querySelector('.cell-input');
+
+  inputForEditing.focus();
+  cellForEditing.focus();
+};
+
+function saveEnteredInfo(e) {
+  const cellForEditing = e.target.closest('td');
+  const trimmedInputValue = inputForEditing.value.trim();
+
+  const regexForTheNameField = /^([a-z ]{4,})$/gim;
+  const regexForPositionNameField = /^([a-z ]{2,})$/gim;
+  const regexForOfficeNameField = /^([a-z ]{2,})$/gim;
+  const regexForAgeField = /^(1[89]|[2-8][0-9]|90)$/;
+  const regexForSalaryField = /^([0-9]{1,})$/;
+
+  switch (cellForEditing.cellIndex) {
+    case 0:
+      if (!trimmedInputValue.match(regexForTheNameField)) {
+        pushNotification(wrongNameNotification);
+        cellForEditing.textContent = initialCellValue;
+        inputForEditing.remove();
+
+        return;
+      }
+
+      break;
+
+    case 1:
+      if (!trimmedInputValue.match(regexForPositionNameField)) {
+        pushNotification(wrongPositionNameNotification);
+        cellForEditing.textContent = initialCellValue;
+        inputForEditing.remove();
+
+        return;
+      }
+
+      break;
+
+    case 2:
+      if (!trimmedInputValue.match(regexForOfficeNameField)) {
+        pushNotification(wrongOfficeNameNotification);
+        cellForEditing.textContent = initialCellValue;
+        inputForEditing.remove();
+
+        return;
+      }
+
+      break;
+
+    case 3:
+      if (!trimmedInputValue.match(regexForAgeField)) {
+        pushNotification(wrongAgeNotification);
+        cellForEditing.textContent = initialCellValue;
+        inputForEditing.remove();
+
+        return;
+      }
+
+      break;
+
+    case 4:
+      if (!trimmedInputValue.match(regexForSalaryField)) {
+        pushNotification(wrongSalaryNotification);
+        cellForEditing.textContent = initialCellValue;
+        inputForEditing.remove();
+
+        return;
+      } else {
+        cellForEditing.textContent
+          = '$' + parseInt(trimmedInputValue).toLocaleString('en-US');
+        inputForEditing.remove();
+
+        return;
+      }
+  }
+
+  cellForEditing.textContent = trimmedInputValue;
+  inputForEditing.remove();
+}
+
+tableBody.addEventListener('dblclick', editTableCell);
+tableBody.addEventListener('focusout', saveEnteredInfo);
+
+tableBody.addEventListener('keypress', e => {
+  if (e.key === 'Enter') {
+    saveEnteredInfo(e);
+  }
 });
