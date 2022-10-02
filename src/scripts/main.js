@@ -128,21 +128,36 @@ function isValid(formElements) {
   const minAgeValue = 18;
   const maxAgeValue = 90;
 
-  const inputNameLength = formElements.name.value.length;
+  const inputNameMatch = formElements.name.value.match(/\D/gi);
+  const inputNameLength = inputNameMatch ? inputNameMatch.length : 0;
   const inputAge = formElements.age.value;
 
-  if (
-    inputNameLength < minNameLength
-    || inputAge < minAgeValue
-    || inputAge > maxAgeValue
-  ) {
+  if (inputNameLength < minNameLength) {
+    pushNotification(
+      'Error',
+      'Name length is less then 4 letters!',
+      'error'
+    );
+
+    return false;
+  }
+
+  if (inputAge < minAgeValue) {
+    pushNotification('Error', 'You must be 18 years old or above!', 'error');
+
+    return false;
+  }
+
+  if (inputAge > maxAgeValue) {
+    pushNotification('Error', 'You must be 90 years old or less!', 'error');
+
     return false;
   }
 
   return true;
 }
 
-function pushNotification(posTop, posRight, title, description, type) {
+function pushNotification(title, description, type) {
   const notification = document.createElement('div');
 
   notification.className = `notification ${type}`;
@@ -157,8 +172,8 @@ function pushNotification(posTop, posRight, title, description, type) {
     </p>
   `;
 
-  notification.style.top = `${posTop}px`;
-  notification.style.right = `${posRight}px`;
+  notification.style.top = `10px`;
+  notification.style.right = `10px`;
   notification.style.transition = `opacity .3s`;
   notification.style.opacity = '0';
 
@@ -204,15 +219,18 @@ function saveInputValueToTable(tableDataItem, input, previousValue) {
   tableDataItem.innerHTML = input.value.trim();
 }
 
+function booleanToggler(bool) {
+  return !bool;
+}
+
 const table = document.querySelector('table');
 const tableBody = table.tBodies[0];
-const tableHeadings = [...table.tHead.rows[0].cells];
-let employees = getEmployees(tableBody.rows);
 const form = document.querySelector('.new-employee-form');
-
-tableHeadings.forEach(heading => {
-  heading.sortAsASC = true;
-});
+const eventsData = {
+  prevTarget: null,
+  clickCount: 0,
+};
+let employees = getEmployees(tableBody.rows);
 
 document.addEventListener('click', (e) => {
   const target = e.target;
@@ -221,12 +239,23 @@ document.addEventListener('click', (e) => {
 
   if (tableHeading && !tableHeading.closest('tFoot')) {
     const sortKey = tableHeading.textContent.trim('').toLowerCase();
-    const isASCSort = tableHeading.sortAsASC;
-    const compareFunction = createSorterByKey(sortKey, isASCSort);
+    const isASCSort = eventsData.prevTarget !== e.target;
+    let compareFunction = createSorterByKey(sortKey, isASCSort);
 
+    if (eventsData.prevTarget === e.target) {
+      eventsData.clickCount++;
+    } else {
+      eventsData.clickCount = 0;
+    }
+
+    if (eventsData.prevTarget === e.target && eventsData.clickCount > 1) {
+      compareFunction = createSorterByKey(sortKey, booleanToggler(isASCSort));
+      eventsData.clickCount = 0;
+    }
+
+    eventsData.prevTarget = e.target;
     employees.sort(compareFunction);
     updateEmployeesMarkup(employees);
-    tableHeading.sortAsASC = !isASCSort;
   }
 
   if (tableDataItem) {
@@ -265,8 +294,6 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   if (!isValid(form.elements)) {
-    pushNotification(10, 10, 'Error', 'Message example.', 'error');
-
     return;
   }
 
@@ -278,7 +305,8 @@ form.addEventListener('submit', (e) => {
     salary: formatSalaryToNumber(form.elements.salary.value),
   };
 
+  form.reset();
   employees.unshift(newEmployee);
   updateEmployeesMarkup(employees);
-  pushNotification(10, 10, 'Complete', 'Message example.', 'success');
+  pushNotification('Complete', 'Message example.', 'success');
 });
