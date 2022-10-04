@@ -8,7 +8,21 @@ const headCells = headOfTable.children;
 
 const body = document.body;
 
-[...headCells].forEach(element => (element.dataset.countOfClick = 0));
+const offices = `
+  <option value="Tokyo">Tokyo</option>
+
+  <option value="Singapore">Singapore</option>
+
+  <option value="London">London</option>
+
+  <option value="New York">New York</option>
+
+  <option value="Edinburgh">Edinburgh</option>
+
+  <option value="San Francisco">San Francisco</option>
+`;
+
+[...headCells].forEach(element => (element.dataset.sortStatus = null));
 
 headOfTable.addEventListener('click', () => {
   const tableRows = [...bodyOfTable.rows];
@@ -17,63 +31,65 @@ headOfTable.addEventListener('click', () => {
 
   const headCell = headCells[index];
 
-  headCell.dataset.countOfClick++;
+  const directionOfSort = headCell.dataset.sortStatus;
 
-  const clicks = headCell.dataset.countOfClick;
+  [...headCells].forEach(element => {
+    if (event.target !== element) {
+      element.dataset.sortStatus = null;
+    }
+  });
 
-  conversion(index, tableRows, clicks);
+  switch (index) {
+    case 0:
+    case 1:
+    case 2:
+
+      tableRows.sort((a, b) => {
+        const first = a.children[index];
+        const second = b.children[index];
+
+        if (directionOfSort === 'null' || directionOfSort === 'desc') {
+          headCell.dataset.sortStatus = 'asc';
+
+          return first.innerText.localeCompare(second.innerText);
+        } else {
+          headCell.dataset.sortStatus = 'desc';
+
+          return second.innerText.localeCompare(first.innerText);
+        }
+      });
+
+      break;
+
+    case 3:
+    case 4:
+      tableRows.sort((a, b) => {
+        let first = a.children[index].innerText;
+        let second = b.children[index].innerText;
+
+        if (index === 4) {
+          const convertToNumber = (value) => {
+            return value.slice(1).replace(/,/g, '');
+          };
+
+          first = convertToNumber(first);
+
+          second = convertToNumber(second);
+        }
+
+        if (directionOfSort === 'null' || directionOfSort === 'desc') {
+          headCell.dataset.sortStatus = 'asc';
+
+          return first - second;
+        } else {
+          headCell.dataset.sortStatus = 'desc';
+
+          return second - first;
+        }
+      });
+  }
 
   bodyOfTable.append(...tableRows);
-
-  function conversion(cellIndex, array, numberOfClicks) {
-    [...headCells].forEach(element => {
-      if (event.target !== element) {
-        element.dataset.countOfClick = 0;
-      }
-    });
-
-    switch (cellIndex) {
-      case 0:
-      case 1:
-      case 2:
-
-        array.sort((a, b) => {
-          const first = a.children[cellIndex];
-          const second = b.children[cellIndex];
-
-          if (numberOfClicks % 2 !== 0) {
-            return first.innerText.localeCompare(second.innerText);
-          } else {
-            return second.innerText.localeCompare(first.innerText);
-          }
-        });
-
-        break;
-
-      case 3:
-      case 4:
-        array.sort((a, b) => {
-          let first = a.children[cellIndex].innerText;
-          let second = b.children[cellIndex].innerText;
-
-          if (cellIndex === 4) {
-            first
-            = +(a.children[cellIndex].innerText.slice(1).replace(/,/g, ''));
-
-            second
-            = +(b.children[cellIndex].innerText.slice(1).replace(/,/g, ''));
-          }
-
-          if (numberOfClicks % 2 !== 0) {
-            return first - second;
-          } else {
-            return second - first;
-          }
-        });
-    }
-
-    return array;
-  }
 });
 
 bodyOfTable.addEventListener('click', () => {
@@ -92,7 +108,7 @@ body.insertAdjacentHTML('beforeend', `
         name="name"
         type="text"
         data-qa="name"
-        >
+      >
       </input>
     </label>
 
@@ -102,7 +118,6 @@ body.insertAdjacentHTML('beforeend', `
         name="position"
         type="text"
         data-qa="position"
-        
       >
       </input>
     </label>
@@ -112,19 +127,8 @@ body.insertAdjacentHTML('beforeend', `
       <select
         name="office"
         data-qa="office"
-        
       >
-        <option value="Tokyo">Tokyo</option>
-
-        <option value="Singapore">Singapore</option>
-
-        <option value="London">London</option>
-
-        <option value="New York">New York</option>
-
-        <option value="Edinburgh">Edinburgh</option>
-        
-        <option value="San Francisco">San Francisco</option>
+        ${offices}
       </select>
     </label>
 
@@ -148,9 +152,7 @@ body.insertAdjacentHTML('beforeend', `
       </input>
     </label>
 
-    <button
-      type="submit"
-    >
+    <button type="submit">
       Save to table
     </button>
   </form>
@@ -242,27 +244,17 @@ bodyOfTable.addEventListener('dblclick', () => {
   if (position === 2) {
     event.target.innerHTML = `
       <select
-        name="office"
-        data-qa="office"
-        class="cell-input"
+      name="office"
+      data-qa="office"
+      class="cell-input"
       >
-        <option value="Tokyo">Tokyo</option>
-
-        <option value="Singapore">Singapore</option>
-
-        <option value="London">London</option>
-
-        <option value="New York">New York</option>
-
-        <option value="Edinburgh">Edinburgh</option>
-        
-        <option value="San Francisco">San Francisco</option>
+        ${offices}
       </select>
     `;
   } else {
     event.target.innerHTML = `
-    <input class="cell-input"></input>
-  `;
+      <input class="cell-input"></input>
+    `;
   }
 
   const input = document.getElementsByClassName('cell-input')[0];
