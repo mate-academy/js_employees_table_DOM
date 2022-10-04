@@ -1,6 +1,8 @@
 'use strict';
 
+// const body = document.body;
 const table = document.querySelector('table');
+const tableBody = table.querySelector('tbody');
 
 /* #region  sort */
 let sortExample = 1;
@@ -12,10 +14,10 @@ table.addEventListener('click', (e) => {
 
   if (sortParam) {
     const employeesSorted = [...listSorting(employees, sortParam)]
-      .map(row => [...row.children].map(cell => cell.innerText));
+      .map(row => [...row.cells].map(cell => cell.innerText));
 
     for (let i = 1; i < employees.length - 1; i++) {
-      [...employees[i].children].forEach((cell, index) => {
+      [...employees[i].cells].forEach((cell, index) => {
         cell.innerText = employeesSorted[i - 1][index];
       });
     }
@@ -26,55 +28,52 @@ function listSorting(list, sortParam) {
   const listEmployees = [...list].slice(1, -1);
 
   if (currentSortParam === sortParam) {
-    sortExample = (sortExample === 0) ? 1 : 0;
+    sortExample = (sortExample) ? 0 : 1;
   } else {
     sortExample = 0;
     currentSortParam = sortParam;
   }
 
   return listEmployees.sort((a, b) => {
-    return (sortExample === 0)
-      ? switchForListSorting(sortParam, a, b)
-      : switchForListSorting(sortParam, b, a);
+    return (sortExample)
+      ? switchForListSorting(sortParam, b, a)
+      : switchForListSorting(sortParam, a, b);
   });
 };
 
-function salaryToNumber(string) {
-  return +string.slice(1).split(',').join('');
+function salaryToNumber(salary) {
+  return +salary.slice(1).split(',').join('');
 };
 
 function switchForListSorting(sortParam, a, b) {
   switch (sortParam) {
     case 'Age':
-      return +a.children[3].innerText - +b.children[3].innerText;
+      return +a.cells[3].innerText - +b.cells[3].innerText;
 
     case 'Salary':
-      return salaryToNumber(a.children[4].innerText)
-        - salaryToNumber(b.children[4].innerText);
+      return salaryToNumber(a.cells[4].innerText)
+        - salaryToNumber(b.cells[4].innerText);
 
     case 'Name':
-      return (a.children[0].innerText).localeCompare(b.children[0].innerText);
+      return (a.cells[0].innerText).localeCompare(b.cells[0].innerText);
 
     case 'Position':
-      return (a.children[1].innerText).localeCompare(b.children[1].innerText);
+      return (a.cells[1].innerText).localeCompare(b.cells[1].innerText);
 
     case 'Office':
-      return (a.children[2].innerText).localeCompare(b.children[2].innerText);
-
-    default:
-      break;
+      return (a.cells[2].innerText).localeCompare(b.cells[2].innerText);
   }
 }
 /* #endregion */
 
 /* #region  select */
-table.children[1].addEventListener('click', (e) => {
+tableBody.addEventListener('click', (e) => {
   const tr = e.target.closest('tr');
-  const active = document.querySelectorAll('.active');
+  const activeRow = document.querySelectorAll('.active');
 
   if (!tr.classList.contains('active')) {
-    active.forEach(item => {
-      item.classList.remove('active');
+    activeRow.forEach(row => {
+      row.classList.remove('active');
     });
   }
 
@@ -157,7 +156,7 @@ function addPersonToTable(employee) {
 
   pushNotification('Success!', succesMessage, 'success', 4000);
 
-  table.children[1].insertAdjacentHTML('beforeend', `
+  tableBody.insertAdjacentHTML('beforeend', `
     <tr>
       <td>
         ${capitalize(employee.get('name'))}
@@ -250,56 +249,52 @@ function removeElem(elem) {
   const elemHeight = elem.offsetHeight;
 
   elem.remove();
-
   moveMessage(elemHeight);
 }
 /* #endregion */
 
 /* #region  formating cell */
 table.addEventListener('dblclick', (e) => {
-  const td = e.target.closest('td');
+  const cell = e.target.closest('td');
   const row = e.target.closest('tr');
   let typeInput = '';
-  const tdContent = td.innerText;
+  const cellContent = cell.innerText;
   let nameCell = '';
-  const tdSizes = getComputedStyle(td);
-  const tdWidth = td.clientWidth
-    - parseInt(tdSizes.paddingLeft) - parseInt(tdSizes.paddingRight);
+  const cellSizes = getComputedStyle(cell);
+  const cellWidth = cell.clientWidth
+    - parseInt(cellSizes.paddingLeft) - parseInt(cellSizes.paddingRight);
 
-  td.innerText = '';
+  cell.innerText = '';
 
-  switch (td) {
-    case row.children[0]:
+  switch (cell) {
+    case row.cells[0]:
       nameCell = 'name';
       typeInput = 'text';
       break;
 
-    case row.children[1]:
+    case row.cells[1]:
       nameCell = 'position';
       typeInput = 'text';
       break;
 
-    case row.children[2]:
+    case row.cells[2]:
       nameCell = 'office';
       typeInput = 'text';
       break;
 
-    case row.children[3]:
+    case row.cells[3]:
       nameCell = 'age';
       typeInput = 'number';
       break;
 
-    case row.children[4]:
+    case row.cells[4]:
       nameCell = 'salary';
       typeInput = 'number';
-      break;
-
-    default:
       break;
   }
 
   function createFormInCell() {
-    td.insertAdjacentHTML('afterbegin', `
+    cell.insertAdjacentHTML('afterbegin', `
       <form id="format-cell">
         <input class="cell-input" name="${nameCell}" type="${typeInput}">
       </form>
@@ -336,7 +331,7 @@ table.addEventListener('dblclick', (e) => {
       break;
 
     case 'office':
-      td.insertAdjacentHTML('afterbegin', `
+      cell.insertAdjacentHTML('afterbegin', `
         <form id="format-cell">
           <select class="cell-input" name="office" type="text">
             <option value="Tokyo">Tokyo</option>
@@ -349,9 +344,6 @@ table.addEventListener('dblclick', (e) => {
         </form>
       `);
       break;
-
-    default:
-      break;
   }
 
   const formCell = document.querySelector('#format-cell');
@@ -361,7 +353,7 @@ table.addEventListener('dblclick', (e) => {
     eFormCell.stopPropagation();
   });
 
-  cellInput.style.width = tdWidth + 'px';
+  cellInput.style.width = cellWidth + 'px';
   cellInput.focus();
 
   cellInput.addEventListener('blur', () => {
@@ -388,7 +380,7 @@ table.addEventListener('dblclick', (e) => {
 
       pushNotification('Error!', message, 'error', 4000);
 
-      td.innerText = tdContent;
+      cell.innerText = cellContent;
     }
 
     if (nameCell === 'salary' && formData.get(nameCell) < 0) {
@@ -417,9 +409,9 @@ table.addEventListener('dblclick', (e) => {
       : formData.get(nameCell);
 
     if (formData.get(nameCell) === '') {
-      td.innerText = tdContent;
+      cell.innerText = cellContent;
     } else {
-      td.innerText = data;
+      cell.innerText = data;
     }
   }
 });
