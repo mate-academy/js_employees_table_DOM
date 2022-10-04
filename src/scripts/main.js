@@ -2,8 +2,9 @@
 
 const tableHeader = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
-let clickColumn = null;
 const form = document.createElement('form');
+let clickColumn = null;
+let editingTd = false;
 
 const pushNotification = (title, description, type) => {
   const message = document.createElement('div');
@@ -119,9 +120,11 @@ function saveToTable(e) {
 function editCell(e) {
   const td = e.target.closest('td');
 
-  if (!td) {
+  if (!td || editingTd) {
     return;
   }
+
+  editingTd = true;
 
   const valueTd = td.textContent;
 
@@ -140,6 +143,8 @@ function editCell(e) {
     } else {
       td.textContent = inputValue;
     }
+
+    editingTd = false;
   };
 
   td.firstElementChild.onkeydown = (eventKeydown) => {
