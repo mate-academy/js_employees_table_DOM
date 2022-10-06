@@ -210,7 +210,8 @@ function editTableCell(e) {
         <input 
           class="cell-input"
           name="cell-for-editing" 
-          type="number" 
+          type="number"
+          value="${initialCellValue}"
         >
       `;
 
@@ -221,7 +222,8 @@ function editTableCell(e) {
         <input 
           class="cell-input"
           name="cell-for-editing" 
-          type="text" 
+          type="text"
+          value="${initialCellValue}"
         >
       `;
   }
