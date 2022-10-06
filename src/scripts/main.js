@@ -20,6 +20,10 @@ function Person(firstName, position, office, age, salary) {
   this.salary = salary;
 }
 
+function transformToNumber(string) {
+  return Number(string.split('').filter(el => !isNaN(el)).join(''));
+}
+
 function updateInfo() {
   tableBody.innerHTML = '';
 
@@ -31,14 +35,16 @@ function updateInfo() {
             <td>${person.position}</td>
             <td>${person.office}</td>
             <td>${person.age}</td>
-            <td>${person.salary}</td>
+            <td>${new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: 'USD',
+              maximumFractionDigits: 0
+            }).format(transformToNumber(person.salary))}</td>
         `;
 
     tableBody.append(insertPerson);
   }
 }
-
-// sorting implementation
 
 function sortFunction(first, second, order) {
   let a;
@@ -93,8 +99,6 @@ table.addEventListener('click', () => {
   }
 });
 
-// selecting row implementation
-
 tableBody.addEventListener('click', () => {
   const activeRow = tableBody.querySelector('.active');
 
@@ -105,60 +109,65 @@ tableBody.addEventListener('click', () => {
   event.target.closest('tr').classList.add('active');
 });
 
-// adding form
-
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
 
 form.innerHTML = `
-    <label>Name: 
-        <input 
-            name="name" 
-            type="text" 
-            data-qa="name" 
-            required
-        >
-    </label>
-    <label>Position: 
-        <input 
-            name="position" 
-            type="text" 
-            data-qa="position" 
-            required
-        >
-    </label>
     <label>
-        Office: 
-        <select name="office" required>
-            <option>Tokyo</option>
-            <option>Singapore</option>
-            <option>London</option>
-            <option>New York</option>
-            <option>Edinburgh</option>
-            <option>San Francisco</option>
-        </select>
+      Name: 
+      <input 
+        name="name" 
+        type="text" 
+        data-qa="name" 
+        required
+      >
     </label>
-    <label>Age: 
-        <input 
-            name="age" 
-            type="number" 
-            data-qa="age" 
-            required
-        >
+
+    <label>
+      Position: 
+      <input 
+        name="position" 
+        type="text" 
+        data-qa="position" 
+        required
+      >
     </label>
-    <label>Salary: 
-        <input 
-            name="salary" 
-            type="number" 
-            data-qa="salary" 
-            required
-        >
+
+    <label>
+      Office: 
+      <select name="office" required>
+        <option>Tokyo</option>
+        <option>Singapore</option>
+        <option>London</option>
+        <option>New York</option>
+        <option>Edinburgh</option>
+        <option>San Francisco</option>
+      </select>
     </label>
+
+    <label>
+      Age: 
+      <input 
+        name="age" 
+        type="number" 
+        data-qa="age" 
+        required
+      >
+    </label>
+
+    <label>
+      Salary: 
+      <input 
+        name="salary" 
+        type="number" 
+        data-qa="salary" 
+        required
+      >
+    </label>
+
     <button type="submit">Save to table</button>
 `;
-
-// showing notifications implementation
 
 function showNotification(titleText, descriptionText, type) {
   const notification = document.createElement('div');
@@ -258,12 +267,10 @@ submitButton.addEventListener('click', () => {
   }
 });
 
-// implementing editting existing cell
-
 tableBody.addEventListener('dblclick', () => {
   const selectedPersonName = event.target.closest('tr').children[0].innerText;
-  const selectedPerson = 
-    peopleStorage.find(person => person.name === selectedPersonName);
+  const selectedPerson
+    = peopleStorage.find(person => person.name === selectedPersonName);
   const cellToEdit = event.target;
   let propertyToEdit;
 
@@ -276,9 +283,16 @@ tableBody.addEventListener('dblclick', () => {
   }
 
   const input = document.createElement('input');
+  const cellText = cellToEdit.innerText
 
   input.classList.add('cell-input');
-  input.placeholder = cellToEdit.innerText;
+  input.placeholder = cellText;
+
+  if (transformToNumber(cellText) !== 0) {
+    input.type = 'number';
+  } else {
+    input.type = 'text';
+  }
 
   cellToEdit.innerText = '';
   cellToEdit.append(input);
