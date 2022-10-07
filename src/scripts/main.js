@@ -4,6 +4,14 @@ const root = document.querySelector('body');
 const table = document.querySelector('table');
 const tHead = document.querySelector('thead > tr');
 const tBody = document.querySelector('tbody');
+const tdList = root.querySelectorAll('td');
+
+// When I want edit my table cell, my input have own width, and table stretches.
+// Here I set fixed width for my cells,
+// and in css 100% relative width for my input.
+tdList.forEach(td => {
+  td.style.width = `${parseFloat(getComputedStyle(td).width)}px`;
+});
 
 // sort table;
 const getNumber = num => {
