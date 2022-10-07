@@ -148,6 +148,7 @@ tr.active {
   background: transparent;
   padding: 0;
   outline: none;
+  max-width: 150px;
 }
 
 .notification {
@@ -160,8 +161,8 @@ tr.active {
   border-radius: 10px;
   background: rgba(132, 132, 132, 0.3);
 
-  top: 10px;
-  right: 10px;
+  top: 50px;
+  right: 50px;
 
   .title {
     display: block;
