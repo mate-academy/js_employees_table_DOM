@@ -246,9 +246,11 @@ form.addEventListener('submit', e => {
 tBody.addEventListener('dblclick', bodyEvent => {
   const initialValue = bodyEvent.target.textContent;
 
-  bodyEvent.target.innerHTML = `
-    <input type="text" class="cell-input" value="${initialValue}">
-  `;
+  bodyEvent.target.innerHTML = `<input
+                                  type="text" 
+                                  class="cell-input" 
+                                  value="${initialValue}"
+                                  >`;
 
   const inputCell = tBody.querySelector('.cell-input');
 
