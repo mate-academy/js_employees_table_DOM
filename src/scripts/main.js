@@ -246,29 +246,32 @@ form.addEventListener('submit', e => {
 tBody.addEventListener('dblclick', bodyEvent => {
   const initialValue = bodyEvent.target.textContent;
 
-  bodyEvent.target.innerHTML = `<input
+  bodyEvent.target.innerHTML = `<input 
                                   type="text" 
-                                  class="cell-input" 
-                                  value="${initialValue}"
-                                  >`;
+                                  class="cell-input"  
+                                  value="${initialValue}">`;
 
   const inputCell = tBody.querySelector('.cell-input');
 
   inputCell.selectionStart = inputCell.value.length;
   inputCell.focus();
 
-  inputCell.addEventListener('blur', inputMouseEvent => {
+  const blurAction = (inputMouseEvent) => {
     const inputText = inputMouseEvent.target.value || initialValue;
 
     inputMouseEvent.target.outerHTML = `<td>${inputText}</td>`;
-  });
+  };
+
+  inputCell.addEventListener('blur', blurAction);
 
   inputCell.addEventListener('keydown', inputKeyEvent => {
     if (inputKeyEvent.key !== 'Enter') {
       return;
     }
 
-    const inputText = inputKeyEvent.target.value || initialValue;
+    const inputText = inputKeyEvent.target.value;
+
+    inputCell.removeEventListener('blur', blurAction);
 
     inputKeyEvent.target.outerHTML = `<td>${inputText}</td>`;
   });
