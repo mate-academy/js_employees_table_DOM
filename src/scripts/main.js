@@ -1,10 +1,8 @@
 'use strict';
 
-// const body = document.body;
 const table = document.querySelector('table');
 const tableBody = table.querySelector('tbody');
 
-/* #region  sort */
 let sortExample = 1;
 let currentSortParam = '';
 
@@ -64,9 +62,7 @@ function switchForListSorting(sortParam, a, b) {
       return (a.cells[2].innerText).localeCompare(b.cells[2].innerText);
   }
 }
-/* #endregion */
 
-/* #region  select */
 tableBody.addEventListener('click', (e) => {
   const tr = e.target.closest('tr');
   const activeRow = document.querySelectorAll('.active');
@@ -79,9 +75,7 @@ tableBody.addEventListener('click', (e) => {
 
   tr.classList.toggle('active');
 });
-/* #endregion */
 
-/* #region  adding form */
 table.insertAdjacentHTML('afterend', `
   <form class="new-employee-form">
     <label>Name: 
@@ -114,9 +108,7 @@ table.insertAdjacentHTML('afterend', `
     <button>Save to table</button>
   </form>
 `);
-/* #endregion */
 
-/* #region  adding a new employee */
 const form = document.querySelector('.new-employee-form');
 
 form.addEventListener('submit', (e) => {
@@ -191,9 +183,7 @@ function capitalize(string) {
     .map(word => word.slice(0, 1).toUpperCase() + word.slice(1))
     .join(' ');
 }
-/* #endregion */
 
-/* #region  create message */
 function calculateCoordsForMessage() {
   const notification = document.querySelector('.notification');
   const coordsMessage = {};
@@ -251,9 +241,7 @@ function removeElem(elem) {
   elem.remove();
   moveMessage(elemHeight);
 }
-/* #endregion */
 
-/* #region  formating cell */
 table.addEventListener('dblclick', (e) => {
   const cell = e.target.closest('td');
   const row = e.target.closest('tr');
@@ -415,4 +403,3 @@ table.addEventListener('dblclick', (e) => {
     }
   }
 });
-/* #endregion */
