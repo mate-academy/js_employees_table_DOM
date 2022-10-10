@@ -2,78 +2,84 @@
 
 const body = document.querySelector('body');
 const tableBody = document.querySelector('tbody');
-
-tableBody.classList.add('table-body');
-
-body.insertAdjacentHTML('beforeend', `
-<form action="" class="new-employee-form">
-<label>
-  Name:
-  <input
-    pattern="[A-Za-z]"
-    name="name" 
-    type="text" 
-    data-qa="name" 
-    required
-    minlength ="4"
-    value=""
-  >
-</label>
-
-<label>
-  Position:
-  <input 
-    name="position"
-    type="text" 
-    data-qa="position"
-    required
-    value=""
-  >
-</label>
-
-<label>
-  Office:
-  <select 
+const selectOffice = `
+<select 
+  class="input-edit"
   nema="office" 
   type="text" 
   data-qa="office"
   required
   value=""
 >
-  <option value="" disabled selected></option>
   <option value="Tokyo">Tokyo</option>
+  <option value="London">London</option>
   <option value="Singapore">Singapore</option>
   <option value="New York">New York</option>
   <option value="Edinburgh">Edinburgh</option>
   <option value="San Francisco">San Francisco</option>
-  </select>
-</label>
+</select>
+`;
 
-<label>
-  Age:
-  <input 
-  name="age" 
-  type="number" 
-  data-qa="age" 
-  min="18"
-  max="90"
-  required
-  value=""
->
-</label>
+const countriesOffice = [`Tokyo`, `Singapore`, `London`,
+  `New York`, `Edinburgh`, `San Francisco`];
 
-<label>
-  Salary:
-  <input 
-  name="salary" 
-  type="number" 
-  data-qa="salary"
-  required
-  value=""
-  >
-</label>
+tableBody.classList.add('table-body');
 
-<button type="submit">Save to table</button>
+body.insertAdjacentHTML('beforeend', `
+<form action="" class="new-employee-form">
+  <label>
+    Name:
+    <input
+      pattern="[A-Za-z]"
+      name="name" 
+      type="text" 
+      data-qa="name" 
+      required
+      value=""
+    >
+  </label>
+
+  <label>
+    Position:
+    <input 
+      name="position"
+      type="text" 
+      data-qa="position"
+      required
+      value=""
+    >
+  </label>
+
+  <label>
+    Office:
+    ` + selectOffice + `
+  </label>
+
+  <label>
+    Age:
+    <input 
+      name="age" 
+      type="number" 
+      data-qa="age" 
+      min="18"
+      max="90"
+      required
+      value=""
+    >
+  </label>
+
+  <label>
+    Salary:
+    <input 
+      name="salary" 
+      type="number" 
+      data-qa="salary"
+      required
+      value=""
+    >
+  </label>
+
+  <button type="submit">Save to table</button>
 </form>
 `);
 
@@ -100,58 +106,57 @@ function resetCount() {
 document.querySelector('thead').addEventListener('click', (e) => {
   const whereСlicked = e.target;
   const tableBodyActive = document.querySelector('tbody');
-  const personsNow = [...tableBodyActive.querySelectorAll('tr')];
-  let personsRender = [];
+  let personsNow = [...tableBodyActive.querySelectorAll('tr')];
 
-  function sortedAlphabet(person) {
-    return person.sort((a, b) => a.children[whereСlicked.cellIndex]
+  function sortedAlphabet(personsToSort) {
+    return personsToSort.sort((a, b) => a.children[whereСlicked.cellIndex]
       .innerText.localeCompare(b.children[whereСlicked.cellIndex].innerText));
   }
 
   switch (whereСlicked.innerText) {
     case 'Name':
       if (counterClickName > 0) {
-        personsRender = personsNow.reverse();
+        personsNow.reverse();
         break;
       }
 
       resetCount();
       counterClickName++;
-      personsRender = sortedAlphabet(personsNow);
+      sortedAlphabet(personsNow);
       break;
 
     case 'Position':
       if (counterClickPosition > 0) {
-        personsRender = personsNow.reverse();
+        personsNow.reverse();
         break;
       }
 
       resetCount();
       counterClickPosition++;
-      personsRender = sortedAlphabet(personsNow);
+      sortedAlphabet(personsNow);
       break;
 
     case 'Office':
       if (counterClickOffice > 0) {
-        personsRender = personsNow.reverse();
+        personsNow.reverse();
         break;
       }
 
       resetCount();
       counterClickOffice++;
-      personsRender = sortedAlphabet(personsNow);
+      sortedAlphabet(personsNow);
       break;
 
     case 'Age':
       if (counterClickAge > 0) {
-        personsRender = personsNow.reverse();
+        personsNow.reverse();
         break;
       }
 
       resetCount();
       counterClickAge++;
 
-      personsRender = personsNow.sort((a, b) => {
+      personsNow.sort((a, b) => {
         return +a.children[whereСlicked.cellIndex].innerText
         - +b.children[whereСlicked.cellIndex].innerText;
       });
@@ -159,19 +164,19 @@ document.querySelector('thead').addEventListener('click', (e) => {
 
     case 'Salary':
       if (counterClickSalary > 0) {
-        personsRender = personsNow.reverse();
+        personsNow = personsNow.reverse();
         break;
       }
 
       resetCount();
       counterClickSalary++;
 
-      personsRender = personsNow.sort((a, b) => getSalary(a
+      personsNow = personsNow.sort((a, b) => getSalary(a
         .children[whereСlicked.cellIndex].innerText)
         - getSalary(b.children[whereСlicked.cellIndex].innerText));
   }
 
-  tableBody.append(...personsRender);
+  tableBody.append(...personsNow);
 });
 
 tableBody.addEventListener('click', (e) => {
@@ -240,16 +245,48 @@ buttonForm.onclick = (e) => {
 
 let elementText;
 
-window.addEventListener('dblclick', (e) => {
-  if (e.target.closest('tbody') === null) {
+function saveInputText(input) {
+  if (input.value === '') {
+    input.closest('td').innerHTML = elementText;
+
     return;
   }
 
-  if (e.target.closest('tbody').classList.contains('table-body')) {
-    elementText = e.target.innerText;
+  input.closest('td').innerHTML = `${input.value}`;
+}
 
-    e.target.closest('td').innerHTML = `
-    <input 
+tableBody.addEventListener('dblclick', (e) => {
+  if (e.target.closest('td').innerHTML.includes('<input')
+  || e.target.closest('td').innerHTML.includes('<select')) {
+    return;
+  }
+
+  if (countriesOffice.some(countri => countri
+    === e.target.closest('td').innerHTML)) {
+    e.target.closest('td').innerHTML = selectOffice;
+
+    const selectEdit = document.querySelector('.input-edit');
+
+    selectEdit.addEventListener('blur', () => {
+      saveInputText(selectEdit);
+    });
+
+    selectEdit.addEventListener('keypress', (even) => {
+      if (even.key === 'Enter') {
+        saveInputText(selectEdit);
+      }
+    });
+
+    return;
+  }
+
+  elementText = e.target.innerText;
+
+  const elementWidth = e.target.clientWidth;
+
+  e.target.closest('td').innerHTML = `
+    <input
+    autofocus
       class="input-edit" 
       value="${elementText}"
       style="
@@ -257,36 +294,20 @@ window.addEventListener('dblclick', (e) => {
         background: none;
         font-size:15px; 
         height: 28px;
-        width: 100px;
+        width: ${elementWidth - 36}px;
       "
     >
     `;
-  }
-});
 
-window.addEventListener('click', (e) => {
   const inputEdit = document.querySelector('.input-edit');
 
-  if (inputEdit === null
-    || e.target.classList.contains('input-edit')) {
-    return;
-  }
+  inputEdit.addEventListener('blur', () => {
+    saveInputText(inputEdit);
+  });
 
-  if (inputEdit.value === '') {
-    inputEdit.closest('td').innerHTML = elementText;
-  }
-
-  inputEdit.closest('td').innerHTML = `${inputEdit.value}`;
-});
-
-window.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    const inputEdit = document.querySelector('.input-edit');
-
-    if (inputEdit.value === '') {
-      inputEdit.closest('td').innerHTML = elementText;
+  inputEdit.addEventListener('keypress', (even) => {
+    if (even.key === 'Enter') {
+      saveInputText(inputEdit);
     }
-
-    inputEdit.closest('td').innerHTML = `${inputEdit.value}`;
-  }
+  });
 });
