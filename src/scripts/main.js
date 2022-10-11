@@ -290,7 +290,8 @@ const validateCell = (cellType, newValue) => {
         return `$${parseFloat(
           newValue
             .replace('$', '')
-            .replace(',', '.'))
+            .replace(',', '.')
+            .replace('-', ''))
           .toFixed(3)
         }`;
       }
