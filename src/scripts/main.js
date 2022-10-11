@@ -105,6 +105,10 @@ tBody.addEventListener('click', e => {
 
 // form;
 
+const offices = [
+  'Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco',
+];
+
 const formEl = `
   <form class="new-employee-form">
     <label>
@@ -127,13 +131,7 @@ const formEl = `
     <label>
       Office:
       <select data-qa="office" name="office">
-        <option value="Tokyo">Tokyo</option>
-        <option value="Singapore">Singapore</option>
-        <option value="Singapore">Singapore</option>
-        <option value="London">London</option>
-        <option value="New York">New York</option>
-        <option value="Edinburgh">Edinburgh</option>
-        <option value="San Francisco">San Francisco</option>
+      ${offices.map(city => `<option value="${city}">${city}</option>`)}
     </select>
     </label>
     <label>
@@ -243,6 +241,62 @@ form.addEventListener('submit', e => {
 
 // editing of table cells;
 
+const getCellType = (value) => {
+  let cellType;
+
+  switch (true) {
+    case value.includes('$'):
+      cellType = 'salary';
+      break;
+
+    case offices.includes(value):
+      cellType = 'office';
+      break;
+
+    case !isNaN(+value):
+      cellType = 'age';
+      break;
+
+    case typeof value === 'string':
+      cellType = 'str';
+      break;
+  }
+
+  return cellType;
+};
+
+const validateCell = (cellType, newValue) => {
+  switch (cellType) {
+    case 'str':
+      if (newValue.length > 2) {
+        return newValue;
+      }
+      break;
+
+    case 'office':
+      if (offices.includes(newValue)) {
+        return newValue;
+      }
+      break;
+
+    case 'age':
+      if (newValue >= 18 && newValue <= 90) {
+        return newValue;
+      }
+      break;
+
+    case 'salary':
+      if (!isNaN(parseFloat(newValue.replace('$', '')))) {
+        return `$${parseFloat(
+          newValue
+            .replace('$', '')
+            .replace(',', '.'))
+          .toFixed(3)
+        }`;
+      }
+  }
+};
+
 tBody.addEventListener('dblclick', bodyEvent => {
   const initialValue = bodyEvent.target.textContent;
 
@@ -257,7 +311,13 @@ tBody.addEventListener('dblclick', bodyEvent => {
   inputCell.focus();
 
   const blurAction = (inputMouseEvent) => {
-    const inputText = inputMouseEvent.target.value || initialValue;
+    const currentValue = inputMouseEvent.target.value;
+
+    const currentCellType = getCellType(initialValue);
+
+    const newData = validateCell(currentCellType, currentValue);
+
+    const inputText = newData || initialValue;
 
     inputMouseEvent.target.outerHTML = `<td>${inputText}</td>`;
   };
