@@ -10,10 +10,10 @@ const clickCounts = {};
 thead.addEventListener('click', (e) => {
   workerData = [];
 
-  // eslint-disable-next-line max-len
-  const allWorkers = [...document.querySelector('tbody').querySelectorAll('tr')];
-  // eslint-disable-next-line max-len
-  const theadElements = [...document.querySelector('thead').querySelectorAll('th')];
+  const allWorkers = [...document.querySelector('tbody')
+    .querySelectorAll('tr')];
+  const theadElements = [...document.querySelector('thead')
+    .querySelectorAll('th')];
 
   collect(allWorkers, theadElements);
 
@@ -22,7 +22,11 @@ thead.addEventListener('click', (e) => {
   }
 
   // eslint-disable-next-line max-len
-  const sortedData = sort(workerData, e.target.innerText, clickCounts[e.target.innerText]);
+  const sortedData = sort(
+    workerData,
+    e.target.innerText,
+    clickCounts[e.target.innerText]
+  );
 
   clickCounts[e.target.innerText]++;
 
@@ -48,49 +52,57 @@ function collect(allWorkers, theadElements) {
 }
 
 function sort(list, sortLine, direction) {
+  const copyOfList = [...list];
+
   switch (sortLine) {
     case 'Name':
     case 'Position':
     case 'Office':
-      return sortString(list, sortLine, direction);
+      return sortString(copyOfList, sortLine, direction);
     case 'Age':
-      return sortNumbers(list, sortLine, direction);
+      return sortNumbers(copyOfList, sortLine, direction);
     case 'Salary':
-      return sortSalary(list, sortLine, direction);
+      return sortSalary(copyOfList, sortLine, direction);
   }
 }
 
 function sortSalary(list, sortLine, direction) {
+  const copyOfList = [...list];
+
   return (direction % 2 === 0)
-    ? list
+    ? copyOfList
       .sort((personA, personB) => (
         fromDollars(personA[sortLine]) - fromDollars(personB[sortLine])
       ))
-    : list
+    : copyOfList
       .sort((personA, personB) => (
         fromDollars(personB[sortLine]) - fromDollars(personA[sortLine])
       ));
 }
 
 function sortNumbers(list, sortLine, direction) {
+  const copyOfList = [...list];
+
   return (direction % 2 === 0)
-    ? list
+    ? copyOfList
       .sort((personA, personB) => (
         personA[sortLine] - personB[sortLine]
       ))
-    : list
+    : copyOfList
       .sort((personA, personB) => (
         personB[sortLine] - personA[sortLine]
       ));
 }
 
 function sortString(list, sortLine, direction) {
+  const copyOfList = [...list];
+
   return (direction % 2 === 0)
-    ? list
+    ? copyOfList
       .sort((personA, personB) => (
         personA[sortLine].localeCompare(personB[sortLine])
       ))
-    : list
+    : copyOfList
       .sort((personA, personB) => (
         personB[sortLine].localeCompare(personA[sortLine])
       ));
