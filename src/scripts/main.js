@@ -9,44 +9,54 @@ const tdList = root.querySelectorAll('td');
 // When I want edit my table cell, my input have own width, and table stretches.
 // Here I set fixed width for my cells,
 // and in css 100% relative width for my input.
-tdList.forEach(td => {
-  td.style.width = `${parseFloat(getComputedStyle(td).width)}px`;
-});
+const setWidth = () => {
+  tdList.forEach(td => {
+    td.style.width = `${parseFloat(getComputedStyle(td).width)}px`;
+  });
+};
+
+setWidth();
+
+function addAttributes() {
+  const tBodyList = [...tBody.children];
+
+  for (const tr of tBodyList) {
+    [...tr.cells].forEach((item, index) => {
+      item.dataset.label = tHead.children[index].textContent.toLowerCase();
+    });
+  }
+}
+
+addAttributes();
 
 // sort table;
 const getNumber = num => {
   return num.replace(/[\D]+/g, '');
 };
 
-const getColumnID = el => {
-  for (let i = 0; i < tHead.cells.length; i++) {
-    if (tHead.cells[i] === el) {
-      return i;
-    }
-  }
+const parseTable = () => {
+  return [...tBody.children].map(row => {
+    const person = {};
+
+    [...row.cells].forEach(cell => {
+      person[cell.dataset.label] = cell.textContent;
+    });
+
+    return person;
+  });
 };
 
-const parseTable = columnID => {
-  const data = [];
-
-  for (const row of tBody.children) {
-    data.push(row.cells[columnID].textContent);
-  }
-
-  return data;
-};
-
-const sortData = (data, sortType) => {
-  const arrEl = getNumber(data[0]);
+const sortData = (data, columnName, sortType) => {
+  const arrEl = getNumber(data[0][columnName]);
 
   const callBacks = {
     'ASC': {
-      forString: (a, b) => a.localeCompare(b),
-      forNum: (a, b) => getNumber(a) - getNumber(b),
+      forString: (a, b) => a[columnName].localeCompare(b[columnName]),
+      forNum: (a, b) => getNumber(a[columnName]) - getNumber(b[columnName]),
     },
     'DESC': {
-      forString: (a, b) => b.localeCompare(a),
-      forNum: (a, b) => getNumber(b) - getNumber(a),
+      forString: (a, b) => b[columnName].localeCompare(a[columnName]),
+      forNum: (a, b) => getNumber(b[columnName]) - getNumber(a[columnName]),
     },
   };
 
@@ -57,24 +67,24 @@ const sortData = (data, sortType) => {
   return data.sort(callBacks[sortType].forString);
 };
 
-const replaceColumn = (columnID, data) => {
-  for (let i = 0; i < tBody.children.length; i++) {
-    const row = tBody.children[i];
-
-    row.cells[columnID].textContent = data[i];
-  }
+const replaceTable = (data) => {
+  tBody.innerHTML = data.map(row => `
+    <tr>
+      <td data-label="name">${row.name}</td>
+      <td data-label="position">${row.position}</td>
+      <td data-label="office">${row.office}</td>
+      <td data-label="age">${row.age}</td>
+      <td data-label="salary">${row.salary}</td>
+    </tr>
+    `).join('');
 };
 
 tHead.addEventListener('click', e => {
   const sortType = e.target.dataset.sort;
-  const columnID = getColumnID(e.target);
-  const data = parseTable(columnID);
+  const sortColumnName = e.target.textContent.toLowerCase();
+  const data = parseTable();
 
   switch (sortType) {
-    case undefined:
-      e.target.dataset.sort = 'ASC';
-      break;
-
     case 'ASC':
       e.target.dataset.sort = 'DESC';
       break;
@@ -82,10 +92,16 @@ tHead.addEventListener('click', e => {
     case 'DESC':
       e.target.dataset.sort = 'ASC';
       break;
+
+    default:
+      e.target.dataset.sort = 'ASC';
+      break;
   }
 
-  sortData(data, e.target.dataset.sort);
-  replaceColumn(columnID, data);
+  sortData(data, sortColumnName, e.target.dataset.sort);
+
+  replaceTable(data);
+  setWidth();
 });
 
 // select row;
@@ -157,8 +173,9 @@ const formEl = `
 const formValidator = (data) => {
   const nameLength = data.name.length;
   const age = data.age;
+  const salary = data.salary;
 
-  return nameLength > 4 && (age >= 18 && age <= 90);
+  return nameLength > 4 && (age >= 18 && age <= 90) && salary > 0;
 };
 
 const addNotification = type => {
@@ -166,29 +183,31 @@ const addNotification = type => {
 
   switch (type) {
     case 'success':
-      notification = `<div 
-                data-qa="notification" 
-                class="notification ${type}"
-              >
-                <p class="title">
-                  The employee was successfully added. 
-                </p>
-              </div>
-             `;
+      notification = `
+        <div 
+          data-qa="notification" 
+          class="notification ${type}"
+        >
+          <p class="title">
+            The employee was successfully added. 
+          </p>
+        </div>
+      `;
       break;
     case 'error':
-      notification = `<div 
-                data-qa="notification" 
-                class="notification ${type}"
-              >
-                <p class="title">
-                  Invalid data.
-                  Сheck the following:
-                  * Name value has not less than 4 letters
-                  * Age is not less than 18 or more than 90
-                </p>
-              </div>
-             `;
+      notification = `
+        <div 
+          data-qa="notification" 
+          class="notification ${type}"
+        >
+          <p class="title">
+            Invalid data.
+            Сheck the following:
+            * Name value has not less than 4 letters
+            * Age is not less than 18 or more than 90
+          </p>
+        </div>
+        `;
       break;
   }
   root.insertAdjacentHTML('afterbegin', notification);
@@ -224,19 +243,18 @@ form.addEventListener('submit', e => {
 
   const newRow = `
     <tr>
-      ${Object.keys(tableData).map(key => {
-    if (key === 'salary') {
-      return `<td>${makeSalaryValue(+tableData[key])}</td>`;
-    }
-
-    return `<td>${tableData[key]}</td>`;
-  }).join('')}
+      <td data-label="name">${tableData.name}</td>
+      <td data-label="position">${tableData.position}</td>
+      <td data-label="office">${tableData.office}</td>
+      <td data-label="age">${tableData.age}</td>
+      <td data-label="salary">${makeSalaryValue(+tableData.salary)}</td>
     </tr>
   `;
 
   tBody.insertAdjacentHTML('beforeend', newRow);
   addNotification('success');
   form.reset();
+  setWidth();
 });
 
 // editing of table cells;
