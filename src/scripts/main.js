@@ -12,7 +12,7 @@ const pushNotification = (title, description, type) => {
   message.className = `notification ${type}`;
 
   message.innerHTML = `
-    <h2 class = "title">${title}</h2>
+    <h2 class="title">${title}</h2>
     <p>${description}</p>
   `;
   message.dataset.qa = 'notification';
@@ -43,8 +43,8 @@ function sortTable(e) {
   } else {
     if (th.textContent === 'Salary') {
       rows.sort((trA, trB) =>
-        formatingSalary(trA.cells[th.cellIndex].textContent)
-        - (formatingSalary(trB.cells[th.cellIndex].textContent)));
+        formatSalary(trA.cells[th.cellIndex].textContent)
+        - (formatSalary(trB.cells[th.cellIndex].textContent)));
     } else {
       rows.sort((trA, trB) => trA.cells[th.cellIndex].textContent
         .localeCompare(trB.cells[th.cellIndex].textContent));
@@ -56,7 +56,7 @@ function sortTable(e) {
   rows.forEach(tr => tableBody.append(tr));
 }
 
-function formatingSalary(salary) {
+function formatSalary(salary) {
   return +salary.split('').filter(item =>
     '0123456789'.includes(item)).join('');
 }
@@ -81,6 +81,7 @@ function saveToTable(e) {
   const office = form.querySelector('[name="office"]').value;
   const age = form.querySelector('[name="age"]').value;
   const salary = form.querySelector('[name="salary"]').value;
+  const inputs = form.querySelectorAll('input');
 
   if (!nameValue || !position || !office || !age || !salary) {
     pushNotification('Input error',
@@ -112,6 +113,11 @@ function saveToTable(e) {
   `;
 
   tableBody.append(newRow);
+  form.querySelector('[name="office"]').firstElementChild.selected = true;
+
+  for (const input of inputs) {
+    input.value = '';
+  }
 
   pushNotification('New employee added',
     'Data has been successfully added to the table.', 'success');
@@ -138,7 +144,7 @@ function editCell(e) {
 
     td.firstElementChild.remove();
 
-    if (inputValue.length === 0) {
+    if (!inputValue.length) {
       td.textContent = valueTd;
     } else {
       td.textContent = inputValue;
