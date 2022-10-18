@@ -3,7 +3,6 @@
 const body = document.querySelector('body');
 const tbody = document.querySelector('tbody');
 const thead = document.querySelector('thead');
-const trs = tbody.querySelectorAll('tr');
 
 function convertToNum(str) {
   let res = '';
@@ -54,7 +53,8 @@ let lastIndex;
 
 thead.addEventListener('click', (e) => {
   const index = e.target.cellIndex;
-
+ 
+  const trs = tbody.querySelectorAll('tr');
   const sorted = [...trs].sort((prev, next) => {
     const a = convertToNum(prev.cells[index].innerText);
     const b = convertToNum(next.cells[index].innerText);
