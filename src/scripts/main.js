@@ -84,22 +84,31 @@ function saveToTable(e) {
   const inputs = form.querySelectorAll('input');
 
   if (!nameValue || !position || !office || !age || !salary) {
-    pushNotification('Input error',
-      'All fields are required.', 'error');
+    pushNotification(
+      'Input error',
+      'All fields are required.',
+      'error'
+    );
 
     return;
   }
 
   if (nameValue.length < 4) {
-    pushNotification('Input error',
-      'Name has less than 4 letters.', 'error');
+    pushNotification(
+      'Input error',
+      'Name has less than 4 letters.',
+      'error'
+    );
 
     return;
   }
 
   if (age < 18 || age > 90) {
-    pushNotification('Input error',
-      'Age is less than 18 or more than 90.', 'error');
+    pushNotification(
+      'Input error',
+      'Age is less than 18 or more than 90.',
+      'error'
+    );
 
     return;
   }
@@ -119,8 +128,11 @@ function saveToTable(e) {
     input.value = '';
   }
 
-  pushNotification('New employee added',
-    'Data has been successfully added to the table.', 'success');
+  pushNotification(
+    'New employee added',
+    'Data has been successfully added to the table.',
+    'success'
+  );
 }
 
 function editCell(e) {
