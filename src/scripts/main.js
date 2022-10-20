@@ -1,8 +1,11 @@
 'use strict';
 
-const body = document.querySelector('body');
+const body = document.body;
 const tbody = document.querySelector('tbody');
 const thead = document.querySelector('thead');
+let direction = true;
+let lastIndex;
+let selectedRow;
 
 function convertToNum(str) {
   let res = '';
@@ -22,12 +25,12 @@ function convertToMoney(str) {
   return money;
 }
 
-const keyDown = (e) => {
+const onKeyDown = (e) => {
   if (e.key !== 'Enter') {
     return;
   }
 
-  if (e.target.value.length === 0) {
+  if (!e.target.value.length) {
     e.target.closest('td').innerText = innerText;
   }
 
@@ -48,12 +51,9 @@ const onBlur = (e) => {
   }
 };
 
-let direction = true;
-let lastIndex;
-
 thead.addEventListener('click', (e) => {
   const index = e.target.cellIndex;
- 
+
   const trs = tbody.querySelectorAll('tr');
   const sorted = [...trs].sort((prev, next) => {
     const a = convertToNum(prev.cells[index].innerText);
@@ -75,8 +75,6 @@ thead.addEventListener('click', (e) => {
 
   tbody.append(...sorted);
 });
-
-let selectedRow;
 
 tbody.addEventListener('click', (e) => {
   if (selectedRow === e.target) {
@@ -113,7 +111,7 @@ tbody.addEventListener('dblclick', (e) => {
   }
 });
 
-tbody.addEventListener('keydown', keyDown);
+tbody.addEventListener('keydown', onKeyDown);
 
 function formCreator() {
   const form = document.createElement('form');
