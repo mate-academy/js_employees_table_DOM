@@ -11,23 +11,31 @@ const text = document.createElement('p');
 
 let rowsArray = Array.from(tBody.rows);
 
-let clicksOnTable = 0;
+let sortOrder;
+let sortHeader;
 
 table.addEventListener('click', function(ev) {
-  clicksOnTable++;
-
   const elem = ev.target;
 
   if (elem.tagName !== 'TH') {
     return;
   }
-  sortlist(elem.cellIndex, elem.dataset.type);
+
+  if (sortHeader !== elem) {
+    sortOrder = 'ASC';
+    sortHeader = elem;
+  } else {
+    sortOrder = 'DESC';
+    sortHeader = !sortHeader;
+  }
+
+  sortlist(elem.cellIndex, elem.dataset.type, sortOrder);
 });
 
-function sortlist(colNum, type) {
+function sortlist(colNum, type, order) {
   let compare;
 
-  if (clicksOnTable % 2 !== 0) {
+  if (order === 'ASC') {
     compare = function(rowA, rowB) {
       switch (type) {
         case 'string':
@@ -60,14 +68,13 @@ function sortlist(colNum, type) {
   }
 
   rowsArray.sort(compare);
-
-  function toNumber(string) {
-    const str = string.replace(',', '.').slice(1);
-
-    return str;
-  }
-
   tBody.append(...rowsArray);
+}
+
+function toNumber(string) {
+  const str = string.replace(',', '.').slice(1);
+
+  return str;
 }
 
 const handleListRows = function(ev) {
@@ -76,7 +83,7 @@ const handleListRows = function(ev) {
   if (item.tagName !== 'TD') {
     return;
   }
-  item.parentNode.classList.toggle('active');
+  item.parentElement.classList.toggle('active');
 };
 
 const preventSelection = function(ev) {
@@ -85,7 +92,6 @@ const preventSelection = function(ev) {
 
 table.addEventListener('click', handleListRows);
 table.addEventListener('mousedown', preventSelection);
-
 
 // adding form
 
@@ -223,6 +229,13 @@ function showNotification(title, shownText, type) {
   message.classList.add(`${type}`);
   message.append(header, text);
   document.body.append(message);
+
+  const Formcoords = form.getBoundingClientRect();
+
+  message.style.left = Formcoords.left + 'px';
+
+  message.style.top = Formcoords.top
+    + form.offsetHeight + 20 + 'px';
 
   setTimeout(() => {
     message.remove();
