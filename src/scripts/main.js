@@ -69,43 +69,34 @@ function sort(list, sortLine, direction) {
 function sortSalary(list, sortLine, direction) {
   const copyOfList = [...list];
 
-  return (direction % 2 === 0)
-    ? copyOfList
-      .sort((personA, personB) => (
-        fromDollars(personA[sortLine]) - fromDollars(personB[sortLine])
-      ))
-    : copyOfList
-      .sort((personA, personB) => (
-        fromDollars(personB[sortLine]) - fromDollars(personA[sortLine])
-      ));
+  return copyOfList
+    .sort((personA, personB) => {
+      return direction % 2 === 0
+        ? fromDollars(personA[sortLine]) - fromDollars(personB[sortLine])
+        : fromDollars(personB[sortLine]) - fromDollars(personA[sortLine]);
+    });
 }
 
 function sortNumbers(list, sortLine, direction) {
   const copyOfList = [...list];
 
-  return (direction % 2 === 0)
-    ? copyOfList
-      .sort((personA, personB) => (
-        personA[sortLine] - personB[sortLine]
-      ))
-    : copyOfList
-      .sort((personA, personB) => (
-        personB[sortLine] - personA[sortLine]
-      ));
+  return copyOfList
+    .sort((personA, personB) => {
+      return direction % 2 === 0
+        ? personA[sortLine] - personB[sortLine]
+        : personB[sortLine] - personA[sortLine];
+    });
 }
 
 function sortString(list, sortLine, direction) {
   const copyOfList = [...list];
 
-  return (direction % 2 === 0)
-    ? copyOfList
-      .sort((personA, personB) => (
-        personA[sortLine].localeCompare(personB[sortLine])
-      ))
-    : copyOfList
-      .sort((personA, personB) => (
-        personB[sortLine].localeCompare(personA[sortLine])
-      ));
+  return copyOfList
+    .sort((personA, personB) => {
+      return direction % 2 === 0
+        ? personA[sortLine].localeCompare(personB[sortLine])
+        : personB[sortLine].localeCompare(personA[sortLine]);
+    });
 }
 
 function fromDollars(salary) {
