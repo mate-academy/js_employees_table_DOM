@@ -51,18 +51,17 @@ function sortlist(colNum, type, order) {
       }
     };
   } else {
-    compare = function(rowA, rowB) {
+    compare = function(rowB, rowA) {
       switch (type) {
         case 'string':
-          return rowB.cells[colNum].textContent
-            .localeCompare(rowA.cells[colNum].textContent);
-
+          return rowA.cells[colNum].textContent
+            .localeCompare(rowB.cells[colNum].textContent);
         case 'number':
-          return rowB.cells[colNum].textContent
-          - rowA.cells[colNum].textContent;
+          return rowA.cells[colNum].textContent
+          - rowB.cells[colNum].textContent;
         case 'salary':
-          return toNumber(rowB.cells[colNum].textContent)
-          - toNumber(rowA.cells[colNum].textContent);
+          return toNumber(rowA.cells[colNum].textContent)
+          - toNumber(rowB.cells[colNum].textContent);
       }
     };
   }
@@ -152,6 +151,7 @@ body.insertAdjacentHTML('beforeend', `
       <input
         type="number"
         name="salary"
+        min="0"
         data-qa="salary"
         required
       />
@@ -186,11 +186,13 @@ button.onclick = (ev) => {
 
   const correctInputSalaryLength = [...onlyWithLabels]
     .filter(elem => elem.dataset.qa === 'salary')
-    .every(el => el.value.length > 0);
+    .every(el => el.value > 0);
 
-  if (correctInputTextLength
+  const allInputsValid = correctInputTextLength
     && correctInputAgeLength
-    && correctInputSalaryLength) {
+    && correctInputSalaryLength;
+
+  if (allInputsValid) {
     ev.preventDefault();
 
     tBody.insertAdjacentHTML('beforeend', `
@@ -207,21 +209,21 @@ button.onclick = (ev) => {
   }
 
   if (!correctInputTextLength) {
-    showNotification('Attention',
+    showNotification(10, 10, 'Attention',
       "'The length must be more than 4 digits'", 'error');
   } else if (!correctInputAgeLength) {
-    showNotification('Attention',
+    showNotification(10, 10, 'Attention',
       "'The age must be betwen 18 and 90'", 'error');
   } else if (!correctInputSalaryLength) {
-    showNotification('Attention',
+    showNotification(10, 10, 'Attention',
       "'Salary must be passed'", 'error');
   } else {
-    showNotification('Congratulation',
+    showNotification(10, 10, 'Congratulation',
       'New employee is added to the form', 'success');
   }
 };
 
-function showNotification(title, shownText, type) {
+function showNotification(posTop, posRight, title, shownText, type) {
   message.className = 'notification';
   header.className = `title`;
   header.textContent = `${title}`;
@@ -230,12 +232,8 @@ function showNotification(title, shownText, type) {
   message.append(header, text);
   document.body.append(message);
 
-  const Formcoords = form.getBoundingClientRect();
-
-  message.style.left = Formcoords.left + 'px';
-
-  message.style.top = Formcoords.top
-    + form.offsetHeight + 20 + 'px';
+  message.style.top = posTop + 'px';
+  message.style.right = posRight + 'px';
 
   setTimeout(() => {
     message.remove();
@@ -259,19 +257,16 @@ function formatValue(input) {
 }
 
 function formatToString(input) {
-  if (input.length === 3) {
-    return '$' + '0,' + input;
+  switch (input.length) {
+    case 3:
+      return '$' + '0,' + input;
+    case 2:
+      return '$' + '0,0' + input;
+    case 1:
+      return '$' + '0,00' + input;
+    default:
+      return '$' + input.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
-
-  if (input.length === 2) {
-    return '$' + '0,0' + input;
-  }
-
-  if (input.length === 1) {
-    return '$' + '0,00' + input;
-  }
-
-  return '$' + input.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 // editing of table cells
@@ -297,7 +292,7 @@ tBody.addEventListener('dblclick', function(ev) {
     if (input.value.length === 0) {
       input.value = prevTargetContent;
 
-      showNotification('Attention',
+      showNotification(10, 10, 'Attention',
         "The field shouldn't be empty \n *Initial value was restored!",
         'error');
     }
@@ -309,7 +304,7 @@ tBody.addEventListener('dblclick', function(ev) {
     if (input.value.length === 0) {
       input.value = prevTargetContent;
 
-      showNotification('Attention',
+      showNotification(10, 10, 'Attention',
         "The field shouldn't be empty \n *Initial value was restored!",
         'error');
     }
