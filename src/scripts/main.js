@@ -1,7 +1,5 @@
 'use strict';
 
-/* TABLE COLUMNS ASC DESC ORDER SORTING ____________________________________ */
-
 const heading = document.querySelector('thead').firstElementChild;
 const headingItems = [...heading.querySelectorAll('th')];
 const tableBody = document.querySelector('tbody');
@@ -29,6 +27,7 @@ const numberToSalary = (elem) => {
 
 function tableSort(column) {
   const index = headingItems.indexOf(column);
+  const data = column.dataset;
 
   const callbackSort = (rowA, rowB) => {
     const one = rowA.children[index].innerText;
@@ -36,18 +35,18 @@ function tableSort(column) {
     let first = one;
     let second = two;
 
-    if (column.dataset.order === 'asc') {
+    if (data.order === 'asc') {
       first = two;
       second = one;
     }
 
-    if (column.dataset.type === 'text') {
-      return first.localeCompare(second);
-    } else if (column.dataset.type === 'salary') {
-      return salaryToNumber(first)
-      - salaryToNumber(second);
-    } else if (column.dataset.type === 'number') {
-      return first - second;
+    switch (data.type) {
+      case 'text':
+        return first.localeCompare(second);
+      case 'salary':
+        return salaryToNumber(first) - salaryToNumber(second);
+      case 'number':
+        return first - second;
     }
   };
   const sorted = [...tableBody.children].sort(callbackSort);
@@ -55,11 +54,10 @@ function tableSort(column) {
   tableRows.forEach(item => item.remove());
   sorted.forEach(item => tableBody.append(item));
 
-  if (!column.hasAttribute('data-order')
-  || column.dataset.order === 'desc') {
-    column.dataset.order = 'asc';
+  if (!data.order || data.order === 'desc') {
+    data.order = 'asc';
   } else {
-    column.dataset.order = 'desc';
+    data.order = 'desc';
   }
 }
 
@@ -72,8 +70,6 @@ heading.addEventListener('click', (e) => {
 
   tableSort(item);
 });
-
-/* SELECTING ROW IN A TABLE ________________________________________________ */
 
 tableRows.forEach(item => item.setAttribute('class', 'row'));
 
@@ -96,8 +92,6 @@ tableBody.addEventListener('click', (e) => {
   [...item.children].forEach(cell => cell.classList.add('cell-active'));
 });
 
-/* NEW EMPLOYEE FORM _______________________________________________________ */
-
 const form = document.createElement('form');
 
 form.setAttribute('class', 'new-employee-form');
@@ -119,8 +113,6 @@ const salary = document.querySelector('#salary');
 
 age.type = 'number';
 salary.type = 'number';
-
-/** select item */
 
 const selectLabel = document.createElement('label');
 
@@ -147,8 +139,6 @@ selectLabel.append(select);
 form.insertBefore(selectLabel, form.children[2]);
 
 selectLabel.insertAdjacentText('afterbegin', 'Office:');
-
-/** form button, adding a new row to the form */
 
 const button = document.createElement('button');
 
@@ -211,8 +201,6 @@ const addRow = (e) => {
 
 form.addEventListener('submit', addRow);
 
-/* NOTIFICATION WINDOW ______________________________________________________ */
-
 const alertTable = document.createElement('div');
 
 alertTable.style.top = '5px';
@@ -249,8 +237,6 @@ const notification = (message, type) => {
 
   setTimeout(adjust, '2800');
 };
-
-/* TABLE CELLS EDITING ______________________________________________________ */
 
 function addInput(cell, index) {
   const inputCollection = [...document.getElementsByTagName('label')]
