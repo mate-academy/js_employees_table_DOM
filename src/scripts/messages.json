@@ -1,0 +1,67 @@
+[
+  {
+    "title": "All fields are required!",
+    "description": "Please, fill out all form fields!",
+    "type": "error"
+  },
+
+  {
+    "title": "Invalid name!",
+    "description": "Name must contain only English alphabet characters or spaces",
+    "type": "error"
+  },
+
+  {
+    "title": "Invalid name!",
+    "description": "Name must not be shorter than 4 characters",
+    "type": "error"
+  },
+
+  {
+    "title": "Invalid position name!",
+    "description": "Position name must contain only English alphabet characters or spaces",
+    "type": "error"
+  },
+
+  {
+    "title": "Invalid age!",
+    "description": "Please, insert correct age",
+    "type": "error"
+  },
+
+  {
+    "title": "Data added!",
+    "description": "New employee successfully added to the table",
+    "type": "success"
+  },
+
+  {
+    "title": "Empty Field!",
+    "description": "Field is empty! Data didn't saved",
+    "type": "error"
+  },
+
+  {
+    "title": "Not a number!",
+    "description": "Please, insert a number",
+    "type": "error"
+  },
+
+  {
+    "title": "Data saved!",
+    "description": "Information is refreshed!",
+    "type": "success"
+  },
+
+  {
+    "title": "Invalid data!",
+    "description": "Data must contain only English alphabet characters or spaces",
+    "type": "error"
+  },
+
+  {
+    "title": "Invalid data!",
+    "description": "Office in this city doesn't exist",
+    "type": "error"
+  }
+]
