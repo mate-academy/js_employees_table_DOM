@@ -301,8 +301,7 @@ function getWorkerInfo(workerData) {
 function sort(workers, value, orderASC) {
   return workers.sort(
     ({ [value]: value1 }, { [value]: value2 }) => {
-      let a = value1;
-      let b = value2;
+      let [a, b] = [value1, value2];
 
       if (!orderASC) {
         [a, b] = [b, a];
