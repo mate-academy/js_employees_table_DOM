@@ -299,18 +299,19 @@ function getWorkerInfo(workerData) {
 }
 
 function sort(workers, value, orderASC) {
-  if (orderASC) {
-    return workers.sort(
-      ({ [value]: a }, { [value]: b }) => typeof a === 'string'
-        ? a.localeCompare(b)
-        : a - b
-    );
-  }
-
   return workers.sort(
-    ({ [value]: a }, { [value]: b }) => typeof a === 'string'
-      ? b.localeCompare(a)
-      : b - a
+    ({ [value]: value1 }, { [value]: value2 }) => {
+      let a = value1;
+      let b = value2;
+
+      if (!orderASC) {
+        [a, b] = [b, a];
+      }
+
+      return typeof a === 'string'
+        ? a.localeCompare(b)
+        : a - b;
+    }
   );
 }
 
