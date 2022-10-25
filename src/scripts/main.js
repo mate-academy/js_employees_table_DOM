@@ -11,82 +11,21 @@ const workersData = () => [...table.tBodies[0].rows];
 const notification = createPush();
 const checker = checkClick();
 
-const pushEmptyFields = {
-  title: 'All fields are required',
-  description: 'Please\n '
-    + 'fill out all form fields',
-  type: 'error',
-};
+const messages = require('./messages.json');
 
-const pushInvalidNameText = {
-  title: 'Invalid name',
-  description: 'Name must contain\n '
-    + 'only English alphabet characters or spaces',
-  type: 'error',
-};
-
-const pushInvalidNameLength = {
-  title: 'Invalid name',
-  description: `Name must not be\n `
-    + 'shorter than 4 characters',
-  type: 'error',
-};
-
-const pushInvalidPosition = {
-  title: 'Invalid position name',
-  description: 'position name must contain\n '
-    + 'only English alphabet characters or spaces',
-  type: 'error',
-};
-
-const pushInvalidAge = {
-  title: 'Invalid age',
-  description: 'Please\n '
-    + 'insert correct age',
-  type: 'error',
-};
-
-const pushSuccessAdd = {
-  title: 'Data added',
-  description: 'New employee\n '
-    + 'successfully added to the table',
-  type: 'success',
-};
-
-const pushEmptyCell = {
-  title: 'Empty Field',
-  description: 'Field is empty!\n '
-    + 'Data didn\'t saved',
-  type: 'error',
-};
-
-const pushCellNotNumber = {
-  title: 'Not a number',
-  description: 'Please\n '
-    + 'insert a number',
-  type: 'error',
-};
-
-const pushCellSaved = {
-  title: 'Data saved',
-  description: 'Information\n '
-    + 'is refreshed',
-  type: 'success',
-};
-
-const pushCellNotString = {
-  title: 'Invalid data',
-  description: 'Data must contain\n '
-    + 'only English alphabet characters or spaces',
-  type: 'error',
-};
-
-const pushCellWrongOffice = {
-  title: 'Invalid data',
-  description: 'Office in this city\n '
-    + 'doesn\'t exist',
-  type: 'error',
-};
+const [
+  pushEmptyFields,
+  pushInvalidNameText,
+  pushInvalidNameLength,
+  pushInvalidPosition,
+  pushInvalidAge,
+  pushSuccessAdd,
+  pushEmptyCell,
+  pushCellNotNumber,
+  pushCellSaved,
+  pushCellNotString,
+  pushCellWrongOffice,
+] = messages;
 
 workersData().forEach(el => {
   [...el.cells].forEach(cell => {
@@ -181,7 +120,7 @@ for (const [input, type] of formInputs) {
   form.append(addInput(input, type));
 }
 
-form.querySelector(':nth-child(2)').insertAdjacentElement('afterend', (() => {
+form.querySelector(':nth-child(2)').after((() => {
   const label = document.createElement('label');
   const select = document.createElement('select');
 
@@ -282,150 +221,75 @@ tableBody.addEventListener('dblclick', clickEvent => {
   const isName = target.cellIndex === 0;
   const isOffice = target.cellIndex === 2;
   const isStringField = target.cellIndex === 0
-    || target.cellIndex === 1
-    || target.cellIndex === 2;
+    || target.cellIndex === 1;
 
-  input.onblur = () => {
+  function changeCellContent(pushMessage, value = initialValue) {
+    target.innerText = value;
+    notification(pushMessage);
+    input.remove();
+  }
+
+  function saveEditedField() {
     if (!input.value) {
-      target.innerText = initialValue;
-      notification(pushEmptyCell);
-      input.remove();
+      changeCellContent(pushEmptyCell);
 
       return;
     }
 
     if ((isAge || isSalary) && !input.value.match(/[0-9]/)) {
-      target.innerText = initialValue;
-      notification(pushCellNotNumber);
-      input.remove();
+      changeCellContent(pushCellNotNumber);
 
       return;
     }
 
     if (isStringField && input.value.match(/[0-9]/)) {
-      target.innerText = initialValue;
-      notification(pushCellNotString);
-      input.remove();
+      changeCellContent(pushCellNotString);
 
       return;
     }
 
     if (isSalary && input.value.match(/[0-9]/)) {
-      target.innerText = getSalaryStr(input.value);
-      notification(pushCellSaved);
-      input.remove();
+      changeCellContent(pushCellSaved, getSalaryStr(input.value));
 
       return;
     }
 
     if (isName && input.value.length < 4) {
-      target.innerText = initialValue;
-      notification(pushInvalidNameLength);
-      input.remove();
+      changeCellContent(pushInvalidNameLength);
 
       return;
     }
 
     if (isName && !input.value.match(/^[a-zA-Z ]*$/g)) {
-      target.innerText = initialValue;
-      notification(pushInvalidNameText);
-      input.remove();
+      changeCellContent(pushInvalidNameText);
 
       return;
     }
 
     if (isAge && (+input.value < 18 || +input.value > 90)) {
-      target.innerText = initialValue;
-      notification(pushInvalidAge);
-      input.remove();
+      changeCellContent(pushInvalidAge);
 
       return;
     }
 
     if (isOffice && !officeCities.includes(input.value)) {
-      target.innerText = initialValue;
-      notification(pushCellWrongOffice);
-      input.remove();
+      changeCellContent(pushCellWrongOffice);
 
       return;
     }
 
-    target.innerText = input.value;
-    notification(pushCellSaved);
-    input.remove();
+    changeCellContent(pushCellSaved, input.value);
+  }
+
+  input.onblur = () => {
+    saveEditedField();
   };
 
   input.onkeydown = (keyboardEvent) => {
     const isEnter = keyboardEvent.code === 'Enter';
 
-    if (!input.value && isEnter) {
-      target.innerText = initialValue;
-      notification(pushEmptyCell);
-      input.remove();
-
-      return;
-    }
-
-    if ((isAge || isSalary) && !input.value.match(/[0-9]/) && isEnter) {
-      target.innerText = initialValue;
-      notification(pushCellNotNumber);
-      input.remove();
-
-      return;
-    }
-
-    if (isStringField && input.value.match(/[0-9]/) && isEnter) {
-      target.innerText = initialValue;
-      notification(pushCellNotString);
-      input.remove();
-
-      return;
-    }
-
-    if (isSalary && input.value.match(/[0-9]/) && isEnter) {
-      target.innerText = getSalaryStr(input.value);
-      notification(pushCellSaved);
-      input.remove();
-
-      return;
-    }
-
-    if (isName && input.value.length < 4 && isEnter) {
-      target.innerText = initialValue;
-      notification(pushInvalidNameLength);
-      input.remove();
-
-      return;
-    }
-
-    if (isName && !input.value.match(/^[a-zA-Z ]*$/g) && isEnter) {
-      target.innerText = initialValue;
-      notification(pushInvalidNameText);
-      input.remove();
-
-      return;
-    }
-
-    if (isAge && (+input.value < 18 || +input.value > 90) && isEnter) {
-      target.innerText = initialValue;
-      notification(pushInvalidAge);
-      input.remove();
-
-      return;
-    }
-
-    if (isOffice && !officeCities.includes(input.value) && isEnter) {
-      target.innerText = initialValue;
-      notification(pushCellWrongOffice);
-      input.remove();
-
-      return;
-    }
-
     if (isEnter) {
-      target.innerText = input.value;
-      notification(pushCellSaved);
-      input.remove();
+      saveEditedField();
     }
   };
 });
@@ -434,8 +298,8 @@ function getWorkerInfo(workerData) {
   return workerData.map(el => el.innerText);
 }
 
-function sort(workers, value, count) {
-  if (count % 2 !== 0) {
+function sort(workers, value, orderASC) {
+  if (orderASC) {
     return workers.sort(
       ({ [value]: a }, { [value]: b }) => typeof a === 'string'
         ? a.localeCompare(b)
@@ -452,18 +316,18 @@ function sort(workers, value, count) {
 
 function checkClick() {
   let action = '';
-  let counter = 0;
+  let orderASC = false;
 
   return function(value) {
     if (!action || action === value) {
-      counter++;
+      orderASC = !orderASC;
       action = value;
     } else {
       action = value;
-      counter = 1;
+      orderASC = true;
     }
 
-    return counter;
+    return orderASC;
   };
 }
 
