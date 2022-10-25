@@ -9,11 +9,23 @@ const tableRows = [...tableBody.children];
 
 headingItems.forEach(item => item.setAttribute('class', 'column'));
 
-for (const item of headingItems.slice(0, 3)) {
-  item.dataset.type = 'text';
+function setDataAttribut(collection) {
+  for (const item of collection.slice(0, 3)) {
+    item.dataset.type = 'text';
+  }
+  collection[3].dataset.type = 'number';
+  collection[4].dataset.type = 'salary';
 }
-headingItems[3].dataset.type = 'number';
-headingItems[4].dataset.type = 'salary';
+
+setDataAttribut(headingItems);
+
+const salaryToNumber = (cell) => {
+  return cell.slice(1).split(',').join('');
+};
+
+const numberToSalary = (elem) => {
+  return `$${Number(elem).toLocaleString()}`;
+};
 
 function tableSort(column) {
   const index = headingItems.indexOf(column);
@@ -29,15 +41,11 @@ function tableSort(column) {
       second = one;
     }
 
-    const transformSalary = (cell) => {
-      return cell.slice(1).split(',').join('');
-    };
-
     if (column.dataset.type === 'text') {
       return first.localeCompare(second);
     } else if (column.dataset.type === 'salary') {
-      return transformSalary(first)
-      - transformSalary(second);
+      return salaryToNumber(first)
+      - salaryToNumber(second);
     } else if (column.dataset.type === 'number') {
       return first - second;
     }
@@ -93,6 +101,7 @@ tableBody.addEventListener('click', (e) => {
 const form = document.createElement('form');
 
 form.setAttribute('class', 'new-employee-form');
+form.autocomplete = 'off';
 document.body.insertBefore(form, document.body.lastChild);
 
 const inputs = ['name', 'position', 'age', 'salary'];
@@ -127,7 +136,7 @@ select.setAttribute('required', '');
 const optionsValues = ['Tokyo', 'Singapore', 'London',
   'New York', 'Edinburgh', 'San Francisco'];
 const optionCollection = optionsValues.map(item =>
-  `<option>${item}</option>`
+  `<option data-id="${item}">${item}</option>`
 );
 
 optionCollection.forEach(item =>
@@ -149,9 +158,9 @@ button.innerText = 'Save to table';
 
 form.append(button);
 
-const editSalary = (elem) => {
-  return `$${Number(elem).toLocaleString()}`;
-};
+function containsNumber(str) {
+  return str.split('').some(item => '0123456789'.includes(item));
+}
 
 const transformUpperCase = (person) => {
   const nameArr = person.split(' ');
@@ -172,25 +181,32 @@ const addRow = (e) => {
 
   newTr.innerHTML = `
       <td>${transformUpperCase(dataInput.name)}</td>
-      <td>${dataInput.position}</td>
+      <td>${transformUpperCase(dataInput.position)}</td>
       <td>${dataInput.office}</td>
       <td>${dataInput.age}</td>
-      <td>${editSalary(dataInput.salary)}</td>
+      <td>${numberToSalary(dataInput.salary)}</td>
   `;
 
-  if (dataInput.name.length < 4) {
+  if (dataInput.name.length < 4 || containsNumber(dataInput.name)) {
     return notification(wrongNameMessage, 'error');
-  } else if (dataInput.position.length <= 0) {
+  }
+
+  if (dataInput.position.length <= 0) {
     return notification(wrongPosition, 'error');
-  } else if (dataInput.age < 18) {
+  }
+
+  if (dataInput.age < 18) {
     return notification(smallAgeMessage, 'error');
-  } else if (dataInput.age > 90) {
+  }
+
+  if (dataInput.age > 90) {
     return notification(bigAgeMessage, 'error');
   }
 
   notification(success, 'success');
 
   tableBody.append(newTr);
+  form.reset();
 };
 
 form.addEventListener('submit', addRow);
@@ -215,6 +231,7 @@ const smallAgeMessage = 'Sorry, you are too young for this game';
 const bigAgeMessage = 'Sorry, you are too old for this game';
 const wrongNameMessage = 'Please, enter valid name';
 const wrongPosition = 'Please, enter valid position';
+const wrongSalaryMessage = 'Please, enter valid salary';
 const success = 'Employee successfully added';
 
 const notification = (message, type) => {
@@ -235,35 +252,115 @@ const notification = (message, type) => {
 
 /* TABLE CELLS EDITING ______________________________________________________ */
 
+function addInput(cell, index) {
+  const inputCollection = [...document.getElementsByTagName('label')]
+    .map(item => item.firstElementChild);
+  const input = inputCollection[index].cloneNode(true);
+
+  if (index === 4) {
+    input.setAttribute('value', `${salaryToNumber(cell.innerText)}`);
+  } else {
+    input.setAttribute('value', `${cell.innerText}`);
+  }
+  input.className = 'cell-input';
+  cell.append(input);
+  cell.firstChild.remove();
+
+  if (index === 2) {
+    const option = tableBody.querySelector(`[data-id="${cell.firstElementChild
+      .getAttribute('value')}"]`);
+
+    option.setAttribute('selected', '');
+  }
+  document.querySelector('.cell-input').focus();
+}
+
 tableBody.addEventListener('dblclick', (e) => {
   const cellInput = e.target.closest('.cell-active');
   const activeCell = document.querySelector('.cell-active--mod');
 
   if (!cellInput || !tableBody.contains(cellInput)) {
     return;
-  } else if (activeCell) {
+  }
+
+  if (activeCell) {
     activeCell.classList.remove('cell-active--mod');
   }
   cellInput.className += '--mod';
 
-  cellInput.innerHTML
-  = `<input class="cell-input" value="${cellInput.innerText}"></input>`;
+  const indexCell = [...document.querySelector('.row.active').children]
+    .findIndex(item => item.className === 'cell-active--mod');
+
+  addInput(e.target, indexCell);
 });
+
+const validationNameData = (cell, input) => {
+  if (input.value.length < 4 || containsNumber(input.value)) {
+    return notification(wrongNameMessage, 'error');
+  }
+  cell.innerText = transformUpperCase(input.value);
+  modAction(cell, input);
+};
+
+const validationPositionData = (cell, input) => {
+  cell.innerText = transformUpperCase(input.value);
+  modAction(cell, input);
+};
+
+const validationOfficeData = (cell, input) => {
+  cell.innerText = `${input.value}`;
+  modAction(cell, input);
+};
+
+const validationAgeData = (cell, input) => {
+  if (input.value < 18) {
+    return notification(smallAgeMessage, 'error');
+  }
+
+  if (input.value > 90) {
+    return notification(bigAgeMessage, 'error');
+  }
+  cell.innerText = `${input.value}`;
+  modAction(cell, input);
+};
+
+const validationSalaryData = (cell, input) => {
+  if (input.value <= 0) {
+    return notification(wrongSalaryMessage, 'error');
+  }
+  cell.innerText = `${numberToSalary(input.value)}`;
+  modAction(cell, input);
+};
+
+function modAction(cell, input) {
+  input.remove();
+  cell.classList.remove('cell-active--mod');
+
+  if (!input.value) {
+    cell.innerText = `${input.getAttribute('value')}`;
+  }
+}
 
 const itemMod = () => {
   const inputMod = document.querySelector('.cell-input');
   const cellMod = document.querySelector('.cell-active--mod');
-  const cellText = inputMod.value;
 
   if (!inputMod || !tableBody.contains(inputMod)) {
     return;
-  } else if (!cellText) {
-    cellMod.innerText = `${inputMod.getAttribute('value')}`;
-  } else {
-    cellMod.innerText = `${cellText}`;
   }
 
-  cellMod.classList.remove('cell-active--mod');
+  switch (`${inputMod.name}`) {
+    case 'name':
+      return validationNameData(cellMod, inputMod);
+    case 'position':
+      return validationPositionData(cellMod, inputMod);
+    case 'office':
+      return validationOfficeData(cellMod, inputMod);
+    case 'age':
+      return validationAgeData(cellMod, inputMod);
+    case 'salary':
+      return validationSalaryData(cellMod, inputMod);
+  }
 };
 
 tableBody.addEventListener('blur', itemMod, true);
