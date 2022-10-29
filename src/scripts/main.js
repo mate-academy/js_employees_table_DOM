@@ -282,8 +282,6 @@ document.addEventListener('submit', function(e) {
     newTableRow.append(cell);
   }
 
-
-  console.log(currentTable)
   currentTable.append(newTableRow);
-  form.reset();
+  document.querySelector('.new-employee-form').reset();
 });
