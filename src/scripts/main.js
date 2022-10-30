@@ -159,7 +159,6 @@ document.addEventListener('click', function(e) {
 
 document.addEventListener('dblclick', function(e) {
   if (e.target.tagName === 'TD') {
-    const columnName = document.querySelector('table').tHead.firstElementChild.children[e.srcElement.cellIndex].innerText;
     const inpText = document.createElement('input');
 
     prevCellText = e.target.innerText;
