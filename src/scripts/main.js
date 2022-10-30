@@ -2,29 +2,30 @@
 
 const doc = {
   orderASC: false,
-  cities: ['Tokyo', 'Singapore', 'London',
-    'New_York', 'Edinburgh', 'San_Francisco'],
-
-  get: (element) => document.querySelector(element),
   create: (element) => document.createElement(element),
+  get: (element) => document.querySelector(element),
   getAll: (element) => document.querySelectorAll(element),
   getCell: (row, evenT) => row.children[evenT.target.cellIndex]
     .textContent.replace(/[$,]/g, ''),
 
+  monetize: (item) => '$' + new Intl.NumberFormat('en-US').format(+item),
   capitalize: (words) => words.split(' ')
     .map(word => word[0].charAt(0).toUpperCase()
-    + word.slice(1)).join(' '),
+    + word.slice(1)).join(' ').replace('_', ' '),
 
-  monetize: (item) => '$'
-    + new Intl.NumberFormat('en-US').format(+item),
+  get cities() {
+    return [...this.getAll('tbody tr')].map(tr => tr.children[2].innerText);
+  },
 
   createInput: (thisName, type) => `
     <label>${thisName}:
       <input name=${thisName.toLowerCase()}
         data-qa=${thisName.toLowerCase()}
         type=${type}
-        autocomplete="off" required>
-    </label>`,
+        autocomplete="off" required
+      >
+    </label>
+  `,
 };
 
 doc.get('table').insertAdjacentHTML('afterEnd', `
@@ -33,16 +34,18 @@ doc.get('table').insertAdjacentHTML('afterEnd', `
     ${doc.createInput('Position', 'text')}
       <label>Office:
         <select name="Office" data-qa='office'>
-          ${doc.cities.map((city) => `
-            <option value=${city}>
-              ${city.split('_').join(' ')}
-            </option>`, '')}
+          ${[...new Set(doc.cities)].map((city) => `
+            <option value=${city.replace(' ', '_')}>
+              ${city}
+            </option>
+          `, '')}
         </select>
       </label>
     ${doc.createInput('Age', 'number')}
     ${doc.createInput('Salary', 'number')}
     <button type="Submit">Save to table</button>
-  </form>`);
+  </form>`
+);
 
 doc.get('form').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -80,7 +83,7 @@ doc.get('form').addEventListener('submit', (e) => {
 const notify = (posTop, type) => {
   const notification = doc.create('div');
   const message = {
-    name_error: '..another letter or two needed!',
+    name_error: 'Another letter required or two...',
     position_error: 'This position has been filled!',
     age_error: 'No way!<br/>...it is </b>illegal</b> to hire at this age!',
     success: 'New Record ADDED!<br/><br/>Double click to eddit table',
