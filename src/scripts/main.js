@@ -40,7 +40,7 @@ body.innerHTML += `
   </label>
   <label>Office:
     <select data-qa="office" name="office" required form="employee">
-      <option value="Tokio">Tokio</option>
+      <option value="Tokyo">Tokyo</option>
       <option value="Singapore">Singapore</option>
       <option value="London">London</option>
       <option value="New York">New York</option>
