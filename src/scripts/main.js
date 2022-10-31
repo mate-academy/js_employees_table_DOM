@@ -89,10 +89,6 @@ tHead.addEventListener('click', e => {
       e.target.dataset.sort = 'DESC';
       break;
 
-    case 'DESC':
-      e.target.dataset.sort = 'ASC';
-      break;
-
     default:
       e.target.dataset.sort = 'ASC';
       break;
@@ -175,7 +171,7 @@ const formValidator = (data) => {
   const age = data.age;
   const salary = data.salary;
 
-  return nameLength > 4 && (age >= 18 && age <= 90) && salary > 0;
+  return nameLength >= 4 && (age >= 18 && age <= 90) && salary > 0;
 };
 
 const addNotification = type => {
@@ -220,9 +216,7 @@ const addNotification = type => {
 };
 
 const makeSalaryValue = num => {
-  const correctNum = num.toFixed(3);
-
-  return `$${correctNum.toString().replace('.', ',')}`;
+  return `$${num.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 };
 
 table.insertAdjacentHTML('afterend', formEl);
@@ -247,7 +241,7 @@ form.addEventListener('submit', e => {
       <td data-label="position">${tableData.position}</td>
       <td data-label="office">${tableData.office}</td>
       <td data-label="age">${tableData.age}</td>
-      <td data-label="salary">${makeSalaryValue(+tableData.salary)}</td>
+      <td data-label="salary">${makeSalaryValue(tableData.salary)}</td>
     </tr>
   `;
 
