@@ -19,11 +19,13 @@ const doc = {
 
   createInput: (thisName, type) => `
     <label>${thisName}:
-      <input name=${thisName.toLowerCase()}
+      <input
+        name=${thisName.toLowerCase()}
         data-qa=${thisName.toLowerCase()}
         type=${type}
-        autocomplete="off" required
-      >
+        autocomplete="off"
+        required
+      />
     </label>
   `,
 };
