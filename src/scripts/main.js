@@ -60,18 +60,20 @@ body.innerHTML += `
 
 document.addEventListener('click', function(e) {
   const targClick = e.target;
-  const rowsList = Array.from(document.querySelector('table').children[1].children);
+  const table = document.querySelector('table');
+  const tableBody = document.querySelector('table').tBodies;
+  const rowsList = Array.from(table.children[1].children);
   const columnIndex = e.srcElement.cellIndex;
 
   function sortStringCol(list) {
+    const getString = (el) => {
+      return el.children[columnIndex].innerText;
+    };
+
     if (flag) {
       flag = false;
 
       return list.sort((a, b) => {
-        const getString = (el) => {
-          return el.children[columnIndex].innerText;
-        };
-
         return getString(a).localeCompare(getString(b));
       });
     }
@@ -80,64 +82,50 @@ document.addEventListener('click', function(e) {
       flag = true;
 
       return list.sort((a, b) => {
-        const getString = (el) => {
-          return el.children[columnIndex].innerText;
-        };
-
         return getString(b).localeCompare(getString(a));
       });
     }
   };
 
   function sortNumberCol(list) {
+    const getNumber = (el) => {
+      const textElement = el.children[columnIndex].innerText;
+
+      return textElement.replace('$', '').replace(',', '');
+    };
+
     if (flag) {
       flag = false;
 
-      return list.sort((a, b) => {
-        const getNumber = (el) => {
-          const textElement = el.children[columnIndex].innerText;
-
-          return textElement.replace('$', '').replace(',', '');
-        };
-
-        return getNumber(a) - getNumber(b);
-      });
+      return list.sort((a, b) => getNumber(a) - getNumber(b));
     }
 
     if (!flag) {
       flag = true;
 
-      return list.sort((a, b) => {
-        const getNumber = (el) => {
-          const textElement = el.children[columnIndex].innerText;
-
-          return textElement.replace('$', '').replace(',', '');
-        };
-
-        return getNumber(b) - getNumber(a);
-      });
+      return list.sort((a, b) => getNumber(b) - getNumber(a));
     }
   };
 
   switch (targClick.textContent) {
     case 'Name':
-      document.querySelector('table').tBodies[0].append(...sortStringCol(rowsList));
+      tableBody[0].append(...sortStringCol(rowsList));
       break;
 
     case 'Position':
-      document.querySelector('table').tBodies[0].append(...sortStringCol(rowsList));
+      tableBody[0].append(...sortStringCol(rowsList));
       break;
 
     case 'Office':
-      document.querySelector('table').tBodies[0].append(...sortStringCol(rowsList));
+      tableBody[0].append(...sortStringCol(rowsList));
       break;
 
     case 'Age':
-      document.querySelector('table').tBodies[0].append(...sortNumberCol(rowsList));
+      tableBody[0].append(...sortNumberCol(rowsList));
       break;
 
     case 'Salary':
-      document.querySelector('table').tBodies[0].append(...sortNumberCol(rowsList));
+      tableBody[0].append(...sortNumberCol(rowsList));
       break;
   };
 });
@@ -159,13 +147,14 @@ document.addEventListener('click', function(e) {
 
 document.addEventListener('dblclick', function(e) {
   if (e.target.tagName === 'TD') {
-    const inpText = document.createElement('input');
+    const input = document.createElement('input');
 
     prevCellText = e.target.innerText;
-    inpText.classList = 'cell-input';
+    input.value = prevCellText;
+    input.classList = 'cell-input';
     e.target.innerText = '';
-    inpText.setAttribute('type', 'text');
-    e.target.append(inpText);
+    input.setAttribute('type', 'text');
+    e.target.append(input);
     e.target.children[0].focus();
   }
 });
