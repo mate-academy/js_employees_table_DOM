@@ -4,7 +4,7 @@ const body = document.querySelector('body');
 
 body.insertAdjacentHTML('beforeend', `
   <form 
-  selected="#"
+  action="#"
   method="get"
   class="new-employee-form"
   >
@@ -106,8 +106,12 @@ form.addEventListener('submit', (events) => {
 
   if (userName.length < 4) {
     pushNotification('error', 'Error', 'Name must have more than 3 letters');
-  } else if (userAge < 18 || userAge > 90) {
-    pushNotification('warning', 'Warning', 'Age is incorrect !');
+  } else if (userAge < 18) {
+    pushNotification('warning', 'Warning', 'Sorry, You are too young !');
+  } else if (userAge > 90) {
+    pushNotification('warning', 'Warning', `
+    Sorry, We are looking for younger specialist !
+    `);
   } else {
     tbody.insertAdjacentHTML('afterbegin', `
       <tr>
@@ -183,6 +187,8 @@ tbody.addEventListener('dblclick', ev => {
   if (ev.target.cellIndex === 2) {
     const select = document.createElement('select');
 
+    select.style.color = '#808080';
+    select.style.outlineColor = '#808080';
     select.dataset.qa = 'office';
 
     select.insertAdjacentHTML('afterbegin', `
@@ -206,9 +212,19 @@ tbody.addEventListener('dblclick', ev => {
       return;
     }
 
-    if (newInput.value < 18 || newInput.value > 90) {
+    if (newInput.value < 18) {
       ev.target.innerText = prevContent;
-      pushNotification('warning', 'Warning', 'Age is incorrect !');
+      pushNotification('warning', 'Warning', 'Sorry, You are too young !');
+
+      return;
+    }
+
+    if (newInput.value > 90) {
+      ev.target.innerText = prevContent;
+
+      pushNotification('warning', 'Warning', `
+      Sorry, We are looking for younger specialist !
+      `);
 
       return;
     }
