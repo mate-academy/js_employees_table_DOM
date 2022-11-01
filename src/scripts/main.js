@@ -104,13 +104,8 @@ form.addEventListener('submit', e => {
 
   const data = new FormData(form);
   const tr = document.createElement('tr');
-  const dataArr = [
-    data.get('name'),
-    data.get('position'),
-    data.get('office'),
-    data.get('age'),
-    data.get('salary'),
-  ];
+  const dataArr = [data.get('name'), data.get('position'), data.get('office'),
+    data.get('age'), data.get('salary')];
 
   if (data.get('name').length < 4) {
     showNotification('Short name',
@@ -165,4 +160,117 @@ tbody.addEventListener('click', e => {
     active.classList.remove('active');
     row.classList.add('active');
   }
+});
+
+tbody.addEventListener('dblclick', change => {
+  const target = change.target;
+  const targetText = target.textContent;
+
+  const newInput = document.createElement('input');
+
+  newInput.classList = 'cell-input';
+  newInput.name = 'text';
+  newInput.type = 'text';
+  target.textContent = null;
+
+  target.append(newInput);
+  newInput.focus();
+
+  const cellInput = document.querySelector('.cell-input');
+
+  newInput.addEventListener('keydown', eventPush => {
+    if (eventPush.code === 'Enter') {
+      if (cellInput.value.length === 0) {
+        target.textContent = targetText;
+      }
+
+      if (target.cellIndex < 3) {
+        if (cellInput.value.length < 4) {
+          showNotification('Short name',
+            'Name must have more than 4 letters', 'error');
+
+          target.textContent = targetText;
+        } else {
+          target.textContent = cellInput.value;
+        }
+      }
+
+      if (target.cellIndex === 3) {
+        if (+cellInput.value) {
+          if (+cellInput.value < 18
+              || +cellInput.value > 90) {
+            showNotification('Wrong age',
+              'Write an age between 18 and 90', 'error');
+
+            target.textContent = targetText;
+          } else {
+            target.textContent = cellInput.value;
+          }
+        } else {
+          showNotification('Wrong age',
+            'Write an age between 18 and 90', 'error');
+
+          target.textContent = targetText;
+        }
+      }
+
+      if (target.cellIndex === 4) {
+        if (+cellInput.value) {
+          target.textContent = `
+            $${+cellInput.value.toLocaleString('en-US')}`;
+        } else {
+          showNotification('Wrong number',
+            'Еnter salary', 'error');
+
+          target.textContent = targetText;
+        }
+      }
+    }
+  });
+
+  newInput.addEventListener('blur', focusout => {
+    if (cellInput.value.length === 0) {
+      target.textContent = targetText;
+    }
+
+    if (target.cellIndex < 3) {
+      if (cellInput.value.length < 4) {
+        showNotification('Short name',
+          'Name must have more than 4 letters', 'error');
+        target.textContent = targetText;
+      } else {
+        target.textContent = cellInput.value;
+      }
+    }
+
+    if (target.cellIndex === 3) {
+      if (+cellInput.value) {
+        if (+cellInput.value < 18
+            || +cellInput.value > 90) {
+          showNotification('Wrong age',
+            'Write an age between 18 and 90', 'error');
+
+          target.textContent = targetText;
+        } else {
+          target.textContent = cellInput.value;
+        }
+      } else {
+        showNotification('Wrong age',
+          'Write an age between 18 and 90', 'error');
+        target.textContent = targetText;
+      }
+    }
+
+    if (target.cellIndex === 4) {
+      if (+cellInput.value) {
+        target.textContent = `
+          $${+cellInput.value.toLocaleString('en-US')}`;
+      } else {
+        showNotification('Wrong number',
+          'Еnter salary', 'error');
+
+        target.textContent = targetText;
+      }
+    }
+  });
 });
