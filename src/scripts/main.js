@@ -1,7 +1,6 @@
 'use strict';
 
 const tbody = document.querySelector('tbody');
-const rows = [...tbody.children];
 let sorted;
 
 function Normalize(salary) {
@@ -9,6 +8,7 @@ function Normalize(salary) {
 }
 
 function sortTable(e) {
+  const rows = [...tbody.children];
   const item = e.target.closest('th');
   const index = item.cellIndex;
 
