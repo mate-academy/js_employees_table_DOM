@@ -228,7 +228,7 @@ tbody.addEventListener('dblclick', change => {
     }
   });
 
-  newInput.addEventListener('blur', focusout => {
+  newInput.addEventListener('blur', () => {
     if (cellInput.value.length === 0) {
       target.textContent = targetText;
     }
