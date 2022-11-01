@@ -159,90 +159,96 @@ document.addEventListener('dblclick', function(e) {
   }
 });
 
-['focusout', 'keypress'].forEach(eventName => document.addEventListener(eventName, function(e) {
-  if (e.key === 'Enter' || e.type === 'focusout') {
-    const inputResult = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1);
-    const columnName = document.querySelector('table').tHead.firstElementChild.children[e.path[1].cellIndex].innerText;
-    const setText = (text) => {
-      e.target.parentElement.innerText = text;
-    };
+['focusout', 'keypress'].forEach(eventName =>
+  document.addEventListener(eventName, function(e) {
+    const description = 'Information was added successfully';
 
-    if (!inputResult) {
-      setText(prevCellText);
+    if (e.key === 'Enter' || e.type === 'focusout') {
+      const inputResult = e.target.value.charAt(0).toUpperCase()
+      + e.target.value.slice(1);
+      const columnName = document.querySelector('table')
+        .tHead.firstElementChild.children[e.path[1].cellIndex].innerText;
+      const setText = (text) => {
+        e.target.parentElement.innerText = text;
+      };
 
-      return;
+      if (!inputResult) {
+        setText(prevCellText);
+
+        return;
+      }
+
+      switch (columnName) {
+        case 'Name' :
+          if (inputResult.length > 4) {
+            setText(inputResult);
+            pushNotification(10, 10, 'Success', description, 'success');
+          } else {
+            setText(prevCellText);
+            pushNotification(10, 10, 'Error', 'Short text!', 'error');
+          };
+          break;
+
+        case 'Position' :
+          if (inputResult.length > 1) {
+            setText(inputResult);
+            pushNotification(10, 10, 'Success', description, 'success');
+          } else {
+            setText(prevCellText);
+            pushNotification(10, 10, 'Error', 'Short text!', 'error');
+          };
+          break;
+
+        case 'Office' :
+          const officeList = document.querySelector('[name="office"]').children;
+          const officeArr = [];
+
+          for (const key of officeList) {
+            officeArr.push(key.innerText);
+          }
+
+          if (officeArr.includes(inputResult)) {
+            setText(inputResult);
+            pushNotification(10, 10, 'Success', description, 'success');
+          } else {
+            setText(prevCellText);
+            pushNotification(10, 10, 'Error', 'Wrong office name!', 'error');
+          };
+          break;
+
+        case 'Age' :
+          if (inputResult >= 18 && inputResult <= 90) {
+            setText(inputResult);
+            pushNotification(10, 10, 'Success', description, 'success');
+          } else {
+            setText(prevCellText);
+            pushNotification(10, 10, 'Error', 'Wrong age!', 'error');
+          };
+          break;
+
+        case 'Salary' :
+          if (inputResult >= 1) {
+            const salary = new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: 'USD',
+              minimumFractionDigits: 0,
+            }).format(inputResult);
+
+            setText(salary);
+            pushNotification(10, 10, 'Success', description, 'success');
+          } else {
+            setText(prevCellText);
+            pushNotification(10, 10, 'Error', 'Wrong sum!', 'error');
+          };
+      }
+
+      const row = document.querySelector('.active');
+
+      row.classList.remove('active');
+      e.target.remove();
     }
-
-    switch (columnName) {
-      case 'Name' :
-        if (inputResult.length > 4) {
-          setText(inputResult);
-          pushNotification(10, 10, 'Success', 'Information was added successfully', 'success');
-        } else {
-          setText(prevCellText);
-          pushNotification(10, 10, 'Error', 'Short text!', 'error');
-        };
-        break;
-
-      case 'Position' :
-        if (inputResult.length > 1) {
-          setText(inputResult);
-          pushNotification(10, 10, 'Success', 'Information was added successfully', 'success');
-        } else {
-          setText(prevCellText);
-          pushNotification(10, 10, 'Error', 'Short text!', 'error');
-        };
-        break;
-
-      case 'Office' :
-        const officeList = document.querySelector('[name="office"]').children;
-        const officeArr = [];
-
-        for (const key of officeList) {
-          officeArr.push(key.innerText);
-        }
-
-        if (officeArr.includes(inputResult)) {
-          setText(inputResult);
-          pushNotification(10, 10, 'Success', 'Information was added successfully', 'success');
-        } else {
-          setText(prevCellText);
-          pushNotification(10, 10, 'Error', 'Wrong office name!', 'error');
-        };
-        break;
-
-      case 'Age' :
-        if (inputResult >= 18 && inputResult <= 90) {
-          setText(inputResult);
-          pushNotification(10, 10, 'Success', 'Information was added successfully', 'success');
-        } else {
-          setText(prevCellText);
-          pushNotification(10, 10, 'Error', 'Wrong age!', 'error');
-        };
-        break;
-
-      case 'Salary' :
-        if (inputResult >= 1) {
-          const salary = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-          }).format(inputResult);
-
-          setText(salary);
-          pushNotification(10, 10, 'Success', 'Information was added successfully', 'success');
-        } else {
-          setText(prevCellText);
-          pushNotification(10, 10, 'Error', 'Wrong sum!', 'error');
-        };
-    }
-
-    const row = document.querySelector('.active');
-
-    row.classList.remove('active');
-    e.target.remove();
-  }
-}));
+  })
+);
 
 document.addEventListener('submit', function(e) {
   e.preventDefault();
