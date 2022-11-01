@@ -138,6 +138,7 @@ body.insertAdjacentHTML('beforeend', `
         name="age"
         type="number"
         data-qa="age"
+        min="18"
       >
       </input>
     </label>
@@ -212,20 +213,34 @@ form.addEventListener('submit', () => {
     </tr>
   `;
 
-  if (formValues.name.length < 4
-    || isNaN(formValues.name) === false
-    || formValues.age < 18
-    || formValues.age > 90
-    || formValues.position.length === 0
-    || isNaN(formValues.position) === false
-    || formValues.salary === 0
-  ) {
+  if (formValues.name.length === 0) {
     callNotification('Error', 'error', `
-      <p>You need to fill all fields</p>
-      <p>Length of name must be not less than 4 letters</p>
-      <p>You don't need to use numbers in Name and Position fields</p>
-      <p>Age must be not less than 18 and not more than 90 years old</p>
-    `);
+    <p>You need to fill name field</p>
+  `);
+  } else if (isNaN(formValues.name) === false) {
+    callNotification('Error', 'error', `
+    <p>You don't need to use numbers in name field</p>
+  `);
+  } else if (formValues.name.length < 4) {
+    callNotification('Error', 'error', `
+    <p>Length of name must be not less than 4 letters</p>
+  `);
+  } else if (formValues.position.length === 0) {
+    callNotification('Error', 'error', `
+    <p>You need to fill position field</p>
+  `);
+  } else if (isNaN(formValues.position) === false) {
+    callNotification('Error', 'error', `
+    <p>You don't need to use numbers in position field</p>
+  `);
+  } else if (formValues.age < 18 || formValues.age > 90) {
+    callNotification('Error', 'error', `
+    <p>Age must be not less than 18 and not more than 90 years old</p>
+  `);
+  } else if (formValues.salary.length === 0) {
+    callNotification('Error', 'error', `
+    <p>You need to fill salary field</p>
+  `);
   } else {
     callNotification('Success', 'success', `
       <p>Information added to the table</p>
