@@ -133,7 +133,7 @@ form.addEventListener('submit', e => {
     const td = document.createElement('td');
 
     if (i === dataArr.length - 1) {
-      td.textContent = `$${+dataArr[i].toLocaleString('en-US')}`;
+      td.textContent = `$${parseInt(dataArr[i]).toLocaleString('en-US')}`;
     } else {
       td.textContent = dataArr[i];
     }
@@ -217,7 +217,7 @@ tbody.addEventListener('dblclick', change => {
       if (target.cellIndex === 4) {
         if (+cellInput.value) {
           target.textContent = `
-            $${+cellInput.value.toLocaleString('en-US')}`;
+            $${parseInt(cellInput.value).toLocaleString('en-US')}`;
         } else {
           showNotification('Wrong number',
             'Еnter salary', 'error');
@@ -264,7 +264,7 @@ tbody.addEventListener('dblclick', change => {
     if (target.cellIndex === 4) {
       if (+cellInput.value) {
         target.textContent = `
-          $${+cellInput.value.toLocaleString('en-US')}`;
+          $${parseInt(cellInput.value).toLocaleString('en-US')}`;
       } else {
         showNotification('Wrong number',
           'Еnter salary', 'error');
