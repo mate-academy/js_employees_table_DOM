@@ -34,7 +34,7 @@ document.querySelector('table').addEventListener('click', sortTable);
 
 const body = document.querySelector('body');
 
-const showNotification = (title, description, type) => {
+function showNotification(title, description, type) {
   const div = document.createElement('div');
   const h2 = document.createElement('h2');
   const p = document.createElement('p');
@@ -61,13 +61,13 @@ body.insertAdjacentHTML('beforeend',
           name="name"
           type="text"
           data-qa="name"
-          minlength="4"
-          maxlength="15"
-          required
         >
       </label>
       <label>Position:
-        <input name="position" type="text" data-qa="position" required>
+        <input name="position"
+          type="text"
+          data-qa="position"
+      >
       </label>
       <label> Office:
         <select name="office" data-qa="office" >
@@ -80,10 +80,17 @@ body.insertAdjacentHTML('beforeend',
         </select>
       </label>
       <label>Age:
-        <input name="age" type="number" data-qa="age" required>
+        <input name="age"
+          type="number"
+          data-qa="age"
+        >
       </label>
       <label>Salary:
-        <input name="salary" type="number" data-qa="salary" required>
+        <input
+          name="salary"
+          type="number"
+          data-qa="salary"
+        >
       </label>
       <button>Save to table</button>
      </form>`
