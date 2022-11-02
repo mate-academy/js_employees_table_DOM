@@ -215,6 +215,10 @@ tbody.addEventListener('dblclick', change => {
             changeContent();
           }
         }
+
+        showNotification('Wrong age',
+          'Write an age between 18 and 90', 'error');
+        changeContent();
       }
 
       if (money) {
@@ -225,8 +229,10 @@ tbody.addEventListener('dblclick', change => {
             'Еnter salary', 'error');
         }
 
-        target.textContent = `
+        if (+cellInput.value) {
+          target.textContent = `
             $${parseInt(cellInput.value).toLocaleString('en-US')}`;
+        }
       }
     }
   });
@@ -251,12 +257,16 @@ tbody.addEventListener('dblclick', change => {
         target.textContent = cellInput.value;
 
         if (+cellInput.value < 18
-          || +cellInput.value > 90) {
+          || +cellInput.value > 90 || !+cellInput.value) {
           showNotification('Wrong age',
             'Write an age between 18 and 90', 'error');
           changeContent();
         }
       }
+
+      showNotification('Wrong age',
+        'Write an age between 18 and 90', 'error');
+      changeContent();
     }
 
     if (money) {
@@ -267,8 +277,10 @@ tbody.addEventListener('dblclick', change => {
           'Еnter salary', 'error');
       }
 
-      target.textContent = `
+      if (+cellInput.value) {
+        target.textContent = `
           $${parseInt(cellInput.value).toLocaleString('en-US')}`;
+      }
     }
   });
 });
