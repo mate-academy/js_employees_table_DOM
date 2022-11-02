@@ -3,7 +3,7 @@
 const tbody = document.querySelector('tbody');
 let sorted;
 
-function Normalize(salary) {
+function normalize(salary) {
   return +salary.replace(/[^0-9.-]+/g, '');
 }
 
@@ -18,13 +18,13 @@ function sortTable(e) {
     sorted = e.target.textContent;
 
     rows.sort((a, b) => {
-      if (!Normalize(a.cells[index].textContent)) {
+      if (!normalize(a.cells[index].textContent)) {
         return a.cells[index].textContent
           .localeCompare(b.cells[index].textContent);
       }
 
-      return Normalize(a.cells[index].textContent)
-      - Normalize(b.cells[index].textContent);
+      return normalize(a.cells[index].textContent)
+      - normalize(b.cells[index].textContent);
     });
   }
   tbody.append(...rows);
@@ -178,99 +178,97 @@ tbody.addEventListener('dblclick', change => {
 
   const cellInput = document.querySelector('.cell-input');
 
+  const namePositionOffice = target.cellIndex === 0
+    || target.cellIndex === 1 || target.cellIndex === 2;
+  const age = target.cellIndex === 3;
+  const money = target.cellIndex === 4;
+
+  function changeContent(content = targetText) {
+    target.textContent = content;
+    newInput.remove();
+  }
+
   newInput.addEventListener('keydown', eventPush => {
     if (eventPush.code === 'Enter') {
       if (cellInput.value.length === 0) {
-        target.textContent = targetText;
+        changeContent();
       }
 
-      if (target.cellIndex < 3) {
+      if (namePositionOffice) {
+        target.textContent = cellInput.value;
+
         if (cellInput.value.length < 4) {
           showNotification('Short name',
             'Name must have more than 4 letters', 'error');
-
-          target.textContent = targetText;
-        } else {
-          target.textContent = cellInput.value;
+          changeContent();
         }
       }
 
-      if (target.cellIndex === 3) {
+      if (age) {
         if (+cellInput.value) {
+          target.textContent = cellInput.value;
+
           if (+cellInput.value < 18
-              || +cellInput.value > 90) {
+            || +cellInput.value > 90) {
             showNotification('Wrong age',
               'Write an age between 18 and 90', 'error');
-
-            target.textContent = targetText;
-          } else {
-            target.textContent = cellInput.value;
+            changeContent();
           }
-        } else {
-          showNotification('Wrong age',
-            'Write an age between 18 and 90', 'error');
-
-          target.textContent = targetText;
         }
       }
 
-      if (target.cellIndex === 4) {
-        if (+cellInput.value) {
-          target.textContent = `
-            $${parseInt(cellInput.value).toLocaleString('en-US')}`;
-        } else {
+      if (money) {
+        if (!+cellInput.value) {
+          changeContent();
+
           showNotification('Wrong number',
             'Еnter salary', 'error');
-
-          target.textContent = targetText;
         }
+
+        target.textContent = `
+            $${parseInt(cellInput.value).toLocaleString('en-US')}`;
       }
     }
   });
 
   newInput.addEventListener('blur', () => {
     if (cellInput.value.length === 0) {
-      target.textContent = targetText;
+      changeContent();
     }
 
-    if (target.cellIndex < 3) {
+    if (namePositionOffice) {
+      target.textContent = cellInput.value;
+
       if (cellInput.value.length < 4) {
         showNotification('Short name',
           'Name must have more than 4 letters', 'error');
-        target.textContent = targetText;
-      } else {
-        target.textContent = cellInput.value;
+        changeContent();
       }
     }
 
-    if (target.cellIndex === 3) {
+    if (age) {
       if (+cellInput.value) {
+        target.textContent = cellInput.value;
+
         if (+cellInput.value < 18
-            || +cellInput.value > 90) {
+          || +cellInput.value > 90) {
           showNotification('Wrong age',
             'Write an age between 18 and 90', 'error');
-
-          target.textContent = targetText;
-        } else {
-          target.textContent = cellInput.value;
+          changeContent();
         }
-      } else {
-        showNotification('Wrong age',
-          'Write an age between 18 and 90', 'error');
-        target.textContent = targetText;
       }
     }
 
-    if (target.cellIndex === 4) {
-      if (+cellInput.value) {
-        target.textContent = `
-          $${parseInt(cellInput.value).toLocaleString('en-US')}`;
-      } else {
+    if (money) {
+      if (!+cellInput.value) {
+        changeContent();
+
         showNotification('Wrong number',
           'Еnter salary', 'error');
-
-        target.textContent = targetText;
       }
+
+      target.textContent = `
+          $${parseInt(cellInput.value).toLocaleString('en-US')}`;
     }
   });
 });
