@@ -216,9 +216,11 @@ tbody.addEventListener('dblclick', change => {
           }
         }
 
-        showNotification('Wrong age',
-          'Write an age between 18 and 90', 'error');
-        changeContent();
+        if (!+cellInput.value) {
+          showNotification('Wrong age',
+            'Write an age between 18 and 90', 'error');
+          changeContent();
+        }
       }
 
       if (money) {
@@ -257,16 +259,18 @@ tbody.addEventListener('dblclick', change => {
         target.textContent = cellInput.value;
 
         if (+cellInput.value < 18
-          || +cellInput.value > 90 || !+cellInput.value) {
+          || +cellInput.value > 90) {
           showNotification('Wrong age',
             'Write an age between 18 and 90', 'error');
           changeContent();
         }
       }
 
-      showNotification('Wrong age',
-        'Write an age between 18 and 90', 'error');
-      changeContent();
+      if (!+cellInput.value) {
+        showNotification('Wrong age',
+          'Write an age between 18 and 90', 'error');
+        changeContent();
+      }
     }
 
     if (money) {
