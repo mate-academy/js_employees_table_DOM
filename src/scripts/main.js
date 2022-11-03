@@ -153,26 +153,27 @@ button.addEventListener('click', e => {
   const isValidNameLength = inputs[0].value.length > 3;
   const isValidPositionLength = inputs[1].value.length > 3;
   const isValidAge = +(inputs[2].value) > 17 && +(inputs[2].value) < 91;
+  const isValidSalary = inputs[3].value > 0;
   let blockHeightReserve = 0;
 
   for (let i = 0; i < inputs.length; i++) {
     if (!inputs[i].value) {
       pushNotification(10 + blockHeightReserve, 10, 'Warning',
-        `Data is invalid, ${inputs[i].name} cant be blank`, 'warning');
+        `Data is invalid. ${inputs[i].name} cant be blank`, 'warning');
       blockHeightReserve += 120;
     }
   }
 
   if (!isValidNameLength) {
     pushNotification(10 + blockHeightReserve, 10, 'Error',
-      `${inputs[0].value} value has less than 4 letters.`, 'error');
+      `Name value has less than 4 letters.`, 'error');
 
     blockHeightReserve += 120;
   }
 
   if (!isValidPositionLength) {
     pushNotification(10 + blockHeightReserve, 10, 'Error',
-      `${inputs[1].value} value has less than 4 letters.`, 'error');
+      `Position value has less than 4 letters.`, 'error');
 
     blockHeightReserve += 120;
   }
@@ -180,9 +181,20 @@ button.addEventListener('click', e => {
   if (!isValidAge) {
     pushNotification(10 + blockHeightReserve, 10, 'Error',
       'Age value is less than 18 or more than 90.', 'error');
+
+    blockHeightReserve += 120;
   }
 
-  if (isValidNameLength && isValidPositionLength && isValidAge) {
+  if (!isValidSalary) {
+    pushNotification(10 + blockHeightReserve, 10, 'Error',
+      'Salary value is less than 0.', 'error');
+  }
+
+  if (isValidNameLength
+      && isValidPositionLength
+      && isValidAge
+      && isValidSalary
+  ) {
     tbody.insertAdjacentHTML('beforeend', `
     <tr>
       <td>${inputs[0].value}</td>
