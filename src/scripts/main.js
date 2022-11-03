@@ -188,58 +188,7 @@ tbody.addEventListener('dblclick', change => {
     newInput.remove();
   }
 
-  newInput.addEventListener('keydown', eventPush => {
-    if (eventPush.code === 'Enter') {
-      if (cellInput.value.length === 0) {
-        changeContent();
-      }
-
-      if (namePositionOffice) {
-        target.textContent = cellInput.value;
-
-        if (cellInput.value.length < 4) {
-          showNotification('Short name',
-            'Name must have more than 4 letters', 'error');
-          changeContent();
-        }
-      }
-
-      if (age) {
-        if (+cellInput.value) {
-          target.textContent = cellInput.value;
-
-          if (+cellInput.value < 18
-            || +cellInput.value > 90) {
-            showNotification('Wrong age',
-              'Write an age between 18 and 90', 'error');
-            changeContent();
-          }
-        }
-
-        if (!+cellInput.value) {
-          showNotification('Wrong age',
-            'Write an age between 18 and 90', 'error');
-          changeContent();
-        }
-      }
-
-      if (money) {
-        if (!+cellInput.value) {
-          changeContent();
-
-          showNotification('Wrong number',
-            'Еnter salary', 'error');
-        }
-
-        if (+cellInput.value) {
-          target.textContent = `
-            $${parseInt(cellInput.value).toLocaleString('en-US')}`;
-        }
-      }
-    }
-  });
-
-  newInput.addEventListener('blur', () => {
+  function checkNewInput() {
     if (cellInput.value.length === 0) {
       changeContent();
     }
@@ -286,5 +235,15 @@ tbody.addEventListener('dblclick', change => {
           $${parseInt(cellInput.value).toLocaleString('en-US')}`;
       }
     }
+  }
+
+  newInput.addEventListener('keydown', eventPush => {
+    if (eventPush.code === 'Enter') {
+      checkNewInput();
+    }
+  });
+
+  newInput.addEventListener('blur', () => {
+    checkNewInput();
   });
 });
