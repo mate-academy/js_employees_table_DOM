@@ -88,14 +88,14 @@ function notification(type, title, text) {
     body.removeChild(document.querySelector('.notification')), 2000);
 };
 
-function strEdited(str) {
+function capitalizeString(str) {
   return (str[0].toUpperCase() + str.slice(1));
 };
 
 function salaryEdited(salary) {
-  const newFormat = new Intl.NumberFormat('en-US');
+  const numberFormatter = new Intl.NumberFormat('en-US');
 
-  return ('$' + newFormat.format(salary));
+  return ('$' + numberFormatter.format(salary));
 };
 
 const form = document.querySelector('.new-employee-form');
@@ -121,8 +121,8 @@ form.addEventListener('submit', (ev) => {
   } else {
     tbody.insertAdjacentHTML('afterbegin', `
       <tr>
-        <td>${strEdited(nameData)}</td>
-        <td>${strEdited(positionData)}</td>
+        <td>${capitalizeString(nameData)}</td>
+        <td>${capitalizeString(positionData)}</td>
         <td>${officeData}</td>
         <td>${ageData}</td>
         <td>${salaryEdited(salaryData)}</td>
@@ -130,6 +130,7 @@ form.addEventListener('submit', (ev) => {
     `);
 
     notification('success', 'Success', 'A new employee has been added !');
+    ev.target.reset();
   }
 });
 
