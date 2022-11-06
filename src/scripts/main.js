@@ -3,6 +3,7 @@
 const tbody = document.querySelector('tbody');
 const rows = tbody.getElementsByTagName('tr');
 const titles = document.querySelector('tr');
+const allCells = document.querySelectorAll('td');
 const headings = titles.children;
 
 const modeOrder = (value1, value2) =>
@@ -23,112 +24,48 @@ const ascSorterForSalary = (index) => [...rows].sort((row1, row2) =>
 const descSorterForSalary = (index) => [...rows].sort((row1, row2) =>
   replaceExtra(row2.children[index]) - replaceExtra(row1.children[index]));
 
-let ascNames = ascSorter(0);
-let ascPosition = ascSorter(1);
-let ascOffice = ascSorter(2);
-let ascAge = ascSorter(3);
-let ascSalary = ascSorterForSalary(4);
-
-let descNames = descSorter(0);
-let descPosition = descSorter(1);
-let descOffice = descSorter(2);
-let descAge = descSorter(3);
-let descSalary = descSorterForSalary(4);
-
 [...headings].map(heading => {
-  const titleName = heading.textContent;
-
   let isSortedAsc = false;
 
-  if (titleName === 'Name') {
-    heading.addEventListener('click', () => {
-      if (isSortedAsc) {
-        addHTML(descNames);
-        selectTheRow(descNames);
+  const targetHandler = (index) => {
+    if (isSortedAsc) {
+      addHTML(descSorter(index));
+      selectTheRow(descSorter(index));
 
-        isSortedAsc = false;
+      isSortedAsc = false;
 
-        return;
-      };
+      return;
+    };
 
-      addHTML(ascNames);
-      selectTheRow(ascNames);
+    addHTML(ascSorter(index));
+    selectTheRow(ascSorter(index));
 
-      isSortedAsc = true;
-    });
+    isSortedAsc = true;
   };
 
-  if (titleName === 'Position') {
-    heading.addEventListener('click', () => {
-      if (isSortedAsc) {
-        addHTML(descPosition);
-        selectTheRow(descPosition);
+  heading.addEventListener('click', (e) => {
+    const targetHeading = e.target.textContent;
 
-        isSortedAsc = false;
+    if (targetHeading === 'Name') {
+      targetHandler(0);
+    };
 
-        return;
-      };
+    if (targetHeading === 'Position') {
+      targetHandler(1);
+    };
 
-      addHTML(ascPosition);
-      selectTheRow(ascPosition);
+    if (targetHeading === 'Office') {
+      targetHandler(2);
+    };
 
-      isSortedAsc = true;
-    });
-  };
+    if (targetHeading === 'Age') {
+      targetHandler(3);
+    };
 
-  if (titleName === 'Office') {
-    heading.addEventListener('click', () => {
-      if (isSortedAsc) {
-        addHTML(descOffice);
-        selectTheRow(descOffice);
-
-        isSortedAsc = false;
-
-        return;
-      };
-
-      addHTML(ascOffice);
-      selectTheRow(ascOffice);
-
-      isSortedAsc = true;
-    });
-  };
-
-  if (titleName === 'Age') {
-    heading.addEventListener('click', () => {
-      if (isSortedAsc) {
-        addHTML(descAge);
-        selectTheRow(descAge);
-
-        isSortedAsc = false;
-
-        return;
-      };
-
-      addHTML(ascAge);
-      selectTheRow(ascAge);
-
-      isSortedAsc = true;
-    });
-  };
-
-  if (titleName === 'Salary') {
-    heading.addEventListener('click', () => {
-      if (isSortedAsc) {
-        addHTML(descSalary);
-        selectTheRow(descSalary);
-
-        isSortedAsc = false;
-
-        return;
-      };
-
-      addHTML(ascSalary);
-      selectTheRow(ascSalary);
-
-      isSortedAsc = true;
-    });
-  };
+    if (targetHeading === 'Salary') {
+      targetHandler(4);
+    };
+  });
 });
 
 const addHTML = (sorted) => {
@@ -139,13 +76,17 @@ const addHTML = (sorted) => {
 };
 
 const selectTheRow = () => {
-  [...rows].map(row => row.addEventListener('click', () => {
-    if (!row.classList.contains('active')) {
-      [...rows].map(line => line.classList.remove('active'));
-    };
+  [...rows].map(row =>
+    row.addEventListener('click', (e) => {
+      const targetRow = e.currentTarget;
+      const activeCell = tbody.querySelector('.active');
 
-    row.classList.toggle('active');
-  }));
+      targetRow.classList.toggle('active');
+
+      if (activeCell) {
+        activeCell.classList.remove('active');
+      }
+    }));
 };
 
 selectTheRow([...rows]);
@@ -180,15 +121,15 @@ createInForm('input', 'Age:');
 createInForm('input', 'Salary:');
 createInForm('button', 'Save to table');
 
-const addDataQa = (element, value) =>
-  element.setAttribute('data-qa', `${value}`);
-
 const nameOfThePerson = form.children[0].firstElementChild;
 const position = form.children[1].firstElementChild;
 const select = form.children[2].firstElementChild;
 const age = form.children[3].firstElementChild;
 const salary = form.children[4].firstElementChild;
 const button = form.lastElementChild;
+
+const addDataQa = (element, value) =>
+  element.setAttribute('data-qa', `${value}`);
 
 addDataQa(nameOfThePerson, 'name');
 addDataQa(position, 'position');
@@ -222,12 +163,6 @@ const addToNewCell = (newCell, formInput) => {
 button.addEventListener('click', (e) => {
   const newLine = document.createElement('tr');
 
-  const employeeName = form.children[0].firstElementChild;
-  const employeePosition = form.children[1].firstElementChild;
-  const employeeOffice = form.children[2].firstElementChild;
-  const employeeAge = form.children[3].firstElementChild;
-  const employeeSalary = form.children[4].firstElementChild;
-
   e.preventDefault();
 
   newLine.append(createCell());
@@ -236,15 +171,15 @@ button.addEventListener('click', (e) => {
   newLine.append(createCell());
   newLine.append(createCell());
 
-  addToNewCell(newLine.children[0], employeeName.value);
-  addToNewCell(newLine.children[1], employeePosition.value);
-  addToNewCell(newLine.children[2], employeeOffice.value);
-  addToNewCell(newLine.children[3], employeeAge.value);
+  addToNewCell(newLine.children[0], nameOfThePerson.value);
+  addToNewCell(newLine.children[1], position.value);
+  addToNewCell(newLine.children[2], select.value);
+  addToNewCell(newLine.children[3], age.value);
 
   newLine.children[4].textContent = '$'
-  + (+employeeSalary.value).toLocaleString();
+  + (+salary.value).toLocaleString();
 
-  if (employeeName.value.length < 4) {
+  if (nameOfThePerson.value.length < 4) {
     pushNotification(630, 10, 'Ooops, we\'ve got a trouble',
       'Please, fill in at least 4 letters to add a new employee', 'error');
 
@@ -258,10 +193,17 @@ button.addEventListener('click', (e) => {
     return;
   }
 
-  if (employeeAge.value < 18 || employeeAge.value > 90) {
+  if (age.value < 18 || age.value > 90) {
     pushNotification(630, 10, 'Ooops, we\'ve got a trouble',
       'Please, note that employee\'s age has got to be between '
       + '18 and 90 range. Give it another try!', 'error');
+
+    return;
+  }
+
+  if (!salary.value) {
+    pushNotification(630, 10, 'Ooops, we\'ve got a trouble',
+      'Please, add an employee\'s salary', 'error');
 
     return;
   }
@@ -271,17 +213,20 @@ button.addEventListener('click', (e) => {
   pushNotification(630, 10, 'Success!',
     'New employee has been added to the table', 'success');
 
-  ascNames = ascSorter(0);
-  ascPosition = ascSorter(1);
-  ascOffice = ascSorter(2);
-  ascAge = ascSorter(3);
-  ascSalary = ascSorterForSalary(4);
+  [...form].map(formInput => {
+    formInput.value = '';
+  });
 
-  descNames = descSorter(0);
-  descPosition = descSorter(1);
-  descOffice = descSorter(2);
-  descAge = descSorter(3);
-  descSalary = descSorterForSalary(4);
+  ascSorter(0);
+  ascSorter(1);
+  ascSorter(2);
+  ascSorter(3);
+  ascSorterForSalary(4);
+  descSorter(0);
+  descSorter(1);
+  descSorter(2);
+  descSorter(3);
+  descSorterForSalary(4);
 });
 
 const pushNotification = (posTop, posRight, title, description, type) => {
@@ -303,3 +248,58 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 
   setTimeout(() => box.remove(), 2000);
 };
+
+[...allCells].map(cell => {
+  const tableInput = document.createElement('input');
+
+  let cellCopy;
+
+  const enableCursor = () => {
+    [...allCells].map(element => {
+      element.style.pointerEvents = '';
+    });
+  };
+
+  const addRightCellText = () => {
+    switch (tableInput.value.length > 0) {
+      case true:
+        cell.textContent = tableInput.value;
+        break;
+
+      case false:
+        cell.textContent = cellCopy.textContent;
+        break;
+    }
+  };
+
+  cell.addEventListener('dblclick', (e) => {
+    const targetCell = e.target;
+
+    tableInput.style.width = getComputedStyle(cell).width;
+    tableInput.classList.add('cell-input');
+
+    cellCopy = targetCell.cloneNode(true);
+
+    targetCell.textContent = '';
+    tableInput.value = '';
+    tableInput.autofocus = true;
+
+    targetCell.append(tableInput);
+
+    [...allCells].map(element => {
+      element.style.pointerEvents = 'none';
+      cell.style.pointerEvents = '';
+    });
+  });
+
+  cell.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      addRightCellText();
+    }
+  });
+
+  tableInput.addEventListener('blur', () => {
+    addRightCellText();
+    enableCursor();
+  });
+});
