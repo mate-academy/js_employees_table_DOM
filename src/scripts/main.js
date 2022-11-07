@@ -108,36 +108,103 @@ tbody.addEventListener('click', e => {
 
 tbody.addEventListener('dblclick', e => {
   const target = e.target.closest('td');
-  const initialCellValue = target.textContent;
+  let initialCellValue;
 
-  target.innerHTML = '';
+  if (target.cellIndex !== 4) {
+    initialCellValue = target.innerText;
+  } else {
+    initialCellValue = target.innerText.replaceAll(/\W/g, '');
+  }
 
-  target.insertAdjacentHTML('beforeend', `
-    <input
-      type='text'
-      class='cell-input'
-      value='${initialCellValue}'
-      size='${initialCellValue.length}'>
-  `);
+  target.innerText = '';
 
-  const cellInput = document.querySelector('.cell-input');
+  let cellInput;
+
+  if (target.cellIndex !== 2) {
+    cellInput = document.createElement('input');
+  } else {
+    cellInput = document.createElement('select');
+  }
+  cellInput.classList.add('cell-input');
+
+  if (target.cellIndex === 2) {
+    for (let i = 0; i < offices.length; i++) {
+      const selectOption = document.createElement('option');
+
+      selectOption.value = offices[i];
+      selectOption.text = offices[i];
+
+      if (offices[i] === initialCellValue) {
+        selectOption.selected = true;
+      }
+      cellInput.appendChild(selectOption);
+    }
+  } else {
+    cellInput.type = (target.cellIndex < 2) ? 'text' : 'number';
+    cellInput.value = initialCellValue;
+    cellInput.size = initialCellValue.length;
+  }
+  target.append(cellInput);
 
   cellInput.focus();
 
-  cellInput.onblur = function() {
-    if (!cellInput.value) {
-      target.innerHTML = initialCellValue;
-    } else {
-      target.innerHTML = cellInput.value;
-    }
-    cellInput.remove();
-  };
+  cellInput.addEventListener('blur', addInputValueToTableCell);
 
-  cellInput.onchange = function() {
+  cellInput.addEventListener('keypress', ev => {
+    if (ev.key === 'Enter') {
+      cellInput.removeEventListener('blur', addInputValueToTableCell);
+      addInputValueToTableCell();
+    }
+  });
+
+  function addInputValueToTableCell() {
     if (!cellInput.value) {
       target.innerHTML = initialCellValue;
-    } else {
-      target.innerHTML = cellInput.value;
+
+      return;
+    }
+
+    switch (target.cellIndex) {
+      case 0:
+      case 1:
+        if (cellInput.value.length < 4) {
+          pushNotification(10, 10, 'Error',
+            'Value is invalid. Initial value used.', 'error');
+          target.innerHTML = initialCellValue;
+        } else {
+          target.innerHTML = cellInput.value;
+        }
+        break;
+
+      case 2:
+        target.innerHTML = cellInput.value;
+        break;
+
+      case 3:
+        if ((+cellInput.value) < 18 || (+cellInput.value) > 90) {
+          pushNotification(10, 10, 'Error',
+            'Value is invalid. Initial value used.', 'error');
+          target.innerHTML = initialCellValue;
+        } else {
+          target.innerHTML = cellInput.value;
+        }
+        break;
+
+      case 4:
+        if ((+cellInput.value) < 1) {
+          pushNotification(10, 10, 'Error',
+            'Value is invalid. Initial value used.', 'error');
+          target.innerHTML = initialCellValue;
+        } else {
+          target.innerHTML = (+(cellInput.value)).toLocaleString('en-US',
+            {
+              style: 'currency',
+              currency: 'USD',
+              minimumFractionDigits: 0,
+            }
+          );
+        }
+        break;
     }
     cellInput.remove();
   };
