@@ -115,16 +115,6 @@ const form = document.querySelector('form');
 form.addEventListener('submit', ev => {
   ev.preventDefault();
 
-  tbody.insertAdjacentHTML('beforeend', `
-    <tr>
-      <td>${form.elements.name.value}</td>
-      <td>${form.elements.position.value}</td>
-      <td>${form.elements.office.value}</td>
-      <td>${form.elements.age.value}</td>
-      <td>$${parseInt(+form.elements.salary.value).toLocaleString('en-US')}</td>
-    </tr>
-    `);
-
   if (form.elements.name.value.length < 4) {
     notification('Error', 'error',
       'Name must contain at least 4 letters');
@@ -147,6 +137,16 @@ form.addEventListener('submit', ev => {
     return;
   }
 
+  tbody.insertAdjacentHTML('beforeend', `
+    <tr>
+      <td>${form.elements.name.value}</td>
+      <td>${form.elements.position.value}</td>
+      <td>${form.elements.office.value}</td>
+      <td>${form.elements.age.value}</td>
+      <td>$${parseInt(+form.elements.salary.value).toLocaleString('en-US')}</td>
+    </tr>
+    `);
+
   notification('Success!', 'success',
     'New employee successfully added');
   form.reset();
@@ -165,7 +165,6 @@ function notification(title, type, description) {
   }, 3000);
 };
 
-// Double click
 tbody.addEventListener('dblclick', e => {
   const input = document.createElement('input');
   const previousValue = e.target.textContent;
@@ -191,8 +190,6 @@ tbody.addEventListener('dblclick', e => {
     }
 
     if (e.target.cellIndex === 3) {
-      // e.target.textContent = input.value;
-
       if (isNaN(input.value)) {
         e.target.textContent = previousValue;
 
