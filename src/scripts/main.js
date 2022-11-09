@@ -3,7 +3,7 @@
 const body = document.body;
 const tbody = document.querySelector('tbody');
 const theadList = [...document.querySelector('thead tr').children];
-const rows = [...tbody.rows];
+let rows = [...tbody.rows];
 const table = document.querySelector('table');
 
 function salaryToNumber(sal) {
@@ -116,14 +116,14 @@ form.addEventListener('submit', ev => {
   ev.preventDefault();
 
   if (form.elements.name.value.length < 4) {
-    notification('Error', 'error',
+    notification(110, 10, 'Error', 'error',
       'Name must contain at least 4 letters');
 
     return;
   }
 
   if (form.elements.age.value < 18 || form.elements.age.value > 90) {
-    notification('Error',
+    notification(210, 10, 'Error',
       'error', 'Age must be between 18 and 90');
 
     return;
@@ -131,11 +131,14 @@ form.addEventListener('submit', ev => {
 
   if (form.elements.position.value === ''
       || form.elements.salary.value === '') {
-    notification('Missing data',
+    notification(310, 10, 'Missing data',
       'error', 'Please, fill all fields');
 
     return;
   }
+
+  notification(10, 10, 'Success!', 'success',
+    'New employee successfully added');
 
   tbody.insertAdjacentHTML('beforeend', `
     <tr>
@@ -147,18 +150,22 @@ form.addEventListener('submit', ev => {
     </tr>
     `);
 
-  notification('Success!', 'success',
-    'New employee successfully added');
+  rows = [...tbody.rows];
   form.reset();
 });
 
-function notification(title, type, description) {
+function notification(positionTop, positionRight, title, type, description) {
   body.insertAdjacentHTML('beforeend', `
   <div class="notification ${type}" data-qa="notification">
     <h2 class="title">${title}</h2>
     <p>${description}</p>
   </div>
   `);
+
+  const message = document.querySelector('.notification');
+
+  message.style.top = `${positionTop}px`;
+  message.style.right = `${positionRight}px`;
 
   setTimeout(() => {
     body.removeChild(document.querySelector('.notification'));
@@ -185,7 +192,7 @@ tbody.addEventListener('dblclick', e => {
         && e.target.textContent.length < 4) {
       e.target.textContent = previousValue;
 
-      notification('Error', 'error',
+      notification(10, 10, 'Error', 'error',
         'Name must contain at least 4 letters');
     }
 
@@ -193,7 +200,7 @@ tbody.addEventListener('dblclick', e => {
       if (isNaN(input.value)) {
         e.target.textContent = previousValue;
 
-        notification('Error', 'error',
+        notification(10, 10, 'Error', 'error',
           'Age must be a number');
       };
 
@@ -201,7 +208,7 @@ tbody.addEventListener('dblclick', e => {
         || input.value > 90) {
         e.target.textContent = previousValue;
 
-        notification('Error', 'error',
+        notification(10, 10, 'Error', 'error',
           'Age must be between 18 and 90');
       }
     }
@@ -213,7 +220,7 @@ tbody.addEventListener('dblclick', e => {
       } else {
         e.target.textContent = previousValue;
 
-        notification('Error', 'error',
+        notification(10, 10, 'Error', 'error',
           'Please, enter only numbers without symbols');
       }
     }
