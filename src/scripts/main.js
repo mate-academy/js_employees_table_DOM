@@ -159,22 +159,71 @@ function formatSalaryData(data) {
 }
 
 function validationForForm(data) {
-  if (data.name.length < 4 || /\d/.test(data.name)) {
-    showNotification('Error',
-      'Enter a valid name. Name must not be less than 4 letters!',
-      'error'
-    );
+  if (data.hasOwnProperty('name')) {
+    if (data.name.length < 4 || /\d/.test(data.name)) {
+      showNotification('Error',
+        `Enter a valid name. `
+        + `Name must not be less than 4 letters and not contain numbers!`,
+        'error'
+      );
 
-    return false;
+      return false;
+    }
   }
 
-  if (+data.age < 18 || +data.age > 90) {
-    showNotification('Error',
-      'Enter a valid Age. Age must be at least 18 and not more than 90!',
-      'error'
-    );
+  if (data.hasOwnProperty('position')) {
+    if (data.position.length < 4 || /\d/.test(data.position)) {
+      showNotification('Error',
+        `Enter a valid position. `
+        + `Position must not be less than 4 letters and not contain numbers!`,
+        'error'
+      );
 
-    return false;
+      return false;
+    }
+  }
+
+  if (data.hasOwnProperty('office')) {
+    const offices
+      = [
+        'Tokyo',
+        'Singapore',
+        'London',
+        'New York',
+        'Edinburgh',
+        'San Francisco',
+      ];
+
+    if (!offices.includes(data.office)) {
+      showNotification('Error',
+        'Enter a valid location. Office does not exist in this city!',
+        'error'
+      );
+
+      return false;
+    }
+  }
+
+  if (data.hasOwnProperty('age')) {
+    if (+data.age < 18 || +data.age > 90 || isNaN(+data.age)) {
+      showNotification('Error',
+        'Enter a valid Age. Age must be at least 18 and not more than 90!',
+        'error'
+      );
+
+      return false;
+    }
+  }
+
+  if (data.hasOwnProperty('salary')) {
+    if (isNaN(+data.salary) || data.salary === '') {
+      showNotification('Error',
+        'Enter a valid salary. Salary must contain only numbers!',
+        'error'
+      );
+
+      return false;
+    }
   }
 
   showNotification('Success',
@@ -209,14 +258,19 @@ tbody.addEventListener('dblclick', (e) => {
   const input = inputForTable();
 
   const setInputValue = (ev) => {
-    const inputValue = ev.target.value;
+    let inputValue = ev.target.value;
+    const inputData = {};
 
-    if (validationForInputOfCell(inputValue, cellName)) {
-      cell.innerText = cellText;
-    } else if (cellName === 'Salary') {
-      cell.innerText = formatSalaryData(inputValue);
-    } else {
+    inputData[cellName.toLowerCase()] = inputValue;
+
+    if (cellName === 'Salary') {
+      inputValue = formatSalaryData(inputValue);
+    }
+
+    if (validationForForm(inputData)) {
       cell.innerText = inputValue;
+    } else {
+      cell.innerText = cellText;
     }
   };
 
@@ -243,34 +297,4 @@ function inputForTable() {
   input.classList.add('cell-input');
 
   return input;
-}
-
-function validationForInputOfCell(value, cellName) {
-  if (cellName === 'Name' || cellName === 'Position') {
-    return (value.length < 4 || /\d/.test(value));
-  }
-
-  if (cellName === 'Office') {
-    const offices
-      = [
-        'Tokyo',
-        'Singapore',
-        'London',
-        'New York',
-        'Edinburgh',
-        'San Francisco',
-      ];
-
-    return !offices.includes(value);
-  }
-
-  if (cellName === 'Age' && !isNaN(value)) {
-    return (value < 18 || value > 90);
-  }
-
-  if (cellName === 'Salary' && !isNaN(value) && value !== '') {
-    return false;
-  }
-
-  return true;
 }
