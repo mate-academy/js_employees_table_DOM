@@ -1,10 +1,224 @@
 'use strict';
 
+const notifications = {
+  ruleForName: 'Name shouldn\'t be less than 4 letters and contain any number',
+  ruleForPosition: (
+    'Position shouldn\'t be less than 4 letters and contain any number'
+  ),
+  ruleForOffice: 'Office shouldn\'t be less than 3 letters contain any number',
+  ruleForAge: 'Age shouldn\'t be less than 18 and more than 90',
+  ruleForSalary: 'Salary should only contain numbers',
+  ruleForIncorrectField: 'It looks like you have given a wrong field value',
+
+  createNotification(title, description, type) {
+    const notification = document.createElement('div');
+
+    notification.className = `notification ${type}`;
+    notification.dataset.qa = 'notification';
+
+    notification.insertAdjacentHTML('afterbegin', `
+      <h2 class='title'>${title}</h2>
+  
+      <p>${description}</p>
+    `);
+
+    document.body.append(notification);
+
+    setTimeout(() => {
+      notification.remove();
+    }, 4000);
+  },
+
+  showNotification(field) {
+    switch (field) {
+      case 'form-success':
+        this.createNotification(
+          'Success',
+          'The new employee has been added to the table',
+          'success'
+        );
+        break;
+
+      case 'input-success':
+        this.createNotification(
+          'Success',
+          'The data has been updated',
+          'success'
+        );
+        break;
+
+      case 'name':
+        this.createNotification(
+          'Name is invalid',
+          notifications.ruleForName,
+          'error'
+        );
+        break;
+
+      case 'position':
+        this.createNotification(
+          'Position is invalid',
+          notifications.ruleForPosition,
+          'error'
+        );
+        break;
+
+      case 'office':
+        this.createNotification(
+          'Office is invalid',
+          notifications.ruleForOffice,
+          'error'
+        );
+        break;
+
+      case 'age':
+        this.createNotification(
+          'Age is invalid',
+          notifications.ruleForAge,
+          'error'
+        );
+        break;
+
+      case 'salary':
+        this.createNotification(
+          'Salary field has invalid symbol',
+          notifications.ruleForSalary,
+          'error'
+        );
+        break;
+
+      default:
+        this.createNotification(
+          'Opps, something went wrong',
+          notifications.ruleForIncorrectField,
+          'error'
+        );
+        break;
+    }
+  },
+};
+const validation = {
+  numbers: '0123456789',
+  offices: [
+    'Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco',
+  ],
+  incorrectField: '',
+
+  checkFormCorrectness(form) {
+    const isNameCorrect = this.checkNameCorrectness(form.name.value);
+    const isAgeCorrect = this.checkAgeCorrectness(form.age.value);
+    const isPositionCorrect = this
+      .checkPositionCorrectness(form.position.value);
+
+    if (
+      !isNameCorrect
+      || !isAgeCorrect
+      || !isPositionCorrect
+    ) {
+      return false;
+    }
+
+    return true;
+  },
+
+  checkNameCorrectness(employeeName) {
+    if (
+      employeeName.split('').some(symbol => this.numbers.includes(symbol))
+      || employeeName.length < 4
+    ) {
+      this.incorrectField = 'name';
+
+      return false;
+    }
+
+    return true;
+  },
+
+  checkPositionCorrectness(position) {
+    if (
+      position.split('').some(symbol => this.numbers.includes(symbol))
+      || position.length < 4
+    ) {
+      this.incorrectField = 'position';
+
+      return false;
+    }
+
+    return true;
+  },
+
+  checkOfficeCorrectness(office) {
+    const compareResult = this
+      .offices
+      .some(officeName => {
+        return !officeName.localeCompare(office.trim(), { sensivity: 'base' });
+      });
+
+    if (!compareResult) {
+      this.incorrectField = 'office';
+
+      return false;
+    }
+
+    return true;
+  },
+
+  checkAgeCorrectness(age) {
+    const employeeAge = Number(age);
+
+    if (
+      isNaN(employeeAge)
+      || employeeAge < 18
+      || employeeAge > 90
+    ) {
+      this.incorrectField = 'age';
+
+      return false;
+    }
+
+    return true;
+  },
+
+  checkSalaryCorrectness(salary) {
+    const employeeSalary = Number(salary);
+
+    if (
+      isNaN(employeeSalary)
+    ) {
+      this.incorrectField = 'salary';
+
+      return false;
+    }
+
+    return true;
+  },
+
+  checkInputCorrectness(fieldName, fieldValue) {
+    switch (fieldName) {
+      case 'name':
+        return this.checkNameCorrectness(fieldValue);
+
+      case 'position':
+        return this.checkPositionCorrectness(fieldValue);
+
+      case 'office':
+        return this.checkOfficeCorrectness(fieldValue);
+
+      case 'age':
+        return this.checkAgeCorrectness(fieldValue);
+
+      case 'salary':
+        return this.checkSalaryCorrectness(fieldValue);
+
+      default:
+        return true;
+    }
+  },
+};
 const table = document.querySelector('table');
 
 table.sortedRow = null;
 table.selectedRow = null;
-table.editedCell = null;
 
 table.addEventListener('click', function(e) {
   const columnHeader = e.target;
@@ -89,7 +303,6 @@ table.addEventListener('dblclick', function(e) {
   if (
     cell.tagName !== 'TD'
     || ![...table.tBodies].some(tBody => tBody.contains(cell))
-    || table.editedCell
   ) {
     return;
   }
@@ -97,13 +310,16 @@ table.addEventListener('dblclick', function(e) {
   const oldCellData = cell.innerText;
 
   cell.innerHTML = '<input class="cell-input">';
-  cell.firstElementChild.focus();
 
-  cell.firstElementChild.addEventListener('blur', function() {
+  const input = cell.firstElementChild;
+
+  input.focus();
+
+  input.addEventListener('blur', function() {
     changeCellData();
   });
 
-  cell.firstElementChild.addEventListener('keydown', function(ev) {
+  input.addEventListener('keydown', function(ev) {
     if (ev.code !== 'Enter') {
       return;
     }
@@ -112,11 +328,38 @@ table.addEventListener('dblclick', function(e) {
   });
 
   function changeCellData() {
-    if (!cell.firstElementChild.value) {
-      cell.innerText = oldCellData;
+    const headerName = table
+      .tHead
+      .rows[0]
+      .cells[cell.cellIndex]
+      .innerText
+      .trim()
+      .toLowerCase();
+    let inputData = input.value;
+
+    if (
+      inputData !== ''
+      && !validation.checkInputCorrectness(headerName, inputData)
+    ) {
+      notifications.showNotification(headerName);
+      input.focus();
+
+      return;
     }
 
-    cell.innerText = cell.firstElementChild.value;
+    if (headerName === 'salary') {
+      inputData = '$' + Number(inputData).toLocaleString();
+    }
+
+    if (inputData === '') {
+      cell.innerText = oldCellData;
+
+      return;
+    }
+
+    cell.textContent = inputData;
+    notifications.showNotification('input-success');
+    validation.incorrectField = '';
   }
 });
 
@@ -149,12 +392,12 @@ table.insertAdjacentHTML('afterend', `
         data-qa="office"
         required
       >
-        <option value="Tokyo" selected>Tokyo</option>
+        <option value="Tokyo">Tokyo</option>
         <option value="Singapore">Singapore</option>
         <option value="London">London</option>
-        <option value="New york">New York</option>
+        <option value="New York">New York</option>
         <option value="Edinburgh">Edinburgh</option>
-        <option value="San francisco">San Francisco</option>
+        <option value="San Francisco">San Francisco</option>
       </select>
     </label>
 
@@ -187,66 +430,17 @@ const addingForm = document.forms['adding-employee'];
 addingForm.addEventListener('submit', function(e) {
   e.preventDefault();
 
-  const isNameCorrect = checkNameCorrectness();
-  const isAgeCorrect = checkAgeCorrectness();
-  const ruleForName = (
-    'Name shouldn\'t be less than 4 letters and contain any number'
-  );
-  const ruleForAge = 'Age shouldn\'t be less than 18 and more than 90';
-
-  if (!isNameCorrect) {
-    showNotification(
-      'Name is invalid',
-      ruleForName,
-      'error'
-    );
-
-    return;
-  } else if (!isAgeCorrect) {
-    showNotification(
-      'Age is invalid',
-      ruleForAge,
-      'error'
-    );
+  if (!validation.checkFormCorrectness(addingForm)) {
+    addingForm[validation.incorrectField].focus();
+    notifications.showNotification(validation.incorrectField);
+    validation.incorrectField = '';
 
     return;
   }
 
   addEmployee();
-
-  showNotification(
-    'Success',
-    'The new employee has been added to the table',
-    'success'
-  );
-
-  function checkNameCorrectness() {
-    const employeeName = addingForm.name.value;
-    const numbers = '0123456789';
-
-    if (
-      employeeName.split('').some(symbol => numbers.includes(symbol))
-      || employeeName.length < 4
-    ) {
-      return false;
-    }
-
-    return true;
-  }
-
-  function checkAgeCorrectness() {
-    const employeeAge = Number(addingForm.age.value);
-
-    if (
-      isNaN(employeeAge)
-      || employeeAge < 18
-      || employeeAge > 90
-    ) {
-      return false;
-    }
-
-    return true;
-  }
+  clearAddingForm();
+  notifications.showNotification('form-success');
 
   function addEmployee() {
     const { name: employeeName, position, office, age, salary } = addingForm;
@@ -262,22 +456,15 @@ addingForm.addEventListener('submit', function(e) {
     `);
   }
 
-  function showNotification(title, description, type) {
-    const notification = document.createElement('div');
+  function clearAddingForm() {
+    for (const input of addingForm) {
+      if (input.tagName === 'SELECT') {
+        input.options[0].selected = true;
 
-    notification.className = `notification ${type}`;
-    notification.dataset.qa = 'notification';
+        continue;
+      }
 
-    notification.insertAdjacentHTML('afterbegin', `
-      <h2 class='title'>${title}</h2>
-  
-      <p>${description}</p>
-    `);
-
-    document.body.append(notification);
-
-    setTimeout(() => {
-      notification.remove();
-    }, 4000);
-  };
+      input.value = '';
+    }
+  }
 });
