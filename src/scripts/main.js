@@ -218,6 +218,7 @@ const table = document.querySelector('table');
 
 table.sortedRow = null;
 table.selectedRow = null;
+table.editedCell = null;
 
 table.addEventListener('click', function(e) {
   const columnHeader = e.target;
@@ -301,10 +302,13 @@ table.addEventListener('dblclick', function(e) {
 
   if (
     cell.tagName !== 'TD'
+    || table.editedCell
     || ![...table.tBodies].some(tBody => tBody.contains(cell))
   ) {
     return;
   }
+
+  table.editedCell = cell;
 
   const oldCellData = cell.innerText;
 
@@ -352,6 +356,7 @@ table.addEventListener('dblclick', function(e) {
 
     if (inputData === '') {
       cell.innerText = oldCellData;
+      table.editedCell = null;
 
       return;
     }
@@ -359,6 +364,7 @@ table.addEventListener('dblclick', function(e) {
     cell.textContent = inputData;
     notifications.showNotification('input-success');
     validation.incorrectField = '';
+    table.editedCell = null;
   }
 });
 
