@@ -5,7 +5,9 @@ const notifications = {
   ruleForPosition: (
     'Position shouldn\'t be less than 4 letters and contain any number'
   ),
-  ruleForOffice: 'Office shouldn\'t be less than 3 letters contain any number',
+  ruleForOffice: (
+    'Office shouldn\'t be less than 3 letters and contain any number'
+  ),
   ruleForAge: 'Age shouldn\'t be less than 18 and more than 90',
   ruleForSalary: 'Salary should only contain numbers',
   ruleForIncorrectField: 'It looks like you have given a wrong field value',
@@ -148,13 +150,10 @@ const validation = {
   },
 
   checkOfficeCorrectness(office) {
-    const compareResult = this
-      .offices
-      .some(officeName => {
-        return !officeName.localeCompare(office.trim(), { sensivity: 'base' });
-      });
-
-    if (!compareResult) {
+    if (
+      office.split('').some(symbol => this.numbers.includes(symbol))
+      || office.length < 4
+    ) {
       this.incorrectField = 'office';
 
       return false;
