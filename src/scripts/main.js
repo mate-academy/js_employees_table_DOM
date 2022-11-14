@@ -3,12 +3,13 @@
 document.body.style.alignItems = 'flex-start';
 
 const headList = document.querySelector('thead');
-const headName = [
-  ...document.querySelectorAll('thead th')].map(i => i.innerText);
+const headName = [...document.querySelectorAll('thead th')]
+  .map(columnName => columnName.innerText);
 
 const body = document.querySelector('tbody');
 const rows = [...body.querySelectorAll('tr')];
-const cell = (row, n) => row.children[n].textContent.replace(/[$,]/g, '');
+const getCellContent = (row, n) =>
+  row.children[n].textContent.replace(/[$,]/g, '');
 
 headList.addEventListener('click', (e) => {
   let sorted;
@@ -17,10 +18,11 @@ headList.addEventListener('click', (e) => {
 
   if (numOfColum >= 3) {
     sorted = rows.sort((a, b) =>
-      cell(a, numOfColum) - (cell(b, numOfColum)));
+      getCellContent(a, numOfColum) - (getCellContent(b, numOfColum)));
   } else {
     sorted = rows.sort((a, b) =>
-      cell(a, numOfColum).localeCompare(cell(b, numOfColum)));
+      getCellContent(a, numOfColum).localeCompare(
+        getCellContent(b, numOfColum)));
   };
   sorted.map(i => body.appendChild(i));
 });
@@ -32,10 +34,11 @@ headList.addEventListener('dblclick', (e) => {
 
   if (numOfColum >= 3) {
     sorted = rows.sort((a, b) =>
-      cell(b, numOfColum) - (cell(a, numOfColum)));
+      getCellContent(b, numOfColum) - (getCellContent(a, numOfColum)));
   } else {
     sorted = rows.sort((a, b) =>
-      cell(b, numOfColum).localeCompare(cell(a, numOfColum)));
+      getCellContent(b, numOfColum).localeCompare(
+        getCellContent(a, numOfColum)));
   };
 
   sorted.map(i => body.appendChild(i));
@@ -176,7 +179,7 @@ function checkValidation(data) {
   return true;
 };
 
-button.addEventListener('click', (e) => {
+form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const data = Object.fromEntries(new FormData(form).entries());
