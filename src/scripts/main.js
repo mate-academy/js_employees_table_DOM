@@ -29,13 +29,15 @@ table.tHead.addEventListener('click', (happening) => {
   row.sort((a, b) => {
     const ifIncludeNumber = convertToNumber(a[cell]);
 
-    return ifIncludeNumber
-      ? count % 2 === 1
+    if (ifIncludeNumber) {
+      return count % 2 === 1
         ? convertToNumber(a[cell]) - convertToNumber(b[cell])
-        : convertToNumber(b[cell]) - convertToNumber(a[cell])
-      : count % 2 === 1
-        ? a[cell].localeCompare(b[cell])
-        : b[cell].localeCompare(a[cell]);
+        : convertToNumber(b[cell]) - convertToNumber(a[cell]);
+    }
+
+    return count % 2 === 1
+      ? a[cell].localeCompare(b[cell])
+      : b[cell].localeCompare(a[cell]);
   });
 
   for (let i = 1; i < table.rows.length - 1; i++) {
@@ -112,6 +114,17 @@ form.addEventListener('submit', (ev) => {
     return;
   }
 
+  if ([...form.children]
+    .slice(0, -1)
+    .map(el => allSpases(el.childNodes[1].value))
+    .includes(true)) {
+    pushNotification(10, 10, 'Error!',
+      'All form fields must be filled!',
+      'error');
+
+    return;
+  }
+
   const row = table.tBodies[0].insertRow();
 
   for (let i = 0; i < table.rows[0].cells.length; i++) {
@@ -178,6 +191,14 @@ table.tBodies[0].addEventListener('dblclick', (happening) => {
       input.value = '';
     }
 
+    if (allSpases(input.value)) {
+      pushNotification(10, 10, 'Error!',
+        'Cell must be filled!',
+        'error');
+
+      return;
+    }
+
     i.innerText = !input.value
       ? itemOldValue
       : table.rows[0].cells[cellIndex].innerText === 'Salary'
@@ -225,3 +246,13 @@ function pushNotification(posTop, posRight, title, description, type) {
   <p>${description}</p>`;
   setTimeout(() => message.remove(), 2000);
 };
+
+function allSpases(string) {
+  for (const char of string) {
+    if (char !== ' ') {
+      return false;
+    }
+  }
+
+  return true;
+}
