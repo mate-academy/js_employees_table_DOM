@@ -28,14 +28,15 @@ table.tHead.addEventListener('click', (happening) => {
 
   row.sort((a, b) => {
     const ifIncludeNumber = convertToNumber(a[cell]);
+    const ifEven = count % 2 === 1;
 
     if (ifIncludeNumber) {
-      return count % 2 === 1
+      return ifEven
         ? convertToNumber(a[cell]) - convertToNumber(b[cell])
         : convertToNumber(b[cell]) - convertToNumber(a[cell]);
     }
 
-    return count % 2 === 1
+    return ifEven
       ? a[cell].localeCompare(b[cell])
       : b[cell].localeCompare(a[cell]);
   });
@@ -64,10 +65,12 @@ form.className = 'new-employee-form';
 
 document.querySelector('body').append(form);
 
-const nameAndTypeOfFormItem = [['name', 'text'],
+const nameAndTypeOfFormItem = [
+  ['name', 'text'],
   ['position', 'text'],
   ['age', 'number'],
-  ['salary', 'number']];
+  ['salary', 'number'],
+];
 
 form.innerHTML = nameAndTypeOfFormItem.map(item => `
   <label>${capitalized(item[0])}: 
@@ -79,8 +82,14 @@ const select = document.createElement('label');
 
 form.children[1].after(select);
 
-const valueOfSelectOptions
-= [`Tokyo`, `Singapore`, `London`, `New York`, `Edinburgh`, `San Francisco`];
+const valueOfSelectOptions = [
+  `Tokyo`,
+  `Singapore`,
+  `London`,
+  `New York`,
+  `Edinburgh`,
+  `San Francisco`,
+];
 
 select.innerHTML = `Office:
 <select name='office' data-qa='office' required>
@@ -98,29 +107,47 @@ form.append(button);
 form.addEventListener('submit', (ev) => {
   ev.preventDefault();
 
-  if (form.children[0].childNodes[1].value.length < 4) {
-    pushNotification(10, 10, 'Error!',
-      'Name must be longer than three characters', 'error');
+  const tableTitleNameValue = form.children[0].childNodes[1].value;
+  const tableTitleAgeValue = form.children[3].childNodes[1].value;
+
+  if (tableTitleNameValue.length < 4) {
+    pushNotification(
+      10,
+      10,
+      'Error!',
+      'Name must be longer than three characters',
+      'error'
+    );
 
     return;
   }
 
-  if (form.children[3].childNodes[1].value < 18
-    || form.children[3].childNodes[1].value > 90) {
-    pushNotification(10, 10, 'Error!',
+  if (tableTitleAgeValue < 18
+    || tableTitleAgeValue > 90) {
+    pushNotification(
+      10,
+      10,
+      'Error!',
       'Sorry, but the age value does not fit. Value must be between 18 and 90',
-      'error');
+      'error'
+    );
 
     return;
   }
 
-  if ([...form.children]
+  const ifFormFieldsIncludesEmptyValue = [...form.children]
     .slice(0, -1)
     .map(el => allSpases(el.childNodes[1].value))
-    .includes(true)) {
-    pushNotification(10, 10, 'Error!',
+    .includes(true);
+
+  if (ifFormFieldsIncludesEmptyValue) {
+    pushNotification(
+      10,
+      10,
+      'Error!',
       'All form fields must be filled!',
-      'error');
+      'error'
+    );
 
     return;
   }
@@ -129,18 +156,23 @@ form.addEventListener('submit', (ev) => {
 
   for (let i = 0; i < table.rows[0].cells.length; i++) {
     const cell = document.createElement('td');
+    const input = form.children[i].childNodes[1];
 
-    cell.innerText = form.children[i].childNodes[1].name === 'salary'
+    cell.innerText = input.name === 'salary'
       ? '$'
-        + Number(form.children[i].childNodes[1].value).toLocaleString('en-US')
-      : form.children[i].childNodes[1].value;
+        + Number(input.value).toLocaleString('en-US')
+      : input.value;
     row.append(cell);
   }
 
   form.reset();
 
-  pushNotification(10, 10, 'Success!',
-    'Employee has been added to the list!', 'success');
+  pushNotification(
+    10,
+    10,
+    'Success!',
+    'Employee has been added to the list!',
+    'success');
 });
 
 table.tBodies[0].addEventListener('dblclick', (happening) => {
@@ -159,9 +191,10 @@ table.tBodies[0].addEventListener('dblclick', (happening) => {
   input.className = 'cell-input';
 
   const cellIndex = item.cellIndex;
+  const titleOfCell = table.rows[0].cells[cellIndex].innerText;
 
-  if (table.rows[0].cells[cellIndex].innerText === 'Salary'
-  || table.rows[0].cells[cellIndex].innerText === 'Age') {
+  if (titleOfCell === 'Salary'
+  || titleOfCell === 'Age') {
     input.type = 'number';
   }
   item.innerText = '';
@@ -174,34 +207,41 @@ table.tBodies[0].addEventListener('dblclick', (happening) => {
 
     if ((input.value < 18
       || input.value > 90)
-      && table.rows[0].cells[cellIndex].innerText === 'Age') {
-      pushNotification(10, 10, 'Error!',
+      && titleOfCell === 'Age') {
+      pushNotification(
+        10,
+        10,
+        'Error!',
         'Sorry, but the age value does not fit.'
         + 'Value must be between 18 and 90. Try again!',
-        'error');
+        'error'
+      );
 
       input.value = '';
     }
 
     if (input.value.length < 4
-      && table.rows[0].cells[cellIndex].innerText === 'Name') {
-      pushNotification(10, 10, 'Error!',
-        'Name must be longer than three characters. Try again!', 'error');
+      && titleOfCell === 'Name') {
+      pushNotification(
+        10,
+        10,
+        'Error!',
+        'Name must be longer than three characters. Try again!',
+        'error'
+      );
 
       input.value = '';
     }
 
     if (allSpases(input.value)) {
-      pushNotification(10, 10, 'Error!',
-        'Cell must be filled!',
-        'error');
+      i.innerText = itemOldValue;
 
       return;
     }
 
     i.innerText = !input.value
       ? itemOldValue
-      : table.rows[0].cells[cellIndex].innerText === 'Salary'
+      : titleOfCell === 'Salary'
         ? '$'
         + Number(input.value).toLocaleString('en-US')
         : input.value;
