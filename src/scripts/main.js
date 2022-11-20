@@ -4,6 +4,7 @@ document.body.style.alignItems = 'flex-start';
 
 const headList = document.querySelector('thead');
 const body = document.querySelector('tbody');
+const tr = body.querySelectorAll('tr');
 let sortOrder = '';
 let sortHeader = null;
 
@@ -47,6 +48,15 @@ headList.addEventListener('click', (e) => {
   });
 
   body.append(...forSortedTable);
+});
+
+body.addEventListener('click', (e) => {
+  const item = e.target.closest('tr');
+
+  for (const i of tr) {
+    i.classList.remove('active');
+  }
+  item.className = 'active';
 });
 
 const form = document.createElement('form');
