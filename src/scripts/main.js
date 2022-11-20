@@ -3,45 +3,50 @@
 document.body.style.alignItems = 'flex-start';
 
 const headList = document.querySelector('thead');
-const headName = [...document.querySelectorAll('thead th')]
-  .map(columnName => columnName.innerText);
-
 const body = document.querySelector('tbody');
-const rows = [...body.querySelectorAll('tr')];
-const getCellContent = (row, n) =>
-  row.children[n].textContent.replace(/[$,]/g, '');
+let sortOrder = '';
+let sortHeader = null;
+
+function normalizeNumber(number) {
+  let newNumber;
+
+  if (number.includes('$')) {
+    newNumber = number.replace(/[$,]/g, '');
+  } else {
+    newNumber = number;
+  }
+
+  return newNumber;
+};
 
 headList.addEventListener('click', (e) => {
-  let sorted;
-  const target = e.target.closest('th').innerText;
-  const numOfColum = headName.indexOf(target);
+  const toSort = e.target.cellIndex;
+  const target = e.target;
 
-  if (numOfColum >= 3) {
-    sorted = rows.sort((a, b) =>
-      getCellContent(a, numOfColum) - (getCellContent(b, numOfColum)));
+  if (sortHeader !== target) {
+    sortOrder = 'ASC';
+    sortHeader = target;
   } else {
-    sorted = rows.sort((a, b) =>
-      getCellContent(a, numOfColum).localeCompare(
-        getCellContent(b, numOfColum)));
-  };
-  sorted.map(i => body.appendChild(i));
-});
+    sortOrder = 'DESC';
+    sortHeader = null;
+  }
 
-headList.addEventListener('dblclick', (e) => {
-  let sorted;
-  const target = e.target.closest('th').innerText;
-  const numOfColum = headName.indexOf(target);
+  const forSortedTable = [...body.children].sort((a, b) => {
+    const cellA = a.cells[toSort].innerText;
+    const cellB = b.cells[toSort].innerText;
 
-  if (numOfColum >= 3) {
-    sorted = rows.sort((a, b) =>
-      getCellContent(b, numOfColum) - (getCellContent(a, numOfColum)));
-  } else {
-    sorted = rows.sort((a, b) =>
-      getCellContent(b, numOfColum).localeCompare(
-        getCellContent(a, numOfColum)));
-  };
+    if (sortOrder === 'ASC') {
+      return (cellA.includes('$')) === false
+        ? cellA.localeCompare(cellB)
+        : normalizeNumber(cellA) - normalizeNumber(cellB);
+    } else {
+      return (cellA.includes('$')) === false
+        ? cellB.localeCompare(cellA)
+        : normalizeNumber(cellB) - normalizeNumber(cellA);
+    }
+  });
 
-  sorted.map(i => body.appendChild(i));
+  body.append(...forSortedTable);
 });
 
 const form = document.createElement('form');
@@ -121,21 +126,21 @@ function saveDataToTable(data) {
 };
 
 const pushNotification = (title, description, type) => {
-  const messageConteiner = document.createElement('div');
+  const messageContainer = document.createElement('div');
   const messageTitle = document.createElement('h2');
   const messageDescription = document.createElement('p');
 
-  document.body.append(messageConteiner);
-  messageConteiner.append(messageTitle);
-  messageConteiner.append(messageDescription);
-  messageConteiner.classList.add('notification', type);
-  messageConteiner.classList.add(`${type}`);
-  messageConteiner.dataset.qa = 'notification';
+  document.body.append(messageContainer);
+  messageContainer.append(messageTitle);
+  messageContainer.append(messageDescription);
+  messageContainer.classList.add('notification', type);
+  messageContainer.classList.add(`${type}`);
+  messageContainer.dataset.qa = 'notification';
   messageTitle.classList.add('title');
   messageTitle.textContent = title;
   messageDescription.textContent = description;
 
-  setTimeout(() => messageConteiner.remove(), 3000);
+  setTimeout(() => messageContainer.remove(), 3000);
 };
 
 function checkValidation(data) {
