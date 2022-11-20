@@ -84,11 +84,11 @@ for (let i = 0; i < 5; i++) {
 form.append(button);
 
 let count = 0;
-let target = '';
+let sortTarget = '';
 
 document.body.addEventListener('click', e => {
-  count = target.innerText !== e.target.innerText ? 1 : count + 1;
-  target = e.target;
+  count = sortTarget.innerText !== e.target.innerText ? 1 : count + 1;
+  sortTarget = e.target;
 
   if (count === 2) {
     e.preventDefault();
@@ -145,19 +145,15 @@ document.body.addEventListener('click', e => {
   }
 });
 
+let selectItem = '';
+
 employees.addEventListener('click', e => {
-  const item = e.target.closest('tr');
-
-  if (!item || !employees.contains(item)) {
-    return;
-  }
-
-  if (target.parentElement) {
+  if (selectItem) {
     document.querySelector('.active').classList.remove('active');
   }
 
-  target = e.target;
-  target.parentElement.classList.add('active');
+  selectItem = e.target;
+  selectItem.parentElement.classList.add('active');
 });
 
 form.addEventListener('submit', e => {
