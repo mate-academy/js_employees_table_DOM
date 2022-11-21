@@ -70,11 +70,12 @@ tableContainer.insertAdjacentHTML('afterbegin', `
 /* <= */
 
 class ValidationError extends Error {
-  constructor(title, description, type) {
+  constructor(title, description, type, element) {
     super(...arguments);
     this.title = title;
     this.description = description;
     this.type = type;
+    this.element = element;
   }
 }
 
@@ -101,7 +102,7 @@ class Notifications {
     message.style.left = '0px';
     message.style.position = 'static';
 
-    setTimeout(() => message.remove(), 3000);
+    setTimeout(() => message.remove(), 2000);
   }
 }
 
@@ -128,7 +129,8 @@ function checkUserEntries(entries) {
       throw new ValidationError(
         `Incorrect ${title}!`,
         `The ${title} cannot be empty.`,
-        'error'
+        'error',
+        entry
       );
     }
 
@@ -136,7 +138,8 @@ function checkUserEntries(entries) {
       throw new ValidationError(
         `Incorrect ${title}!`,
         `The ${title} cannot contain spaces at the beginning or at the end.`,
-        'error'
+        'error',
+        entry
       );
     }
 
@@ -144,7 +147,8 @@ function checkUserEntries(entries) {
       throw new ValidationError(
         `Incorrect ${title}!`,
         `${specification[title].description}.`,
-        'error'
+        'error',
+        entry
       );
     }
   }
@@ -170,6 +174,14 @@ function sendingNewEmployee() {
       ).show();
     } catch (error) {
       new Notifications(error.title, error.description, error.type).show();
+
+      error.element.style.borderColor = 'red';
+      error.element.style.outlineColor = 'red';
+
+      setTimeout(() => {
+        error.element.style.borderColor = '';
+        error.element.style.outlineColor = '';
+      }, 2000);
     }
   });
 }
