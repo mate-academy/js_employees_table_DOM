@@ -52,11 +52,7 @@ const saveChanges = function(editInput, clicked, pereviousValue) {
 
   clicked.innerHTML = '';
 
-  if (editedValue === '') {
-    clicked.textContent = pereviousValue;
-  } else {
-    clicked.textContent = editedValue;
-  }
+  clicked.textContent = editedValue || pereviousValue;
 };
 
 /// /// /// /// /// /// /// ///
@@ -81,10 +77,11 @@ const sortTable = function(e) {
         case 'Name':
         case 'Office':
           return firstText.localeCompare(secondText);
-        case 'Age':
-          return firstText - secondText;
         case 'Salary':
           return getSalaryNumber(firstText) - getSalaryNumber(secondText);
+        case 'Age':
+        default:
+          return firstText - secondText;
       };
     } else {
       switch (type) {
@@ -92,10 +89,11 @@ const sortTable = function(e) {
         case 'Name':
         case 'Office':
           return secondText.localeCompare(firstText);
-        case 'Age':
-          return secondText - firstText;
         case 'Salary':
           return getSalaryNumber(secondText) - getSalaryNumber(firstText);
+        case 'Age':
+        default:
+          return secondText - firstText;
       }
     }
   });
@@ -147,36 +145,25 @@ const inputName = createInput('Name:', 'name');
 const inputPosition = createInput('Position:', 'position');
 
 // 2) Select Office
+const offices = [
+  'Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco',
+];
 
 const lableSelect = document.createElement('label');
 const selecetElement = document.createElement('select');
-const optionTokyo = document.createElement('option');
-const optionSingapore = document.createElement('option');
-const optionLondon = document.createElement('option');
-const optionYork = document.createElement('option');
-const optionEdinburgh = document.createElement('option');
-const optionSan = document.createElement('option');
 
 lableSelect.textContent = 'Office:';
 selecetElement.setAttribute('name', 'office');
 selecetElement.setAttribute('data-qa', 'office');
-optionTokyo.setAttribute('value', 'Tokyo');
-optionTokyo.textContent = 'Tokyo';
-optionSingapore.setAttribute('value', 'Singapore');
-optionSingapore.textContent = 'Singapore';
-optionLondon.setAttribute('value', 'London');
-optionLondon.textContent = 'London';
-optionYork.setAttribute('value', 'New York');
-optionYork.textContent = 'New York';
-optionEdinburgh.setAttribute('value', 'Edinburgh');
-optionEdinburgh.textContent = 'Edinburgh';
-optionSan.setAttribute('value', 'San Francisco');
-optionSan.textContent = 'San Francisco';
 
-selecetElement.append(
-  optionTokyo, optionSingapore, optionLondon,
-  optionYork, optionEdinburgh, optionSan
-);
+offices.forEach(office => {
+  const option = document.createElement('option');
+
+  option.setAttribute('value', office);
+  option.textContent = office;
+  selecetElement.append(option);
+});
+
 lableSelect.append(selecetElement);
 formElement.append(lableSelect);
 
