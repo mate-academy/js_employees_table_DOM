@@ -59,27 +59,79 @@ body.addEventListener('dblclick', e => {
     return;
   }
 
-  const cell = e.target;
+  const target = e.target;
+  const input = document.createElement('input');
+  const originData = target.innerText;
 
-  cell.innerHTML = `
-    <input type="text" value="${cell.textContent}" class="cell-input">
-  `;
-
-  const input = cell.querySelector('input');
-
+  input.classList.add('cell-input');
+  input.type = 'text';
+  target.innerText = '';
+  target.append(input);
   input.focus();
 
-  input.addEventListener('blur', () => {
+  function saveData(value = originData, key) {
+    target.innerText = value;
     input.remove();
-    cell.textContent = input.value;
-  });
+  }
 
-  input.addEventListener('keydown', (el) => {
-    if (el.key === 'Enter') {
-      input.remove();
-      cell.textContent = input.value;
+  function validData() {
+    if (!input.value) {
+      saveData();
+
+      return;
     }
-  });
+
+    if ((target.cellIndex === 3 || target.cellIndex === 4)
+      && !input.value.match(/[0-9]/)) {
+      saveData();
+
+      return;
+    }
+
+    if (target.cellIndex === 4 && input.value.match(/[0-9]/)) {
+      saveData(`$` + (+input.value).toLocaleString('en-US'));
+
+      return;
+    }
+
+    if ((target.cellIndex === 3) && (input.value < 18 || input.value > 90)) {
+      saveData();
+
+      return;
+    }
+
+    if (target.cellIndex === 2) {
+      e.target.insertAdjacentHTML('beforeend', `
+       
+          <select name="office" data-qa="office">
+            <option value="Tokyo">Tokyo</option>
+            <option value="Singapore">Singapore</option>
+            <option value="London">London</option>
+            <option value="New York">New York</option>
+            <option value="Edinburgh">Edinburgh</option>
+            <option value="San Francisco">San Francisco</option>
+          </select>
+        
+    `);
+
+      input.remove();
+
+      return;
+    }
+    saveData(input.value);
+  }
+
+  input.onblur = () => {
+    validData();
+  };
+
+  input.onkeydown = (keyboardEvent) => {
+    const enter = keyboardEvent.code === 'Enter';
+
+    if (enter) {
+      saveData();
+    }
+  };
 });
 
 // Create a form
