@@ -68,7 +68,7 @@ function onFormSubmit(evt) {
 
   if (employeeName.length < 4) {
     makeANotification('warning', 'Warning',
-      'Please, enter at least 4 charachers');
+      'Name field should has at least 4 charachers');
   } else if (employeeAge < 18 || employeeAge > 90) {
     makeANotification('error', 'Error', 'Please enter a valid age');
   } else {
