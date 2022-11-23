@@ -5,7 +5,7 @@ const tbody = document.querySelector('tbody');
 const thead = document.querySelector('thead');
 let direction = true;
 let lastIndex;
-let selectedRow;
+let innerText;
 
 function convertToNum(str) {
   let res = '';
@@ -25,31 +25,73 @@ function convertToMoney(str) {
   return money;
 }
 
-const onKeyDown = (e) => {
-  if (e.key !== 'Enter') {
+const checkValidation = (e) => {
+  if (!e.target.value.length) {
+    e.target.value = innerText;
+    tableNotification(false);
+
     return;
   }
 
-  if (!e.target.value.length) {
-    e.target.closest('td').innerText = innerText;
+  switch (e.target.closest('td').cellIndex) {
+    case 0:
+    case 1:
+      if (e.target.value.length > 4) {
+        tableNotification(true);
+      } else {
+        if (e.target.value.length) {
+          tableNotification(false);
+
+          return;
+        }
+      }
+      break;
+
+    case 3:
+      if (e.target.value >= 18 && e.target.value < 90) {
+        tableNotification(true);
+      } else {
+        tableNotification(false);
+
+        return;
+      }
+      break;
+
+    case 4:
+      e.target.closest('td').textContent = convertToMoney(e.target.value);
+      tableNotification(true);
+      break;
   }
 
-  if (e.target.tagName === 'INPUT') {
-    e.target.closest('td').innerText = e.target.value;
-    e.target.remove();
-  }
+  e.target.closest('td').textContent = e.target.value;
+  e.target.remove();
 };
 
-const onBlur = (e) => {
-  if (e.target.value.length === 0) {
-    e.target.closest('td').innerText = innerText;
+function tableNotification(info) {
+  const push = document.createElement('div');
+  const title = document.createElement('h2');
+  const p = document.createElement('p');
+
+  push.className = 'notification success';
+  title.className = 'title';
+  title.innerText = 'Sucess!';
+  p.innerText = 'You have changed employer data';
+  push.setAttribute('data-qa', 'notification');
+
+  if (!info) {
+    push.className = 'notification error';
+    title.className = 'title';
+    title.innerText = 'Error!';
+    p.innerText = 'Please, enter valid data';
   }
 
-  if (e.target.tagName === 'INPUT') {
-    e.target.closest('td').innerText = e.target.value;
-    e.target.remove();
-  }
-};
+  push.append(title, p);
+  body.append(push);
+
+  setTimeout(() => {
+    push.remove();
+  }, 2000);
+}
 
 thead.addEventListener('click', (e) => {
   const index = e.target.cellIndex;
@@ -77,41 +119,81 @@ thead.addEventListener('click', (e) => {
 });
 
 tbody.addEventListener('click', (e) => {
-  if (selectedRow === e.target) {
-    selectedRow.closest('tr').classList.remove('active');
-    selectedRow = null;
+  const rows = document.querySelectorAll('tr');
+  const activeRow = document.querySelector('.active');
 
-    return;
+  for (const row of rows) {
+    row.onclick = function() {
+      if (this.children[0].tagName === 'TH') {
+        return;
+      }
+
+      if (activeRow) {
+        activeRow.classList.remove('active');
+      }
+
+      if (activeRow !== this) {
+        this.classList.add('active');
+      }
+    };
   }
-
-  if (selectedRow) {
-    const removeClass = selectedRow.closest('tr');
-
-    removeClass.classList.remove('active');
-  }
-
-  selectedRow = e.target;
-
-  e.target.closest('tr').classList.add('active');
 });
-
-let innerText;
 
 tbody.addEventListener('dblclick', (e) => {
   innerText = e.target.innerText;
 
-  if (e.target.tagName === 'TD') {
-    const input = document.createElement('input');
+  let editor;
 
-    input.className = 'cell-input';
-    input.value = e.target.innerText;
-    input.addEventListener('blur', onBlur);
-    e.target.innerText = '';
-    e.target.append(input);
+  switch (e.target.cellIndex) {
+    case 0:
+    case 1:
+      editor = document.createElement('input');
+      editor.type = 'text';
+      editor.value = e.target.innerText;
+      break;
+
+    case 2:
+      editor = document.createElement('select');
+
+      editor.innerHTML = `
+      <option>Tokyo</option>
+      <option>Singapore</option>
+      <option>London</option>
+      <option>New York</option>
+      <option>Edinburg</option>
+      <option>San Francisco</option>
+    `;
+      editor.value = e.target.innerText;
+      editor.className = 'cell-input';
+      break;
+
+    case 3:
+      editor = document.createElement('input');
+      editor.type = 'number';
+      editor.value = e.target.innerText;
+      break;
+    case 4:
+
+      editor = document.createElement('input');
+      editor.value = convertToNum(e.target.innerText);
+      editor.type = 'number';
+      innerText = convertToNum(e.target.innerText);
+      break;
   }
+
+  editor.className = 'cell-input';
+  e.target.innerText = '';
+  editor.addEventListener('blur', checkValidation);
+  e.target.append(editor);
 });
 
-tbody.addEventListener('keydown', onKeyDown);
+tbody.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') {
+    return;
+  }
+
+  checkValidation(e);
+});
 
 function formCreator() {
   const form = document.createElement('form');
