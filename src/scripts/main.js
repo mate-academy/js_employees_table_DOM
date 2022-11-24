@@ -254,7 +254,7 @@ body.addEventListener('dblclick', (e) => {
     }
 
     if (isSalary && input.value.match(/[0-9]/)) {
-      changeCellContent('$' + input.value
+      changeCellContent('' + input.value
         .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','));
 
       return;
