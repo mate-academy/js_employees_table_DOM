@@ -4,7 +4,7 @@ document.body.style.alignItems = 'flex-start';
 
 const headList = document.querySelector('thead');
 const body = document.querySelector('tbody');
-const tr = body.querySelectorAll('tr');
+
 let sortOrder = '';
 let sortHeader = null;
 
@@ -51,6 +51,7 @@ headList.addEventListener('click', (e) => {
 });
 
 body.addEventListener('click', (e) => {
+  const tr = body.querySelectorAll('tr');
   const item = e.target.closest('tr');
 
   for (const i of tr) {
@@ -210,11 +211,13 @@ form.addEventListener('submit', (e) => {
 body.addEventListener('dblclick', (e) => {
   const target = e.target;
   const input = document.createElement('input');
+  const rowItem = e.target.closest('td');
   const initialValue = target.innerText;
 
   input.classList.add('cell-input');
-  input.type = 'text';
+  input.value = rowItem.innerText;
   input.name = 'cellInput';
+
   target.innerText = '';
   target.append(input);
   input.focus();
