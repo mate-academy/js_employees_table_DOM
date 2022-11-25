@@ -1,8 +1,10 @@
 'use strict';
 
 // write code here
+const table = document.querySelector('table');
+const isFormValid = false;
+
 document.addEventListener('DOMContentLoaded', function() {
-  const table = document.querySelector('table');
   const headers = table.querySelectorAll('th');
   const tableBody = table.querySelector('tbody');
   const rows = tableBody.querySelectorAll('tr');
@@ -36,10 +38,12 @@ document.addEventListener('DOMContentLoaded', function() {
       const a = transform(index, cellA);
       const b = transform(index, cellB);
 
-      switch (true) {
-        case a > b: return 1 * multiplier;
-        case a < b: return -1 * multiplier;
-        case a === b: return 0;
+      if (a > b) {
+        return 1 * multiplier;
+      } else if (a < b) {
+        return -1 * multiplier;
+      } else if (a === b) {
+        return 0;
       }
     });
 
@@ -65,14 +69,28 @@ const newForm = document.createElement('form');
 
 newForm.className = 'new-employee-form';
 
-newForm.innerHTML = `<label>Name:
+newForm.innerHTML
+= `
+<label>Name:
+  <input
+    name="name"
+    type="text"
+    data-qa="name"
+    required
+    id="name"
+    value="">
+</label>
+<label>Position:
 <input
-name="name"
-type="text" data-qa="name" required minlength="4" id="name" value=""></label>
-<label>Position: <input
 name="position"
-type="text" data-qa="position" required id="position" value=""></label>
-<label>Office: <select name="office" required data-qa="office" id="office">
+type="text"
+data-qa="position"
+required
+id="position"
+value="">
+</label>
+<label>Office:
+  <select name="office" required data-qa="office" id="office">
     <option value="Tokyo">Tokyo</option>
     <option value="Singapore">Singapore</option>
     <option value="London">London</option>
@@ -81,22 +99,33 @@ type="text" data-qa="position" required id="position" value=""></label>
     <option value="San Francisco">San Francisco</option>
   </select>
 </label>
-<label>Age: <input name="age"
-  type="number"
-  data-qa="age" required min="18" max="90" id="age" value=""></label>
-<label>Salary: <input name="salary"
-  type="number" data-qa="salary" required id="salary" value=""
-  ></label>
+<label>Age:
+  <input
+    name="age"
+    type="number"
+    data-qa="age"
+    required
+    id="age"
+    value="">
+  </label>
+<label>Salary:
+  <input
+    name="salary"
+    type="number"
+    data-qa="salary"
+    required
+    id="salary"
+    value="">
+  </label>
 <button>Save to table</button>`;
 
-const tableN = document.querySelector('table');
-const tody = document.querySelector('body');
+const body = document.querySelector('body');
 
-tody.append(newForm);
+body.append(newForm);
 
 let selectedTr;
 
-tableN.addEventListener('click', function() {
+table.addEventListener('click', function() {
   const tr = event.target.closest('tr');
 
   function highlight() {
@@ -111,16 +140,60 @@ tableN.addEventListener('click', function() {
     return;
   }
 
-  if (!tableN.contains(tr)) {
+  if (!table.contains(tr)) {
     return;
   }
 
   highlight(tr);
 });
 
+function validateForm() {
+  const notification = document.createElement('div');
+
+  notification.setAttribute('data-qa', 'notification');
+
+  notification.className = 'notification';
+
+  const nameF = document.querySelector('[data-qa="name"]');
+  const x = nameF.value;
+
+  if (x.length < 5) {
+    notification.textContent = 'Name must be more than 4 letters';
+
+    body.append(notification);
+
+    return false;
+  }
+
+  const ageF = document.querySelector('[data-qa="age"]');
+  const y = ageF.value;
+
+  if (y < 18) {
+    notification.textContent = 'Employee must be adult';
+
+    body.append(notification);
+
+    return false;
+  }
+
+  if (y > 90) {
+    notification.textContent = 'Employee must be younger';
+
+    body.append(notification);
+
+    return false;
+  }
+}
+
 document.querySelector('form').addEventListener('submit',
   function() {
     event.preventDefault();
+
+    validateForm();
+
+    if (!isFormValid) {
+      return;
+    }
 
     const tr = document.createElement('tr');
     const cols = ['name', 'position', 'office', 'age', 'salary'];
@@ -145,68 +218,9 @@ function formatSalary(salary) {
   return '$' + new Intl.NumberFormat('en-GB').format(salary);
 }
 
-const form = document.querySelector('.new-employee-form');
-
-const nameEmployee = document.getElementById('name');
-
-const age = document.getElementById('age');
-const notification = document.createElement('div');
-
-notification.setAttribute('data-qa', 'notification');
-
-nameEmployee.addEventListener('input', function() {
-  if (nameEmployee.validity.valid) {
-    notification.textContent = '';
-    notification.className = 'notification error';
-  } else {
-    showError();
-  }
-});
-
-age.addEventListener('input', function() {
-  if (age.validity.valid) {
-    notification.textContent = '';
-    notification.className = 'notification';
-  } else {
-    showError();
-    notification.className = 'notification error';
-  }
-});
-
-form.addEventListener('submit', function() {
-  if (!nameEmployee.validity.valid) {
-    showError();
-    event.preventDefault();
-    notification.className = 'notification error';
-  }
-
-  if (!age.validity.valid) {
-    showError();
-    event.preventDefault();
-    notification.className = 'notification error';
-  }
-});
-
-function showError() {
-  if (nameEmployee.validity.valueMissing) {
-    notification.textContent = 'you need enter a name';
-  } else if (nameEmployee.validity.tooShort) {
-    notification.textContent
-      = `Name to short`;
-  }
-
-  if (age.validity.rangeUnderflow) {
-    notification.textContent = 'you have to be adult';
-  } else if (age.validity.rangeOverflow) {
-    notification.textContent = 'you have to be younger';
-  }
-  document.querySelector('table').appendChild(notification);
-}
-
 let area = null;
-const view = document.querySelector('table');
 
-view.addEventListener('dblclick',
+table.addEventListener('dblclick',
   function() {
     event.preventDefault();
 
@@ -216,6 +230,8 @@ view.addEventListener('dblclick',
   });
 
 function editStart(td) {
+  const innitualValue = td.textContent;
+
   if (td.cellIndex === 2) {
     area = document.createElement('select');
 
@@ -238,14 +254,14 @@ function editStart(td) {
   };
 
   area.onblur = function() {
-    editEnd(td);
+    editEnd(td, area.value || innitualValue);
   };
 
   td.replaceWith(area);
   area.focus();
 }
 
-function editEnd(td) {
-  td.innerHTML = area.value;
+function editEnd(td, value) {
+  td.innerHTML = value;
   area.replaceWith(td);
 }
