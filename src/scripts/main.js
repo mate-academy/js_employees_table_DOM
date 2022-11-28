@@ -37,11 +37,11 @@ headList.addEventListener('click', (e) => {
     const cellB = b.cells[toSort].innerText;
 
     if (sortOrder === 'ASC') {
-      return (cellA.includes('$')) === false
+      return (cellA.includes('$'))
         ? cellA.localeCompare(cellB)
         : normalizeNumber(cellA) - normalizeNumber(cellB);
     } else {
-      return (cellA.includes('$')) === false
+      return (cellA.includes('$'))
         ? cellB.localeCompare(cellA)
         : normalizeNumber(cellB) - normalizeNumber(cellA);
     }
@@ -253,8 +253,9 @@ body.addEventListener('dblclick', (e) => {
       return;
     }
 
+    /* ???? */
     if (isSalary && input.value.match(/[0-9]/)) {
-      changeCellContent('' + input.value
+      changeCellContent(input.value
         .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','));
 
       return;
