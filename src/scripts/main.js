@@ -37,11 +37,11 @@ headList.addEventListener('click', (e) => {
     const cellB = b.cells[toSort].innerText;
 
     if (sortOrder === 'ASC') {
-      return (cellA.includes('$'))
+      return (cellA.includes('$')) === false
         ? cellA.localeCompare(cellB)
         : normalizeNumber(cellA) - normalizeNumber(cellB);
     } else {
-      return (cellA.includes('$'))
+      return (cellA.includes('$')) === false
         ? cellB.localeCompare(cellA)
         : normalizeNumber(cellB) - normalizeNumber(cellA);
     }
