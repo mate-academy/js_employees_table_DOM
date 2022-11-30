@@ -2,7 +2,6 @@
 
 // write code here
 const table = document.querySelector('table');
-const isFormValid = false;
 
 document.addEventListener('DOMContentLoaded', function() {
   const headers = table.querySelectorAll('th');
@@ -147,21 +146,37 @@ table.addEventListener('click', function() {
   highlight(tr);
 });
 
+function tableNotification(info) {
+  const push = document.createElement('div');
+  const title = document.createElement('h2');
+  const p = document.createElement('p');
+
+  push.className = 'notification success';
+  title.className = 'title';
+  title.innerText = 'Sucess!';
+  p.innerText = 'You have changed employer data';
+  push.setAttribute('data-qa', 'notification');
+
+  if (!info) {
+    push.className = 'notification error';
+    title.className = 'title';
+    title.innerText = 'Error!';
+    p.innerText = 'Please, enter valid data';
+  }
+
+  push.append(title, p);
+  body.append(push);
+
+  setTimeout(() => {
+    push.remove();
+  }, 2000);
+}
+
 function validateForm() {
-  const notification = document.createElement('div');
-
-  notification.setAttribute('data-qa', 'notification');
-
-  notification.className = 'notification';
-
   const nameF = document.querySelector('[data-qa="name"]');
   const x = nameF.value;
 
   if (x.length < 5) {
-    notification.textContent = 'Name must be more than 4 letters';
-
-    body.append(notification);
-
     return false;
   }
 
@@ -169,31 +184,20 @@ function validateForm() {
   const y = ageF.value;
 
   if (y < 18) {
-    notification.textContent = 'Employee must be adult';
-
-    body.append(notification);
-
     return false;
   }
 
   if (y > 90) {
-    notification.textContent = 'Employee must be younger';
-
-    body.append(notification);
-
     return false;
   }
+
+  return true;
 }
 
 document.querySelector('form').addEventListener('submit',
   function() {
     event.preventDefault();
-
-    validateForm();
-
-    if (!isFormValid) {
-      return;
-    }
+    tableNotification(validateForm());
 
     const tr = document.createElement('tr');
     const cols = ['name', 'position', 'office', 'age', 'salary'];
