@@ -170,7 +170,7 @@ table.addEventListener('click', (e) => {
   e.path[1].className = 'active';
 });
 
-const massageResultTrue = Promise.resolve('new employer create');
+const massageResultTrue = Promise.resolve('new employer created');
 const massageResultFalse = Promise.reject(Error('some wrong, write correct'));
 
 document.querySelector('button').addEventListener('click', e => {
@@ -198,7 +198,7 @@ document.querySelector('button').addEventListener('click', e => {
     controlForm = false;
   }
 
-  if (dataInput[3].value < 1000) {
+  if (dataInput[3].value < 1) {
     controlForm = false;
   }
 
