@@ -81,46 +81,41 @@ function changeData(input, currentValue) {
   }
 
   const data = JSON.parse(localStorage.getItem('users'));
+  const user = data.find(person => person.name === userName);
 
-  for (let i = 0; i < data.length; i++) {
-    if (data[i].name === userName) {
-      const user = data[i];
+  for (const key in user) {
+    if (user[key] === currentValue) {
+      let newValue = input.value;
 
-      for (const key in user) {
-        if (user[key] === currentValue) {
-          let newValue = input.value;
+      if (key === 'age') {
+        if (isNaN(newValue)) {
+          newValue = currentValue;
+        }
 
-          if (key === 'age') {
-            if (isNaN(newValue)) {
-              newValue = currentValue;
-            }
-
-            if (Number(newValue) < 18 || Number(newValue) > 90) {
-              newValue = currentValue;
-            }
-          }
-
-          if (key === 'salary') {
-            if (newValue[0] === '$') {
-              newValue = Number(newValue.slice(1).replace(/,/gi, ''));
-            }
-
-            if (isNaN(newValue)) {
-              newValue = currentValue;
-            } else {
-              newValue = prepareNumber(newValue);
-            }
-          }
-
-          user[key] = newValue;
-
-          localStorage.setItem('users', JSON.stringify(data));
-
-          ceil.textContent = newValue;
-          delete ceil.firstElementChild;
-          editTable = false;
+        if (Number(newValue) < 18 || Number(newValue) > 90) {
+          newValue = currentValue;
         }
       }
+
+      if (key === 'salary') {
+        if (newValue[0] === '$') {
+          newValue = Number(newValue.slice(1).replace(/,/gi, ''));
+        }
+
+        if (isNaN(newValue)) {
+          newValue = currentValue;
+        } else {
+          newValue = prepareNumber(newValue);
+        }
+      }
+
+      user[key] = newValue;
+
+      localStorage.setItem('users', JSON.stringify(data));
+
+      ceil.textContent = newValue;
+      delete ceil.firstElementChild;
+      editTable = false;
     }
   }
 }
