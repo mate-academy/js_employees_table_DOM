@@ -125,7 +125,7 @@ formNewEmployee.innerHTML = `
     <label data-qa="salary">Salary:
         <input name="salary" type="number">
     </label>
-    <button >Save to table</button>
+    <button type ="submit" >Save to table</button>
 `;
 
 document.body.append(formNewEmployee);
@@ -185,6 +185,18 @@ function creareNewItemOfTable({ name: fullname, position, office,
     `;
 
   tableBody.append(itemOfTable);
+  clearForm();
+}
+
+function clearForm() {
+  const formFilds = formNewEmployee.querySelectorAll('input');
+  const formSelector = formNewEmployee.querySelector('select');
+
+  for (const item of formFilds) {
+    item.value = '';
+  }
+
+  formSelector.options[0].selected = true;
 }
 
 function convertSalaryInRightFormat(salary) {
