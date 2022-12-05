@@ -4,8 +4,8 @@ const body = document.querySelector('body');
 const tableHeaders = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
 
-let isAsc = false;
-let defaultIndex = 0;
+let isAsc = true;
+let defaultIndex = -1;
 
 tableHeaders.addEventListener('click', (e) => {
   const tableRows = tableBody.querySelectorAll('tr');
@@ -14,7 +14,7 @@ tableHeaders.addEventListener('click', (e) => {
 });
 
 const sortData = (arr, index) => {
-  isAsc = index !== defaultIndex ? isAsc : !isAsc;
+  isAsc = index !== defaultIndex || !isAsc;
   defaultIndex = index;
 
   arr.sort((a, b) => {
@@ -106,11 +106,28 @@ const numberFormatCurrency = {
 button.addEventListener('click', e => {
   e.preventDefault();
 
-  if (textFieldValidation(form.children[0].firstElementChild.value, 4)
-    && textFieldValidation(form.children[1].firstElementChild.value, 1)
-    && textFieldValidation(form.children[4].firstElementChild.value, 1)
-    && ageValidation(form.children[3].firstElementChild.value, 18, 90)
-  ) {
+  const nameValidation
+    = textFieldValidation(form.children[0].firstElementChild.value, 4);
+  const positionValidation
+    = textFieldValidation(form.children[1].firstElementChild.value, 1);
+  const ageCheck
+    = ageValidation(form.children[3].firstElementChild.value, 18, 90);
+  const salaryValidation
+    = textFieldValidation(form.children[4].firstElementChild.value, 1);
+
+  if (!nameValidation) {
+    pushNotification(10, 10, 'Name error!',
+      'Name field should have at least 4 characters');
+  } else if (!positionValidation) {
+    pushNotification(10, 10, 'Position error!',
+      'Position field should not be empty');
+  } else if (!ageCheck) {
+    pushNotification(10, 10, 'Age error!',
+      'Age should be between 18 and 90');
+  } else if (!salaryValidation) {
+    pushNotification(10, 10, 'Salary error!',
+      'Salary field should not be empty');
+  } else {
     const newRow = document.createElement('tr');
 
     for (let i = 0; i < form.children.length - 1; i++) {
@@ -129,13 +146,8 @@ button.addEventListener('click', e => {
     tableBody.prepend(newRow);
     form.reset();
 
-    pushNotification(10, 10, 'Title of Success message',
-      'Message example.\n '
-    + 'Notification should contain title and description.', 'success');
-  } else {
-    pushNotification(10, 10, 'Title of Error message',
-      'Message example.\n '
-  + 'Notification should contain title and description.', 'error');
+    pushNotification(10, 10, 'New record was added',
+      'Success. All data was successfully added to DB.', 'success');
   }
 });
 
@@ -168,6 +180,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 };
 
 tableBody.addEventListener('dblclick', e => {
+  const cellWidth = getComputedStyle(e.target).width;
   const currentCell = e.target;
 
   if (currentCell.nodeName === 'TD') {
@@ -180,6 +193,8 @@ tableBody.addEventListener('dblclick', e => {
 
     currentCell.append(input);
     input.focus();
+    input.setAttribute('width', 20);
+    input.style.width = cellWidth;
 
     input.addEventListener('blur', () => {
       const tempText = input.value || innerTextNode.textContent;
