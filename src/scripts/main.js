@@ -3,6 +3,9 @@
 const table = document.querySelector('table');
 const headers = table.querySelector('thead');
 const tbody = table.querySelector('tbody');
+const minEmployeeAge = 18;
+const maxEmployeeAge = 90;
+const minEmployeeSalary = 0;
 let colIndex = -1;
 
 headers.addEventListener('click', (eventOnClick) => {
@@ -47,7 +50,7 @@ function toNormalNumber(string) {
     ? res = string.slice(1).split(',').join('')
     : res = string;
 
-  return +res;
+  return Number(res);
 }
 
 tbody.addEventListener('click', (eventOnClick) => {
@@ -71,51 +74,67 @@ function singleSelectRow(target, nameClass, tableBody) {
 document.querySelector('table').insertAdjacentHTML(
   'afterend', `
   <form class="new-employee-form">
-  <label>Name:
-    <input
-      name="name"
-      type="text"
-      data-qa="name"
-      value = ''
-    >
-  </label>
-  <label>Position:
-    <input
-      name="position"
-      type="text"
-      data-qa="position"
-      value = ''
-    >
-  </label>
-  <label>Office:
-    <select name="office" data-qa="office">
-      <option>Tokyo</option>
-      <option>Singapore</option>
-      <option>London</option>
-      <option>New York</option>
-      <option>Edinburgh</option>
-      <option>San Francisco</option>
-    </select>
-  </label>
-  <label>Age:
-    <input
-      name="age"
-      type="number"
-      data-qa="age"
-      value = ''
-    >
-  </label>
-  <label>Salary:
-    <input
-      name="salary"
-      type="number"
-      data-qa="salary"
-      value = ''
-    >
-  </label>
-  <button type="submit">Save to table</button>
-</form>`
-);
+
+    <label>
+      Name:
+      <input
+        name="name"
+        type="text"
+        data-qa="name"
+        value = ''
+      >
+    </label>
+
+    <label>
+      Position:
+      <input
+        name="position"
+        type="text"
+        data-qa="position"
+        value = ""
+      >
+    </label>
+
+    <label>
+      Office:
+      <select name="office" data-qa="office">
+        <option>Tokyo</option>
+        <option>Singapore</option>
+        <option>London</option>
+        <option>New York</option>
+        <option>Edinburgh</option>
+        <option>San Francisco</option>
+      </select>
+    </label>
+
+    <label>
+      Age:
+      <input
+        name="age"
+        type="number"
+        data-qa="age"
+        value = ""
+        min = "${minEmployeeAge}"
+        max = "${maxEmployeeAge}"
+      >
+    </label>
+
+    <label>
+      Salary:
+      <input
+        name="salary"
+        type="number"
+        data-qa="salary"
+        value = ""
+        min = "${minEmployeeSalary}"
+      >
+    </label>
+
+    <button type="submit">
+      Save to table
+    </button>
+  </form>
+`);
 
 const form = document.querySelector('.new-employee-form');
 
@@ -155,9 +174,16 @@ function validForm(key, value) {
     return false;
   }
 
-  if (key === 'age' && (+value < 18 || +value > 90)) {
+  if (key === 'age' && (+value < minEmployeeAge || +value > maxEmployeeAge)) {
     pushNotification('Error', 'error',
       'Age must be at least 18 and not more than 90');
+
+    return false;
+  }
+
+  if (key === 'salary' && (+value < minEmployeeSalary)) {
+    pushNotification('Error', 'error',
+      'Salary cannot be negative');
 
     return false;
   }
