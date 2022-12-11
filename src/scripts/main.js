@@ -183,17 +183,11 @@ const inputsAll = form.querySelectorAll('input');
 button.addEventListener('click', e => {
   e.preventDefault();
 
-  let launchCount = 0;
-
   for (let i = 0; i < inputsAll.length; i++) {
     if (!inputsAll[i].value) {
-      launchCount++;
-    }
-
-    if (launchCount > 0) {
       pushNotification(
         'Erorr',
-        'All fields should be signed',
+        'All fields should be signed with correct values',
         'error'
       );
 
@@ -241,4 +235,39 @@ button.addEventListener('click', e => {
     'Employee has been added',
     'success'
   );
+});
+
+// cell edititing on double click
+tbody.addEventListener('dblclick', e => {
+  if (e.target.tagName !== 'TD') {
+    return;
+  }
+
+  const inputs = tbody.querySelectorAll('.cell-input');
+
+  if (inputs.length >= 1) {
+    return;
+  }
+
+  const previousText = e.target.textContent;
+  const newInput = document.createElement('input');
+
+  newInput.classList.add('cell-input');
+  newInput.value = previousText;
+
+  e.target.firstChild.replaceWith(newInput);
+
+  // eslint-disable-next-line no-shadow
+  newInput.addEventListener('keydown', e => {
+    if (e.code === 'Enter') {
+      switch (newInput.value) {
+        case '':
+          newInput.replaceWith(`${previousText}`);
+          break;
+
+        default:
+          newInput.replaceWith(`${newInput.value}`);
+      }
+    }
+  });
 });
