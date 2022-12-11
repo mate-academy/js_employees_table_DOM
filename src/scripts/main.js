@@ -100,7 +100,10 @@ button.appendChild(document.createTextNode('Save to table'));
 form.append(button);
 
 const numberFormatCurrency = {
-  style: 'currency', currency: 'USD', maximumFractionDigits: 0,
+  style: 'currency',
+  currency: 'USD',
+  currencyDisplay: 'narrowSymbol',
+  maximumFractionDigits: 0,
 };
 
 button.addEventListener('click', e => {
