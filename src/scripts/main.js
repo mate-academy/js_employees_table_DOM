@@ -40,10 +40,10 @@ const sortData = (arr, index) => {
 const getNumber = (data) => data.replace(/\D/g, '');
 
 tableBody.addEventListener('click', e => {
-  Array.from(e.target.parentElement.parentElement.children).forEach(el => {
+  Array.from(tableBody.children).forEach(el => {
     el.classList.remove('active');
   });
-  e.target.parentElement.classList.add('active');
+  e.target.closest('tr').classList.add('active');
 });
 
 const form = document.createElement('form');
@@ -99,13 +99,6 @@ const button = document.createElement('button');
 button.appendChild(document.createTextNode('Save to table'));
 form.append(button);
 
-const numberFormatCurrency = {
-  style: 'currency',
-  currency: 'USD',
-  currencyDisplay: 'narrowSymbol',
-  maximumFractionDigits: 0,
-};
-
 button.addEventListener('click', e => {
   e.preventDefault();
 
@@ -140,8 +133,8 @@ button.addEventListener('click', e => {
       if (i !== 4) {
         newData.innerText = elementValue;
       } else {
-        newData.innerText = new Intl.NumberFormat('us-US', numberFormatCurrency)
-          .format(elementValue);
+        newData.innerText
+          = '$' + new Intl.NumberFormat('us-US').format(elementValue);
       }
       newRow.append(newData);
     }
