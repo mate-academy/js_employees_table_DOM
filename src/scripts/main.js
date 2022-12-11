@@ -5,31 +5,31 @@ const form = document.createElement('form');
 form.className = 'new-employee-form';
 
 form.insertAdjacentHTML('beforeend', `
-  <label>
-    Name:
-    <input name="name" type="text" data-qa="name" minlength="4">
-  </label>
-  <label>
-  Position:
-  <input name="position" type="text" data-qa="position">
-  </label>
-  <label for="office">
-    Office:
-    <select id="office" name="office" data-qa="office">
-      <option value="Tokyo">Tokio</option>
-      <option value="Singapore">Singapore</option>
-      <option value="London">London</option>
-      <option value="New York">New York</option>
-      <option value="Edinburgh">Edinburgh</option>
-      <option value="San Francisco">San Francisco</option>
-    </select>
-  </label>
-  <label>
-  Age:
-  <input name="age" type="number" data-qa="age">
-  </label>
-  <label>Salary: <input name="salary" type="number" data-qa="salary"></label>
-  <button type="submit">Save to table</button>
+<label>
+Name:
+<input name="name" type="text" data-qa="name" minlength="4">
+</label>
+<label>
+Position:
+<input name="position" type="text" data-qa="position">
+</label>
+<label for="office">
+Office:
+<select id="office" name="office" data-qa="office">
+<option value="Tokyo">Tokio</option>
+<option value="Singapore">Singapore</option>
+<option value="London">London</option>
+<option value="New York">New York</option>
+<option value="Edinburgh">Edinburgh</option>
+<option value="San Francisco">San Francisco</option>
+</select>
+</label>
+<label>
+Age:
+<input name="age" type="number" data-qa="age">
+</label>
+<label>Salary: <input name="salary" type="number" data-qa="salary"></label>
+<button type="submit">Save to table</button>
 `);
 
 document.body.append(form);
@@ -42,8 +42,8 @@ const pushNotification = (title, description, type) => {
   notifications.setAttribute('data-qa', 'notification');
 
   notifications.insertAdjacentHTML('afterbegin', `
-    <h2 class='title'>${title}</h2>
-    <p>${description}</p>
+  <h2>${title}</h2>
+  <p>${description}</p>
   `);
 
   element.append(notifications);
@@ -53,6 +53,9 @@ const pushNotification = (title, description, type) => {
   }, 1999);
 };
 
+const headNames = document.querySelector('thead');
+let [...positionList] = document.querySelectorAll('tr');
+let newPosition = positionList.slice(1, -1);
 const button = document.querySelector('button');
 
 button.addEventListener('click', (e) => {
@@ -75,14 +78,14 @@ button.addEventListener('click', (e) => {
 
   if (names.length < 4) {
     pushNotification('Warning message',
-      '"Name" should have minimum 4 symbols.', 'warning');
+      '"Name" should have minimum 4 symbols.', 'error');
 
     return;
   }
 
   if (age < 18 || age > 90) {
     pushNotification('Warning message',
-      '"Age" is less than 18 or more than 90.', 'warning');
+      '"Age" is less than 18 or more than 90.', 'error');
 
     return;
   }
@@ -105,25 +108,10 @@ button.addEventListener('click', (e) => {
     'Сongratulations. You have successfully added an employee.', 'success');
 
   form.reset();
+
+  [...positionList] = document.querySelectorAll('tr');
+  newPosition = positionList.slice(1, -1);
 });
-
-const headNames = document.querySelector('thead');
-const [...positionList] = document.querySelectorAll('tr');
-const newPosition = positionList.slice(1, -1);
-const people = [];
-
-for (let i = 0; i < newPosition.length; i++) {
-  const [...item] = newPosition[i].querySelectorAll('td');
-  const human = {};
-
-  human.name = item[0].textContent;
-  human.position = item[1].textContent;
-  human.office = item[2].textContent;
-  human.age = +item[3].textContent;
-  human.salary = item[4].textContent;
-
-  people.push(human);
-}
 
 const clickBoolean = {
   name: true,
@@ -133,7 +121,7 @@ const clickBoolean = {
   salary: true,
 };
 
-function sortNames() {
+function sortNames(people) {
   if (clickBoolean.name) {
     people.sort((a, b) => a.name.localeCompare(b.name));
   } else {
@@ -141,7 +129,7 @@ function sortNames() {
   }
 }
 
-function sortPosition() {
+function sortPosition(people) {
   if (clickBoolean.position) {
     people.sort((a, b) => a.position.localeCompare(b.position));
   } else {
@@ -149,7 +137,7 @@ function sortPosition() {
   }
 }
 
-function sortOffice() {
+function sortOffice(people) {
   if (clickBoolean.office) {
     people.sort((a, b) => a.office.localeCompare(b.office));
   } else {
@@ -157,7 +145,7 @@ function sortOffice() {
   }
 }
 
-function sortAge() {
+function sortAge(people) {
   if (clickBoolean.age) {
     people.sort((a, b) => a.age - b.age);
   } else {
@@ -165,7 +153,7 @@ function sortAge() {
   }
 }
 
-function sortSalary() {
+function sortSalary(people) {
   if (clickBoolean.salary) {
     people.sort((a, b) => {
       const aSalary = a.salary.slice(1).split(',').join('');
@@ -183,28 +171,48 @@ function sortSalary() {
   }
 }
 
+function employeesList(list) {
+  const array = [];
+
+  for (let i = 0; i < list.length; i++) {
+    const [...item] = list[i].querySelectorAll('td');
+    const human = {};
+
+    human.name = item[0].textContent;
+    human.position = item[1].textContent;
+    human.office = item[2].textContent;
+    human.age = +item[3].textContent;
+    human.salary = item[4].textContent;
+
+    array.push(human);
+  }
+
+  return array;
+}
+
 headNames.addEventListener('click', (e) => {
   const headName = e.target.textContent.toLowerCase();
+  const people = employeesList(newPosition);
 
   switch (headName) {
     case 'name':
-      sortNames();
+      sortNames(people);
       break;
 
     case 'position':
-      sortPosition();
+      sortPosition(people);
       break;
 
     case 'office':
-      sortOffice();
+      sortOffice(people);
       break;
 
     case 'age':
-      sortAge();
+      sortAge(people);
       break;
 
     case 'salary':
-      sortSalary();
+      sortSalary(people);
       break;
   }
 
@@ -227,13 +235,18 @@ headNames.addEventListener('click', (e) => {
   }
 });
 
-newPosition.forEach(element => {
-  element.addEventListener('click', () => {
-    newPosition.forEach(item => {
-      if (item.classList.contains('active')) {
-        item.classList.remove('active');
-      }
-    });
-    element.classList.add('active');
+const tbody = document.querySelector('tbody');
+
+tbody.addEventListener('click', (e) => {
+  const tag = e.target.parentElement.tagName.toLowerCase();
+
+  newPosition.forEach(element => {
+    if (element.classList.contains('active')) {
+      element.classList.remove('active');
+    }
   });
+
+  if (tag === 'tr') {
+    e.target.parentElement.className = 'active';
+  }
 });
