@@ -5,31 +5,78 @@ const form = document.createElement('form');
 form.className = 'new-employee-form';
 
 form.insertAdjacentHTML('beforeend', `
-<label>
-Name:
-<input name="name" type="text" data-qa="name" minlength="4">
-</label>
-<label>
-Position:
-<input name="position" type="text" data-qa="position">
-</label>
-<label for="office">
-Office:
-<select id="office" name="office" data-qa="office">
-<option value="Tokyo">Tokio</option>
-<option value="Singapore">Singapore</option>
-<option value="London">London</option>
-<option value="New York">New York</option>
-<option value="Edinburgh">Edinburgh</option>
-<option value="San Francisco">San Francisco</option>
-</select>
-</label>
-<label>
-Age:
-<input name="age" type="number" data-qa="age">
-</label>
-<label>Salary: <input name="salary" type="number" data-qa="salary"></label>
-<button type="submit">Save to table</button>
+  <label>
+    Name:
+
+    <input
+      name="name"
+      type="text"
+      data-qa="name"
+    >
+  </label>
+
+  <label>
+    Position:
+
+    <input
+      name="position"
+      type="text"
+      data-qa="position"
+    >
+  </label>
+
+  <label for="office">
+    Office:
+
+    <select
+      id="office"
+      name="office"
+      data-qa="office"
+    >
+      <option value="Tokyo">
+        Tokio
+      </option>
+      <option value="Singapore">
+        Singapore
+      </option>
+      <option value="London">
+        London
+      </option>
+      <option value="New York">
+        New York
+      </option>
+      <option value="Edinburgh">
+        Edinburgh
+      </option>
+      <option value="San Francisco">
+        San Francisco
+      </option>
+    </select>
+  </label>
+
+  <label>
+    Age:
+
+    <input
+      name="age"
+      type="number"
+      data-qa="age"
+    >
+  </label>
+
+  <label>
+    Salary:
+
+    <input
+      name="salary"
+      type="number"
+      data-qa="salary"
+    >
+  </label>
+
+  <button type="submit">
+    Save to table
+  </button>
 `);
 
 document.body.append(form);
@@ -42,8 +89,8 @@ const pushNotification = (title, description, type) => {
   notifications.setAttribute('data-qa', 'notification');
 
   notifications.insertAdjacentHTML('afterbegin', `
-  <h2>${title}</h2>
-  <p>${description}</p>
+    <h2>${title}</h2>
+    <p>${description}</p>
   `);
 
   element.append(notifications);
