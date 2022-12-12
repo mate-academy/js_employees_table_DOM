@@ -1,6 +1,7 @@
 'use strict';
 
 const thead = document.querySelector('thead');
+const th = thead.querySelectorAll('th');
 const tbody = document.querySelector('tbody');
 const tr = tbody.rows;
 
@@ -62,6 +63,10 @@ thead.addEventListener('click', e => {
         };
     }
 
+    for (let i = 0; i < th.length; i++) {
+      th[i].removeAttribute('data-sorted');
+    }
+
     e.target.setAttribute('data-sorted', 'DESC');
   } else {
     // sort in ASC order
@@ -87,6 +92,10 @@ thead.addEventListener('click', e => {
           return [...coll].sort((a, b) =>
             a.children[i].textContent < b.children[i].textContent ? -1 : 1);
         };
+    }
+
+    for (let i = 0; i < th.length; i++) {
+      th[i].removeAttribute('data-sorted');
     }
 
     e.target.setAttribute('data-sorted', 'ASC');
@@ -256,6 +265,18 @@ tbody.addEventListener('dblclick', e => {
   newInput.value = previousText;
 
   e.target.firstChild.replaceWith(newInput);
+
+  // eslint-disable-next-line no-shadow
+  newInput.addEventListener('blur', e => {
+    switch (newInput.value) {
+      case '':
+        newInput.replaceWith(`${previousText}`);
+        break;
+
+      default:
+        newInput.replaceWith(`${newInput.value}`);
+    }
+  }, true);
 
   // eslint-disable-next-line no-shadow
   newInput.addEventListener('keydown', e => {
