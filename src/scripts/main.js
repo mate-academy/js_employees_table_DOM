@@ -262,33 +262,93 @@ tbody.addEventListener('dblclick', e => {
   const newInput = document.createElement('input');
 
   newInput.classList.add('cell-input');
-  newInput.value = previousText;
 
   e.target.firstChild.replaceWith(newInput);
 
+  const checkInput = function() {
+    // eslint-disable-next-line max-len
+    if (e.target.cellIndex === 0 || e.target.cellIndex === 1 || e.target.cellIndex === 2) {
+      if (newInput.value.length < 4) {
+        newInput.replaceWith(previousText);
+
+        pushNotification(
+          'Erorr',
+          'Should be longer than 4 letters',
+          'error'
+        );
+
+        return;
+      }
+
+      if (!isNaN(newInput.value)) {
+        newInput.replaceWith(previousText);
+
+        pushNotification(
+          'Erorr',
+          `Shouldn't be number`,
+          'error'
+        );
+
+        return;
+      }
+    }
+
+    if (e.target.cellIndex === 3) {
+      if (isNaN(newInput.value)) {
+        newInput.replaceWith(previousText);
+
+        pushNotification(
+          'Erorr',
+          'Should be number',
+          'error'
+        );
+
+        return;
+      }
+
+      if (newInput.value < 18 || newInput.value > 90) {
+        newInput.replaceWith(previousText);
+
+        pushNotification(
+          'Erorr',
+          'Age should be more than 18 and less than 90',
+          'error'
+        );
+
+        return;
+      }
+    }
+
+    if (e.target.cellIndex === 4) {
+      if (isNaN(newInput.value)) {
+        newInput.replaceWith(previousText);
+
+        pushNotification(
+          'Erorr',
+          'Should be number',
+          'error'
+        );
+
+        return;
+      }
+
+      newInput.replaceWith(
+        `$${Intl.NumberFormat('en-US').format(newInput.value)}`
+      );
+    }
+
+    newInput.replaceWith(newInput.value);
+  };
+
   // eslint-disable-next-line no-shadow
   newInput.addEventListener('blur', e => {
-    switch (newInput.value) {
-      case '':
-        newInput.replaceWith(`${previousText}`);
-        break;
-
-      default:
-        newInput.replaceWith(`${newInput.value}`);
-    }
+    checkInput();
   }, true);
 
   // eslint-disable-next-line no-shadow
   newInput.addEventListener('keydown', e => {
     if (e.code === 'Enter') {
-      switch (newInput.value) {
-        case '':
-          newInput.replaceWith(`${previousText}`);
-          break;
-
-        default:
-          newInput.replaceWith(`${newInput.value}`);
-      }
+      checkInput();
     }
   });
 });
