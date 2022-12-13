@@ -140,7 +140,7 @@ const validation = (input) => {
 
   switch (input.name) {
     case 'name':
-      return /^([ \u00c0-\u01ffa-zA-Z-])+$/.test(val) && val.length > 4;
+      return /^([ \u00c0-\u01ffa-zA-Z-])+$/.test(val) && val.length > 3;
     case 'position':
       return /^([ \u00c0-\u01ffa-zA-Z-])+$/.test(val);
     case 'age': return parseInt(val) >= 18 && parseInt(val) <= 90;
@@ -326,7 +326,7 @@ tbody.addEventListener('dblclick', (e) => {
 
     switch (index) {
       case 0:
-        return /^([ \u00c0-\u01ffa-zA-Z-])+$/.test(val) && val.length > 4;
+        return /^([ \u00c0-\u01ffa-zA-Z-])+$/.test(val) && val.length > 3;
       case 1:
         return /^([ \u00c0-\u01ffa-zA-Z-])+$/.test(val);
       case 3: return parseInt(val) >= 18 && parseInt(val) <= 90;
