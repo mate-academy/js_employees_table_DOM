@@ -3,7 +3,7 @@ body {
   background-attachment: fixed;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 100vh;
   padding: 100px;
   font-family: Roboto, sans-serif;
@@ -13,6 +13,8 @@ body {
 
 table {
   border-collapse: collapse;
+  align-self: flex-start;
+
   min-width: 600px;
   max-width: 1000px;
 }
@@ -150,13 +152,19 @@ tr.active {
   outline: none;
 }
 
-.notification {
-  position: absolute;
-  width: 300px;
-  min-height: 100px;
-  padding: 0 16px;
+.notificationContainer {
+  display: grid;
+  gap: 10px;
+  align-content: flex-start;
   box-sizing: border-box;
+  width: 300px;
+}
 
+.notification {
+  margin-left: 24px;
+  width: 270px;
+  height: 100px;
+  padding: 10px 16px;
   border-radius: 10px;
   background: rgba(132, 132, 132, 0.3);
 
@@ -175,6 +183,7 @@ tr.active {
 
   &.success {
     background: rgba(10, 189, 0, 0.3);
+
   }
 
   &.error {
