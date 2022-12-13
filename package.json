@@ -9,6 +9,7 @@
     "lint": "mate-scripts lint",
     "test:only": "mate-scripts test",
     "build": "mate-scripts build",
+    "deploy": "mate-scripts deploy",
     "test": "npm run lint && npm run test:only"
   },
   "keywords": [],

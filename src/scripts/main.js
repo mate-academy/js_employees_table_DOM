@@ -30,10 +30,13 @@ function sortRows(arr, index) {
   ascending = true;
 
   return arr.sort((a, b) => {
-    if (isNaN(num(a.cells[index].innerText))) {
-      return a.cells[index].innerText.localeCompare(b.cells[index].innerText);
+    const first = a.cells[index].innerText;
+    const second = b.cells[index].innerText;
+
+    if (isNaN(num(first))) {
+      return first.localeCompare(second);
     } else {
-      return num(a.cells[index].innerText) - num(b.cells[index].innerText);
+      return num(first) - num(second);
     }
   });
 }
@@ -42,10 +45,13 @@ function reSortRows(arr, index) {
   ascending = false;
 
   return arr.sort((a, b) => {
-    if (isNaN(num(a.cells[index].innerText))) {
-      return b.cells[index].innerText.localeCompare(a.cells[index].innerText);
+    const first = a.cells[index].innerText;
+    const second = b.cells[index].innerText;
+
+    if (isNaN(num(first))) {
+      return second.localeCompare(first);
     } else {
-      return num(b.cells[index].innerText) - num(a.cells[index].innerText);
+      return num(second) - num(first);
     }
   });
 }
@@ -79,14 +85,14 @@ container.insertAdjacentHTML('afterbegin',
         <option disabled selected value="" hidden></option>
         <option value="Tokyo">Tokyo</option>
         <option value="Singapore">Singapore</option>
-        <option value="london">London</option>
+        <option value="London">London</option>
         <option value="New-York">New York</option>
         <option value="Edinburgh">Edinburgh</option>
         <option value="San Francisco">San Francisco</option>
       </select>
     </label>
     <label>Age:
-      <input name="age"  data-qa="age" type="number" required>
+      <input name="age" data-qa="age" type="number" required>
     </label>
     <label>Salary:
       <input name="salary" data-qa="salary" type="number" required>
@@ -103,7 +109,6 @@ buttonSubmit.addEventListener('click', (ev) => {
   ev.preventDefault();
 
   const newRow = document.createElement('tr');
-  const salary = document.querySelector('[data-qa*=salary]');
 
   if (!validateForm(fieldsForm)) {
     return;
@@ -115,7 +120,7 @@ buttonSubmit.addEventListener('click', (ev) => {
 
     table.append(newRow);
 
-    if (inputValue !== salary.value) {
+    if (field.name !== 'salary') {
       newCell.append(`${inputValue[0]
         .toUpperCase()}${inputValue.slice(1, inputValue.length)}`);
     } else {
