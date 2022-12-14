@@ -5,6 +5,15 @@ const th = thead.querySelectorAll('th');
 const tbody = document.querySelector('tbody');
 const tr = tbody.rows;
 
+const officeOptions = `
+  <option value="Tokyo">Tokyo</option>
+  <option value="Singapore">Singapore</option>
+  <option value="London">London</option>
+  <option value="New York">New York</option>
+  <option value="Edinburgh">Edinburgh</option>
+  <option value="San Francisco">San Francisco</option>
+`;
+
 const pushNotification = (title, description, type) => {
   const notification = document.querySelector('.notification');
 
@@ -149,12 +158,7 @@ form.insertAdjacentHTML('afterbegin', `
       name="office"
       required
     >
-      <option value="Tokyo">Tokyo</option>
-      <option value="Singapore">Singapore</option>
-      <option value="London">London</option>
-      <option value="New York">New York</option>
-      <option value="Edinburgh">Edinburgh</option>
-      <option value="San Francisco">San Francisco</option>
+      ${officeOptions}
     </select>
   </label>
 
@@ -259,15 +263,21 @@ tbody.addEventListener('dblclick', e => {
   }
 
   const previousText = e.target.textContent;
-  const newInput = document.createElement('input');
+  const newInput = e.target.cellIndex === 2
+    ? document.createElement('select')
+    : document.createElement('input');
 
+  if (newInput.tagName === 'SELECT') {
+    newInput.insertAdjacentHTML('afterbegin', officeOptions);
+  }
+
+  newInput.value = previousText;
   newInput.classList.add('cell-input');
 
   e.target.firstChild.replaceWith(newInput);
 
   const checkInput = function() {
-    // eslint-disable-next-line max-len
-    if (e.target.cellIndex === 0 || e.target.cellIndex === 1 || e.target.cellIndex === 2) {
+    if (e.target.cellIndex === 0 || e.target.cellIndex === 1) {
       if (newInput.value.length < 4) {
         newInput.replaceWith(previousText);
 
