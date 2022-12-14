@@ -2,24 +2,25 @@
 
 const tableHeader = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
-const rows = [...tableBody.children];
 let reverse = false;
 let targetType = '';
 
+let rows = [...tableBody.children];
+
 const sortTableBody = (mouseEvent) => {
+  rows = [...tableBody.children];
+
   const targetCell = mouseEvent.target.closest('th').textContent;
   const header = [...document.querySelectorAll('th')];
   const num = header.findIndex(
     item => item.textContent === mouseEvent.target.textContent
   );
 
-  if (targetType === targetCell) {
-    reverse = !reverse;
-  } else {
-    reverse = false;
-  }
+  reverse = targetType === targetCell
+    ? !reverse
+    : false;
 
-  const newTableBody = [...rows].sort(
+  const newTableBody = rows.sort(
     (a, b) => {
       const x = a.children[num].textContent;
       const y = b.children[num].textContent;
@@ -165,13 +166,13 @@ const addNewPerson = (formEvent) => {
 
   tableBody.insertAdjacentHTML('beforeend', `
   <tr>
-    <th>${namePerson}</th>
-    <th>${position}</th>
-    <th>${office}</th>
-    <th>${age}</th>
-    <th>$${(salary).toLocaleString('en')}</th>
+    <td>${namePerson}</td>
+    <td>${position}</td>
+    <td>${office}</td>
+    <td>${age}</td>
+    <td>$${(salary).toLocaleString('en')}</td>
   </tr>
-  `);
+`);
 
   form.reset();
 
@@ -227,20 +228,52 @@ const addInput = (mouseEvent) => {
 
   const targetItem = mouseEvent.target.closest('td');
   const prevText = targetItem.textContent;
+  const isSalaryTarget = prevText.includes('$');
+
   const input = document.createElement('input');
 
   input.className = 'cell-input';
-  targetItem.innerHTML = '';
-  input.value = prevText;
+
+  input.value = prevText.replaceAll(/\W/g, '');
+
+  input.type = isNaN(+prevText.replaceAll(/\W/g, ''))
+    ? 'text'
+    : 'number';
+
+  targetItem.textContent = '';
 
   targetItem.append(input);
 
   const editValue = (keyboardEvent) => {
-    if (keyboardEvent.code === 'Enter'
-    || keyboardEvent.code === 'NumpadEnter') {
-      targetItem.innerHTML = `${input.value}`;
+    if (keyboardEvent.key === 'Enter') {
+      const inputValue = document.querySelector('.cell-input').value;
+
+      let text = `${inputValue}`;
+
+      if (input.type === 'number') {
+        text = `$${(+inputValue).toLocaleString('en')}`;
+
+        if (!isSalaryTarget) {
+          text = `${inputValue}`;
+
+          if (+inputValue < 18 || +inputValue > 90) {
+            pushNotification(
+              'Sorry (-_-)',
+              'age must be more than 18 and less than 90',
+              'error',
+            );
+
+            return;
+          }
+        }
+      }
+
+      if (text === '') {
+        text = prevText;
+      }
 
       input.remove();
+      targetItem.textContent = text;
       count = false;
     }
   };
