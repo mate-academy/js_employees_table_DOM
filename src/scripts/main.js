@@ -4,6 +4,28 @@
 const tableHeader = document.querySelector('thead');
 const table = document.querySelector('tbody');
 
+const displayStatus = function(posTop, posRight, title, description, type) {
+  const body = document.body;
+  const block = document.createElement('div');
+  const blockTitle = document.createElement('h2');
+  const message = document.createElement('p');
+
+  block.classList.add('notification', type);
+  block.dataset.qa = 'notification';
+  blockTitle.className = 'title';
+  blockTitle.textContent = title;
+  message.innerText = description;
+
+  block.style.width = 'max-content';
+  block.style.top = `${posTop}px`;
+  block.style.right = `${posRight}px`;
+
+  block.append(blockTitle, message);
+  body.append(block);
+
+  setTimeout(() => block.remove(), 4000);
+};
+
 function addSortingListener() {
   const addTable = (array, element) => {
     if (!element.sortedASC) {
@@ -133,28 +155,6 @@ function createForm() {
 function addFormDataToTable() {
   const form = document.querySelector('.new-employee-form');
 
-  const displayStatus = function(posTop, posRight, title, description, type) {
-    const body = document.body;
-    const block = document.createElement('div');
-    const blockTitle = document.createElement('h2');
-    const message = document.createElement('p');
-
-    block.classList.add('notification', type);
-    block.dataset.qa = 'notification';
-    blockTitle.className = 'title';
-    blockTitle.textContent = title;
-    message.innerText = description;
-
-    block.style.width = 'max-content';
-    block.style.top = `${posTop}px`;
-    block.style.right = `${posRight}px`;
-
-    block.append(blockTitle, message);
-    body.append(block);
-
-    setTimeout(() => block.remove(), 2000);
-  };
-
   const clearForm = function() {
     const fields = Array.from(document.querySelectorAll('input'));
 
@@ -207,11 +207,28 @@ function addFormDataToTable() {
 }
 
 function addCellUpdateListener() {
-  const createInput = function() {
+  const createInput = function(placeholder, editIndex) {
+    if (editIndex === 2) {
+      const select = document.createElement('select');
+
+      select.className = 'cell-input';
+
+      select.innerHTML = `
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+      `;
+
+      return select;
+    }
+
     const input = document.createElement('input');
 
     input.className = 'cell-input';
-    input.placeholder = 'Enter data';
+    input.placeholder = `${placeholder}`;
 
     return input;
   };
@@ -230,20 +247,65 @@ function addCellUpdateListener() {
 
     const inputCell = cellParent.insertCell(cellIndex);
 
-    inputCell.insertAdjacentElement('afterbegin', createInput());
+    inputCell.insertAdjacentElement(
+      'afterbegin', createInput(targetCell.textContent, cellIndex)
+    );
 
     const input = document.querySelector('.cell-input');
+    input.focus();
 
     ['blur', 'change'].forEach(function(inputEvent) {
       input.addEventListener(inputEvent, () => {
-        if (input.value !== '') {
-          targetCell.textContent = input.value;
+        if (input.value !== '' && validateEdit(input.value, cellIndex)) {
+          targetCell.textContent = cellIndex === 4
+            ? `$${Number.parseInt(input.value).toLocaleString('en-US')}`
+            : input.value;
         }
 
         inputCell.remove();
         targetCell.style.display = '';
       });
     });
+
+    const validateEdit = function(value, index) {
+      let isLegit = true;
+      let message;
+
+      switch (index) {
+        case 0:
+        case 1:
+          if (value.length < 4) {
+            message = 'Field should be more than 4 character long.';
+            displayStatus(100, 10, 'Invalid data', message, 'error');
+            isLegit = false;
+          }
+          break;
+
+        case 3:
+          if (isNaN(value)) {
+            message = 'Field should have a number type';
+            displayStatus(100, 10, 'Invalid data', message, 'error');
+            isLegit = false;
+          }
+
+          if (+value < 18 || +value > 90) {
+            message = 'Incorrect age';
+            displayStatus(200, 10, 'Invalid data', message, 'error');
+            isLegit = false;
+          }
+          break;
+
+        case 4:
+          if (isNaN(value)) {
+            message = 'Should be a number';
+            displayStatus(100, 10, 'Invalid data', message, 'error');
+            isLegit = false;
+          }
+          break;
+      }
+
+      return isLegit;
+    };
   });
 }
 
