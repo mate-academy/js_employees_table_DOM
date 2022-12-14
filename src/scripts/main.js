@@ -150,9 +150,7 @@ const validation = (input) => {
 };
 
 const pushNotification = (posTop, posRight, title, description, type) => {
-  const bodyElem = document.querySelector('body');
-
-  bodyElem.insertAdjacentHTML('afterbegin', `
+  body.insertAdjacentHTML('afterbegin', `
     <div data-qa="notification" class="notification ${type}">
       <h2 class="title">
         ${title}
@@ -208,20 +206,45 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   let valid = 0;
+  let message = '';
 
   inputs.forEach(x => {
     if (!validation(x)) {
-      valid++;
-    }
+      switch (x.name) {
+        case 'name':
+          x.value.length !== 0 ? message += `
+            "Name" value has <br>less than 4 letters<br><br>`
+            : message += `  "Name" input is empty<br><br>`;
 
-    if (x.value === '') {
+          break;
+
+        case 'position':
+          x.value.length === 0 ? message += `
+            "Position" input is empty<br><br>`
+            : message += ``;
+          break;
+
+        case 'age':
+          x.value.length !== 0 ? message += `
+            "Age" value is less<br>than 18 or more than 90<br><br>`
+            : message += `
+            "Age" input is empty<br><br>`;
+          break;
+
+        case 'salary':
+          x.value.length === 0 ? message += `
+            "Salary" input is empty<br><br>`
+            : message += '';
+          break;
+      }
+
+      valid++;
       x.style.border = '2px solid red';
     }
   });
 
   if (valid) {
-    pushNotification(100, 10, 'Something <br>went wrong',
-      'Try again', 'error');
+    pushNotification(100, 10, 'Try again', message, 'error');
   }
 
   if (!valid) {
