@@ -22,16 +22,16 @@ const sortTableBody = (mouseEvent) => {
 
   const newTableBody = rows.sort(
     (a, b) => {
-      const x = a.children[num].textContent;
-      const y = b.children[num].textContent;
+      const x = a.children[num].textContent.replaceAll(/\W/g, '');
+      const y = b.children[num].textContent.replaceAll(/\W/g, '');
 
-      return isNaN(+x.replaceAll(/\W/g, ''))
+      return isNaN(+x)
         ? reverse
           ? y.localeCompare(x)
           : x.localeCompare(y)
         : reverse
-          ? +y.replaceAll(/\W/g, '') - +x.replaceAll(/\W/g, '')
-          : +x.replaceAll(/\W/g, '') - +y.replaceAll(/\W/g, '');
+          ? +y - +x
+          : +x - +y;
     });
 
   targetType = mouseEvent.target.textContent;
@@ -134,6 +134,9 @@ document.body.insertAdjacentHTML('beforeend', `
 document.body.style = 'align-items: start;';
 
 const form = document.querySelector('.new-employee-form');
+const personNameLength = 4;
+const minAge = 18;
+const maxAge = 90;
 
 const addNewPerson = (formEvent) => {
   formEvent.preventDefault();
@@ -144,7 +147,7 @@ const addNewPerson = (formEvent) => {
   const age = +document.querySelector("input[data-qa='age']").value;
   const salary = +document.querySelector("input[data-qa='salary']").value;
 
-  if (namePerson.length < 4) {
+  if (namePerson.length < personNameLength) {
     pushNotification(
       'Sorry (-_-)',
       'The name must be longer than 4 letters',
@@ -154,7 +157,7 @@ const addNewPerson = (formEvent) => {
     return;
   }
 
-  if (age < 18 || age > 90) {
+  if (age < minAge || age > maxAge) {
     pushNotification(
       'Sorry (-_-)',
       'age must be more than 18 and less than 90',
@@ -251,12 +254,22 @@ const addInput = (mouseEvent) => {
       let text = `${inputValue}`;
 
       if (input.type === 'number') {
+        if (+inputValue < 0) {
+          pushNotification(
+            'Sorry (-_-)',
+            'Value must be more than 0',
+            'error',
+          );
+
+          return;
+        }
+
         text = `$${(+inputValue).toLocaleString('en')}`;
 
         if (!isSalaryTarget) {
           text = `${inputValue}`;
 
-          if (+inputValue < 18 || +inputValue > 90) {
+          if (+inputValue < minAge || +inputValue > maxAge) {
             pushNotification(
               'Sorry (-_-)',
               'age must be more than 18 and less than 90',
@@ -268,7 +281,7 @@ const addInput = (mouseEvent) => {
         }
       }
 
-      if (text === '') {
+      if (!text) {
         text = prevText;
       }
 
