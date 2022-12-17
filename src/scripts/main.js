@@ -1,13 +1,30 @@
 'use strict';
+addForm();
 
 const tableHeader = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
-let reverse = false;
-let targetType = '';
-
+const form = document.querySelector('.new-employee-form');
 let rows = [...tableBody.children];
 
-const sortTableBody = (mouseEvent) => {
+let reverseSort = false;
+let targetCellType = '';
+const minAge = 18;
+const maxAge = 90;
+const personNameLength = 4;
+const errorAgeValue = `age must be more than ${minAge} and less than ${maxAge}`;
+const errorTextValue = `The name, position, office must be`
+  + ` longer than ${personNameLength} letters`;
+let hasOneInptInCell = false;
+let notificationTopPosition = 20;
+
+document.body.style = 'align-items: start;';
+
+tableHeader.addEventListener('click', sortTableBody);
+document.body.addEventListener('click', addClassToTargetRow);
+form.addEventListener('submit', addNewPerson);
+tableBody.addEventListener('dblclick', addInput);
+
+function sortTableBody(mouseEvent) {
   rows = [...tableBody.children];
 
   const targetCell = mouseEvent.target.closest('th').textContent;
@@ -16,8 +33,8 @@ const sortTableBody = (mouseEvent) => {
     item => item.textContent === mouseEvent.target.textContent
   );
 
-  reverse = targetType === targetCell
-    ? !reverse
+  reverseSort = targetCellType === targetCell
+    ? !reverseSort
     : false;
 
   const newTableBody = rows.sort(
@@ -26,20 +43,20 @@ const sortTableBody = (mouseEvent) => {
       const y = b.children[num].textContent.replaceAll(/\W/g, '');
 
       return isNaN(+x)
-        ? reverse
+        ? reverseSort
           ? y.localeCompare(x)
           : x.localeCompare(y)
-        : reverse
-          ? +y - +x
-          : +x - +y;
+        : reverseSort
+          ? Number(y) - Number(x)
+          : Number(x) - Number(y);
     });
 
-  targetType = mouseEvent.target.textContent;
+  targetCellType = mouseEvent.target.textContent;
 
   tableBody.append(...newTableBody);
 };
 
-const addClassToTargetRow = (mouseEvent) => {
+function addClassToTargetRow(mouseEvent) {
   const targetRow = mouseEvent.target.closest('tr');
 
   if (mouseEvent.target.closest('thead')) {
@@ -61,10 +78,8 @@ const addClassToTargetRow = (mouseEvent) => {
   targetRow.classList.add('active');
 };
 
-tableHeader.addEventListener('click', sortTableBody);
-document.body.addEventListener('click', addClassToTargetRow);
-
-document.body.insertAdjacentHTML('beforeend', `
+function addForm() {
+  return document.body.insertAdjacentHTML('beforeend', `
     <form class="new-employee-form">
       <label>
         Name:
@@ -130,15 +145,9 @@ document.body.insertAdjacentHTML('beforeend', `
       <button>Save to table</button>
     </form>
 `);
+}
 
-document.body.style = 'align-items: start;';
-
-const form = document.querySelector('.new-employee-form');
-const personNameLength = 4;
-const minAge = 18;
-const maxAge = 90;
-
-const addNewPerson = (formEvent) => {
+function addNewPerson(formEvent) {
   formEvent.preventDefault();
 
   const namePerson = document.querySelector("input[data-qa='name']").value;
@@ -149,8 +158,7 @@ const addNewPerson = (formEvent) => {
 
   if (namePerson.length < personNameLength) {
     pushNotification(
-      'Sorry (-_-)',
-      'The name must be longer than 4 letters',
+      errorTextValue,
       'error',
     );
 
@@ -159,8 +167,16 @@ const addNewPerson = (formEvent) => {
 
   if (age < minAge || age > maxAge) {
     pushNotification(
-      'Sorry (-_-)',
-      'age must be more than 18 and less than 90',
+      errorAgeValue,
+      'error',
+    );
+
+    return;
+  }
+
+  if (salary < 0) {
+    pushNotification(
+      'Salary cannot be less than 0',
       'error',
     );
 
@@ -180,17 +196,16 @@ const addNewPerson = (formEvent) => {
   form.reset();
 
   pushNotification(
-    'Success (^_^)',
     'New employee was added to table',
     'success',
   );
 };
 
-form.addEventListener('submit', addNewPerson);
+function pushNotification(text, type) {
+  const title = type === 'error'
+    ? 'Sorry (-_-)'
+    : 'Success (^_^)';
 
-let topPosition = 20;
-
-function pushNotification(title, text, type) {
   const div = document.createElement('div');
   const h2 = document.createElement('h2');
   const p = document.createElement('p');
@@ -201,7 +216,7 @@ function pushNotification(title, text, type) {
   p.textContent = text;
 
   div.style = `
-  top: ${topPosition}px;
+  top: ${notificationTopPosition}px;
   right: 20px;
   `;
 
@@ -211,23 +226,21 @@ function pushNotification(title, text, type) {
 
   const remove = () => div.remove();
   const resetTop = () => {
-    topPosition -= 150;
+    notificationTopPosition -= 190;
   };
 
-  topPosition += 150;
+  notificationTopPosition += 190;
 
   setTimeout(remove, 3000);
   setTimeout(resetTop, 3000);
 }
 
-let count = false;
-
-const addInput = (mouseEvent) => {
-  if (count) {
+function addInput(mouseEvent) {
+  if (hasOneInptInCell) {
     return;
   }
 
-  count = true;
+  hasOneInptInCell = true;
 
   const targetItem = mouseEvent.target.closest('td');
   const prevText = targetItem.textContent;
@@ -253,10 +266,13 @@ const addInput = (mouseEvent) => {
 
       let text = `${inputValue}`;
 
+      if (!inputValue || !text) {
+        text = prevText;
+      }
+
       if (input.type === 'number') {
         if (+inputValue < 0) {
           pushNotification(
-            'Sorry (-_-)',
             'Value must be more than 0',
             'error',
           );
@@ -271,27 +287,34 @@ const addInput = (mouseEvent) => {
 
           if (+inputValue < minAge || +inputValue > maxAge) {
             pushNotification(
-              'Sorry (-_-)',
-              'age must be more than 18 and less than 90',
+              errorAgeValue,
               'error',
             );
 
             return;
           }
         }
-      }
+      } else {
+        if (inputValue.length < personNameLength && inputValue.length !== 0) {
+          pushNotification(
+            errorTextValue,
+            'error',
+          );
 
-      if (!text) {
-        text = prevText;
+          return;
+        }
       }
 
       input.remove();
       targetItem.textContent = text;
-      count = false;
+      hasOneInptInCell = false;
+
+      pushNotification(
+        'Employee was changed',
+        'success',
+      );
     }
   };
 
   input.addEventListener('keyup', editValue);
 };
-
-tableBody.addEventListener('dblclick', addInput);
