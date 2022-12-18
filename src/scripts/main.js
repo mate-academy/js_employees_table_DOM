@@ -165,11 +165,11 @@ form.addEventListener('submit', (handler) => {
 
   const data = new FormData(form);
   const salary = data.get('salary');
-  const employeeName = data.get('name');
+  const employeeName = data.get('name').trim();
   const position = data.get('position');
   const office = data.get('office');
   const age = data.get('age');
-  const salaryString = `$` + Number(salary).toLocaleString();
+  const salaryString = `$` + Number(salary).toLocaleString('en-US');
   const errorMessages = checkForErrors(
     employeeName, position, office, age, salary
   );
@@ -212,8 +212,8 @@ tableBody.addEventListener('dblclick', (e) => {
   cell.append(input);
   input.focus();
 
-  input.addEventListener('keyup', (f) => {
-    if (f.key === 'Enter') {
+  input.addEventListener('keyup', (handleKeypress) => {
+    if (handleKeypress.key === 'Enter') {
       updateCell();
     }
   });
@@ -233,6 +233,8 @@ tableBody.addEventListener('dblclick', (e) => {
       }
     }
 
+    cellValues[0] = cellValues[0].trim();
+
     if (cellValues[4][0] === '$') {
       cellValues[4] = +cellValues[4].slice(1).replace(',', '');
     } else {
@@ -251,7 +253,7 @@ tableBody.addEventListener('dblclick', (e) => {
       );
     } else {
       if (cellIndex === 4) {
-        cell.innerText = `$` + Number(cellValues[4]).toLocaleString();
+        cell.innerText = `$` + Number(cellValues[4]).toLocaleString('en-US');
       } else {
         cell.innerText = cellValues[cellIndex];
       }
