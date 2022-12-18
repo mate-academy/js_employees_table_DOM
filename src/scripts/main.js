@@ -1,9 +1,22 @@
 'use strict';
 
-const form = document.createElement('form');
+// ==========  GLOBAL VARIABLES  ==========
+
 const table = document.querySelector('table');
+const tbody = table.querySelector('tbody');
+const form = document.createElement('form');
+const offices = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
 
 let currentKey = '';
+
+// ==========  ADD FORM TO THE PAGE  ==========
 
 form.classList.add('new-employee-form');
 
@@ -30,12 +43,11 @@ form.innerHTML = `
       name='office'
       data-qa='office'
     >
-      <option>Tokyo</option>
-      <option>Singapore</option>
-      <option>London</option>
-      <option>New York</option>
-      <option>Edinburgh</option>
-      <option>San Francisco</option>
+    ${offices.map(office => `
+      <option value=${office}>
+        ${office}
+      </option>
+    `)}
     </select>
   </label>
   <label>
@@ -59,12 +71,71 @@ form.innerHTML = `
 
 table.insertAdjacentElement('afterend', form);
 
+// ==========  GLOBAL FUNCTIONS  ==========
+
+const isInvalidAge = age => age < 18 || age > 90;
+const isInvalidName = employeeName => employeeName.length < 4;
+const isInvalidSalary = salary => salary <= 0;
+
+const convertSalaryToNumber = salary =>
+  Number(salary.textContent.replace('$', '').replace(',', ''));
+
+const showNotification = (param, isValid = false) => {
+  const type = isValid ? 'Success' : 'Error';
+  const deleteNotification = notice => notice.remove();
+
+  const getDescription = elem => {
+    switch (elem) {
+      case 'name':
+        return `The <strong>${elem}</strong> is not correct.
+          Should be more than 4 letters`;
+
+      case 'position':
+        return `The <strong>${elem}</strong> is required`;
+
+      case 'age':
+        return `The <strong>${elem}</strong> of employee should be from to 90`;
+
+      case 'salary':
+        return `The <strong>${elem}</strong> should be more 0`;
+
+      case 'office':
+        return `The <strong>${elem}</strong> should be from list of theoffices`;
+
+      default:
+        return `Employee <strong>${elem.name}</strong> was added to table`;
+    }
+  };
+
+  const notification = document.createElement('div');
+
+  notification.className = `notification ${type.toLowerCase()}`;
+  notification.setAttribute('data-qa', 'notification');
+
+  notification.innerHTML = `
+      <h2 class='title'>${type}</h2>
+      <p>${getDescription(param)}</p>
+  `;
+
+  document.body.append(notification);
+
+  setTimeout(() => deleteNotification(notification), 2000);
+};
+
+const convertSalaryToThousand = numb => `$${numb.toLocaleString('en-US')}`;
+
+// ==========  EDIT CELL  ==========
+
 document.addEventListener('dblclick', e => {
   const elem = e.target.closest('td');
 
   if (!elem) {
     return;
-  };
+  }
+
+  const isAge = +elem.textContent ? true : null;
+  const isSalary = elem.textContent.includes('$');
+  const isOffice = offices.includes(elem.textContent);
 
   const currentValue = elem.textContent;
   const isActive = document.querySelector('.cell-input');
@@ -75,34 +146,92 @@ document.addEventListener('dblclick', e => {
 
   const input = document.createElement('input');
 
+  if (isAge || isSalary) {
+    input.type = 'number';
+  }
+
   input.className = 'cell-input';
   elem.textContent = '';
   elem.append(input);
   input.focus();
 
-  const setUpValue = () => {
-    if (!input.value) {
-      input.remove();
-      elem.textContent = currentValue;
+  // ==========  SET UP VALUE TO THE CELL  ==========
 
-      return;
-    }
-
-    elem.textContent = input.value;
+  const handleCell = value => {
+    elem.textContent = value;
     input.remove();
   };
 
-  input.addEventListener('blur', setUpValue);
+  const setUpValue = () => {
+    switch (true) {
+      case !input.value:
+        handleCell(currentValue);
 
-  input.addEventListener('keydown',
-    ev => ev.key === 'Enter' ? setUpValue() : false);
+        break;
+
+      case isSalary:
+        const isInvalidSalaryValue = isInvalidSalary(Number(input.value));
+
+        if (isInvalidSalaryValue) {
+          handleCell(currentValue);
+          showNotification('salary');
+
+          return;
+        };
+
+        const convertedSalary = convertSalaryToThousand(+input.value);
+
+        handleCell(convertedSalary);
+
+        break;
+
+      case isAge:
+        const value = Number(input.value);
+        const isInvalid = isInvalidAge(value);
+
+        if (isInvalid) {
+          handleCell(currentValue);
+          showNotification('age');
+
+          return;
+        }
+
+        handleCell(value);
+
+        break;
+
+      case isOffice:
+        const isValidValue = offices.includes(input.value);
+
+        if (isValidValue) {
+          handleCell(input.value);
+
+          return;
+        }
+
+        handleCell(currentValue);
+        showNotification('office');
+
+        break;
+
+      default:
+        handleCell(input.value);
+    }
+  };
+
+  input.addEventListener('keydown', ev =>
+    ev.key === 'Enter' ? setUpValue() : false
+  );
+
+  input.addEventListener('blur', setUpValue);
 });
+
+// ==========  SORT, SELECT, ADD EMPLOYEE  ==========
 
 document.addEventListener('click', e => {
   const heading = e.target.closest('thead th');
   const td = e.target.closest('tbody td');
   const button = e.target.closest('form button');
-  const tbody = document.querySelector('tbody');
 
   if (!heading && !td && !button) {
     return;
@@ -110,25 +239,25 @@ document.addEventListener('click', e => {
 
   const element = e.target;
 
-  const employees = [...document.querySelectorAll('tbody tr')]
-    .map(person => {
-      const [personName, position, office, age, salary] = [...person.children];
+  const employees = [...document.querySelectorAll('tbody tr')].map(person => {
+    const [personName, position, office, age, salary] = [...person.children];
 
-      return {
-        name: personName.textContent,
-        position: position.textContent,
-        office: office.textContent,
-        age: Number(age.textContent),
-        salary: Number(salary.textContent.replace('$', '').replace(',', '')),
-      };
-    });
+    return {
+      name: personName.textContent,
+      position: position.textContent,
+      office: office.textContent,
+      age: Number(age.textContent),
+      salary: convertSalaryToNumber(salary),
+    };
+  });
+
+  // ==========  SELECT ROW  ==========
 
   const selectRow = el => {
     const tr = el.parentElement;
-    const isActive = [...tr.parentElement.children]
-      .find(elem =>
-        elem.classList.contains('active')
-      );
+    const isActive = [...tr.parentElement.children].find(elem =>
+      elem.classList.contains('active')
+    );
 
     if (isActive) {
       isActive.classList.remove('active');
@@ -136,6 +265,8 @@ document.addEventListener('click', e => {
 
     tr.classList.add('active');
   };
+
+  // ==========  SORT EMPOYEES  ==========
 
   const sortEmployees = (arrayOfEmployees, elem) => {
     const key = elem.textContent.toLowerCase();
@@ -159,50 +290,14 @@ document.addEventListener('click', e => {
 
     currentKey = currentKey !== key ? (currentKey = key) : (currentKey = '');
 
-    [...tbody.children].forEach((el) => el.remove());
+    [...tbody.children].forEach(el => el.remove());
 
     renderEmployees(arrayOfEmployees);
   };
 
-  const showNotification = (param, isValid) => {
-    const type = isValid ? 'Success' : 'Error';
-    const deleteNotification = notice => notice.remove();
+  // ==========  ADD EMPOYEE TO TABLE  ==========
 
-    const getDescription = elem => {
-      switch (elem) {
-        case 'name':
-          return `The ${elem} is not correct. Should be more than 4 letters`;
-
-        case 'position':
-          return `The ${elem} is required`;
-
-        case 'age':
-          return `The ${elem} of employee should be from to 60`;
-
-        case 'salary':
-          return `The ${elem} should be more 0`;
-
-        default:
-          return `Employee ${elem.name} was added to table`;
-      }
-    };
-
-    const notification = document.createElement('div');
-
-    notification.className = `notification ${type.toLowerCase()}`;
-    notification.setAttribute('data-qa', 'notification');
-
-    notification.innerHTML = `
-      <h2 class='title'>${type}</h2>
-      <p>${getDescription(param)}</p>
-  `;
-
-    document.body.append(notification);
-
-    setTimeout(() => deleteNotification(notification), 2000);
-  };
-
-  const saveToTable = () => {
+  const addToTable = () => {
     e.preventDefault();
 
     const formData = new FormData(form);
@@ -218,8 +313,17 @@ document.addEventListener('click', e => {
 
     let isValid = false;
 
+    // ==========  RESET FORM  ==========
+
+    const resetForm = () =>
+      form.querySelectorAll('input').forEach(input => {
+        input.value = '';
+      });
+
+    // ==========  VALIDATE FIELDS  ==========
+
     switch (true) {
-      case employeeName.length < 4:
+      case isInvalidName(employeeName):
         showNotification('name', isValid);
         break;
 
@@ -227,11 +331,11 @@ document.addEventListener('click', e => {
         showNotification('position', isValid);
         break;
 
-      case age < 18 || age > 60:
+      case isInvalidAge(age):
         showNotification('age', isValid);
         break;
 
-      case salary <= 0:
+      case isInvalidSalary(salary):
         showNotification('salary', isValid);
         break;
 
@@ -240,8 +344,11 @@ document.addEventListener('click', e => {
         isValid = true;
         showNotification(employeeData, isValid);
         renderEmployee(employeeData);
+        resetForm();
     }
   };
+
+  // ==========  RENDER EMPLOYEE  ==========
 
   const renderEmployee = employee => {
     const tr = document.createElement('tr');
@@ -250,7 +357,7 @@ document.addEventListener('click', e => {
       const newTd = document.createElement('td');
 
       if (el === 'salary') {
-        employee[el] = `$${employee[el].toLocaleString('en-US')}`;
+        employee[el] = convertSalaryToThousand(employee[el]);
       }
 
       newTd.textContent = employee[el];
@@ -260,8 +367,12 @@ document.addEventListener('click', e => {
     tbody.append(tr);
   };
 
+  // ==========  RENDER EMPLOYEES  ==========
+
   const renderEmployees = arrayOfEmployees =>
     arrayOfEmployees.map(employee => renderEmployee(employee));
+
+  // ==========  CHECK TYPE ACTION  ==========
 
   switch (element) {
     case td:
@@ -274,6 +385,6 @@ document.addEventListener('click', e => {
       break;
 
     case button:
-      saveToTable();
+      addToTable();
   }
 });
