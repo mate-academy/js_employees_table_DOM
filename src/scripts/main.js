@@ -134,8 +134,17 @@ function pushNotification(title, description, type) {
   }, 3000);
 };
 
-function ageChecker(age) {
-  return age >= 18 && age <= 90;
+function capitalizer(string) {
+  if (+salaryConverter(string)) {
+    return string;
+  }
+
+  return string
+    .trim()
+    .split(' ')
+    .filter(item => item.length > 0)
+    .map(word => word[0].toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 table.addEventListener('click', (e) => {
@@ -178,24 +187,7 @@ document.querySelector('.saveButton').addEventListener('click', (e) => {
       input.style.outline = '';
     });
 
-    if (!input.value) {
-      pushNotification(input.name, 'Should not be empty', 'error');
-      input.style.outline = '1px solid red';
-      input.focus();
-
-      return;
-    }
-
-    if (input.name === 'name' && input.value.length < 4) {
-      pushNotification(input.name, 'Should have minimum 4 letters', 'error');
-      input.focus();
-      input.style.outline = '1px solid red';
-
-      return;
-    }
-
-    if (input.name === 'age' && !ageChecker(input.value)) {
-      pushNotification(input.name, 'Age should be between 18 and 90', 'error');
+    if (!inputValidation(input.name, input.value)) {
       input.style.outline = '1px solid red';
       input.focus();
 
@@ -205,8 +197,8 @@ document.querySelector('.saveButton').addEventListener('click', (e) => {
 
   tbody.insertAdjacentHTML('beforeend', `
     <tr>
-      <td>${formElements.name.value}</td>
-      <td>${formElements.position.value}</td>
+      <td>${capitalizer(formElements.name.value)}</td>
+      <td>${capitalizer(formElements.position.value)}</td>
       <td>${formElements.office.value}</td>
       <td>${formElements.age.value}</td>
       <td>${salaryConverter(formElements.salary.value)}</td>
@@ -228,34 +220,96 @@ tbody.addEventListener('dblclick', (e) => {
   }
 
   const cellContent = td.textContent;
+  const currentColumnTitle
+    = table.rows[0].cells[td.cellIndex].textContent.toLocaleLowerCase();
   const input = document.createElement('input');
 
   input.classList.add('cell-input');
   input.setAttribute('type', 'text');
+
   input.value = cellContent;
+
+  if (currentColumnTitle === 'salary') {
+    input.value = salaryConverter(cellContent);
+  }
+
   td.textContent = '';
   td.append(input);
   input.focus();
 
-  input.addEventListener('blur', blurHandler);
-
-  function blurHandler() {
-    if (input.value === '') {
+  input.onblur = () => {
+    if (!input.value || input.value.trim().length === 0) {
       input.replaceWith(cellContent);
     }
 
-    input.replaceWith(input.value);
+    if (inputValidation(currentColumnTitle, input.value)
+    ) {
+      if (currentColumnTitle === 'salary') {
+        input.replaceWith(salaryConverter(input.value));
+      }
+
+      input.replaceWith(capitalizer(input.value));
+
+      pushNotification(
+        capitalizer(currentColumnTitle), 'Successfully changed', 'success'
+      );
+    }
+  };
+
+  input.addEventListener('keypress', enterHandler);
+
+  function enterHandler(ev) {
+    if (ev.key === 'Enter' && !input.value) {
+      input.replaceWith(cellContent);
+    }
+
+    if (ev.key === 'Enter'
+      && inputValidation(currentColumnTitle, input.value)
+    ) {
+      if (currentColumnTitle === 'salary') {
+        input.replaceWith(salaryConverter(input.value));
+      }
+
+      input.replaceWith(capitalizer(input.value));
+
+      pushNotification(
+        capitalizer(currentColumnTitle), 'Successfully changed', 'success'
+      );
+    }
+  }
+});
+
+function inputValidation(inputName, inputValue) {
+  if (!inputValue || inputValue.trim().length === 0) {
+    pushNotification(
+      capitalizer(inputName), ' Cannot be empty', 'error'
+    );
+
+    return false;
   }
 
-  input.addEventListener('keypress', (ev) => {
-    input.removeEventListener('blur', blurHandler);
+  if (inputName === 'name' && inputValue.trim().length < 4
+  ) {
+    pushNotification(
+      capitalizer(inputName), 'Should have minimum 4 letters', 'error'
+    );
 
-    if (ev.key === 'Enter' && input.value === '') {
-      input.replaceWith(cellContent);
-    }
+    return false;
+  }
 
-    if (ev.key === 'Enter') {
-      input.replaceWith(input.value);
-    }
-  });
-});
+  if (inputName === 'age' && (inputValue < 18 || inputValue > 90)) {
+    pushNotification(
+      capitalizer(inputName), 'Should be between 18 and 90', 'error'
+    );
+
+    return false;
+  }
+
+  if (inputName === 'salary' && inputValue < 0) {
+    pushNotification(capitalizer(inputName), 'Cannot be negative', 'error');
+
+    return false;
+  }
+
+  return true;
+}
