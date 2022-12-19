@@ -43,11 +43,11 @@ form.innerHTML = `
       name='office'
       data-qa='office'
     >
-    ${offices.map(office => `
-      <option value=${office}>
-        ${office}
-      </option>
-    `)}
+    ${offices.map(office => {
+    const value = office.split(' ').join('-');
+
+    return `<option value=${value}>${office}</option>`;
+  })}
     </select>
   </label>
   <label>
@@ -75,7 +75,7 @@ table.insertAdjacentElement('afterend', form);
 
 const isInvalidAge = age => age < 18 || age > 90;
 const isInvalidName = employeeName => employeeName.length < 4;
-const isInvalidSalary = salary => salary <= 0;
+const isInvalidSalary = salary => salary <= 0 || salary >= 1000000;
 
 const convertSalaryToNumber = salary =>
   Number(salary.textContent.replace('$', '').replace(',', ''));
@@ -97,7 +97,7 @@ const showNotification = (param, isValid = false) => {
         return `The <strong>${elem}</strong> of employee should be from to 90`;
 
       case 'salary':
-        return `The <strong>${elem}</strong> should be more 0`;
+        return `The <strong>${elem}</strong> should be not more 1,000,000`;
 
       case 'office':
         return `The <strong>${elem}</strong> should be from list of theoffices`;
@@ -305,6 +305,7 @@ document.addEventListener('click', e => {
 
     const employeeData = {
       ...data,
+      office: data.office.split('-').join(' '),
       age: Number(data.age),
       salary: Number(data.salary),
     };
