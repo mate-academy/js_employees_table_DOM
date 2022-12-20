@@ -104,9 +104,8 @@ const errorMassage = {
 function validateData(dataName, dataValue) {
   switch (dataName) {
     case 'name':
-      return dataValue.length < 4;
     case 'position':
-      return dataValue.length < 4;
+      return dataValue.trim().length < 4;
     case 'age':
       return +dataValue < 18 || +dataValue > 90;
     case 'salary':
@@ -115,16 +114,18 @@ function validateData(dataName, dataValue) {
 }
 
 const pushNotification = (title, description, type) => {
-  if (document.querySelector('.notification')) {
-    document.querySelector('.notification').remove();
+  const notification = document.querySelector('.notification');
+
+  if (notification) {
+    notification.remove();
   }
 
   document.body.insertAdjacentHTML('beforeend', `
-  <div class="notification ${type}">
-    <h2 class="title">${title}</h2>
-    <p>${description}</p>
-  </div>
-`);
+    <div class="notification ${type}">
+      <h2 class="title">${title}</h2>
+      <p>${description}</p>
+    </div>
+  `);
 };
 
 newEmployeesForm.addEventListener('submit', (e) => {
@@ -145,13 +146,13 @@ newEmployeesForm.addEventListener('submit', (e) => {
   }
 
   tbody.insertAdjacentHTML('beforeend', `
-  <tr>
-    <td>${data.get('name')}</td>
-    <td>${data.get('position')}</td>
-    <td>${data.get('office')}</td>
-    <td>${data.get('age')}</td>
-    <td>${convertSalary(data.get('salary'))}</td>
-  </tr>`
+    <tr>
+      <td>${data.get('name')}</td>
+      <td>${data.get('position')}</td>
+      <td>${data.get('office')}</td>
+      <td>${data.get('age')}</td>
+      <td>${convertSalary(data.get('salary'))}</td>
+    </tr>`
   );
 
   pushNotification(
@@ -177,15 +178,19 @@ tbody.addEventListener('dblclick', e => {
     cellSelect.className = 'cell-input';
     cellSelect.setAttribute('name', fieldName);
     e.target.closest('td').append(cellSelect);
+    cellSelect.focus();
 
     for (const option of selectOptions) {
+      const selectedOption = saveText === option ? 'selected' : null;
+
       cellSelect.insertAdjacentHTML('afterbegin', `
-        <option>${option}</option>
+        <option ${selectedOption}>${option}</option>
       `);
     }
 
     cellSelect.addEventListener('change', () => {
       cellSelect.blur();
+      e.target.closest('td').textContent = cellSelect.value;
     });
 
     cellSelect.addEventListener('blur', () => {
