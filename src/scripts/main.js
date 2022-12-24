@@ -4,7 +4,6 @@
 
 const th = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
-const cells = document.querySelectorAll('td');
 
 const notifTimeout = 3000;
 
@@ -334,6 +333,16 @@ const validateCells = (e) => {
         'error',
       );
     }
+  } else if (e.target.cellIndex === 4) {
+    if (input.value < 0) {
+      getValidCells();
+
+      return startNotification(
+        'Salary is not correct',
+        'Salary must be greater than 0',
+        'error',
+      );
+    }
   } else {
     return validCell;
   }
@@ -350,33 +359,39 @@ const saveChangesOnTable = (e, prev) => {
   }
 };
 
-cells.forEach((cell, index) => {
-  cell.addEventListener('dblclick', (e) => {
-    indexCompare.push(index);
+tbody.addEventListener('dblclick', (e) => {
+  const targetCell = e.target.closest('td');
 
-    if (indexCompare[0] !== index) {
-      return startNotification(
-        'Unfinished changes',
-        'You cannot change another cell until this one is not finished',
-        'error',
-        580,
-      );
+  if (!targetCell) {
+    return;
+  }
+
+  const cellIndex = targetCell.cellIndex;
+
+  indexCompare.push(cellIndex);
+
+  if (indexCompare[0] !== cellIndex) {
+    return startNotification(
+      'Unfinished changes',
+      'You cannot change another cell until this one is not finished',
+      'error',
+      580,
+    );
+  }
+
+  const prevText = e.target.innerText;
+
+  changeOnInput(e, prevText);
+
+  const field = e.target.firstElementChild;
+
+  field.addEventListener('blur', () => {
+    saveChangesOnTable(e, prevText);
+  });
+
+  field.addEventListener('keyup', (ev) => {
+    if (ev.key === 'Enter') {
+      field.blur();
     }
-
-    const prevText = e.target.innerText;
-
-    changeOnInput(e, prevText);
-
-    const field = e.target.firstElementChild;
-
-    field.addEventListener('blur', () => {
-      saveChangesOnTable(e, prevText);
-    });
-
-    field.addEventListener('keyup', (ev) => {
-      if (ev.key === 'Enter') {
-        field.blur();
-      }
-    });
   });
 });
