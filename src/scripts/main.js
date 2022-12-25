@@ -4,7 +4,7 @@ const table = document.querySelector('table');
 const headers = table.querySelectorAll('th');
 const tableBody = table.querySelector('tbody');
 
-headers.forEach(function(header) {
+headers.forEach((header) => {
   header.dataset.sorted = 'DESC';
 });
 
@@ -12,44 +12,42 @@ function sortColumn(index, isASC) {
   let sortedRows = [];
 
   if (isASC) {
-    if (index === 4) {
-      sortedRows = Array.from(tableBody.rows).sort((a, b) =>
+    // eslint-disable-next-line chai-friendly/no-unused-expressions
+    index === 4
+      ? sortedRows = Array.from(tableBody.rows).sort((a, b) =>
         (salaryToNumber(a.cells[index].innerHTML)
-        - salaryToNumber(b.cells[index].innerHTML)));
-    } else {
-      sortedRows = Array.from(tableBody.rows).sort((a, b) =>
+        - salaryToNumber(b.cells[index].innerHTML)))
+      : sortedRows = Array.from(tableBody.rows).sort((a, b) =>
         (a.cells[index].innerHTML.localeCompare(b.cells[index].innerHTML)));
-    }
   } else {
-    if (index === 4) {
-      sortedRows = Array.from(tableBody.rows).sort((a, b) =>
+    // eslint-disable-next-line chai-friendly/no-unused-expressions
+    index === 4
+      ? sortedRows = Array.from(tableBody.rows).sort((a, b) =>
         (salaryToNumber(b.cells[index].innerHTML)
-        - salaryToNumber(a.cells[index].innerHTML)));
-    } else {
-      sortedRows = Array.from(tableBody.rows).sort((a, b) =>
+        - salaryToNumber(a.cells[index].innerHTML)))
+      : sortedRows = Array.from(tableBody.rows).sort((a, b) =>
         (b.cells[index].innerHTML.localeCompare(a.cells[index].innerHTML)));
-    }
   }
 
   table.tBodies[0].append(...sortedRows);
 }
 
-headers.forEach(function(header, index) {
+headers.forEach((header, index) => {
   header.addEventListener('click', (e) => {
     let order;
 
-    if (e.target.dataset.sorted === 'ASC') {
-      e.target.dataset.sorted = 'DESC';
-      order = false;
-    } else {
-      e.target.dataset.sorted = 'ASC';
-      order = true;
-    }
+    // eslint-disable-next-line chai-friendly/no-unused-expressions
+    e.target.dataset.sorted === 'ASC'
+      ? (e.target.dataset.sorted = 'DESC',
+      order = false)
+      : (e.target.dataset.sorted = 'ASC',
+      order = true);
+
     sortColumn(index, order);
   });
 });
 
-const pushNotification = (posTop, posRight, title, description, type) => {
+function pushNotification(posTop, posRight, title, description, type) {
   document.body.insertAdjacentHTML('afterbegin', `
     <div data-qa="notification" class="notification ${type}"
       style="top: ${posTop}px; right: ${posRight}px;">
@@ -61,7 +59,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   const notification = document.querySelector('.notification');
 
   setTimeout(() => notification.remove(), 2000);
-};
+}
 
 table.insertAdjacentHTML('afterend', `
   <form class="new-employee-form">
@@ -224,7 +222,7 @@ function salaryToNumber(text) {
 function unselectTable() {
   const trows = tableBody.querySelectorAll('tr');
 
-  trows.forEach(function(tr) {
+  trows.forEach((tr) => {
     tr.classList.remove('active');
   });
 };
@@ -286,7 +284,7 @@ tableBody.addEventListener('dblclick', (e) => {
   row.append(input);
   input.focus();
 
-  input.onblur = function() {
+  input.onblur = () => {
     inputValidation(index);
   };
 
