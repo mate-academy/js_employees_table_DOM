@@ -280,7 +280,13 @@ tbody.addEventListener('dblclick', (e) => {
 });
 
 function inputValidation(inputName, inputValue) {
-  if (!inputValue || inputValue.trim().length === 0) {
+  const ageOutOfRange
+    = inputName === 'age' && (inputValue < 18 || inputValue > 90);
+  const valueIsEmpty = !inputValue || inputValue.trim().length === 0;
+  const properNameLength
+  = inputName === 'name' && inputValue.trim().length < 4;
+
+  if (valueIsEmpty) {
     pushNotification(
       capitalizer(inputName), ' Cannot be empty', 'error'
     );
@@ -288,8 +294,7 @@ function inputValidation(inputName, inputValue) {
     return false;
   }
 
-  if (inputName === 'name' && inputValue.trim().length < 4
-  ) {
+  if (properNameLength) {
     pushNotification(
       capitalizer(inputName), 'Should have minimum 4 letters', 'error'
     );
@@ -297,7 +302,7 @@ function inputValidation(inputName, inputValue) {
     return false;
   }
 
-  if (inputName === 'age' && (inputValue < 18 || inputValue > 90)) {
+  if (ageOutOfRange) {
     pushNotification(
       capitalizer(inputName), 'Should be between 18 and 90', 'error'
     );
