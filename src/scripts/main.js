@@ -149,6 +149,7 @@ bodyElement.append(messageWindow);
 // Create show messages functions
 
 function showError(error, text) {
+  error.classList.remove('warning');
   error.classList.remove('success');
   error.classList.add('error');
   error.style.visibility = 'visible';
@@ -163,6 +164,7 @@ function showError(error, text) {
 
 function showSuccess(error, text) {
   error.classList.remove('error');
+  error.classList.remove('warning');
   error.classList.add('success');
   error.style.visibility = 'visible';
   error.textContent = text;
@@ -179,6 +181,8 @@ function showSuccess(error, text) {
 };
 
 function showWarning(error, text) {
+  error.classList.remove('success');
+  error.classList.remove('error');
   error.classList.add('warning');
   error.style.visibility = 'visible';
   error.textContent = text;
