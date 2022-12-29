@@ -3,20 +3,24 @@
 const table = document.querySelector('tbody');
 const persons = [...table.rows];
 
-//sorting 
+// sorting
 
 function trimmer(salary) {
   return salary.replace(/\D/g, '');
 };
 
-function cleaner(coll) {
+function cleaner(coll, attr) {
   for (const th of coll) {
-    th.removeAttribute('data-sorted');
+    th.removeAttribute(attr);
   };
 }
 
 document.addEventListener('click', e => {
   const target = e.target;
+
+  if (target.tagName !== 'TH') {
+    return;
+  }
 
   if (!target.dataset.sorted || target.dataset.sorted === 'DESC') {
     persons.sort((a, b) => {
@@ -37,7 +41,7 @@ document.addEventListener('click', e => {
       }
     });
 
-    cleaner(document.querySelectorAll('th'));
+    cleaner(document.querySelectorAll('th'), 'data-sorted');
 
     target.dataset.sorted = 'ASC';
   } else {
@@ -59,10 +63,22 @@ document.addEventListener('click', e => {
       }
     });
 
-    cleaner(document.querySelectorAll('th'));
+    cleaner(document.querySelectorAll('th'), 'data-sorted');
 
     target.dataset.sorted = 'DESC';
   };
 
   table.append(...persons);
+});
+
+//selection of the row
+
+table.addEventListener('click', e => {
+  const toSelect = e.target.parentElement;
+
+  for (const row of table.rows) {
+    row.classList.remove('active');
+  }
+
+  toSelect.className = 'active';
 });
