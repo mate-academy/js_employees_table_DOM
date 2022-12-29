@@ -6,7 +6,6 @@ const table = document.querySelector('table');
 document.addEventListener('DOMContentLoaded', function() {
   const headers = table.querySelectorAll('th');
   const tableBody = table.querySelector('tbody');
-  const rows = tableBody.querySelectorAll('tr');
 
   const directions = Array.from(headers).map(function(header) {
     return '';
@@ -27,6 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const sortColumn = function(index) {
     const direction = directions[index] || 'asc';
     const multiplier = (direction === 'asc') ? 1 : -1;
+
+    const rows = tableBody.querySelectorAll('tr');
 
     const newRows = Array.from(rows);
 
