@@ -106,7 +106,7 @@ bodyElement.insertAdjacentHTML('beforeend', `
     <option>London</option>
     <option>New York</option>
     <option>Edinburgh</option>
-    <option>San Frencisco</option>
+    <option>San Francisco</option>
   </select>
 </label>
 
@@ -125,13 +125,14 @@ bodyElement.insertAdjacentHTML('beforeend', `
 
 // Create messages text
 
-const smallNameError = 'Please enter valid name';
-const smallAgeError = 'Sorry, your age is small !';
-const bigAgeError = 'Sorry, your age is big';
+const smallNameError = `Please enter valid name.
+Name must contain more then 4 letters!`;
+const smallAgeError = 'Sorry, your age is small! Age must be at least 18!';
+const bigAgeError = 'Sorry, your age is big. Age must be no more then 90!';
 const successMessage = 'Thanks, you are successfully added new employee!';
-const warningMessage = 'Please wait, something is wrong';
+const warningMessage = 'Please wait, something is wrong...';
 const loadingMessage = 'Loading, please wait...';
-const correctSalary = 'Please enter valid salary';
+const correctSalary = 'Please enter valid salary. It must be more then 0$!';
 
 // Create window message
 
@@ -144,6 +145,7 @@ messageWindow.style.visibility = 'hidden';
 messageWindow.style.alignItems = 'center';
 messageWindow.style.justifyContent = 'center';
 messageWindow.style.flexDirection = 'column';
+messageWindow.style.textAlign = 'center';
 bodyElement.append(messageWindow);
 
 // Create show messages functions
@@ -154,6 +156,10 @@ function showError(error, text) {
   error.classList.add('error');
   error.style.visibility = 'visible';
   error.textContent = text;
+
+  setTimeout(() => {
+    error.style.visibility = 'hidden';
+  }, 5000);
 
   const titleOfMessage = document.createElement('title');
 
@@ -263,44 +269,81 @@ formElement.addEventListener('submit', (e) => {
     setTimeout(() => {
       showSuccess(messageWindow, successMessage);
     }, 3000);
+
+    // Realizing reset input values after success
+
+    setTimeout(() => {
+      e.target.reset();
+    }, 6000);
   }
 });
 
 // ---------Realizing editing the table by double clicking--------
 
-tBodyElement.addEventListener('dblclick', (action) => {
+trElements.map(tr => tr.addEventListener('dblclick', (action) => {
   const target = action.target.closest('td');
 
   if (!target) {
     return;
   }
 
-  const input = document.createElement('input');
-  const firstValue = target.textContent;
+  // Just check if the target is on the office check or on the other cells
 
-  input.classList.add('cell-input');
+  if (target === tr.children[2]) {
+    const select = document.createElement('select');
 
-  input.value = target.textContent;
+    select.classList.add('cell-input');
 
-  while (target.firstChild) {
-    target.removeChild(target.firstChild);
-  }
+    select.insertAdjacentHTML('beforeend', `
+      <option>Tokyo</option>
+      <option>Singapore</option>
+      <option>London</option>
+      <option>New York</option>
+      <option>Edinburgh</option>
+      <option>San Francisco</option>
+    `);
 
-  target.appendChild(input);
-  input.focus();
-
-  input.addEventListener('keyup', (key) => {
-    if (key.code === 'Enter') {
-      target.removeChild(input);
-
-      if (input.value.length === 0) {
-        target.appendChild(document.createTextNode(firstValue));
-      } else {
-        firstValue.includes('$')
-          ? target.appendChild(document.createTextNode(
-            `$${Number(input.value).toLocaleString('en-US')}`))
-          : target.appendChild(document.createTextNode(input.value));
-      }
+    while (target.firstChild) {
+      target.removeChild(target.firstChild);
     }
-  });
-});
+
+    target.appendChild(select);
+    select.focus();
+
+    select.addEventListener('keydown', (key) => {
+      if (key.code === 'Enter') {
+        target.removeChild(select);
+        target.appendChild(document.createTextNode(select.value));
+      }
+    });
+  } else {
+    const input = document.createElement('input');
+    const firstValue = target.textContent;
+
+    input.classList.add('cell-input');
+
+    input.value = target.textContent;
+
+    while (target.firstChild) {
+      target.removeChild(target.firstChild);
+    }
+
+    target.appendChild(input);
+    input.focus();
+
+    input.addEventListener('keydown', (key) => {
+      if (key.code === 'Enter') {
+        target.removeChild(input);
+
+        if (input.value.length === 0) {
+          target.appendChild(document.createTextNode(firstValue));
+        } else {
+          firstValue.includes('$')
+            ? target.appendChild(document.createTextNode(
+              `$${Number(input.value).toLocaleString('en-US')}`))
+            : target.appendChild(document.createTextNode(input.value));
+        }
+      }
+    });
+  }
+}));
