@@ -229,6 +229,8 @@ button.addEventListener('click', e => {
   </tr>
   `);
 
+  persons.push(table.rows[table.rows.length - 1]);
+
   for (const input of inputs) {
     input.value = null;
   }
