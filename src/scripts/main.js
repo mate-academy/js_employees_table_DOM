@@ -208,7 +208,9 @@ sortBy.forEach(el => {
             <td>${person.position}</td>
             <td>${person.office}</td>
             <td>${person.age}</td>
-            <td>$${(person.salary).toLocaleString('en').replaceAll('.', ',')}</td>
+            <td>$${(person.salary)
+    .toLocaleString('en')
+    .replaceAll('.', ',')}</td>
         </tr>`);
     });
 
