@@ -133,6 +133,8 @@ const successMessage = 'Thanks, you are successfully added new employee!';
 const warningMessage = 'Please wait, something is wrong...';
 const loadingMessage = 'Loading, please wait...';
 const correctSalary = 'Please enter valid salary. It must be more then 0$!';
+const editError = `Cell must not be empty or must contain
+more then 4 letters, please enter valid information.`;
 
 // Create window message
 
@@ -321,11 +323,14 @@ trElements.map(tr => tr.addEventListener('dblclick', (action) => {
     const firstValue = target.textContent;
 
     input.classList.add('cell-input');
-
     input.value = target.textContent;
 
     while (target.firstChild) {
       target.removeChild(target.firstChild);
+    }
+
+    if (input.value.length > 4) {
+
     }
 
     target.appendChild(input);
@@ -335,12 +340,42 @@ trElements.map(tr => tr.addEventListener('dblclick', (action) => {
       if (key.code === 'Enter') {
         target.removeChild(input);
 
-        if (input.value.length === 0) {
+        if (input.value.length < 4 && (target === tr.children[0]
+                                        || target === tr.children[1])) {
           target.appendChild(document.createTextNode(firstValue));
+
+          setTimeout(() => {
+            showWarning(messageWindow, warningMessage);
+          }, 1000);
+
+          setTimeout(() => {
+            showError(messageWindow, editError);
+          }, 3000);
+        } else if (target === tr.children[3] && +input.value < 18) {
+          target.appendChild(document.createTextNode(firstValue));
+
+          setTimeout(() => {
+            showWarning(messageWindow, warningMessage);
+          }, 1000);
+
+          setTimeout(() => {
+            showError(messageWindow, smallAgeError);
+          }, 3000);
+        } else if (target === tr.children[3] && +input.value > 90) {
+          target.appendChild(document.createTextNode(firstValue));
+
+          setTimeout(() => {
+            showWarning(messageWindow, warningMessage);
+          }, 1000);
+
+          setTimeout(() => {
+            showError(messageWindow, bigAgeError);
+          }, 3000);
         } else {
           firstValue.includes('$')
             ? target.appendChild(document.createTextNode(
-              `$${Number(input.value).toLocaleString('en-US')}`))
+              `$${Number(input.value.slice(
+                0).split(',').join('')).toLocaleString('en-US')}`))
             : target.appendChild(document.createTextNode(input.value));
         }
       }
