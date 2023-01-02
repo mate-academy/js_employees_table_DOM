@@ -1,39 +1,46 @@
 'use strict';
 
+const root = document.querySelector('body');
 const tHead = document.querySelector('thead');
 const tBody = document.querySelector('tbody');
 
 let asc = true;
 let checkColumn;
 
-function ascSort(rowCollection, targetIndex) {
+function ascSort(rowCollection, targetIndex, type) {
   asc = true;
 
   return Array.from(rowCollection).sort((a, b) => {
-    const cellA = a.cells[targetIndex].innerText;
-    const cellB = b.cells[targetIndex].innerText;
+    const cellA = normalize(type, a.cells[targetIndex].innerText);
+    const cellB = normalize(type, b.cells[targetIndex].innerText);
 
-    return isNaN(normalize(cellA))
+    return isNaN(cellA)
       ? cellA.localeCompare(cellB)
-      : normalize(cellA) - normalize(cellB);
+      : cellA - cellB;
   });
 }
 
-function descSort(rowCollection, targetIndex) {
+function descSort(rowCollection, targetIndex, type) {
   asc = false;
 
   return Array.from(rowCollection).sort((a, b) => {
-    const cellA = a.cells[targetIndex].innerText;
-    const cellB = b.cells[targetIndex].innerText;
+    const cellA = normalize(type, a.cells[targetIndex].innerText);
+    const cellB = normalize(type, b.cells[targetIndex].innerText);
 
-    return isNaN(normalize(cellA))
+    return isNaN(cellA)
       ? cellB.localeCompare(cellA)
-      : normalize(cellB) - normalize(cellA);
+      : cellB - cellA;
   });
 }
 
-function normalize(str) {
-  return +str.replace(/[,$]/g, '');
+function normalize(type, value) {
+  if (type !== 'Salary' && type !== 'salary') {
+    return value;
+  }
+
+  return isNaN(parseInt(value))
+    ? parseInt(value.replace(/[$,]/g, ''))
+    : '$' + Number(value).toLocaleString('en-US');
 }
 
 function appendElement(table, el) {
@@ -44,14 +51,15 @@ function appendElement(table, el) {
 tHead.addEventListener('click', (evt) => {
   const title = evt.target;
   const idx = title.cellIndex;
+  const type = title.innerText;
 
   if (checkColumn === idx && asc) {
-    return descSort(tBody.rows, idx).forEach(rowEl => {
+    return descSort(tBody.rows, idx, type).forEach(rowEl => {
       appendElement(tBody, rowEl);
     });
   }
 
-  return ascSort(tBody.rows, idx).forEach(rowEl => {
+  return ascSort(tBody.rows, idx, type).forEach(rowEl => {
     appendElement(tBody, rowEl);
     checkColumn = idx;
   });
@@ -131,9 +139,10 @@ form.insertAdjacentHTML('afterbegin', `
 
     <button id="submit" type="submit">Save to table</button>
 `);
-document.body.append(form);
+root.append(form);
 
 // Add data from form in table
+
 function onAddRow(e) {
   e.preventDefault();
 
@@ -146,83 +155,105 @@ function onAddRow(e) {
   const newSalary = '$' + Number(salaryInput).toLocaleString('en-US');
 
   if (nameInput.length < 4) {
-    return pushNotification('Error',
-      'Please, enter at least 4 characters', 'error');
-  } else if (positionInput.length <= 0) {
-    return pushNotification('Error',
-      'Please, enter position', 'error');
-  } else if (ageInput < 18 || ageInput > 90) {
-    return pushNotification(
-      'Error', 'Please, enter a valid age', 'error');
-  } else {
-    const row = document.createElement('tr');
-
-    row.insertAdjacentHTML('afterbegin', `
-        <td>${nameInput}</td>
-        <td>${positionInput}</td>
-        <td>${officeInput}</td>
-        <td>${ageInput}</td>
-        <td>${newSalary}</td>
-    `);
-
-    tBody.append(row);
-
-    pushNotification('Success',
-      'Employee was added to the table', 'success');
-
-    form.reset();
+    throw new Error('Name can not be less than 4 letters');
   }
+
+  if (positionInput.length <= 0) {
+    throw new Error('Please enter position name.');
+  }
+
+  if (ageInput < 18 || ageInput > 90) {
+    throw new Error('Please, enter a valid age.');
+  }
+
+  const row = document.createElement('tr');
+
+  row.insertAdjacentHTML('afterbegin', `
+      <td>${nameInput}</td>
+      <td>${positionInput}</td>
+      <td>${officeInput}</td>
+      <td>${ageInput}</td>
+      <td>${newSalary}</td>
+  `);
+
+  tBody.append(row);
+
+  pushNotification('Success',
+    'Employee was added to the table', 'success');
+
+  form.reset();
 }
 
-form.addEventListener('submit', onAddRow);
+form.addEventListener('submit', (evt) => {
+  try {
+    onAddRow(evt);
+  } catch (error) {
+    pushNotification('Error', error.message, 'error');
+  }
+});
 
 // Notification
-const pushNotification = (title, description, type) => {
-  const notification = document.createElement('div');
+const { bottom, right, width } = form.getBoundingClientRect();
 
-  notification.insertAdjacentHTML('afterbegin', `
-    <div class="notification ${type}" data-qa="notification">
+const container = document.createElement('div');
+
+container.style.cssText = `
+  position: absolute;
+  top: ${bottom + 24}px;
+  left: ${right - width}px;
+  display: grid;
+  gap: 24px;
+`;
+root.append(container);
+
+const pushNotification = (title, description, type) => {
+  container.insertAdjacentHTML('beforeend', `
+    <div
+      class="notification ${type}"
+      data-qa="notification"
+      style="position: static"
+    >
       <h2 class="title">${title}</h2>
 
       <p>${description}</p>
     </div>
   `);
 
-  document.body.after(notification);
+  const notification = document.querySelectorAll('.notification');
 
-  setTimeout(() => notification.remove(), 3000);
+  notification.forEach(el => {
+    setTimeout(() => el.remove(), 2000);
+  });
 };
 
 // Edit cell on dblclick
 const cells = document.querySelector('tbody');
+const formInputs = [...form.querySelectorAll('input, select')];
 
 cells.addEventListener('dblclick', (e) => {
   const cell = e.target;
-  const cellPrevValue = cell.textContent;
-  const input = document.createElement('input');
+  const cellPrevValue = cell.innerHTML;
+  const input = formInputs[cell.cellIndex].cloneNode(true);
 
   input.style.width = `${parseInt(getComputedStyle(cell).width)}px`;
   input.classList.add('cell-input');
-  input.value = cell.textContent;
-  cell.textContent = '';
+  input.value = normalize(input.name, cell.innerHTML);
+  cell.innerHTML = '';
   cell.append(input);
 
+  function checkCellInput() {
+    input.value.length <= 0
+      ? cell.innerHTML = cellPrevValue
+      : cell.innerHTML = normalize(input.name, input.value);
+  }
+
   input.onblur = function() {
-    if (input.value.length <= 0) {
-      cell.textContent = cellPrevValue;
-    } else {
-      cell.textContent = input.value;
-      input.remove();
-    }
+    checkCellInput();
   };
 
   cell.addEventListener('keydown', (evt) => {
     if (evt.key === 'Enter') {
-      if (input.value.length <= 0) {
-        cell.textContent = cellPrevValue;
-      } else {
-        cell.textContent = input.value;
-      }
+      checkCellInput();
     }
   });
 });
