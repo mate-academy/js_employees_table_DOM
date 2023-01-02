@@ -1,6 +1,6 @@
 'use strict';
 
-const body = document.querySelector('tbody');
+const tableBody = document.querySelector('tbody');
 const head = document.querySelector('thead');
 const listTd = document.querySelectorAll('td');
 const sortBy = document.querySelectorAll('th');
@@ -11,7 +11,7 @@ form.classList.add('new-employee-form');
 button.innerText = 'Save to table';
 
 let textElement = '';
-let flag = '';
+
 const people = [];
 let selectObj = {};
 const strings = ['name', 'position', 'office'];
@@ -61,14 +61,14 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 };
 
 const getNumber = (string) => {
-  return parseFloat(string.replace('$', '').replace(',', '.'));
+  return +string.replace('$', '').replace(',', '');
 };
 
 const CreateObjectsByContent = () => {
   people.splice(0, people.length);
 
-  for (let i = 0; i < body.children.length; i++) {
-    const [namePerson, position, office, age, salary] = body
+  for (let i = 0; i < tableBody.children.length; i++) {
+    const [namePerson, position, office, age, salary] = tableBody
       .children[i].children;
 
     people.push({
@@ -157,7 +157,7 @@ const lostFocus = (element) => {
   });
 };
 
-const functionFoSort = (sortKey) => {
+const functionFoSort = (sortKey, flag) => {
   return (a, b) => {
     const firstElement = a[sortKey];
     const secondElement = b[sortKey];
@@ -184,17 +184,21 @@ const functionFoSort = (sortKey) => {
 
 sortBy.forEach(el => {
   el.addEventListener('click', (e) => {
-    body.innerHTML = '';
+    tableBody.innerHTML = '';
 
-    if (!flag || flag === 'DESC') {
-      flag = 'ASC';
-    } else if (flag === 'ASC') {
-      flag = 'DESC';
+    if (!e.target.getAttribute('flag')
+      || e.target.getAttribute('flag') === 'DESC') {
+      e.target.setAttribute('flag', 'ASC');
+    } else {
+      e.target.setAttribute('flag', 'DESC');
     }
-    people.sort(functionFoSort(e.target.innerText.toLowerCase()));
+
+    people.sort(functionFoSort(
+      e.target.innerText.toLowerCase(),
+      e.target.getAttribute('flag')));
 
     people.forEach(person => {
-      body.insertAdjacentHTML('beforeend',
+      tableBody.insertAdjacentHTML('beforeend',
         `<tr
           ${JSON.stringify(person) === JSON.stringify(selectObj)
     ? 'class="active"'
@@ -204,17 +208,17 @@ sortBy.forEach(el => {
             <td>${person.position}</td>
             <td>${person.office}</td>
             <td>${person.age}</td>
-            <td>$${person.salary.toFixed(3).replace('.', ',')}</td>
+            <td>$${(person.salary).toLocaleString('en').replaceAll('.', ',')}</td>
         </tr>`);
     });
 
-    setClick(body.querySelectorAll('tr'));
+    setClick(tableBody.querySelectorAll('tr'));
     setDobleClick(document.querySelectorAll('td'));
     setKeyboard(document.querySelectorAll('td'));
   });
 });
 
-setClick(body.querySelectorAll('tr'));
+setClick(tableBody.querySelectorAll('tr'));
 
 const createLabel = (index) => {
   const input = document.createElement('input');
@@ -288,17 +292,21 @@ button.addEventListener('click', (e) => {
     return;
   }
 
-  body.insertAdjacentHTML('beforeend',
+  tableBody.insertAdjacentHTML('beforeend',
     `<tr>
             <td>${objectValid.name}</td>
             <td>${objectValid.position}</td>
             <td>${objectValid.office}</td>
             <td>${objectValid.age}</td>
-            <td>$${(+objectValid.salary).toLocaleString('en')}</td>
+            <td>
+              $${(+objectValid.salary)
+    .toLocaleString('en')
+    .replaceAll('.', ',')}
+            </td>
         </tr>`);
   objectValid.salary = +objectValid.salary;
   people.push(objectValid);
-  setClick(body.querySelectorAll('tr'));
+  setClick(tableBody.querySelectorAll('tr'));
   setDobleClick(document.querySelectorAll('td'));
   setKeyboard(document.querySelectorAll('td'));
 
