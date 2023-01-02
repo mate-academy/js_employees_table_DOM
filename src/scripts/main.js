@@ -351,6 +351,16 @@ trElements.map(tr => tr.addEventListener('dblclick', (action) => {
           setTimeout(() => {
             showError(messageWindow, editError);
           }, 3000);
+        } else if (input.value.split('').every(item => item === ' ')) {
+          target.appendChild(document.createTextNode(firstValue));
+
+          setTimeout(() => {
+            showWarning(messageWindow, warningMessage);
+          }, 1000);
+
+          setTimeout(() => {
+            showError(messageWindow, editError);
+          }, 3000);
         } else if (target === tr.children[3] && +input.value < 18) {
           target.appendChild(document.createTextNode(firstValue));
 
