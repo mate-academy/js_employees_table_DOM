@@ -142,6 +142,19 @@ form.insertAdjacentHTML('afterbegin', `
 root.append(form);
 
 // Add data from form in table
+function valitadeInput(input) {
+  if (input.name === 'name' && input.value.length < 4) {
+    throw new Error('Name can not be less than 4 letters');
+  }
+
+  if (input.name === 'position' && input.value.length <= 0) {
+    throw new Error('Please enter position name.');
+  }
+
+  if (input.name === 'age' && (input.value < 18 || input.value > 90)) {
+    throw new Error('Please, enter a valid age.');
+  }
+}
 
 function onAddRow(e) {
   e.preventDefault();
@@ -154,17 +167,7 @@ function onAddRow(e) {
   const salaryInput = data.get('salary');
   const newSalary = '$' + Number(salaryInput).toLocaleString('en-US');
 
-  if (nameInput.length < 4) {
-    throw new Error('Name can not be less than 4 letters');
-  }
-
-  if (positionInput.length <= 0) {
-    throw new Error('Please enter position name.');
-  }
-
-  if (ageInput < 18 || ageInput > 90) {
-    throw new Error('Please, enter a valid age.');
-  }
+  inputs.forEach(input => valitadeInput(input));
 
   const row = document.createElement('tr');
 
@@ -222,18 +225,23 @@ const pushNotification = (title, description, type) => {
   const notification = document.querySelectorAll('.notification');
 
   notification.forEach(el => {
-    setTimeout(() => el.remove(), 2000);
+    setTimeout(() => el.remove(), 10000);
   });
 };
 
 // Edit cell on dblclick
-const cells = document.querySelector('tbody');
-const formInputs = [...form.querySelectorAll('input, select')];
+const inputs = form.querySelectorAll('input, select');
 
-cells.addEventListener('dblclick', (e) => {
+function checkCellInput(input, cell, prev) {
+  input.value.length <= 0
+    ? cell.innerHTML = prev
+    : cell.innerHTML = normalize(input.name, input.value);
+}
+
+tBody.addEventListener('dblclick', (e) => {
   const cell = e.target;
   const cellPrevValue = cell.innerHTML;
-  const input = formInputs[cell.cellIndex].cloneNode(true);
+  const input = inputs[cell.cellIndex].cloneNode(true);
 
   input.style.width = `${parseInt(getComputedStyle(cell).width)}px`;
   input.classList.add('cell-input');
@@ -241,19 +249,22 @@ cells.addEventListener('dblclick', (e) => {
   cell.innerHTML = '';
   cell.append(input);
 
-  function checkCellInput() {
-    input.value.length <= 0
-      ? cell.innerHTML = cellPrevValue
-      : cell.innerHTML = normalize(input.name, input.value);
-  }
-
   input.onblur = function() {
-    checkCellInput();
+    try {
+      valitadeInput(input);
+      checkCellInput(input, cell, cellPrevValue);
+
+      pushNotification('Success',
+        'Employee was added to the table', 'success');
+    } catch (error) {
+      input.focus();
+      pushNotification('Error', error.message, 'error');
+    }
   };
 
-  cell.addEventListener('keydown', (evt) => {
+  input.addEventListener('keydown', (evt) => {
     if (evt.key === 'Enter') {
-      checkCellInput();
+      input.blur();
     }
   });
 });
