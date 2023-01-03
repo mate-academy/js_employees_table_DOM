@@ -3,7 +3,6 @@
 const tableBody = document.querySelector('tbody');
 const head = document.querySelector('thead');
 const listTd = document.querySelectorAll('td');
-const sortBy = document.querySelectorAll('th');
 const button = document.createElement('button');
 const form = document.createElement('form');
 
@@ -182,24 +181,23 @@ const functionFoSort = (sortKey, flag) => {
   };
 };
 
-sortBy.forEach(el => {
-  el.addEventListener('click', (e) => {
-    tableBody.innerHTML = '';
+head.addEventListener('click', (e) => {
+  tableBody.innerHTML = '';
 
-    if (!e.target.getAttribute('flag')
+  if (!e.target.getAttribute('flag')
       || e.target.getAttribute('flag') === 'DESC') {
-      e.target.setAttribute('flag', 'ASC');
-    } else {
-      e.target.setAttribute('flag', 'DESC');
-    }
+    e.target.setAttribute('flag', 'ASC');
+  } else {
+    e.target.setAttribute('flag', 'DESC');
+  }
 
-    people.sort(functionFoSort(
-      e.target.innerText.toLowerCase(),
-      e.target.getAttribute('flag')));
+  people.sort(functionFoSort(
+    e.target.innerText.toLowerCase(),
+    e.target.getAttribute('flag')));
 
-    people.forEach(person => {
-      tableBody.insertAdjacentHTML('beforeend',
-        `<tr
+  people.forEach(person => {
+    tableBody.insertAdjacentHTML('beforeend',
+      `<tr
           ${JSON.stringify(person) === JSON.stringify(selectObj)
     ? 'class="active"'
     : ''}
@@ -212,12 +210,11 @@ sortBy.forEach(el => {
     .toLocaleString('en')
     .replaceAll('.', ',')}</td>
         </tr>`);
-    });
-
-    setClick(tableBody.querySelectorAll('tr'));
-    setDobleClick(document.querySelectorAll('td'));
-    setKeyboard(document.querySelectorAll('td'));
   });
+
+  setClick(tableBody.querySelectorAll('tr'));
+  setDobleClick(document.querySelectorAll('td'));
+  setKeyboard(document.querySelectorAll('td'));
 });
 
 setClick(tableBody.querySelectorAll('tr'));
