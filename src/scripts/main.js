@@ -2,6 +2,7 @@
 
 const headers = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
+const sortTable = [...tbody.children];
 let colIndex = -1;
 
 headers.addEventListener('click', (e) => {
@@ -14,8 +15,6 @@ headers.addEventListener('click', (e) => {
 });
 
 function sortingTable(index, nameColumn, directSorting) {
-  const sortTable = [...tbody.children];
-
   sortTable.sort((first, second) => {
     const a = first.children[index].innerText;
     const b = second.children[index].innerText;
@@ -49,14 +48,21 @@ function toNormalNumber(string) {
   return Number(res);
 };
 
-[...tbody.children].forEach(tr => {
-  tr.addEventListener('click', () => {
-    [...tbody.children].forEach(row =>
-      row.classList.contains('active') ? row.classList.remove('active') : 1);
-
-    tr.classList.add('active');
-  });
+sortTable.forEach(tr => {
+  rowSelected(tr);
 });
+
+function rowSelected(el) {
+  el.addEventListener('click', () => {
+    isActiveClass(sortTable);
+    el.classList.add('active');
+  });
+}
+
+function isActiveClass(arr) {
+  arr.forEach(row =>
+    row.classList.contains('active') ? row.classList.remove('active') : 1);
+};
 
 document.querySelector('body').insertAdjacentHTML('beforeend', `
   <form class='new-employee-form'>
@@ -124,9 +130,21 @@ function normalizeValueForm(key, value) {
     : value;
 }
 
+const maxAge = 90;
+const minAge = 18;
+const minSalary = 1000;
+const maxSalary = 1000000;
+
 function validForm(key, value) {
-  if (!value) {
+  if (!value.replace(/ /g, '')) {
     pushNotification('Error', 'error', 'Fill in all fields');
+
+    return false;
+  }
+
+  if (value.includes('  ')) {
+    pushNotification('Error', 'error',
+      'Field should not contains multiple  spaces');
 
     return false;
   }
@@ -138,9 +156,16 @@ function validForm(key, value) {
     return false;
   }
 
-  if (key === 'age' && (+value > 90 || +value < 18)) {
+  if (key === 'age' && (+value > maxAge || +value < minAge)) {
     pushNotification('Error', 'error',
       'Age must be at least 18 and not more 90');
+
+    return false;
+  }
+
+  if (key === 'salary' && (+value > maxSalary || +value < minSalary)) {
+    pushNotification('Error', 'error',
+      'Salary must be at least $1,000 and not more $1,000,000');
 
     return false;
   }
