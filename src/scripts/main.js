@@ -135,6 +135,10 @@ const loadingMessage = 'Loading, please wait...';
 const correctSalary = 'Please enter valid salary. It must be more then 0$!';
 const editError = `Cell must not be empty or must contain
 more then 4 letters, please enter valid information.`;
+const stringError = `This cell must contain only letters,
+please enter valid information!`;
+const numberError = `This cell must contain only numbers and must not be empty,
+please enter valid information!`;
 
 // Create window message
 
@@ -202,6 +206,16 @@ function showWarning(error, text) {
   messageWindow.prepend(titleOfMessage);
 };
 
+function showMessages(error) {
+  setTimeout(() => {
+    showWarning(messageWindow, warningMessage);
+  }, 1000);
+
+  setTimeout(() => {
+    showError(messageWindow, error);
+  }, 3000);
+};
+
 // Add info from form to table
 
 const formElement = document.querySelector('form');
@@ -218,37 +232,13 @@ formElement.addEventListener('submit', (e) => {
   // Checking that form data is correct
 
   if (nameInputValue.length < 4) {
-    setTimeout(() => {
-      showWarning(messageWindow, warningMessage);
-    }, 1000);
-
-    setTimeout(() => {
-      showError(messageWindow, smallNameError);
-    }, 3000);
-  } else if (ageInputValue < 18) {
-    setTimeout(() => {
-      showWarning(messageWindow, warningMessage);
-    }, 1000);
-
-    setTimeout(() => {
-      showError(messageWindow, smallAgeError);
-    }, 3000);
-  } else if (ageInputValue > 90) {
-    setTimeout(() => {
-      showWarning(messageWindow, warningMessage);
-    }, 1000);
-
-    setTimeout(() => {
-      showError(messageWindow, bigAgeError);
-    }, 3000);
-  } else if (salaryInputValue <= 0) {
-    setTimeout(() => {
-      showWarning(messageWindow, warningMessage);
-    }, 1000);
-
-    setTimeout(() => {
-      showError(messageWindow, correctSalary);
-    }, 3000);
+    showMessages(smallNameError);
+  } else if (+ageInputValue < 18) {
+    showMessages(smallAgeError);
+  } else if (+ageInputValue > 90) {
+    showMessages(bigAgeError);
+  } else if (+salaryInputValue <= 0) {
+    showMessages(correctSalary);
   } else {
     setTimeout(() => {
       const trElement = document.createElement('tr');
@@ -290,7 +280,6 @@ trElements.map(tr => tr.addEventListener('dblclick', (action) => {
   }
 
   // Just check if the target is on the office check or on the other cells
-
   if (target === tr.children[2]) {
     const select = document.createElement('select');
 
@@ -329,64 +318,90 @@ trElements.map(tr => tr.addEventListener('dblclick', (action) => {
       target.removeChild(target.firstChild);
     }
 
-    if (input.value.length > 4) {
-
-    }
-
     target.appendChild(input);
     input.focus();
 
     input.addEventListener('keydown', (key) => {
+      function checkStringInputType(value) {
+        if (value.search(/\d/) !== -1) {
+          return true;
+        } else {
+          return false;
+        }
+      };
+
+      function checkNumberInputType(value) {
+        if (value.search(/\D/) !== -1) {
+          return true;
+        } else {
+          return false;
+        }
+      };
+
       if (key.code === 'Enter') {
         target.removeChild(input);
 
-        if (input.value.length < 4 && (target === tr.children[0]
-                                        || target === tr.children[1])) {
-          target.appendChild(document.createTextNode(firstValue));
+        const targets = [
+          tr.children[0],
+          tr.children[1],
+          tr.children[3],
+          tr.children[4],
+        ];
 
-          setTimeout(() => {
-            showWarning(messageWindow, warningMessage);
-          }, 1000);
+        switch (target) {
+          case targets[0]:
+          case targets[1]:
+            if (input.value.length < 4) {
+              target.appendChild(document.createTextNode(firstValue));
+              showMessages(smallNameError);
+            } else if (checkStringInputType(input.value)) {
+              target.appendChild(document.createTextNode(firstValue));
+              showMessages(stringError);
+            } else if (input.value.split('').every(x => x === ' ')) {
+              target.appendChild(document.createTextNode(firstValue));
+              showMessages(editError);
+            } else {
+              target.appendChild(document.createTextNode(input.value));
+            }
+            break;
 
-          setTimeout(() => {
-            showError(messageWindow, editError);
-          }, 3000);
-        } else if (input.value.split('').every(item => item === ' ')) {
-          target.appendChild(document.createTextNode(firstValue));
+          case targets[2]:
+            if (checkNumberInputType(input.value)) {
+              target.appendChild(document.createTextNode(firstValue));
+              showMessages(numberError);
+            } else if (input.value.length <= 0) {
+              target.appendChild(document.createTextNode(firstValue));
+              showMessages(editError);
+            } else if (+input.value < 18) {
+              target.appendChild(document.createTextNode(firstValue));
+              showMessages(smallAgeError);
+            } else if (+input.value > 90) {
+              target.appendChild(document.createTextNode(firstValue));
+              showMessages(bigAgeError);
+            } else {
+              target.appendChild(document.createTextNode(input.value));
+            }
+            break;
 
-          setTimeout(() => {
-            showWarning(messageWindow, warningMessage);
-          }, 1000);
+          case targets[3]:
+            const number = input.value.slice(1).split(',').join('');
 
-          setTimeout(() => {
-            showError(messageWindow, editError);
-          }, 3000);
-        } else if (target === tr.children[3] && +input.value < 18) {
-          target.appendChild(document.createTextNode(firstValue));
-
-          setTimeout(() => {
-            showWarning(messageWindow, warningMessage);
-          }, 1000);
-
-          setTimeout(() => {
-            showError(messageWindow, smallAgeError);
-          }, 3000);
-        } else if (target === tr.children[3] && +input.value > 90) {
-          target.appendChild(document.createTextNode(firstValue));
-
-          setTimeout(() => {
-            showWarning(messageWindow, warningMessage);
-          }, 1000);
-
-          setTimeout(() => {
-            showError(messageWindow, bigAgeError);
-          }, 3000);
-        } else {
-          firstValue.includes('$')
-            ? target.appendChild(document.createTextNode(
-              `$${Number(input.value.slice(
-                0).split(',').join('')).toLocaleString('en-US')}`))
-            : target.appendChild(document.createTextNode(input.value));
+            if (checkNumberInputType(number)) {
+              target.appendChild(document.createTextNode(firstValue));
+              showMessages(numberError);
+            } else if (+number <= 0) {
+              target.appendChild(document.createTextNode(firstValue));
+              showMessages(correctSalary);
+            } else if (!input.value.includes('$')) {
+              target.appendChild(
+                document.createTextNode(
+                  `$${(+input.value).toLocaleString('en-US')}`));
+            } else {
+              target.appendChild(document.createTextNode(input.value));
+            }
+            break;
+          default:
+            target.appendChild(document.createTextNode(input.value));
         }
       }
     });
