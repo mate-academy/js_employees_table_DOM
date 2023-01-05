@@ -177,7 +177,7 @@ function validateForm() {
   const nameF = document.querySelector('[data-qa="name"]');
   const x = nameF.value;
 
-  if (x.length < 5) {
+  if (x.length < 4) {
     return false;
   }
 
@@ -200,23 +200,25 @@ document.querySelector('form').addEventListener('submit',
     event.preventDefault();
     tableNotification(validateForm());
 
-    const tr = document.createElement('tr');
-    const cols = ['name', 'position', 'office', 'age', 'salary'];
+    if (validateForm()) {
+      const tr = document.createElement('tr');
+      const cols = ['name', 'position', 'office', 'age', 'salary'];
 
-    for (let q = 0; q < cols.length; ++q) {
-      const tdNew = document.createElement('td');
+      for (let q = 0; q < cols.length; ++q) {
+        const tdNew = document.createElement('td');
 
-      tdNew.textContent = document.getElementById(cols[q]).value;
+        tdNew.textContent = document.getElementById(cols[q]).value;
 
-      if (cols[q] === 'salary') {
-        tdNew.textContent = formatSalary(document.getElementById(cols[q]).value
-        );
+        if (cols[q] === 'salary') {
+          tdNew.textContent = formatSalary(
+            document.getElementById(cols[q]).value);
+        }
+
+        tr.appendChild(tdNew);
       }
 
-      tr.appendChild(tdNew);
+      document.querySelector('tbody').appendChild(tr);
     }
-
-    document.querySelector('tbody').appendChild(tr);
   });
 
 function formatSalary(salary) {
