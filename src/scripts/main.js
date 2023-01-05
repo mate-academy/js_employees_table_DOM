@@ -91,7 +91,6 @@ formCl.addEventListener('click', (e) => {
     return;
   }
 
-
   tr.innerHTML = `
     <td>${namePerson}</td>
     <td>${formCl.elements.position.value}</td>
@@ -199,6 +198,16 @@ thead.addEventListener('click', (e) => {
 let td;
 let textarea;
 
+class Activ {
+  constructor(textareaN) {
+    this.textarea = textareaN;
+  }
+
+  activ() {
+    textarea.focus();
+  }
+}
+
 document.addEventListener('dblclick', (e) => {
   if (td) {
     return;
@@ -209,14 +218,15 @@ document.addEventListener('dblclick', (e) => {
   if (!td) {
     return;
   }
-
   textarea = document.createElement('textarea');
-
   textarea.value = td.innerHTML;
   textarea.classList.add('cell-input');
   td.style.display = 'none';
   td.after(textarea);
-  textarea.focus();
+
+  const activS = new Activ(textarea);
+
+  activS.activ();
 });
 
 document.addEventListener('keydown', (e) => {
