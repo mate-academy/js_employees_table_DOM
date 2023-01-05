@@ -1,0 +1,389 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 14,
+    "passes": 5,
+    "pending": 0,
+    "failures": 9,
+    "start": "2022-10-27T13:28:41.215Z",
+    "end": "2022-10-27T13:29:13.743Z",
+    "duration": 32065,
+    "testsRegistered": 14,
+    "passPercent": 35.714285714285715,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "8b1f9815-caf0-4e8d-b32b-ea852d2d1359",
+      "title": "",
+      "fullFile": "cypress/integration/jsEmployeesTableDOM.spec.js",
+      "file": "cypress/integration/jsEmployeesTableDOM.spec.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "5f4779b4-6167-4653-87fc-11a901662342",
+          "title": "Employees table",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "should sort by name ASC",
+              "fullTitle": "Employees table should sort by name ASC",
+              "timedOut": null,
+              "duration": 912,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Name').click();\ncy.checkValuesSorted('Name', 'ASC');",
+              "err": {},
+              "uuid": "bbfd993b-e10e-4e01-b9ab-b4828910ace1",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should sort by name DESC",
+              "fullTitle": "Employees table should sort by name DESC",
+              "timedOut": null,
+              "duration": 768,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Name').dblclick();\ncy.checkValuesSorted('Name', 'DESC');",
+              "err": {
+                "message": "TypeError: The following error originated from your application code, not from Cypress.\n\n  > Cannot read property 'cellIndex' of null\n\nWhen Cypress detects uncaught errors originating from your application it will automatically fail the current test.\n\nThis behavior is configurable, and you can choose to turn this off by listening to the `uncaught:exception` event.\n\nhttps://on.cypress.io/uncaught-exception-from-application",
+                "estack": "TypeError: The following error originated from your application code, not from Cypress.\n\n  > Cannot read property 'cellIndex' of null\n\nWhen Cypress detects uncaught errors originating from your application it will automatically fail the current test.\n\nThis behavior is configurable, and you can choose to turn this off by listening to the `uncaught:exception` event.\n\nhttps://on.cypress.io/uncaught-exception-from-application\n    at editStart (http://localhost:8080/main.d8ebb8d6.js:245:10)\n    at HTMLTableElement.<anonymous> (http://localhost:8080/main.d8ebb8d6.js:241:3)",
+                "diff": null
+              },
+              "uuid": "abca57d0-8aae-448c-bcfa-83491eb0e2b2",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should sort by age ASC",
+              "fullTitle": "Employees table should sort by age ASC",
+              "timedOut": null,
+              "duration": 336,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Age').click();\ncy.checkValuesSorted('Age', 'ASC');",
+              "err": {},
+              "uuid": "2f6b0a5d-2cc7-4bca-8f2e-03ede5d1b0ea",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should sort by age DESC",
+              "fullTitle": "Employees table should sort by age DESC",
+              "timedOut": null,
+              "duration": 526,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Age').dblclick();\ncy.checkValuesSorted('Age', 'DESC');",
+              "err": {
+                "message": "TypeError: The following error originated from your application code, not from Cypress.\n\n  > Cannot read property 'cellIndex' of null\n\nWhen Cypress detects uncaught errors originating from your application it will automatically fail the current test.\n\nThis behavior is configurable, and you can choose to turn this off by listening to the `uncaught:exception` event.\n\nhttps://on.cypress.io/uncaught-exception-from-application",
+                "estack": "TypeError: The following error originated from your application code, not from Cypress.\n\n  > Cannot read property 'cellIndex' of null\n\nWhen Cypress detects uncaught errors originating from your application it will automatically fail the current test.\n\nThis behavior is configurable, and you can choose to turn this off by listening to the `uncaught:exception` event.\n\nhttps://on.cypress.io/uncaught-exception-from-application\n    at editStart (http://localhost:8080/main.d8ebb8d6.js:245:10)\n    at HTMLTableElement.<anonymous> (http://localhost:8080/main.d8ebb8d6.js:241:3)",
+                "diff": null
+              },
+              "uuid": "a76fb348-393e-4eda-86fe-6dc12c53e688",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should sort by salary ASC",
+              "fullTitle": "Employees table should sort by salary ASC",
+              "timedOut": null,
+              "duration": 250,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Salary').click();\ncy.checkValuesSorted('Salary', 'ASC');",
+              "err": {},
+              "uuid": "71a638ab-ec78-4141-8704-aebeba3a7387",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should sort by salary DESC",
+              "fullTitle": "Employees table should sort by salary DESC",
+              "timedOut": null,
+              "duration": 489,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Salary').dblclick();\ncy.checkValuesSorted('Salary', 'DESC');",
+              "err": {
+                "message": "TypeError: The following error originated from your application code, not from Cypress.\n\n  > Cannot read property 'cellIndex' of null\n\nWhen Cypress detects uncaught errors originating from your application it will automatically fail the current test.\n\nThis behavior is configurable, and you can choose to turn this off by listening to the `uncaught:exception` event.\n\nhttps://on.cypress.io/uncaught-exception-from-application",
+                "estack": "TypeError: The following error originated from your application code, not from Cypress.\n\n  > Cannot read property 'cellIndex' of null\n\nWhen Cypress detects uncaught errors originating from your application it will automatically fail the current test.\n\nThis behavior is configurable, and you can choose to turn this off by listening to the `uncaught:exception` event.\n\nhttps://on.cypress.io/uncaught-exception-from-application\n    at editStart (http://localhost:8080/main.d8ebb8d6.js:245:10)\n    at HTMLTableElement.<anonymous> (http://localhost:8080/main.d8ebb8d6.js:241:3)",
+                "diff": null
+              },
+              "uuid": "e6005ee8-e4ba-4a96-90ea-ea54db9f5b0b",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have proper values in rows after the sorting ASC",
+              "fullTitle": "Employees table should have proper values in rows after the sorting ASC",
+              "timedOut": null,
+              "duration": 308,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.get('th').contains('Name').click();\ncy.compareRowValuesAfterSort('Airi Satou', ['Airi Satou', 'Accountant', 'Tokyo', '33', '$162,700']);",
+              "err": {},
+              "uuid": "039110a6-b8c8-49f0-b0b7-4fff2a325731",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have proper values in rows after the sorting DESC",
+              "fullTitle": "Employees table should have proper values in rows after the sorting DESC",
+              "timedOut": null,
+              "duration": 467,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.get('th').contains('Name').dblclick();\ncy.compareRowValuesAfterSort('Zorita Serrano', ['Zorita Serrano', 'Software Engineer', 'San Francisco', '56', '$115,000']);",
+              "err": {
+                "message": "TypeError: The following error originated from your application code, not from Cypress.\n\n  > Cannot read property 'cellIndex' of null\n\nWhen Cypress detects uncaught errors originating from your application it will automatically fail the current test.\n\nThis behavior is configurable, and you can choose to turn this off by listening to the `uncaught:exception` event.\n\nhttps://on.cypress.io/uncaught-exception-from-application",
+                "estack": "TypeError: The following error originated from your application code, not from Cypress.\n\n  > Cannot read property 'cellIndex' of null\n\nWhen Cypress detects uncaught errors originating from your application it will automatically fail the current test.\n\nThis behavior is configurable, and you can choose to turn this off by listening to the `uncaught:exception` event.\n\nhttps://on.cypress.io/uncaught-exception-from-application\n    at editStart (http://localhost:8080/main.d8ebb8d6.js:245:10)\n    at HTMLTableElement.<anonymous> (http://localhost:8080/main.d8ebb8d6.js:241:3)",
+                "diff": null
+              },
+              "uuid": "ea9ab895-a678-4bed-9173-6b22c65b839d",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "row should have class active after click",
+              "fullTitle": "Employees table row should have class active after click",
+              "timedOut": null,
+              "duration": 189,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Airi Satou').parent().should('not.have.class', 'active');\ncy.contains('Airi Satou').click();\ncy.contains('Airi Satou').parent().should('have.class', 'active');",
+              "err": {},
+              "uuid": "c918b0b0-6baa-4afe-95e6-87277a062f85",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should be able to add a new employee",
+              "fullTitle": "Employees table should be able to add a new employee",
+              "timedOut": null,
+              "duration": 5912,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.fillNewEmployeeForm('Adam', 'QA Engineer', 'San Francisco', 18, 50000);\ncy.get('[data-qa=\"notification\"]').should('have.class', 'success');\ncy.compareRowValuesAfterSort('Adam', ['Adam', 'QA Engineer', 'San Francisco', '18', '$50,000']);",
+              "err": {
+                "message": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress/integration/jsEmployeesTableDOM.spec.js:332:40)",
+                "diff": null
+              },
+              "uuid": "68fcbce2-b7ec-45f0-a263-256462f6c033",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have warning notification on name field\n   with invalid input",
+              "fullTitle": "Employees table should have warning notification on name field\n   with invalid input",
+              "timedOut": null,
+              "duration": 5618,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.fillNewEmployeeForm('Ada', 'QA Engineer', 'San Francisco', 18, 50000);\ncy.get('[data-qa=\"notification\"]').should('have.class', 'error');\ncy.checkDataDoesntExist('Ada', 50000);",
+              "err": {
+                "message": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress/integration/jsEmployeesTableDOM.spec.js:337:40)",
+                "diff": null
+              },
+              "uuid": "0ac5b7df-588c-4746-a642-2ff2aaedd9b8",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have warning notification on position \n  field with invalid input",
+              "fullTitle": "Employees table should have warning notification on position \n  field with invalid input",
+              "timedOut": null,
+              "duration": 5333,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.get('[data-qa=\"name\"]').type('Adam');\ncy.get('[data-qa=\"office\"]').select('San Francisco');\ncy.get('[data-qa=\"age\"]').type('18{enter}');\ncy.get('[data-qa=\"salary\"]').type('50000{enter}');\ncy.get('button').contains('Save to table').click();\ncy.get('[data-qa=\"notification\"]').should('have.class', 'error');\ncy.checkDataDoesntExist('Adam', 50000);",
+              "err": {
+                "message": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress/integration/jsEmployeesTableDOM.spec.js:346:40)",
+                "diff": null
+              },
+              "uuid": "7dda380c-01e3-4974-b691-d3720189d81c",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have warning notification on age field\n   if the age less than 18",
+              "fullTitle": "Employees table should have warning notification on age field\n   if the age less than 18",
+              "timedOut": null,
+              "duration": 5509,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.fillNewEmployeeForm('Adam', 'QA Engineer', 'San Francisco', 17, 50000);\ncy.get('[data-qa=\"notification\"]').should('have.class', 'error');\ncy.checkDataDoesntExist('Adam', 50000);",
+              "err": {
+                "message": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress/integration/jsEmployeesTableDOM.spec.js:351:40)",
+                "diff": null
+              },
+              "uuid": "3562112a-5400-4619-90d6-a628fd7e3f8e",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have warning notification on age field\n   if the age bigger than 90",
+              "fullTitle": "Employees table should have warning notification on age field\n   if the age bigger than 90",
+              "timedOut": null,
+              "duration": 5448,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.fillNewEmployeeForm('Adam', 'QA Engineer', 'San Francisco', 91, 50000);\ncy.get('[data-qa=\"notification\"]').should('have.class', 'error');\ncy.checkDataDoesntExist('Adam', 50000);",
+              "err": {
+                "message": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress/integration/jsEmployeesTableDOM.spec.js:356:40)",
+                "diff": null
+              },
+              "uuid": "15cd78ce-6250-4b38-9fcd-638086fad88b",
+              "parentUUID": "5f4779b4-6167-4653-87fc-11a901662342",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "bbfd993b-e10e-4e01-b9ab-b4828910ace1",
+            "2f6b0a5d-2cc7-4bca-8f2e-03ede5d1b0ea",
+            "71a638ab-ec78-4141-8704-aebeba3a7387",
+            "039110a6-b8c8-49f0-b0b7-4fff2a325731",
+            "c918b0b0-6baa-4afe-95e6-87277a062f85"
+          ],
+          "failures": [
+            "abca57d0-8aae-448c-bcfa-83491eb0e2b2",
+            "a76fb348-393e-4eda-86fe-6dc12c53e688",
+            "e6005ee8-e4ba-4a96-90ea-ea54db9f5b0b",
+            "ea9ab895-a678-4bed-9173-6b22c65b839d",
+            "68fcbce2-b7ec-45f0-a263-256462f6c033",
+            "0ac5b7df-588c-4746-a642-2ff2aaedd9b8",
+            "7dda380c-01e3-4974-b691-d3720189d81c",
+            "3562112a-5400-4619-90d6-a628fd7e3f8e",
+            "15cd78ce-6250-4b38-9fcd-638086fad88b"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 32065,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "6.2.1"
+    },
+    "marge": {
+      "options": {
+        "reportDir": "raw_reports",
+        "overwrite": false,
+        "html": false,
+        "json": true
+      },
+      "version": "5.1.0"
+    }
+  }
+}
