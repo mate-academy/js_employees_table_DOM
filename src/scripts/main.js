@@ -51,6 +51,8 @@ formCl.addEventListener('click', (e) => {
   const massageErrorName = 'Имя пользователя должно иметь не менее 4 букв';
   const massageErrorAgeMin = 'Возраст не должен быть меньше 18 лет';
   const massageErrorAgeMax = 'Возраст не должен быть больше 90 лет';
+  const massageErrorNumber = 'Значение возраста должно быть числом';
+  const massageErrorSalary = 'Значение зарплата должно быть числом';
 
   const tr = document.createElement('tr');
 
@@ -59,7 +61,7 @@ formCl.addEventListener('click', (e) => {
   const salaryPerson = '$'
   + new Intl.NumberFormat('en-us').format(formCl.elements.salary.value);
 
-  if (namePerson.length <= 4) {
+  if (namePerson.length < 4) {
     massageHTML(massageErrorName, 'error');
 
     return;
@@ -76,6 +78,19 @@ formCl.addEventListener('click', (e) => {
 
     return;
   }
+
+  if (typeof agePerson !== 'number') {
+    massageHTML(massageErrorNumber, 'error');
+
+    return;
+  }
+
+  if (typeof agePerson !== 'number') {
+    massageHTML(massageErrorSalary, 'error');
+
+    return;
+  }
+
 
   tr.innerHTML = `
     <td>${namePerson}</td>
