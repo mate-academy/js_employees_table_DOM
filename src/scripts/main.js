@@ -177,6 +177,8 @@ addEmployee.addEventListener('submit', submitEvent => {
   newRow.insertCell(3).innerText = employeeInfo.get('age');
   newRow.insertCell(4).innerText = salary;
 
+  rows.push(newRow);
+
   addEmployee.reset();
 
   pushNotification(
