@@ -195,6 +195,28 @@ function validateForm() {
   return true;
 }
 
+function clearForm() {
+  const nameF = document.querySelector('[data-qa="name"]');
+
+  nameF.value = '';
+
+  const ageF = document.querySelector('[data-qa="age"]');
+
+  ageF.value = '';
+
+  const positionF = document.querySelector('[data-qa="position"]');
+
+  positionF.value = '';
+
+  const salaryF = document.querySelector('[data-qa="salary"]');
+
+  salaryF.value = '';
+
+  const officeF = document.querySelector('[data-qa="office"]');
+
+  officeF.value = 'Tokio';
+}
+
 document.querySelector('form').addEventListener('submit',
   function() {
     event.preventDefault();
@@ -219,6 +241,8 @@ document.querySelector('form').addEventListener('submit',
 
       document.querySelector('tbody').appendChild(tr);
     }
+
+    clearForm();
   });
 
 function formatSalary(salary) {
