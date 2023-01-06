@@ -58,8 +58,6 @@ formCl.addEventListener('click', (e) => {
 
   const namePerson = formCl.elements.name.value;
   const agePerson = formCl.elements.age.value;
-  const salaryPerson = '$'
-  + new Intl.NumberFormat('en-us').format(formCl.elements.salary.value);
 
   if (namePerson.length < 4) {
     massageHTML(massageErrorName, 'error');
@@ -79,17 +77,20 @@ formCl.addEventListener('click', (e) => {
     return;
   }
 
-  if (typeof agePerson !== 'number') {
+  if (!Number(agePerson)) {
     massageHTML(massageErrorNumber, 'error');
 
     return;
   }
 
-  if (typeof agePerson !== 'number') {
+  if (!Number(formCl.elements.salary.value)) {
     massageHTML(massageErrorSalary, 'error');
 
     return;
   }
+
+  const salaryPerson = '$'
+  + new Intl.NumberFormat('en-us').format(formCl.elements.salary.value);
 
   tr.innerHTML = `
     <td>${namePerson}</td>
