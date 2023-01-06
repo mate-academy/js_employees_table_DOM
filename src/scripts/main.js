@@ -209,6 +209,8 @@ tbody.addEventListener('dblclick', (e) => {
   input.addEventListener('blur', () => {
     if (!validForm(input.name, input.value)) {
       target.innerHTML = prevValue;
+
+      return;
     }
 
     target.innerHTML = normalizeValueForm(input.name, input.value);
