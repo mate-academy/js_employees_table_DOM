@@ -6,7 +6,7 @@ const tabBody = document.querySelector('tbody');
 
 const rows = tabBody.rows;
 
-let clickCount;
+let clickCount = null;
 
 function convertToNumber(elem) {
   return elem.split('$').join('').split(',').join('');
@@ -138,7 +138,7 @@ form.addEventListener('submit', ev => {
     || data.get('age') === 0
     || data.get('salary') === 0) {
     pushNotification('Error', 'No data filled', 'error');
-  } else if (data.get('name') < 4) {
+  } else if (data.get('name').length < 4) {
     pushNotification('Error', 'Invalid name', 'error');
   } else if (+data.get('age') < 18 || +data.get('age') > 90) {
     pushNotification('Error',
@@ -160,10 +160,9 @@ form.addEventListener('submit', ev => {
       tr.append(td);
 
       pushNotification('Success', 'Successfully added', 'success');
+      form.reset();
     }
   }
-
-  form.reset();
 
   tabBody.append(tr);
 });
