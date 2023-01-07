@@ -2,7 +2,6 @@
 
 const headers = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
-const sortTable = [...tbody.children];
 let colIndex = -1;
 
 headers.addEventListener('click', (e) => {
@@ -15,6 +14,8 @@ headers.addEventListener('click', (e) => {
 });
 
 function sortingTable(index, nameColumn, directSorting) {
+  const sortTable = [...tbody.children];
+
   sortTable.sort((first, second) => {
     const a = first.children[index].innerText;
     const b = second.children[index].innerText;
@@ -48,16 +49,12 @@ function toNormalNumber(string) {
   return Number(res);
 };
 
-sortTable.forEach(tr => {
-  rowSelected(tr);
-});
+tbody.addEventListener('click', (e) => {
+  const target = e.target;
 
-function rowSelected(el) {
-  el.addEventListener('click', () => {
-    isActiveClass(sortTable);
-    el.classList.add('active');
-  });
-}
+  isActiveClass([...tbody.children]);
+  target.parentElement.classList.add('active');
+});
 
 function isActiveClass(arr) {
   arr.forEach(row =>
