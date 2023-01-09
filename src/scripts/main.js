@@ -11,38 +11,39 @@ headers.forEach((header) => {
 function sortColumn(index, isASC) {
   let sortedRows = [];
 
-  if (isASC) {
-    // eslint-disable-next-line chai-friendly/no-unused-expressions
-    index === 4
-      ? sortedRows = Array.from(tableBody.rows).sort((a, b) =>
-        (salaryToNumber(a.cells[index].innerHTML)
-        - salaryToNumber(b.cells[index].innerHTML)))
-      : sortedRows = Array.from(tableBody.rows).sort((a, b) =>
-        (a.cells[index].innerHTML.localeCompare(b.cells[index].innerHTML)));
-  } else {
-    // eslint-disable-next-line chai-friendly/no-unused-expressions
-    index === 4
-      ? sortedRows = Array.from(tableBody.rows).sort((a, b) =>
-        (salaryToNumber(b.cells[index].innerHTML)
-        - salaryToNumber(a.cells[index].innerHTML)))
-      : sortedRows = Array.from(tableBody.rows).sort((a, b) =>
-        (b.cells[index].innerHTML.localeCompare(a.cells[index].innerHTML)));
-  }
+  sortedRows = Array.from(tableBody.rows).sort((a, b) => {
+    const first = a.cells[index].innerHTML;
+    const second = b.cells[index].innerHTML;
+
+    if (isASC) {
+      return index === 4
+        ? (salaryToNumber(first) - salaryToNumber(second))
+        : first.localeCompare(second);
+    } else {
+      return index === 4
+        ? (salaryToNumber(second) - salaryToNumber(first))
+        : second.localeCompare(first);
+    }
+  });
 
   table.tBodies[0].append(...sortedRows);
 }
 
-headers.forEach((header, index) => {
+function salaryToNumber(text) {
+  return +text.slice(1).replace(/,/g, '');
+};
+
+headers.forEach(function(header, index) {
   header.addEventListener('click', (e) => {
     let order;
 
-    // eslint-disable-next-line chai-friendly/no-unused-expressions
-    e.target.dataset.sorted === 'ASC'
-      ? (e.target.dataset.sorted = 'DESC',
-      order = false)
-      : (e.target.dataset.sorted = 'ASC',
-      order = true);
-
+    if (e.target.dataset.sorted === 'ASC') {
+      e.target.dataset.sorted = 'DESC';
+      order = false;
+    } else {
+      e.target.dataset.sorted = 'ASC';
+      order = true;
+    }
     sortColumn(index, order);
   });
 });
@@ -81,6 +82,7 @@ table.insertAdjacentHTML('afterend', `
     </label>
     <label>Office: 
       <select data-qa="office" name="office" type="text">
+        <option disabled selected value="" hidden></option>
         <option value="Tokyo">Tokyo</option>
         <option value="Singapore">Singapore</option>
         <option value="London">London</option>
@@ -130,7 +132,7 @@ button.addEventListener('click', (e) => {
 });
 
 function formValidation(personName, personPosition, personAge, personSalary) {
-  if (personName.value.length < 4) {
+  if (personName.value.trim().length < 4) {
     const nameStyle = form.querySelector('[data-qa="name"]');
 
     nameStyle.style.borderColor = '#e25644';
@@ -139,13 +141,13 @@ function formValidation(personName, personPosition, personAge, personSalary) {
       nameStyle.style.borderColor = '';
     }, 2000);
 
-    pushNotification(450, 20, 'Щось пішло не так',
-      `Name: меньше 4х символів`, 'error');
+    pushNotification(450, 20, 'Something went wrong',
+      `Name: less than 4 characters`, 'error');
 
     return false;
   }
 
-  if (personPosition.value.length < 1) {
+  if (personPosition.value.trim().length < 1) {
     const positionStyle = form.querySelector('[data-qa="position"]');
 
     positionStyle.style.borderColor = '#e25644';
@@ -154,8 +156,8 @@ function formValidation(personName, personPosition, personAge, personSalary) {
       positionStyle.style.borderColor = '';
     }, 2000);
 
-    pushNotification(450, 20, 'Щось пішло не так',
-      `Position: не може бути пустим`, 'error');
+    pushNotification(450, 20, 'Something went wrong',
+      `Position: cannot be empty`, 'error');
 
     return false;
   }
@@ -170,8 +172,8 @@ function formValidation(personName, personPosition, personAge, personSalary) {
       ageStyle.style.borderColor = '';
     }, 2000);
 
-    pushNotification(450, 20, 'Щось пішло не так',
-      'Age: має бути від 18 до 90', 'error');
+    pushNotification(450, 20, 'Something went wrong',
+      'Age: must be between 18 and 90', 'error');
 
     return false;
   }
@@ -185,14 +187,14 @@ function formValidation(personName, personPosition, personAge, personSalary) {
       salaryStyle.style.borderColor = '';
     }, 2000);
 
-    pushNotification(450, 20, 'Щось пішло не так',
-      `Дохід не може бути пустим або від'ємним`, 'error');
+    pushNotification(450, 20, 'Something went wrong',
+      `Saary cannot be empty or negative`, 'error');
 
     return false;
   }
 
-  pushNotification(450, 20, 'Вау - це успіх',
-    'Нові дані додано до таблиці', 'success');
+  pushNotification(450, 20, 'Wow - this is a success',
+    'New data is added to the table', 'success');
 
   return true;
 };
@@ -213,10 +215,6 @@ function saveDataToTable(personName, position, office, age, salary) {
 
 function numberWithComma(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
-
-function salaryToNumber(text) {
-  return +text.slice(1).replace(/,/g, '');
 };
 
 function unselectTable() {
@@ -251,17 +249,22 @@ tableBody.addEventListener('dblclick', (e) => {
   let input;
 
   switch (index) {
+    case 1:
+      input = document.createElement('input');
+      input.type = 'text';
+      break;
     case 2:
       input = document.createElement('select');
 
       input.innerHTML = `
          <select>
-           <option value="Tokyo">Tokyo</option>
-           <option value="Singapore">Singapore</option>
-           <option value="London">London</option>
-           <option value="New York">New York</option>
-           <option value="Edinburgh">Edinburgh</option>
-           <option value="San Francisco">San Francisco</option>
+          <option disabled selected value="" hidden></option>
+          <option value="Tokyo">Tokyo</option>
+          <option value="Singapore">Singapore</option>
+          <option value="London">London</option>
+          <option value="New York">New York</option>
+          <option value="Edinburgh">Edinburgh</option>
+          <option value="San Francisco">San Francisco</option>
          </select>
        `;
       break;
@@ -297,43 +300,54 @@ tableBody.addEventListener('dblclick', (e) => {
   });
 
   const inputValidation = (i) => {
-    if (input.value !== '') {
-      switch (i) {
-        case 0:
-          if (input.value.length < 4) {
-            row.innerText = tempValue;
+    if (!input.value) {
+      // eslint-disable-next-line no-return-assign
+      return row.innerText = tempValue;
+    }
 
-            pushNotification(450, 20, 'Щось пішло не так',
-              `Name: меньше 4х символів`, 'error');
-            break;
-          }
-          row.innerText = input.value;
-          break;
-        case 3:
-          if (input.value < 18 || input.value > 90) {
-            row.innerText = tempValue;
+    switch (i) {
+      case 0:
+        if (input.value.trim().length < 4) {
+          row.innerText = tempValue;
 
-            pushNotification(450, 20, 'Щось пішло не так',
-              'Вік має бути від 18 до 90', 'error');
-            break;
-          }
-          row.innerText = input.value;
+          pushNotification(450, 20, 'Something went wrong',
+            `Name: less than 4 characters`, 'error');
           break;
-        case 4:
-          if (input.value < 0) {
-            row.innerText = tempValue;
+        }
+        row.innerText = input.value;
+        break;
+      case 1:
+        if (input.value.trim().length < 1) {
+          row.innerText = tempValue;
 
-            pushNotification(450, 20, 'Щось пішло не так',
-              'Перевірь правельність введених даних', 'error');
-            break;
-          }
-          row.innerText = `$${numberWithComma(input.value)}`;
+          pushNotification(450, 20, 'Something went wrong',
+            `Position: cannot be empty`, 'error');
           break;
-        default:
-          row.innerText = input.value;
-      }
-    } else {
-      row.innerText = tempValue;
+        }
+        row.innerText = input.value;
+        break;
+      case 3:
+        if (input.value < 18 || input.value > 90) {
+          row.innerText = tempValue;
+
+          pushNotification(450, 20, 'Something went wrong',
+            'Age must be between 18 and 90', 'error');
+          break;
+        }
+        row.innerText = input.value;
+        break;
+      case 4:
+        if (input.value < 0) {
+          row.innerText = tempValue;
+
+          pushNotification(450, 20, 'Something went wrong',
+            'Check that the data you entered is correct', 'error');
+          break;
+        }
+        row.innerText = `$${numberWithComma(input.value)}`;
+        break;
+      default:
+        row.innerText = input.value;
     }
     input.remove();
   };
