@@ -22,16 +22,15 @@ function stringCompare(a, b, child) {
   return result;
 }
 
-// Sorting function
-
 const sort = (ev) => {
   const tr = document.querySelectorAll('tr');
   const tableContent = [...tr].slice(1, tr.length - 1);
+  const targetDataAtr = ev.target.dataset.asc;
 
   tbody.innerHTML = '';
 
-  if (ev.target.dataset.asc === 'true'
-  || (ev.target.dataset.asc === 'false' && previous !== ev.target.innerText)) {
+  if (targetDataAtr === 'true'
+  || (targetDataAtr === 'false' && previous !== ev.target.innerText)) {
     switch (ev.target.innerText) {
       case 'Name':
         tableContent.sort((a, b) =>
@@ -65,8 +64,7 @@ const sort = (ev) => {
 
     ev.target.dataset.asc = 'false';
     previous = ev.target.innerText;
-  } else if (
-    ev.target.dataset.asc === 'false' && previous === ev.target.innerText) {
+  } else {
     switch (ev.target.innerText) {
       case 'Name':
         tableContent.sort((a, b) =>
@@ -107,8 +105,6 @@ const sort = (ev) => {
 
 table.addEventListener('click', sort);
 
-// Active on select
-
 const handlerSelect = (ev) => {
   const tr = document.getElementsByTagName('tr');
 
@@ -121,8 +117,6 @@ const handlerSelect = (ev) => {
 };
 
 tbody.addEventListener('click', handlerSelect);
-
-// Notification
 
 const pushNotification = (posTop, posRight, title, description, type) => {
   const div = document.createElement('div');
@@ -146,8 +140,6 @@ const pushNotification = (posTop, posRight, title, description, type) => {
     div.remove();
   }, 2000);
 };
-
-// Form to add employees
 
 document.body.insertAdjacentHTML('beforeend', `
 <form name="adder" class="new-employee-form">
@@ -230,7 +222,7 @@ const validate = (ev) => {
   } else {
     tbody.insertAdjacentHTML('beforeend', `
     <tr>
-            <td>${name}</td>
+            <td>${nameElem}</td>
             <td>${position}</td>
             <td>${office}</td>
             <td>${age}</td>
@@ -245,8 +237,6 @@ const validate = (ev) => {
 };
 
 button.addEventListener('click', validate);
-
-// contenteditable
 
 tbody.addEventListener('dblclick', (ev) => {
   const text = ev.target.textContent;
