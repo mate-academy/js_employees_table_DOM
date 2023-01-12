@@ -132,8 +132,17 @@ form.addEventListener('submit', action => {
 
     newMessage('Invalid name'
       , 'Name length should be more then 3 letters.', 'error');
-  } else if (fields[3].children[0].value < 18
-      || fields[3].children[0].value > 90) {
+  }
+
+  if (fields[4].children[0].value < 0) {
+    removeOldMessage();
+
+    newMessage('Invalid salary'
+      , 'Salary should be more then 0.', 'error');
+  }
+
+  if (fields[3].children[0].value < 18
+      || fields[3].children[0].value > 90 || fields[3].children[0].value < 0) {
     removeOldMessage();
 
     newMessage('Invalid age'
