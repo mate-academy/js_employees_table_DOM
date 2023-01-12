@@ -12,16 +12,6 @@ let sortAsc = false;
 [].forEach.call(headers, (header, index) => {
   header.addEventListener('click', (events) => {
     sortColumn(index, false);
-
-    // const curr = rows;
-
-    // rows.forEach(item => {
-    //   if (item === curr) {
-    //     item.className = 'active';
-    //   } else {
-    //     item.className = '';
-    //   }
-    // });
   });
 });
 
@@ -30,11 +20,7 @@ let sortAsc = false;
     const curr = e.target.closest('tr');
 
     rows.forEach(row => {
-      if (row === curr) {
-        row.className = 'active';
-      } else {
-        row.className = '';
-      }
+      row === curr ? row.className = 'active' : row.className = '';
     });
   });
 });
