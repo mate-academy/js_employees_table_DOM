@@ -102,6 +102,11 @@ function addInput(text, type = 'text') {
 
   if (type === 'text') {
     input.pattern = '[A-Za-z -]+';
+
+    const validNote = 'this.setCustomValidity("Use words, \' \', and - ")';
+
+    input.setAttribute('onchange', 'this.setCustomValidity("")');
+    input.setAttribute('oninvalid', validNote);
   }
 
   input.name = text;
@@ -135,7 +140,11 @@ form.addEventListener('submit', (send) => {
   const checkName = dataObject.name.length < 4;
   const checkPosition = dataObject.position.length < 4;
   const checkAge = +dataObject.age < 18 || +dataObject.age > 90;
-  const textMessage = `Text must contain > 3 symbols`;
+  const textMessage = `
+    Text must contain > 3 symbols
+    only words, spaces and '-'
+    without digits
+  `;
   const ageMessage = `Age must be at 18 to 90`;
   const added = 'employee added to the table';
 
@@ -145,8 +154,12 @@ form.addEventListener('submit', (send) => {
     form.after(note(ageMessage));
   } else {
     addToTable(dataObject);
-    form.after(note(added, 'success'));
+
+    const successNote = note(added, 'success');
+
+    form.after(successNote);
     document.querySelector('.new-employee-form').reset();
+    setTimeout(() => successNote.remove(), 2000);
   }
 });
 
