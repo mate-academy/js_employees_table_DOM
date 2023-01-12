@@ -33,33 +33,29 @@ table.addEventListener('click', (e) => {
       case 'Office':
         e.target.classList.toggle('asc');
 
-        if (e.target.classList.contains('asc')) {
-          sortElements = listElements.sort((a, b) => {
-            return a.children[index].textContent
-              .localeCompare(b.children[index].textContent);
-          });
-        } else {
-          sortElements = listElements.sort((a, b) => {
-            return b.children[index].textContent
-              .localeCompare(a.children[index].textContent);
-          });
-        }
+        sortElements = listElements.sort((a, b) => {
+          return a.children[index].textContent
+            .localeCompare(b.children[index].textContent);
+        });
+
+        if (!e.target.classList.contains('asc')) {
+          sortElements.reverse();
+        };
+
         e.target.classList.add(tableCell);
         break;
       case 'Age':
         e.target.classList.toggle('asc');
 
-        if (e.target.classList.contains('asc')) {
-          sortElements = listElements.sort((a, b) => {
-            return (+a.children[index].textContent) - (+b
-              .children[index].textContent);
-          });
-        } else {
-          sortElements = listElements.sort((a, b) => {
-            return (+b.children[index].textContent) - (+a
-              .children[index].textContent);
-          });
-        }
+        sortElements = listElements.sort((a, b) => {
+          return (+a.children[index].textContent) - (+b
+            .children[index].textContent);
+        });
+
+        if (!e.target.classList.contains('asc')) {
+          sortElements.reverse();
+        };
+
         e.target.classList.add(tableCell);
         break;
       case 'Salary':
@@ -70,15 +66,14 @@ table.addEventListener('click', (e) => {
             .textContent.split(',').join('').slice(1));
         };
 
-        if (e.target.classList.contains('asc')) {
-          sortElements = listElements.sort((a, b) => {
-            return (convertToNumber(a)) - (convertToNumber(b));
-          });
-        } else {
-          sortElements = listElements.sort((a, b) => {
-            return (convertToNumber(b)) - (convertToNumber(a));
-          });
-        }
+        sortElements = listElements.sort((a, b) => {
+          return (convertToNumber(a)) - (convertToNumber(b));
+        });
+
+        if (!e.target.classList.contains('asc')) {
+          sortElements.reverse();
+        };
+
         e.target.classList.add(tableCell);
         break;
     }
