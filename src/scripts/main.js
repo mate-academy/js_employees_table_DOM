@@ -137,8 +137,8 @@ form.addEventListener('submit', (send) => {
 
   const data = new FormData(form);
   const dataObject = Object.fromEntries(data.entries());
-  const checkName = dataObject.name.length < 4;
-  const checkPosition = dataObject.position.length < 4;
+  const checkName = validateTextData(dataObject.name).length < 4;
+  const checkPosition = validateTextData(dataObject.position).length < 4;
   const checkAge = +dataObject.age < 18 || +dataObject.age > 90;
   const textMessage = `
     Text must contain > 3 symbols
