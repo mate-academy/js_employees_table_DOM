@@ -165,11 +165,19 @@ form.addEventListener('submit', (e) => {
 
   pushNotification('Success message',
     'New employee was successfully added to the table.', 'success');
+
+  form.reset();
 });
 
 // notification
 
 const pushNotification = (title, description, type) => {
+  const oldNotification = document.querySelector('.notification');
+
+  if (oldNotification) {
+    oldNotification.remove();
+  }
+
   document.body.insertAdjacentHTML('beforeend', `
     <div data-qa="notification" class="notification ${type}">
       <h2 class="title">${title}</h2>
@@ -183,3 +191,46 @@ const pushNotification = (title, description, type) => {
     notification.remove();
   }, '5000');
 };
+
+// cells editing
+
+tbody.addEventListener('dblclick', e => {
+  const cell = e.target.closest('td');
+  const oldData = cell.textContent;
+
+  cell.innerHTML = `
+    <input class="cell-input" name="input" value=${oldData} type="text">
+  `;
+
+  const cellInput = document.querySelector('.cell-input');
+
+  if (cell.cellIndex === 3 || cell.cellIndex === 4) {
+    cellInput.type = 'number';
+  }
+
+  cellInput.focus();
+
+  cellInput.addEventListener('blur', () => {
+    setCellData(cell, cellInput, oldData);
+  });
+
+  cellInput.addEventListener('keydown', ev => {
+    if (ev.code === 'Enter') {
+      setCellData(cell, cellInput, oldData);
+    }
+  });
+});
+
+function setCellData(cell, input, oldData) {
+  let newData = input.value;
+
+  if (!newData) {
+    newData = oldData;
+  }
+
+  cell.textContent = `${newData}`;
+
+  if (cell.cellIndex === 4) {
+    cell.textContent = `$${Number(newData).toLocaleString('en-US')}`;
+  }
+}
