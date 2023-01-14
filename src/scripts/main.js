@@ -15,6 +15,7 @@ const submitBtn = document.createElement('button');
 const block = document.createElement('div');
 const blockTitle = document.createElement('h3');
 const textP = document.createElement('p');
+let defaultText;
 
 addInput('name');
 addInput('position');
@@ -42,6 +43,39 @@ form.append(submitBtn);
 form.className = 'new-employee-form';
 table.after(form);
 
+tableRows.addEventListener('dblclick', e => {
+  const td = e.target.closest('td');
+
+  if (!td || !tableRows.contains(td)) {
+    return null;
+  }
+
+  defaultText = td.textContent;
+
+  const input = createInput();
+
+  td.textContent = '';
+  td.append(input);
+
+  input.addEventListener('blur', addNewData);
+
+  input.addEventListener('keypress', (keypress) => {
+    if (keypress.key === 'Enter') {
+      addNewData(keypress);
+    }
+  });
+
+  function addNewData(action) {
+    let value = action.target.value;
+
+    if (!(value.trim().length > 0)) {
+      value = defaultText;
+    }
+    td.textContent = value;
+    input.remove();
+  }
+});
+
 tableRows.addEventListener('click', e => {
   const item = e.target.closest('tr');
 
@@ -50,7 +84,9 @@ tableRows.addEventListener('click', e => {
   }
 
   [...rowsCollection].forEach(element => {
-    element.classList.remove('active');
+    if (element.classList.contains('active')) {
+      element.classList.toggle('active');
+    }
   });
   item.classList.add('active');
 });
@@ -205,3 +241,13 @@ function validateTextData(dataText) {
 
   return textArray.join(' ');
 }
+
+function createInput(startValue = '') {
+  const input = document.createElement('input');
+
+  input.className = 'cell-input';
+  input.type = 'text';
+  input.value = startValue;
+
+  return input;
+};
