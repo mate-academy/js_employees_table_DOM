@@ -166,7 +166,7 @@ body.addEventListener('dblclick', (evt) => {
 
       case 4:
         newCell.value = newCell.value !== ''
-          ? '$' + Number(newCell.value).toLocaleString('en-US')
+          ? '$' + Number(newCell.value.remove('$')).toLocaleString('en-US')
           : previousValue;
 
         break;
