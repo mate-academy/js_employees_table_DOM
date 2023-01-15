@@ -104,9 +104,7 @@ const createNotification = (type) => {
 const formButton = document.querySelector('button');
 const nameInput = document.querySelector('[name = name]');
 const positionInput = document.querySelector('[name = position]');
-const officeSelect = Array.from(
-  document.querySelector('[name = office]'));
-const officeOption = officeSelect.find(option => option.selected === true);
+const officeSelect = document.querySelector('[name = office]');
 const ageInput = document.querySelector('[name = age]');
 const salaryInput = document.querySelector('[name = salary]');
 
@@ -134,7 +132,7 @@ const addEmployee = () => {
   newEmployee.innerHTML = `
   <td>${nameInput.value}</td>
   <td>${positionInput.value}</td>
-  <td>${officeOption.value}</td>
+  <td>${officeSelect.value}</td>
   <td>${Number(ageInput.value)}</td>
   <td>${salaryConverted}</td>
 `;
