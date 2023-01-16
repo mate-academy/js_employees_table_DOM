@@ -34,9 +34,9 @@ header.addEventListener('click', (evt) => {
       }
     });
 
-  counter = indexTitle === currentIndex
-    ? counter
-    : 0;
+  if (indexTitle !== currentIndex) {
+    counter = 0;
+  }
 
   if (counter % 2 === 1) {
     body.append(...container.reverse());
@@ -128,17 +128,10 @@ body.addEventListener('dblclick', (evt) => {
   const newCell = document.createElement('input');
 
   newCell.classList.add('cell-input');
+  newCell.setAttribute('type', 'text');
 
-  switch (selectedCell.cellIndex) {
-    case 3:
-      newCell.setAttribute('type', 'number');
-
-      break;
-
-    default:
-      newCell.setAttribute('type', 'text');
-
-      break;
+  if (selectedCell.cellIndex === 3) {
+    newCell.setAttribute('type', 'number');
   }
 
   selectedCell.textContent = '';
@@ -147,36 +140,29 @@ body.addEventListener('dblclick', (evt) => {
   newCell.focus();
 
   const modifyCell = function() {
-    switch (selectedCell.cellIndex) {
-      case 0:
-        if (newCell.value.length < 4) {
-          pushNotification('Error', 'Name should have more than 3 letters');
-          newCell.value = previousValue;
-        }
+    if (newCell.value.length < 4
+         && selectedCell.cellIndex === 0) {
+      pushNotification('Error', 'Name should have more than 3 letters');
+      newCell.value = previousValue;
+    }
 
-        break;
+    if ((newCell.value < 18 || newCell.value > 90)
+        && selectedCell.cellIndex === 3) {
+      pushNotification('Error', 'Incorrect age', 'error');
+      newCell.value = previousValue;
+    }
 
-      case 3:
-        if (newCell.value < 18 || newCell.value > 90) {
-          pushNotification('Error', 'Incorrect age', 'error');
-          newCell.value = previousValue;
-        }
+    if (selectedCell.cellIndex === 4
+        && newCell.value !== '') {
+      const numbers = newCell.value
+        .replace('$', '')
+        .replaceAll(',', '');
 
-        break;
+      newCell.value = '$' + Number(numbers).toLocaleString('en-US');
+    }
 
-      case 4:
-        newCell.value = newCell.value !== ''
-          ? '$' + Number(newCell.value.remove('$')).toLocaleString('en-US')
-          : previousValue;
-
-        break;
-
-      default:
-        if (newCell.value === '') {
-          newCell.value = previousValue;
-        }
-
-        break;
+    if (newCell.value === '') {
+      newCell.value = previousValue;
     }
   };
 
