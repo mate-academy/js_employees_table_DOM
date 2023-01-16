@@ -54,30 +54,36 @@ tbody.addEventListener('click', (e) => {
 
 // form added
 
-const form = document.createElement('form');
+document.body.insertAdjacentHTML('beforeend', `
+  <form class="new-employee-form">
+    <label>Name: <input name="name" type="text" data-qa="name"></label>
 
-form.classList.add('new-employee-form');
+    <label>Position: <input name="position" type="text" data-qa="position">
+    </label>
 
-form.innerHTML = `
-  <label>Name: <input name="name" type="text" data-qa="name"></label>
-  <label>Position: <input name="position" type="text" data-qa="position">
-  </label>
-  <label>Office:
-    <select name="office" data-qa="office">
-      <option>Tokyo</option>
-      <option>Singapore</option>
-      <option>London</option>
-      <option>New York</option>
-      <option>Edinburgh</option>
-      <option>San Francisco</option>
-    </select>
-  </label>
-  <label>Age: <input name="age" type="number" data-qa="age"></label>
-  <label>Salary: <input name="salary" type="number" data-qa="salary"></label>
-  <button>Save to table</button>`;
+    <label>Office:
+      <select name="office" data-qa="office">
+        <option>Tokyo</option>
 
-document.body.append(form);
+        <option>Singapore</option>
 
+        <option>London</option>
+
+        <option>New York</option>
+
+        <option>Edinburgh</option>
+
+        <option>San Francisco</option>
+      </select>
+    </label>
+
+    <label>Age: <input name="age" type="number" data-qa="age"></label>
+
+    <label>Salary: <input name="salary" type="number" data-qa="salary"></label>
+
+    <button>Save to table</button>
+  </form>`
+);
 // notification creation
 
 const createNotification = (type) => {
@@ -122,21 +128,24 @@ const validateForm = () => {
 };
 
 const addEmployee = () => {
-  const newEmployee = document.createElement('tr');
   const salaryConverted = Number(salaryInput
     .value)
     .toLocaleString('en-US', {
       style: 'currency', currency: 'USD', maximumFractionDigits: 0,
     });
 
-  newEmployee.innerHTML = `
+  tbody.insertAdjacentHTML('beforeend', `
   <td>${nameInput.value}</td>
+
   <td>${positionInput.value}</td>
+
   <td>${officeSelect.value}</td>
+
   <td>${Number(ageInput.value)}</td>
+
   <td>${salaryConverted}</td>
-`;
-  tbody.append(newEmployee);
+`);
+
 };
 
 formButton.addEventListener('click', (e) => {
@@ -180,8 +189,9 @@ tbody.addEventListener('dblclick', (e) => {
   inputElement.addEventListener('mouseleave', addTextHandler);
 
   inputElement.addEventListener('keypress', (ev) => {
-    if (ev.key === 'Enter') {
-      addTextHandler();
+    if (ev.key !== 'Enter') {
+      return;
     }
+    addTextHandler();
   });
 });
