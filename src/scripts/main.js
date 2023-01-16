@@ -145,7 +145,11 @@ const addEmployee = () => {
 
   <td>${salaryConverted}</td>
 `);
-
+  nameInput.value = '';
+  positionInput.value = '';
+  officeSelect.value = '';
+  ageInput.value = '';
+  salaryInput.value = '';
 };
 
 formButton.addEventListener('click', (e) => {
