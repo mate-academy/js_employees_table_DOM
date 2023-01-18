@@ -5,7 +5,6 @@
 const table = document.querySelector('table');
 const tbody = table.tBodies[0];
 const header = table.tHead;
-const rows = Array.from(table.tBodies[0].rows);
 let isASCSorted = true;
 const getSalary = (salaryString) => {
   return Number(salaryString
@@ -14,6 +13,7 @@ const getSalary = (salaryString) => {
 };
 
 header.addEventListener('click', (e) => {
+  const rows = Array.from(table.tBodies[0].rows);
   const columnName = e.target.innerText;
   const index = e.target.cellIndex;
 
@@ -113,6 +113,10 @@ const positionInput = document.querySelector('[name = position]');
 const officeSelect = document.querySelector('[name = office]');
 const ageInput = document.querySelector('[name = age]');
 const salaryInput = document.querySelector('[name = salary]');
+const convertSalary = (salary) => Number(salary)
+  .toLocaleString('en-US', {
+    style: 'currency', currency: 'USD', maximumFractionDigits: 0,
+  });
 
 const validateForm = () => {
   switch (true) {
@@ -128,12 +132,6 @@ const validateForm = () => {
 };
 
 const addEmployee = () => {
-  const salaryConverted = Number(salaryInput
-    .value)
-    .toLocaleString('en-US', {
-      style: 'currency', currency: 'USD', maximumFractionDigits: 0,
-    });
-
   tbody.insertAdjacentHTML('beforeend', `
   <td>${nameInput.value}</td>
 
@@ -143,7 +141,7 @@ const addEmployee = () => {
 
   <td>${Number(ageInput.value)}</td>
 
-  <td>${salaryConverted}</td>
+  <td>${convertSalary(salaryInput.value)}</td>
 `);
   nameInput.value = '';
   positionInput.value = '';
@@ -173,24 +171,33 @@ formButton.addEventListener('click', (e) => {
 
 tbody.addEventListener('dblclick', (e) => {
   const inputElement = document.createElement('input');
+  const index = e.target.cellIndex;
+  const offices = Array.from(officeSelect.children).map(option =>
+    option.innerHTML);
+  const validateNewValue = (value) => {
+    switch (true) {
+      case !value.length:
+      case index === 2 && !offices.includes(value):
+      case ((index === 3 || index === 4) && isNaN(+value)) || +value <= 0:
+        return e.target.innerHTML;
+      case index === 4 && !isNaN(+value):
+        return convertSalary(value);
+      default:
+        return value;
+    }
+  };
   const addTextHandler = () => {
     const newCell = document.createElement('td');
 
-    newCell.innerText = inputElement.value;
-
-    if (!newCell.innerText.length) {
-      newCell.innerText = e.target.innerText;
-    }
-
+    newCell.innerHTML = validateNewValue(inputElement.value);
     inputElement.replaceWith(newCell);
   };
 
   inputElement.classList.add('cell-input');
-  inputElement.value = e.target.innerText;
+  inputElement.value = e.target.innerHTML;
   e.target.replaceWith(inputElement);
-
   inputElement.addEventListener('blur', addTextHandler);
-  inputElement.addEventListener('mouseleave', addTextHandler);
+  inputElement.addEventListener('mouseout', addTextHandler);
 
   inputElement.addEventListener('keypress', (ev) => {
     if (ev.key !== 'Enter') {
