@@ -3,7 +3,6 @@
 // write code here
 const head = document.querySelector('thead');
 const body = document.querySelector('tbody');
-/* const table = document.querySelector('table'); */
 
 /* sorted table */
 let count = 0;
@@ -140,7 +139,7 @@ form.addEventListener('submit', (e) => {
     pushNotification('Error',
       'Please enter the position', 'error');
   } else if (!input[3].value) {
-    pushNotification('Error', 'Please enter the salary');
+    pushNotification('Error', 'Please enter the salary', 'error');
   } else {
     body.insertAdjacentHTML('beforeend', `
       <tr>
@@ -172,11 +171,30 @@ body.addEventListener('dblclick', (e) => {
   clickedCell.textContent = ''; // delete text from the cell
 
   newInput.classList.add('cell-input');
+  newInput.placeholder = cellText;
 
   clickedCell.append(newInput);
+
   newInput.focus();
 
   const cellInput = document.querySelector('.cell-input');
+
+  if (clickedCell.cellIndex === 2) {
+    clickedCell.innerHTML = `
+    <select name="office"
+            data-qa="office" 
+            type="text"
+            class="cell-input"
+            class="temporary">
+      <option value="tokyo">Tokyo</option>
+      <option value="singapore">Singapore</option>
+      <option value="london">London</option>
+      <option value="new york">New York</option>
+      <option value="edinburg">Edinburgh</option>
+      <option value="san francisco">San Francisco</option>
+    </select>
+  `;
+  };
 
   newInput.addEventListener('keydown', (ev) => {
     if (ev.code === 'Enter') {
@@ -184,26 +202,49 @@ body.addEventListener('dblclick', (e) => {
         cellInput.value = cellText;
       }
 
-      if (clickedCell.cellIndex === 0) {
-        if (cellInput.value.length < 4) {
-          clickedCell.textContent = cellText;
-        } else {
+      switch (clickedCell.cellIndex) {
+        case 0:
+          if (cellInput.value.length < 4) {
+            clickedCell.textContent = cellText;
+          } else {
+            clickedCell.textContent = cellInput.value;
+          }
+          break;
+
+        case 1:
           clickedCell.textContent = cellInput.value;
-        }
-      } else if (clickedCell.cellIndex === 3) {
-        if (cellInput.value < 18 || cellInput.value > 90) {
-          clickedCell.textContent = cellText;
-        } else {
-          clickedCell.textContent = cellInput.value;
-        }
-      } else if (clickedCell.cellIndex === 4) {
-        if (!Number(cellInput.value)) {
-          clickedCell.textContent = cellText;
-        } else {
-          clickedCell.textContent
-            = '$' + new Intl.NumberFormat('en-GB').format(cellInput.value);
-        }
+          break;
+
+        case 2:
+          const option = clickedCell.querySelectorAll('option');
+
+          if (option.textContent === cellText) {
+            option.setAttribute('selected', true);
+          }
+
+          clickedCell.textContent = option.textContent;
+          document.querySelector('.temporary').remove();
+          break;
+
+        case 3:
+          if (!Number(cellInput.value)
+            || cellInput.value < 18 || cellInput.value > 90) {
+            clickedCell.textContent = cellText;
+          } else {
+            clickedCell.textContent = cellInput.value;
+          }
+          break;
+
+        case 4:
+          if (!Number(cellInput.value)) {
+            clickedCell.textContent = cellText;
+          } else {
+            clickedCell.textContent
+              = '$' + new Intl.NumberFormat('en-GB').format(cellInput.value);
+          }
+          break;
       }
+      pushNotification('Success', 'Changes was added', 'success');
     }
   });
 
@@ -212,7 +253,50 @@ body.addEventListener('dblclick', (e) => {
       cellInput.value = cellText;
     }
 
-    if (clickedCell.cellIndex === 0) {
+    switch (clickedCell.cellIndex) {
+      case 0:
+        if (cellInput.value.length < 4) {
+          clickedCell.textContent = cellText;
+        } else {
+          clickedCell.textContent = cellInput.value;
+        }
+        break;
+
+      case 1:
+        clickedCell.textContent = cellInput.value;
+        break;
+
+      case 2:
+        const option = clickedCell.querySelectorAll('option');
+
+        if (option.textContent === cellText) {
+          option.setAttribute('selected', true);
+        }
+
+        clickedCell.textContent = option.textContent;
+        document.querySelector('.temporary').remove();
+        break;
+
+      case 3:
+        if (!Number(cellInput.value)
+          || cellInput.value < 18 || cellInput.value > 90) {
+          clickedCell.textContent = cellText;
+        } else {
+          clickedCell.textContent = cellInput.value;
+        }
+        break;
+
+      case 4:
+        if (!Number(cellInput.value)) {
+          clickedCell.textContent = cellText;
+        } else {
+          clickedCell.textContent
+            = '$' + new Intl.NumberFormat('en-GB').format(cellInput.value);
+        }
+        break;
+    }
+
+    /* if (clickedCell.cellIndex === 0) {
       if (cellInput.value.length < 4) {
         clickedCell.textContent = cellText;
       } else {
@@ -231,6 +315,6 @@ body.addEventListener('dblclick', (e) => {
         clickedCell.textContent
           = '$' + new Intl.NumberFormat('en-GB').format(cellInput.value);
       }
-    }
+    } */
   });
 });
