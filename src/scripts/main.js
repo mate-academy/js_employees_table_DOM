@@ -72,11 +72,11 @@ const sortColumn = (index) => {
       return sortAsc
         ? cellA.localeCompare(cellB)
         : cellB.localeCompare(cellA);
-    } else {
-      return sortAsc
-        ? cellA - cellB
-        : cellB - cellA;
     }
+
+    return sortAsc
+      ? cellA - cellB
+      : cellB - cellA;
   });
 
   newRows.forEach((newRow) => {
