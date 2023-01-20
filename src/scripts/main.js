@@ -4,7 +4,7 @@
 const head = document.querySelector('thead');
 const body = document.querySelector('tbody');
 
-/* sorted table */
+// sorted table
 let count = 0;
 
 head.addEventListener('click', (e) => {
@@ -33,8 +33,7 @@ head.addEventListener('click', (e) => {
   }
 });
 
-/* highlighted click */
-
+// highlighted click
 body.addEventListener('click', (e) => {
   const target = e.target;
 
@@ -43,8 +42,7 @@ body.addEventListener('click', (e) => {
     : target.parentNode.classList.add('active'));
 });
 
-/* form */
-
+// form
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
@@ -77,7 +75,8 @@ form.insertAdjacentHTML('afterbegin', `
       <option>New York</option>
       <option>Edinburgh</option>
       <option>San Francisco</option>
-    </select></label>
+    </select>
+</label>
 <label>
   Age: 
     <input 
@@ -98,8 +97,7 @@ form.insertAdjacentHTML('afterbegin', `
 <button type='submit'>Save to table</button>
 `);
 
-/* notification and adding rows in the table */
-
+// notification and adding rows in the table
 const input = [...form.querySelectorAll('input')];
 const options = form.querySelector('option').innerText;
 
@@ -159,16 +157,15 @@ form.addEventListener('submit', (e) => {
   }
 });
 
-/* double click */
-
+// double click
 body.addEventListener('dblclick', (e) => {
   const newInput = document.createElement('input');
 
-  const cellText = e.target.textContent; // get text from the cell
+  const cellText = e.target.textContent;
 
   const clickedCell = e.target;
 
-  clickedCell.textContent = ''; // delete text from the cell
+  clickedCell.textContent = '';
 
   newInput.classList.add('cell-input');
   newInput.placeholder = cellText;
@@ -181,18 +178,19 @@ body.addEventListener('dblclick', (e) => {
 
   if (clickedCell.cellIndex === 2) {
     clickedCell.innerHTML = `
-    <select name="office"
-            data-qa="office" 
-            type="text"
-            class="cell-input"
-            class="temporary">
-      <option value="tokyo">Tokyo</option>
-      <option value="singapore">Singapore</option>
-      <option value="london">London</option>
-      <option value="new york">New York</option>
-      <option value="edinburg">Edinburgh</option>
-      <option value="san francisco">San Francisco</option>
-    </select>
+      <select name="office"
+              data-qa="office" 
+              type="text"
+              class="cell-input"
+              class="temporary"
+      >
+        <option value="tokyo">Tokyo</option>
+        <option value="singapore">Singapore</option>
+        <option value="london">London</option>
+        <option value="new york">New York</option>
+        <option value="edinburg">Edinburgh</option>
+        <option value="san francisco">San Francisco</option>
+      </select>
   `;
   };
 
@@ -202,48 +200,7 @@ body.addEventListener('dblclick', (e) => {
         cellInput.value = cellText;
       }
 
-      switch (clickedCell.cellIndex) {
-        case 0:
-          if (cellInput.value.length < 4) {
-            clickedCell.textContent = cellText;
-          } else {
-            clickedCell.textContent = cellInput.value;
-          }
-          break;
-
-        case 1:
-          clickedCell.textContent = cellInput.value;
-          break;
-
-        case 2:
-          const option = clickedCell.querySelectorAll('option');
-
-          if (option.textContent === cellText) {
-            option.setAttribute('selected', true);
-          }
-
-          clickedCell.textContent = option.textContent;
-          document.querySelector('.temporary').remove();
-          break;
-
-        case 3:
-          if (!Number(cellInput.value)
-            || cellInput.value < 18 || cellInput.value > 90) {
-            clickedCell.textContent = cellText;
-          } else {
-            clickedCell.textContent = cellInput.value;
-          }
-          break;
-
-        case 4:
-          if (!Number(cellInput.value)) {
-            clickedCell.textContent = cellText;
-          } else {
-            clickedCell.textContent
-              = '$' + new Intl.NumberFormat('en-GB').format(cellInput.value);
-          }
-          break;
-      }
+      changingTheTable(clickedCell, cellInput, cellText);
       pushNotification('Success', 'Changes was added', 'success');
     }
   });
@@ -253,68 +210,52 @@ body.addEventListener('dblclick', (e) => {
       cellInput.value = cellText;
     }
 
-    switch (clickedCell.cellIndex) {
-      case 0:
-        if (cellInput.value.length < 4) {
-          clickedCell.textContent = cellText;
-        } else {
-          clickedCell.textContent = cellInput.value;
-        }
-        break;
-
-      case 1:
-        clickedCell.textContent = cellInput.value;
-        break;
-
-      case 2:
-        const option = clickedCell.querySelectorAll('option');
-
-        if (option.textContent === cellText) {
-          option.setAttribute('selected', true);
-        }
-
-        clickedCell.textContent = option.textContent;
-        document.querySelector('.temporary').remove();
-        break;
-
-      case 3:
-        if (!Number(cellInput.value)
-          || cellInput.value < 18 || cellInput.value > 90) {
-          clickedCell.textContent = cellText;
-        } else {
-          clickedCell.textContent = cellInput.value;
-        }
-        break;
-
-      case 4:
-        if (!Number(cellInput.value)) {
-          clickedCell.textContent = cellText;
-        } else {
-          clickedCell.textContent
-            = '$' + new Intl.NumberFormat('en-GB').format(cellInput.value);
-        }
-        break;
-    }
-
-    /* if (clickedCell.cellIndex === 0) {
-      if (cellInput.value.length < 4) {
-        clickedCell.textContent = cellText;
-      } else {
-        clickedCell.textContent = cellInput.value;
-      }
-    } else if (clickedCell.cellIndex === 3) {
-      if (cellInput.value < 18 || cellInput.value > 90) {
-        clickedCell.textContent = cellText;
-      } else {
-        clickedCell.textContent = cellInput.value;
-      }
-    } else if (clickedCell.cellIndex === 4) {
-      if (!Number(cellInput.value)) {
-        clickedCell.textContent = cellText;
-      } else {
-        clickedCell.textContent
-          = '$' + new Intl.NumberFormat('en-GB').format(cellInput.value);
-      }
-    } */
+    changingTheTable(clickedCell, cellInput, cellText);
   });
 });
+
+// clickedCell === cell, cellInput === inputCell, cellText === text
+function changingTheTable(cell, inputCell, text) {
+  switch (cell.cellIndex) {
+    case 0:
+      if (inputCell.value.length < 4) {
+        cell.textContent = text;
+      } else {
+        cell.textContent = inputCell.value;
+      }
+      break;
+
+    case 1:
+      cell.textContent = inputCell.value;
+      break;
+
+    case 2:
+      const option = cell.querySelectorAll('option');
+
+      if (option.textContent === text) {
+        option.setAttribute('selected', true);
+      }
+
+      cell.textContent = option.textContent;
+      document.querySelector('.temporary').remove();
+      break;
+
+    case 3:
+      if (!Number(inputCell.value)
+        || inputCell.value < 18 || inputCell.value > 90) {
+        cell.textContent = text;
+      } else {
+        cell.textContent = inputCell.value;
+      }
+      break;
+
+    case 4:
+      if (!Number(inputCell.value)) {
+        cell.textContent = text;
+      } else {
+        cell.textContent
+          = '$' + new Intl.NumberFormat('en-GB').format(inputCell.value);
+      }
+      break;
+  }
+};
