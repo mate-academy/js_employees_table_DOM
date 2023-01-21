@@ -224,7 +224,7 @@ submit.addEventListener('click', (e) => {
 
 tbody.addEventListener('dblclick', (e) => {
   const target = e.target.closest('td');
-  const text = target.innerHTML;
+  const text = target.textContent;
   const input = document.createElement('input');
 
   if (!target) {
@@ -238,6 +238,10 @@ tbody.addEventListener('dblclick', (e) => {
 
   input.onblur = function() {
     target.innerHTML = input.value;
+
+    if (input.value === '') {
+      target.innerHTML = text;
+    }
   };
 
   input.onkeyup = function(ev) {
