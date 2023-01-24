@@ -216,32 +216,38 @@ submit.addEventListener('click', (e) => {
       if (item.dataset.qa === 'salary') {
         const number = +item.value;
 
-        td.innerHTML = `$${number.toLocaleString('en-US')}`;
+        td.innerHTML = convertSalary(number);
       }
     }
   }
 });
 
+function convertSalary(value) {
+  return `$${value.toLocaleString('en-US')}`;
+}
+
 tbody.addEventListener('dblclick', (e) => {
   const target = e.target.closest('td');
   const text = target.textContent;
-  const input = document.createElement('input');
 
   if (!target) {
     return;
   }
 
-  target.innerHTML = '';
-  target.append(input);
-  input.classList.add('cell-input');
+  target.innerHTML = `<input type="text" class="cell-input">`;
+
+  const input = document.querySelector('.cell-input');
+  const cellIndex = target.cellIndex;
+
   input.value = text;
+  input.focus();
 
   input.onblur = function() {
-    target.innerHTML = input.value;
+    const notification = document.body.querySelectorAll('.notification');
 
-    if (input.value === '') {
-      target.innerHTML = text;
-    }
+    [...notification].map(item => item.remove());
+    target.innerHTML = tableValidation(input.value, cellIndex, text);
+    input.replaceWith(target);
   };
 
   input.onkeyup = function(ev) {
@@ -250,3 +256,49 @@ tbody.addEventListener('dblclick', (e) => {
     }
   };
 });
+
+function tableValidation(value, index, text) {
+  if (index === 0 || index === 1 || index === 2) {
+    for (const ch of value.split(' ').join('')) {
+      if (ch.toLowerCase() === ch.toUpperCase()) {
+        createNotification('error', 'Name error',
+          'Your name must contain only letters');
+
+        return text;
+      }
+    }
+  }
+
+  if (index === 0) {
+    if (value.length < 4) {
+      createNotification('error', 'Name error',
+        'Your name must not be shorter than 4 letters');
+
+      return text;
+    }
+  }
+
+  if (index === 3) {
+    if (value < 18 || value > 90 || isNaN(+value)) {
+      createNotification('error', 'Wrong age',
+        'Your age cannot be less than 18 and more than 90 years old');
+
+      return text;
+    }
+  }
+
+  if (index === 4 && isNaN(+value)) {
+    createNotification('error', 'Wrong number',
+      'Your salary must be a number');
+
+    return text;
+  } else if (index === 4 && !isNaN(+value)) {
+    return convertSalary(+value);
+  }
+
+  if (value === '') {
+    return text;
+  }
+
+  return value;
+}
