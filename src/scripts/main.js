@@ -1,17 +1,23 @@
-"use strict";
+'use strict';
 
-const employees = document.querySelector("table");
+const employees = document.querySelector('table');
 
 sortTable(employees);
 
 function sortTable(table) {
   let isAsc = true;
+  let columnTitle = '';
 
-  document.querySelectorAll("th").forEach((th) =>
-    th.addEventListener("click", () => {
-      const tbody = table.querySelector("tbody");
+  document.querySelectorAll('th').forEach((th) => {
+    return th.addEventListener('click', (e) => {
+      const tbody = table.querySelector('tbody');
 
-      Array.from(tbody.querySelectorAll("tr"))
+      if (columnTitle !== e.target.textContent) {
+        isAsc = true;
+        columnTitle = e.target.textContent;
+      }
+
+      Array.from(tbody.querySelectorAll('tr'))
         .sort(
           getCompareFunction(
             Array.from(th.parentNode.children).indexOf(th),
@@ -21,8 +27,8 @@ function sortTable(table) {
         .forEach((tr) => tbody.appendChild(tr));
 
       isAsc = !isAsc;
-    })
-  );
+    });
+  });
 }
 
 function getCompareFunction(headerIndex, dir) {
@@ -31,15 +37,15 @@ function getCompareFunction(headerIndex, dir) {
     const bCellValue = getRowCellValue(dir ? b : a, headerIndex);
 
     if (
-      aCellValue !== "" &&
-      bCellValue !== "" &&
+      aCellValue !== '' &&
+      bCellValue !== '' &&
       !isNaN(aCellValue) &&
       !isNaN(bCellValue)
     ) {
       return aCellValue - bCellValue;
     }
 
-    return aCellValue[0] === "$"
+    return aCellValue[0] === '$'
       ? parseInt(aCellValue.slice(1)) - parseInt(bCellValue.slice(1))
       : aCellValue.toString().localeCompare(bCellValue);
   };
