@@ -1,6 +1,16 @@
 'use strict';
 
 const employees = document.querySelector('table');
+let previousSelectedRow;
+
+document.querySelector('tbody').addEventListener('click', (e) => {
+  if (previousSelectedRow) {
+    previousSelectedRow.classList.remove('active');
+  }
+
+  e.target.parentNode.classList.add('active');
+  previousSelectedRow = e.target.parentNode;
+});
 
 sortTable(employees);
 
