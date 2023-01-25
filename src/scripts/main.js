@@ -287,13 +287,15 @@ function tableValidation(value, index, text) {
     }
   }
 
-  if (index === 4 && isNaN(+value)) {
+  const salary = +value.slice(1).split(',').join('');
+
+  if (index === 4 && isNaN(salary)) {
     createNotification('error', 'Wrong number',
       'Your salary must be a number');
 
     return text;
-  } else if (index === 4 && !isNaN(+value)) {
-    return convertSalary(+value);
+  } else if (index === 4 && !isNaN(salary)) {
+    return convertSalary(salary);
   }
 
   if (value === '') {
