@@ -23,6 +23,7 @@ function sortTable(table) {
         .sort(
           getCompareFunction(
             Array.from(th.parentNode.children).indexOf(th),
+            th.textContent,
             isAsc
           )
         )
@@ -33,23 +34,23 @@ function sortTable(table) {
   });
 }
 
-function getCompareFunction(headerIndex, dir) {
+function getCompareFunction(headerIndex, headerName, dir) {
   return function(a, b) {
     const aCellValue = getRowCellValue(dir ? a : b, headerIndex);
     const bCellValue = getRowCellValue(dir ? b : a, headerIndex);
 
-    if (
-      aCellValue !== ''
-      && bCellValue !== ''
-      && !isNaN(aCellValue)
-      && !isNaN(bCellValue)
-    ) {
-      return aCellValue - bCellValue;
-    }
+    switch (headerName) {
+      case 'Name':
+      case 'Position':
+      case 'Office':
+        return aCellValue.toString().localeCompare(bCellValue);
 
-    return aCellValue[0] === '$'
-      ? parseInt(aCellValue.slice(1)) - parseInt(bCellValue.slice(1))
-      : aCellValue.toString().localeCompare(bCellValue);
+      case 'Age':
+        return aCellValue - bCellValue;
+
+      case 'Salary':
+        return parseInt(aCellValue.slice(1)) - parseInt(bCellValue.slice(1));
+    }
   };
 }
 
