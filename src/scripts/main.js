@@ -149,6 +149,42 @@ function addEmployee(form) {
     const employeeAge = document.querySelector('[name="age"]');
     const employeeSalary = document.querySelector('[name="salary"]');
 
+    if (employeeName.value.length < 4) {
+      pushNotification(
+        150,
+        10,
+        'Name input error',
+        'Name must not be less than 4 letters',
+        'error'
+      );
+
+      return;
+    }
+
+    if (employeePosition.value.length < 4) {
+      pushNotification(
+        150,
+        10,
+        'Position input error',
+        'Position must not be less than 4 letters',
+        'error'
+      );
+
+      return;
+    }
+
+    if (parseInt(employeeAge.value) < 18 || parseInt(employeeAge.value) > 90) {
+      pushNotification(
+        150,
+        10,
+        'Age input error',
+        'Age must not be less than 18 and more than 90',
+        'error'
+      );
+
+      return;
+    }
+
     const newEmployeeRow = `
       <tr>
         <td>${employeeName.value}</td>
@@ -163,10 +199,44 @@ function addEmployee(form) {
       .querySelector('tbody')
       .insertAdjacentHTML('beforeend', newEmployeeRow);
 
+    pushNotification(
+      150,
+      10,
+      'Success!',
+      'New employee successfully added to the table',
+      'success'
+    );
+
     employeeName.value = '';
     employeePosition.value = '';
     employeeOffice.value = 'default';
     employeeAge.value = '';
     employeeSalary.value = '';
   });
+}
+
+function pushNotification(posTop, posRight, title, description, type) {
+  const body = document.querySelector('body');
+  const message = document.createElement('div');
+
+  message.classList = `notification ${type}`;
+  message.dataset.qa = 'notification';
+  message.style.top = posTop + 'px';
+  message.style.right = posRight + 'px';
+
+  const messageTitle = document.createElement('h2');
+
+  messageTitle.className = 'title';
+  messageTitle.textContent = title;
+
+  const messageDescription = document.createElement('p');
+
+  messageDescription.textContent = description;
+
+  message.append(messageTitle, messageDescription);
+  body.append(message);
+
+  setTimeout(() => {
+    message.style.visibility = 'hidden';
+  }, 2000);
 }
