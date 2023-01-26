@@ -71,11 +71,11 @@ function selectRow(table) {
 }
 
 function createForm(table) {
-  const form = document.createElement('form');
+  const newEmployeeForm = document.createElement('form');
 
-  form.classList.add('new-employee-form');
+  newEmployeeForm.classList.add('new-employee-form');
 
-  form.innerHTML = `
+  newEmployeeForm.innerHTML = `
     <label>
       Name: 
       <input 
@@ -103,7 +103,7 @@ function createForm(table) {
         data-qa="office"
         required
       >
-        <option>Tokyo</option>
+        <option value="default">Tokyo</option>
         <option>San Francisco</option>
         <option>Singapore</option>
         <option>New York</option>
@@ -134,5 +134,39 @@ function createForm(table) {
     </button>
   `;
 
-  table.parentNode.insertBefore(form, table.nextSibling);
+  table.parentNode.insertBefore(newEmployeeForm, table.nextSibling);
+
+  addEmployee(newEmployeeForm);
+}
+
+function addEmployee(form) {
+  form.querySelector('button').addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const employeeName = document.querySelector('[name="name"]');
+    const employeePosition = document.querySelector('[name="position"]');
+    const employeeOffice = document.querySelector('[name="office"]');
+    const employeeAge = document.querySelector('[name="age"]');
+    const employeeSalary = document.querySelector('[name="salary"]');
+
+    const newEmployeeRow = `
+      <tr>
+        <td>${employeeName.value}</td>
+        <td>${employeePosition.value}</td>
+        <td>${employeeOffice.value}</td>
+        <td>${employeeAge.value}</td>
+        <td>$${parseInt(employeeSalary.value).toLocaleString('en-US')}</td>
+      </tr>
+    `;
+
+    document
+      .querySelector('tbody')
+      .insertAdjacentHTML('beforeend', newEmployeeRow);
+
+    employeeName.value = '';
+    employeePosition.value = '';
+    employeeOffice.value = 'default';
+    employeeAge.value = '';
+    employeeSalary.value = '';
+  });
 }
