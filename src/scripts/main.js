@@ -147,10 +147,12 @@ window.addEventListener('DOMContentLoaded', () => {
             const parsedX = childX.replace(/\D/g, '');
             const parsedY = childY.replace(/\D/g, '');
 
-            return ascendingOrder ? parsedX - parsedY
+            return ascendingOrder
+              ? parsedX - parsedY
               : parsedY - parsedX;
           default:
-            return ascendingOrder ? childX.localeCompare(childY)
+            return ascendingOrder
+              ? childX.localeCompare(childY)
               : childY.localeCompare(childX);
         }
       });
