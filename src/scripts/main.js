@@ -169,7 +169,9 @@ body.insertAdjacentHTML('beforeend', `
 
 function printNotification(stat, message) {
   body.insertAdjacentHTML('beforeend', `
-    <div class="${stat}" data-qa="notification">${stat} <br> ${message}</div>
+    <div class=" notification ${stat}"
+      data-qa="notification">${stat} <br> ${message}
+    </div>
   `);
 }
 
@@ -180,15 +182,6 @@ const ageInput = form.querySelector('[data-qa="age"]');
 const positionInput = form.querySelector('[data-qa="position"]');
 const officeInput = form.querySelector('[data-qa="office"]');
 const salaryInput = form.querySelector('[data-qa="salary"]');
-// let salaryFormated = '';
-
-// if (salaryInput.value.length <= 3) {
-//   salaryFormated = salaryInput;
-// } else {
-//   for (const letter of salaryInput) {
-//     console.log (letter);
-//   }
-// }
 
 button.addEventListener('click', e => {
   let salaryFormated = '';
@@ -204,7 +197,7 @@ button.addEventListener('click', e => {
       || !officeInput.value
       || !salaryInput.value
   ) {
-    printNotification('error', 'message of error');
+    printNotification('error', 'Your data is invalid');
   } else {
     let count = 0;
 
@@ -234,7 +227,7 @@ button.addEventListener('click', e => {
       </tr>
     `);
 
-    printNotification('success', 'message of success');
+    printNotification('success', 'New employee is successfully added');
 
     nameInput.value = '';
     ageInput.value = '';
@@ -242,8 +235,4 @@ button.addEventListener('click', e => {
     officeInput.value = '';
     salaryInput.value = '';
   }
-
-  // console.log(Number.isInteger(parseInt(ageInput.value)));
 });
-
-// console.log(e.target.closest('tr'));
