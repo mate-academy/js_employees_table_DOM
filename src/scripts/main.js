@@ -29,8 +29,7 @@ thead.addEventListener('click', (e) => {
     if (!isNaN(+value1)) {
       return value1 - value2;
     } else if (value1[0] === '$') {
-      return value1.slice(1).split(',').join('') - value2
-        .slice(1).split(',').join('');
+      return toNumber(value1) - toNumber(value2);
     } else if (typeof value1 === 'string') {
       return value1.localeCompare(value2);
     }
@@ -155,7 +154,7 @@ function validation(validatedForm) {
   for (let i = 0; i < validatedForm.elements.length - 1; i++) {
     const item = validatedForm.elements[i];
 
-    if (item.value === '') {
+    if (item.value.trim() === '') {
       createNotification('error', 'Field error', 'The field cannot be empty');
 
       return false;
@@ -219,12 +218,17 @@ submit.addEventListener('click', (e) => {
         td.innerHTML = convertSalary(number);
       }
     }
+    form.reset();
   }
 });
 
 function convertSalary(value) {
   return `$${value.toLocaleString('en-US')}`;
 }
+
+const toNumber = function(value) {
+  return +value.slice(1).split(',').join('');
+};
 
 tbody.addEventListener('dblclick', (e) => {
   const target = e.target.closest('td');
@@ -287,7 +291,7 @@ function tableValidation(value, index, text) {
     }
   }
 
-  const salary = +value.slice(1).split(',').join('');
+  const salary = toNumber(value);
 
   if (index === 4 && isNaN(salary)) {
     createNotification('error', 'Wrong number',
@@ -298,7 +302,7 @@ function tableValidation(value, index, text) {
     return convertSalary(salary);
   }
 
-  if (value === '') {
+  if (value.trim() === '') {
     return text;
   }
 
