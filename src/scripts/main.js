@@ -161,7 +161,9 @@ body.insertAdjacentHTML('beforeend', `
       <option value="Edinburgh">Edinburgh</option>
       <option value="San Francisco">San Francisco</option>
     </select></label>
-    <label>Age: <input name="age" type="number" data-qa="age" required></label>
+    <label>Age:
+      <input name="age" type="number" data-qa="age" min = "18" required>
+    </label>
     <label>
       Salary: <input name="salary" type="number" data-qa="salary" required>
     </label>
