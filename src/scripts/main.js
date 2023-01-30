@@ -118,8 +118,6 @@ tbody.addEventListener('click', e => {
   // const active = document.getElementsByClassName('active');
   // console.log(active);
 
-
-
   for (let i = 0; i < tr.length; i++) {
     tr[i].classList.remove('active');
   };
@@ -282,4 +280,124 @@ button.addEventListener('click', e => {
     'Employee has been added',
     'success'
   );
+});
+
+tbody.addEventListener('click', e => {
+  if (e.target.tagName !== 'TD') {
+    return;
+  }
+
+  const inputs = tbody.querySelectorAll('.cell-input');
+
+  if (inputs.length >= 1) {
+    return;
+  }
+
+  const previousText = e.target.textContent;
+  const newInput = e.target.cellIndex === 2
+    ? document.createElement('select')
+    : document.createElement('input');
+
+  if (newInput.tagName === 'SELECT') {
+    newInput.insertAdjacentHTML('afterbegin', `  
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    `);
+  }
+
+  newInput.value = previousText;
+  newInput.classList.add('cell-input');
+
+  e.target.firstChild.replaceWith(newInput);
+
+  const checkInput = function() {
+    if (e.target.cellIndex === 0 || e.target.cellIndex === 1) {
+      if (newInput.value.length < 4) {
+        newInput.replaceWith(previousText);
+
+        pushNotification(
+          'Erorr',
+          'Should be longer than 4 letters',
+          'error'
+        );
+
+        return;
+      }
+
+      if (!isNaN(newInput.value)) {
+        newInput.replaceWith(previousText);
+
+        pushNotification(
+          'Erorr',
+          `Shouldn't be number`,
+          'error'
+        );
+
+        return;
+      }
+    }
+
+    if (e.target.cellIndex === 3) {
+      if (isNaN(newInput.value)) {
+        newInput.replaceWith(previousText);
+
+        pushNotification(
+          'Erorr',
+          'Should be number',
+          'error'
+        );
+
+        return;
+      }
+
+      if (newInput.value < 18 || newInput.value > 90) {
+        newInput.replaceWith(previousText);
+
+        pushNotification(
+          'Erorr',
+          'Age should be more than 18 and less than 90',
+          'error'
+        );
+
+        return;
+      }
+    }
+
+    if (e.target.cellIndex === 4) {
+      if (isNaN(newInput.value)) {
+        newInput.replaceWith(previousText);
+
+        pushNotification(
+          'Erorr',
+          'Should be number',
+          'error'
+        );
+
+        return;
+      }
+
+      newInput.replaceWith(
+        `$${Intl.NumberFormat('en-US').format(newInput.value)}`
+      );
+    }
+
+    newInput.replaceWith(newInput.value);
+  };
+
+  // eslint-disable-next-line no-shadow
+  newInput.addEventListener('blur', e => {
+    checkInput();
+  }, true);
+
+  // eslint-disable-next-line no-shadow
+  newInput.addEventListener('keydown', e => {
+    if (e.code === 'Enter') {
+      checkInput();
+    }
+  });
+
 });
