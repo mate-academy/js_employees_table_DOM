@@ -77,6 +77,8 @@ thead.addEventListener('click', e => {
     return;
   }
 
+  tr = tbody.querySelectorAll('tr');
+
   switch (e.target.textContent) {
     case headers.children[0].textContent :
       sorted = sortStrings(tr, 0);
@@ -169,10 +171,16 @@ body.insertAdjacentHTML('beforeend', `
 
 function printNotification(stat, message) {
   body.insertAdjacentHTML('beforeend', `
-    <div class=" notification ${stat}"
+    <div class="notification ${stat}"
       data-qa="notification">${stat} <br> ${message}
     </div>
   `);
+
+  const notification = document.querySelector('.notification');
+
+  setTimeout(() => {
+    notification.remove();
+  }, 2000);
 }
 
 const form = document.querySelector('form');
