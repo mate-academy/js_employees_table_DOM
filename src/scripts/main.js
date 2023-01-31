@@ -265,7 +265,7 @@ function warning() {
 
 // #endregion
 
-// #region ---Add an employee--
+// #region --Add an employee--
 
 function convertToCurrency(number) {
   const formatter = new Intl.NumberFormat('en-US', {
@@ -342,5 +342,57 @@ form.addEventListener('submit', e => {
   }, 2000);
 
   userInputArr = [];
+});
+// #endregion
+
+// #region --Modify cell--
+
+const cellInput = document.createElement('input');
+let countActiveCells = document.querySelectorAll('.modifying').length;
+let oldCellValue = '';
+
+cellInput.classList.add('cell-input');
+
+for (const row of tbody.rows) {
+  for (const cell of row.cells) {
+    cell.addEventListener('dblclick', e => {
+      e.target.classList.add('modifying');
+      oldCellValue = e.target.textContent;
+
+      if (countActiveCells <= 1) {
+        e.target.textContent = '';
+        e.target.appendChild(cellInput);
+        cellInput.focus();
+      }
+    });
+  }
+}
+
+function setNewValue(input, oldValue) {
+  let newCellValue = input.value;
+
+  if (oldValue.indexOf('$') !== -1) {
+    newCellValue = convertToCurrency(+newCellValue);
+  }
+
+  if ((newCellValue.length > 0) && (newCellValue !== '$0')) {
+    input.parentNode.textContent = newCellValue;
+  } else {
+    input.parentNode.textContent = oldValue;
+  }
+
+  input.value = '';
+  input.remove();
+  countActiveCells = 0;
+}
+
+cellInput.addEventListener('keypress', inputEvent => {
+  if (inputEvent.key === 'Enter') {
+    setNewValue(inputEvent.target, oldCellValue);
+  }
+});
+
+cellInput.addEventListener('blur', inputEvent => {
+  setNewValue(inputEvent.target, oldCellValue);
 });
 // #endregion
