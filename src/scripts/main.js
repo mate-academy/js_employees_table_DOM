@@ -292,8 +292,27 @@ function editTableCell(table) {
 
   function setEditedCellValue() {
     if (isEditing) {
-      editedCell.textContent
-        = input.value.trim() !== '' ? input.value.trim() : previousTextContent;
+      const cellIndex = Array.from(editedCell.parentNode.children).indexOf(
+        editedCell
+      );
+
+      if (input.value.trim()) {
+        if (cellIndex === 4) {
+          editedCell.textContent
+            = input.value.trim().slice(0, 1) === '$'
+              ? `$${parseInt(
+                input.value.trim().split(',').join('').slice(1)
+              ).toLocaleString('en-US')}`
+              : `$${parseInt(
+                input.value.trim().split(',').join('')
+              ).toLocaleString('en-US')}`;
+        } else {
+          editedCell.textContent = input.value.trim();
+        }
+      } else {
+        editedCell.textContent = previousTextContent;
+      }
+
       isEditing = false;
     }
   }
