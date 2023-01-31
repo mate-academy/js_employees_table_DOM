@@ -2,6 +2,7 @@
 
 const employeesBody = document.querySelector('tbody');
 const titleSort = document.querySelector('thead');
+const titleColumn = titleSort.children[0].children;
 const sumString = string => +string.slice(1).split(',').join('');
 let sortedCell;
 
@@ -56,8 +57,54 @@ document.addEventListener('click', (e) => {
 
 // Create form
 const newForm = document.createElement('form');
-const selectCity = document.createElement('select');
 const newButton = document.createElement('button');
+
+newButton.textContent = 'Save to table';
+newButton.id = 'addEmployees';
+newForm.id = 'addForm';
+newForm.className = 'new-employee-form';
+document.body.children[0].after(newForm);
+
+// Function for creating form elements
+const createFormElements = (parentElement, element, child, attributes,) => {
+  const newElement = document.createElement('label');
+  const newChild = document.createElement(child);
+
+  newElement.textContent = element;
+
+  for (const key in attributes) {
+    newChild.setAttribute(key, attributes[key]);
+  }
+
+  newElement.append(newChild);
+  parentElement.append(newElement);
+};
+
+createFormElements(newForm, 'Name:', 'input', {
+  name: 'name',
+  type: 'text',
+  'data-qa': 'name',
+  id: 'inputName',
+  required: '',
+});
+
+createFormElements(newForm, 'Position:', 'input', {
+  name: 'position',
+  type: 'text',
+  'data-qa': 'position',
+  id: 'inputPosition',
+  required: '',
+});
+
+createFormElements(newForm, 'Office:', 'select', {
+  name: 'Office',
+  type: 'text',
+  'data-qa': 'office',
+  id: 'inputOffice',
+  required: '',
+});
+
+const selectCity = document.querySelector('select');
 
 selectCity.innerHTML = `
   <option>Tokyo</option>
@@ -67,73 +114,25 @@ selectCity.innerHTML = `
   <option>Edinburgh</option>
   <option>San Francisco</option>
 `;
-newButton.textContent = 'Save to table';
-newButton.id = 'addEmployees';
-newForm.id = 'addForm';
 
-newForm.className = 'new-employee-form';
-document.body.children[0].after(newForm);
+createFormElements(newForm, 'Age:', 'input', {
+  name: 'age',
+  type: 'number',
+  'data-qa': 'age',
+  id: 'inputAge',
+  required: '',
+  min: 18,
+  max: 90,
+});
 
-for (let i = 1; i <= 5; i++) {
-  const newLabel = document.createElement('label');
-  const newInput = document.createElement('input');
+createFormElements(newForm, 'Salary:', 'input', {
+  name: 'salary',
+  type: 'number',
+  'data-qa': 'salary',
+  id: 'inputSalary',
+  required: '',
+});
 
-  switch (i) {
-    case 1:
-      newLabel.textContent = 'Name:';
-      newLabel.append(newInput);
-      newInput.setAttribute('name', 'name');
-      newInput.setAttribute('type', 'text');
-      newInput.setAttribute('data-qa', 'name');
-      newInput.setAttribute('id', 'inputName');
-      newInput.setAttribute('required', '');
-      break;
-
-    case 2:
-      newLabel.append(newInput);
-      newLabel.textContent = 'Position:';
-      newLabel.append(newInput);
-      newInput.setAttribute('name', 'position');
-      newInput.setAttribute('type', 'text');
-      newInput.setAttribute('data-qa', 'position');
-      newInput.setAttribute('id', 'inputPosition');
-      newInput.setAttribute('required', '');
-      break;
-
-    case 3:
-      newLabel.textContent = 'Office:';
-      newLabel.append(selectCity);
-      selectCity.setAttribute('name', 'office');
-      selectCity.setAttribute('type', 'text');
-      selectCity.setAttribute('list', 'cityList');
-      selectCity.setAttribute('data-qa', 'office');
-      selectCity.setAttribute('id', 'inputOffice');
-      selectCity.setAttribute('required', '');
-      break;
-
-    case 4:
-      newLabel.textContent = 'Age:';
-      newLabel.append(newInput);
-      newInput.setAttribute('name', 'age');
-      newInput.setAttribute('type', 'number');
-      newInput.setAttribute('data-qa', 'age');
-      newInput.setAttribute('id', 'inputAge');
-      newInput.setAttribute('min', '18');
-      newInput.setAttribute('max', '90');
-      newInput.setAttribute('required', '');
-      break;
-
-    case 5:
-      newLabel.textContent = 'Salary:';
-      newLabel.append(newInput);
-      newInput.setAttribute('name', 'salsary');
-      newInput.setAttribute('type', 'number');
-      newInput.setAttribute('data-qa', 'salary');
-      newInput.setAttribute('id', 'inputSalary');
-      newInput.setAttribute('required', '');
-  }
-  newForm.append(newLabel);
-}
 newForm.append(newButton);
 
 // Event submit form
@@ -149,11 +148,11 @@ form.addEventListener('submit', (e) => {
   const salary = document.querySelector('#inputSalary').value;
   const newEmployee = document.createElement('tr');
 
-  if (!validation(nameEmployee, 0)) {
+  if (!validation(nameEmployee, 'Name')) {
     return;
   };
 
-  if (!validation(age, 3)) {
+  if (!validation(age, 'Age')) {
     return;
   };
 
@@ -190,14 +189,15 @@ employeesBody.addEventListener('dblclick', (e) => {
 
 // Event for key Enter
 employeesBody.addEventListener('keyup', (e) => {
-  if (e.code === 'Enter') {
+  if (e.code === 'Enter' || e.code === 'NumpadEnter') {
     save(e);
   }
 });
 
 // Event for save and data validation
 const save = (e) => {
-  if (validation(newCell.value, e.target.parentElement.cellIndex)) {
+  if (validation(newCell.value,
+    titleColumn[e.target.parentElement.cellIndex].textContent)) {
     if (e.target.parentElement.cellIndex === 4) {
       if (newCell.value[0] !== '$') {
         newCell.parentElement.textContent
@@ -221,57 +221,73 @@ const save = (e) => {
 
 newCell.addEventListener('blur', (save));
 
-// Validation function
-const validation = (info, index) => {
-  if (index === 0 || index === 1 || index === 2) {
-    if (info.length < 4) {
-      pushNotification(150, 10, `${titleSort.children[0]
-        .children[index].textContent} is to short!`,
-      `You enter ${info.length} characters.\n `
-      + 'Please enter more than 4 characters.', 'error');
+// Validation functions
+const validation = (inputValue, columnName) => {
+  switch (columnName) {
+    case 'Name':
+      return validateName(inputValue);
 
-      return false;
-    }
+    case 'Age':
+      return validateAge(inputValue);
+
+    case 'Salary':
+      return validateSalary(inputValue);
+  };
+
+  return true;
+};
+
+const validateName = (value) => {
+  if (value.length < 4) {
+    pushNotification(150, 10, `${value} is to short!`,
+      `You enter ${value.length} characters.\n `
+    + 'Please enter more than 4 characters.', 'error');
+
+    return false;
   }
 
-  if (index === 3) {
-    if (!isFinite(info)) {
-      pushNotification(290, 10, 'Age is not correct!',
-        `You enter not a number\n `
-        + 'Please enter corect number more 18 and less than 90.', 'error');
+  return true;
+};
 
-      return false;
-    }
+const validateAge = (value) => {
+  if (!isFinite(value)) {
+    pushNotification(290, 10, 'Age is not correct!',
+      `You enter not a number\n `
+      + 'Please enter corect number more 18 and less than 90.', 'error');
 
-    if (info < 18 || info > 90) {
-      pushNotification(290, 10, 'Age is not correct!',
-        `You enter ${info} years.\n `
-        + 'Please enter more 18 and less than 90.', 'error');
-
-      return false;
-    }
+    return false;
   }
 
-  if (index === 4) {
-    if (info[0] === '$') {
-      if (!isFinite(sumString(info))) {
-        pushNotification(290, 10, 'Salary is not correct!',
-          `You enter not a number\n `
-          + 'Please enter corect number', 'error');
+  if (value < 18 || value > 90) {
+    pushNotification(290, 10, 'Age is not correct!',
+      `You enter ${value} years.\n `
+      + 'Please enter more 18 and less than 90.', 'error');
 
-        return false;
-      }
+    return false;
+  }
 
-      return true;
-    }
+  return true;
+};
 
-    if (!isFinite(+info.split(',').join(''))) {
+const validateSalary = (value) => {
+  if (value[0] === '$') {
+    if (!isFinite(sumString(value))) {
       pushNotification(290, 10, 'Salary is not correct!',
         `You enter not a number\n `
         + 'Please enter corect number', 'error');
 
       return false;
     }
+
+    return true;
+  }
+
+  if (!isFinite(+value.split(',').join(''))) {
+    pushNotification(290, 10, 'Salary is not correct!',
+      `You enter not a number\n `
+      + 'Please enter corect number', 'error');
+
+    return false;
   }
 
   return true;
