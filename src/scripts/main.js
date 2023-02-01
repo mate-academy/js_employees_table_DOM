@@ -4,7 +4,6 @@
 const head = document.querySelector('thead');
 const body = document.querySelector('tbody');
 
-// sorted table
 let count = 0;
 
 head.addEventListener('click', (e) => {
@@ -33,7 +32,6 @@ head.addEventListener('click', (e) => {
   }
 });
 
-// highlighted click
 body.addEventListener('click', (e) => {
   const target = e.target;
 
@@ -42,7 +40,6 @@ body.addEventListener('click', (e) => {
     : target.parentNode.classList.add('active'));
 });
 
-// form
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
@@ -51,12 +48,7 @@ document.body.append(form);
 form.insertAdjacentHTML('afterbegin', `
 <label>
   Name:
-    <input
-      name="name"
-      data-qa="name"
-      type="text"
-      min = '4'
-    >
+    <input name="name" data-qa="name" type="text" min = '4'>
 </label>
 <label>
   Position:
@@ -68,13 +60,17 @@ form.insertAdjacentHTML('afterbegin', `
 </label>
 <label>
   Office: 
-    <select name="office" data-qa="office" type="text">
-      <option>Tokyo</option>
-      <option>Singapore</option>
-      <option>London</option>
-      <option>New York</option>
-      <option>Edinburgh</option>
-      <option>San Francisco</option>
+    <select
+      name="office"
+      data-qa="office"
+      type="text"
+    >
+        <option>Tokyo</option>
+        <option>Singapore</option>
+        <option>London</option>
+        <option>New York</option>
+        <option>Edinburgh</option>
+        <option>San Francisco</option>
     </select>
 </label>
 <label>
@@ -97,7 +93,6 @@ form.insertAdjacentHTML('afterbegin', `
 <button type='submit'>Save to table</button>
 `);
 
-// notification and adding rows in the table
 const input = [...form.querySelectorAll('input')];
 const options = form.querySelector('option').innerText;
 
@@ -157,7 +152,6 @@ form.addEventListener('submit', (e) => {
   }
 });
 
-// double click
 body.addEventListener('dblclick', (e) => {
   const newInput = document.createElement('input');
 
@@ -214,7 +208,6 @@ body.addEventListener('dblclick', (e) => {
   });
 });
 
-// clickedCell === cell, cellInput === inputCell, cellText === text
 function changingTheTable(cell, inputCell, text) {
   switch (cell.cellIndex) {
     case 0:
