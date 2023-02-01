@@ -4,6 +4,8 @@ const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 const tr = tbody.rows;
 const th = thead.querySelectorAll('th');
+const ErrorString = 'Error';
+const errorString = 'error';
 
 thead.addEventListener('click', e => {
   if (e.target.getAttribute('data-sorted') === 'ASC') {
@@ -115,17 +117,12 @@ thead.addEventListener('click', e => {
 
 tbody.addEventListener('click', e => {
   const patentTarget = e.target.parentElement;
-  // const active = document.getElementsByClassName('active');
-  // console.log(active);
 
   for (let i = 0; i < tr.length; i++) {
     tr[i].classList.remove('active');
   };
 
   patentTarget.classList.add('active');
-
-  // console.log(active);
-  // console.log(tbody.contains(active[0]));
 });
 
 const form = document.createElement('form');
@@ -221,9 +218,9 @@ button.addEventListener('click', e => {
 
   if (nameInput.value.length < 4) {
     pushNotification(
-      'Erorr',
+      ErrorString,
       'Name should be longer than 4 letters',
-      'error'
+      errorString
     );
 
     return;
@@ -231,9 +228,9 @@ button.addEventListener('click', e => {
 
   if (positionInput.value.length < 4) {
     pushNotification(
-      'Erorr',
+      ErrorString,
       'Position name should be longer than 4 letters',
-      'error'
+      errorString
     );
 
     return;
@@ -241,9 +238,9 @@ button.addEventListener('click', e => {
 
   if (ageInput.value < 18 || ageInput.value > 90) {
     pushNotification(
-      'Erorr',
+      ErrorString,
       'Age should be between 18-90',
-      'error'
+      errorString
     );
 
     return;
@@ -251,9 +248,9 @@ button.addEventListener('click', e => {
 
   if (salaryInput.value < 100) {
     pushNotification(
-      'Erorr',
+      Error,
       'Salary should be more 100',
-      'error'
+      errorString
     );
 
     return;
@@ -320,9 +317,9 @@ tbody.addEventListener('click', e => {
         newInput.replaceWith(previousText);
 
         pushNotification(
-          'Erorr',
+          ErrorString,
           'Should be longer than 4 letters',
-          'error'
+          errorString
         );
 
         return;
@@ -332,9 +329,9 @@ tbody.addEventListener('click', e => {
         newInput.replaceWith(previousText);
 
         pushNotification(
-          'Erorr',
+          ErrorString,
           `Shouldn't be number`,
-          'error'
+          errorString
         );
 
         return;
@@ -346,9 +343,9 @@ tbody.addEventListener('click', e => {
         newInput.replaceWith(previousText);
 
         pushNotification(
-          'Erorr',
+          ErrorString,
           'Should be number',
-          'error'
+          errorString
         );
 
         return;
@@ -358,9 +355,9 @@ tbody.addEventListener('click', e => {
         newInput.replaceWith(previousText);
 
         pushNotification(
-          'Erorr',
+          ErrorString,
           'Age should be more than 18 and less than 90',
-          'error'
+          errorString
         );
 
         return;
@@ -372,9 +369,9 @@ tbody.addEventListener('click', e => {
         newInput.replaceWith(previousText);
 
         pushNotification(
-          'Erorr',
+          ErrorString,
           'Should be number',
-          'error'
+          errorString
         );
 
         return;
@@ -388,16 +385,13 @@ tbody.addEventListener('click', e => {
     newInput.replaceWith(newInput.value);
   };
 
-  // eslint-disable-next-line no-shadow
-  newInput.addEventListener('blur', e => {
+  newInput.addEventListener('blur', ev => {
     checkInput();
   }, true);
 
-  // eslint-disable-next-line no-shadow
-  newInput.addEventListener('keydown', e => {
-    if (e.code === 'Enter') {
+  newInput.addEventListener('keydown', ev => {
+    if (ev.code === 'Enter') {
       checkInput();
     }
   });
-
 });
