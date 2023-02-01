@@ -196,21 +196,26 @@ employeesBody.addEventListener('keyup', (e) => {
 
 // Event for save and data validation
 const save = (e) => {
-  if (validation(newCell.value,
-    titleColumn[e.target.parentElement.cellIndex].textContent)) {
-    if (e.target.parentElement.cellIndex === 4) {
-      if (newCell.value[0] !== '$') {
-        newCell.parentElement.textContent
-        = `$${Number(newCell.value).toLocaleString('en-US')}`;
+  const isValid = validation(newCell.value,
+    titleColumn[e.target.parentElement.cellIndex].textContent);
+  const salaryChange = e.target.parentElement.cellIndex === 4;
+  const salaryWithout$ = newCell.value[0] !== '$';
 
-        return;
-      }
+  if (isValid && salaryChange && salaryWithout$) {
+    newCell.parentElement.textContent
+      = `$${Number(newCell.value).toLocaleString('en-US')}`;
 
-      newCell.parentElement.textContent
-        = `$${Number(sumString(newCell.value)).toLocaleString('en-US')}`;
+    return;
+  }
 
-      return;
-    }
+  if (isValid && salaryChange) {
+    newCell.parentElement.textContent
+      = `$${Number(sumString(newCell.value)).toLocaleString('en-US')}`;
+
+    return;
+  }
+
+  if (isValid) {
     newCell.parentElement.textContent = newCell.value;
 
     return;
