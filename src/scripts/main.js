@@ -295,22 +295,24 @@ function editTableCell(table) {
       const cellIndex = Array.from(editedCell.parentNode.children).indexOf(
         editedCell
       );
+      const inputValue = input.value.trim();
 
-      if (input.value.trim()) {
-        if (cellIndex === 4) {
+      switch (true) {
+        case inputValue && cellIndex === 4:
           editedCell.textContent
-            = input.value.trim().slice(0, 1) === '$'
+            = inputValue.slice(0, 1) === '$'
               ? `$${parseInt(
-                input.value.trim().split(',').join('').slice(1)
+                inputValue.split(',').join('').slice(1)
               ).toLocaleString('en-US')}`
-              : `$${parseInt(
-                input.value.trim().split(',').join('')
-              ).toLocaleString('en-US')}`;
-        } else {
-          editedCell.textContent = input.value.trim();
-        }
-      } else {
-        editedCell.textContent = previousTextContent;
+              : `$${parseInt(inputValue.split(',').join('')).toLocaleString(
+                'en-US'
+              )}`;
+          break;
+        case inputValue && cellIndex !== 4:
+          editedCell.textContent = inputValue;
+          break;
+        case !inputValue:
+          editedCell.textContent = previousTextContent;
       }
 
       isEditing = false;
