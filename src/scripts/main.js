@@ -85,6 +85,7 @@ table.insertAdjacentHTML(
       type='text'
       class='name'
       data-qa='name'
+      required
       >
     </label>
 
@@ -95,6 +96,7 @@ table.insertAdjacentHTML(
       class='position'
       type='text'
       data-qa='position'
+      required
       >
     </label>
 
@@ -119,16 +121,20 @@ table.insertAdjacentHTML(
     <label>
       Age:
       <input
+      type='number'
       data-qa='age'
       class='age'
+      required
       >
     </label>
 
     <label>
       Salary:
       <input
+      type='number'
       data-qa='salary'
       class='salary'
+      required
       >
     </label>
 
@@ -171,44 +177,53 @@ submitButton.addEventListener('click', function(events) {
   for (let i = 0; i < labels.length - 1; i++) {
     const tableData = document.createElement('td');
     const input = labels[i].firstElementChild;
+    let inputValue = input.value;
 
-    if (input.classList.value === 'name' && input.value.length < 4) {
+    if (
+      input.classList.value === 'name'
+    && (inputValue.length < 4
+    || inputValue.includes('  ')
+    || inputValue.includes('. '))) {
       return showNotification(
         'Error',
         'Name must have more than 3 letters!',
         'error'
       );
-    }
+    };
 
-    if (input.classList.value === 'position' && input.value.length === 0) {
+    if (
+      input.classList.value === 'position'
+    && (inputValue.length === 0
+    || inputValue.includes('  ')
+    || inputValue.includes('. '))) {
       return showNotification(
         'Error',
         'You must specify your position!',
         'error'
       );
-    }
+    };
 
     if (input.classList.value === 'age'
-      && (+input.value < 18
-      || +input.value > 90
-      || !+input.value)) {
+      && (+inputValue < 18
+      || +inputValue > 90
+      || !+inputValue)) {
       return showNotification(
         'Error', 'Age must be in range from 18 to 90 years!', 'error');
-    }
+    };
 
     if (input.classList.value === 'salary') {
-      if (input.value.length === 0) {
+      if (inputValue.length === 0) {
         return showNotification('Error', 'You must enter the salary!', 'error');
-      }
+      };
 
-      const salarySize = +input.value;
+      const salarySize = +inputValue;
 
-      input.value = '$' + salarySize.toLocaleString('en-US');
-    }
+      inputValue = '$' + salarySize.toLocaleString('en-US');
+    };
 
     row.append(tableData);
-    tableData.innerText = input.value;
-  }
+    tableData.innerText = inputValue;
+  };
 
   showNotification('Success', 'The form add into Table', 'success');
   tbody.append(row);
@@ -238,6 +253,7 @@ function addCellEvents(cell) {
     cell.replaceChildren(input);
     input.focus();
 
+    const officeCell = cell.parentElement.querySelectorAll('td')[2];
     const ageCell = cell.parentElement.querySelectorAll('td')[3];
     const salaryCell = cell.parentElement.querySelectorAll('td')[4];
 
@@ -245,7 +261,38 @@ function addCellEvents(cell) {
       input.setAttribute('type', 'number');
     };
 
+    if (cell === officeCell) {
+      input.remove();
+
+      cell.insertAdjacentHTML('afterbegin', `
+      <select
+      data-qa='office'
+      id='office'
+      name='office'
+      class='office'
+      >
+        <option value='Tokyo'>Tokyo</option>
+        <option value='Singapore'>Singapore</option>
+        <option value='London'>London</option>
+        <option value='New York'>New York</option>
+        <option value='Edinburgh'>Edinburgh</option>
+        <option value='San Francisco'>San Francisco</option>
+      </select>
+      `);
+
+      const select = document.querySelector('tbody select');
+
+      select.value = cellText;
+      select.focus();
+    };
+
     cell.addEventListener('blur', function() {
+      if (cell === officeCell) {
+        const select = document.querySelector('tbody select');
+
+        return select.replaceWith(select.value);
+      };
+
       if (cell === ageCell
         && input.value.length > 0
         && (input.value < 18 || input.value > 90)) {
@@ -268,6 +315,12 @@ function addCellEvents(cell) {
 
     cell.addEventListener('keypress', function(events) {
       if (events.code === 'Enter') {
+        if (cell === officeCell) {
+          const select = document.querySelector('tbody select');
+
+          return select.replaceWith(select.value);
+        };
+
         if (cell === ageCell && (input.value < 18 || input.value > 90)) {
           showNotification('Error',
             'Age must be in range from 18 to 90 years!', 'error');
