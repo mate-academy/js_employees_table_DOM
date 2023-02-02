@@ -107,13 +107,13 @@ function initForm() {
   table.insertAdjacentHTML('afterend', `
     <form class="new-employee-form">
       <label>Name:
-        <input name="name" type="text" data-qa="name" required>
+        <input name="name" type="text" data-qa="name">
       </label>
       <label>Position:
-        <input name="position" type="text" data-qa="position" required>
+        <input name="position" type="text" data-qa="position">
       </label>
       <label>Office:
-        <select name="office" data-qa="office" required>
+        <select name="office" data-qa="office">
           <option value="San Francisco">San Francisco</option>
           <option value="Tokyo">Tokyo</option>
           <option value="Singapore">Singapore</option>
@@ -123,14 +123,40 @@ function initForm() {
         </select>
       </label>
       <label>Age:
-        <input name="age" type="number" data-qa="age" required>
+        <input name="age" type="number" data-qa="age">
       </label>
       <label>Salary:
-        <input name="salary" type="number" data-qa="salary" required>
+        <input name="salary" type="number" data-qa="salary">
       </label>
       <button type="submit">Save to table</button>
     </form>
   `);
+}
+
+function initNotification(type, message) {
+  notification.classList.add('notification', type);
+
+  notification.innerHTML = `
+    <p class="title">
+      ${message}
+    </p>
+  `;
+}
+
+function validate(key, value) {
+  if (!value) {
+    return false;
+  }
+
+  if (key === 'name' && value.length < 4) {
+    return false;
+  }
+
+  if (key === 'age' && (value < 18 || value > 90)) {
+    return false;
+  }
+
+  return true;
 }
 
 const table = document.querySelector('table');
@@ -140,7 +166,7 @@ const tableBody = document.querySelector('tbody');
 initTableBody();
 initForm();
 
-const form = document.querySelector('.new-employee-form');
+const form = document.querySelector('form');
 const notification = document.querySelector('[data-qa="notification"]');
 
 let index;
@@ -188,22 +214,6 @@ tableBody.addEventListener('click', (e) => {
   }
 });
 
-let validation;
-
-function initNotification() {
-  notification.classList.add('notification', `${validation
-    ? 'error'
-    : 'success'}`);
-
-  notification.innerHTML = `
-    <p class="title">
-      ${validation
-    ? 'Please fill out all fields!'
-    : 'Congratulations! Your data has been entered into the table!'}
-    </p>
-  `;
-}
-
 form.addEventListener('submit', e => {
   e.preventDefault();
 
@@ -212,17 +222,19 @@ form.addEventListener('submit', e => {
   const userOffice = form.querySelector('[name="office"]');
   const userPosition = form.querySelector('[name="position"]');
   const userSalary = form.querySelector('[name="salary"]');
-
   const salary
   = `$${userSalary.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+  const formData = new FormData(form);
 
-  validation
-    = userName.value.length < 4 || (userAge.value < 18 || userAge.value > 90) || userPosition.value.length === 0;
+  for (const [key, value] of formData) {
+    if (!validate(key, value)) {
+      initNotification('error', 'Please fill out all fields!');
 
-  initNotification();
+      return false;
+    }
 
-  if (validation) {
-    return false;
+    initNotification('success',
+      'Congratulations! Your data has been entered into the table!');
   }
 
   usersData.push({
@@ -238,8 +250,6 @@ form.addEventListener('submit', e => {
 
   setTimeout(() => {
     notification.removeAttribute('class');
-    // notification.className = '';
-    // notification.innerHTML = '';
   }, 6000);
 });
 
