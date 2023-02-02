@@ -30,9 +30,11 @@ function tableSort(column, asc = true) {
   const rowsArray = Array.from(document.querySelectorAll('tbody tr'));
 
   const sortedRows = rowsArray.sort((a, b) => {
-    let aText = a.querySelector(`td:nth-child(${column + 1})`).textContent;
+    let aText = a.querySelector(
+      `td:nth-child(${column + 1})`).textContent.toLocaleLowerCase();
 
-    let bText = b.querySelector(`td:nth-child(${column + 1})`).textContent;
+    let bText = b.querySelector(
+      `td:nth-child(${column + 1})`).textContent.toLocaleLowerCase();
 
     if (aText.includes('$') || bText.includes('$')) {
       aText = convertSalary(aText);
