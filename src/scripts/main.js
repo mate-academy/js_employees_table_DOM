@@ -116,12 +116,13 @@ for (let i = 0; i < titles.length; i++) {
 
 tbody.addEventListener('click', e => {
   const row = e.target.parentNode;
-  const countActiveElements = document.querySelectorAll('.active').length;
+  const activeElements = [...document.querySelectorAll('.active')];
 
-  if (row.className !== 'active' && countActiveElements < 1) {
+  if (activeElements.length === 0) {
     row.classList.add('active');
-  } else if (row.className === 'active') {
-    row.classList.remove('active');
+  } else if (activeElements.length === 1) {
+    row.classList.add('active');
+    activeElements[0].classList.remove('active');
   }
 });
 
@@ -342,6 +343,7 @@ form.addEventListener('submit', e => {
   }, 2000);
 
   userInputArr = [];
+  form.reset();
 });
 // #endregion
 
@@ -358,6 +360,7 @@ for (const row of tbody.rows) {
     cell.addEventListener('dblclick', e => {
       e.target.classList.add('modifying');
       oldCellValue = e.target.textContent;
+      cellInput.value = oldCellValue;
 
       if (countActiveCells <= 1) {
         e.target.textContent = '';
@@ -370,15 +373,43 @@ for (const row of tbody.rows) {
 
 function setNewValue(input, oldValue) {
   let newCellValue = input.value;
+  const cell = input.parentNode;
+  let incorrectData = false;
+
+  // new value validation
+  if (newCellValue.length === 0) {
+    const warningPopUp = warning();
+
+    setTimeout(() => {
+      warningPopUp.style.display = 'none';
+    }, 2000);
+  }
+
+  const cellIndex = [...cell.parentNode.children].indexOf(cell);
+
+  if (((cellIndex === 0)
+  && ((newCellValue.length > 0) && (newCellValue.length < 4)))
+  || ((cellIndex === 3)
+  && (newCellValue.length > 0) && (newCellValue < 18 || newCellValue >= 90))) {
+    incorrectData = true;
+
+    const errorPopUp = error();
+
+    setTimeout(() => {
+      errorPopUp.style.display = 'none';
+    }, 2000);
+  }
+  //
 
   if (oldValue.indexOf('$') !== -1) {
     newCellValue = convertToCurrency(+newCellValue);
   }
 
-  if ((newCellValue.length > 0) && (newCellValue !== '$0')) {
-    input.parentNode.textContent = newCellValue;
+  if ((newCellValue.length > 0) && (newCellValue !== '$0')
+  && (incorrectData === false)) {
+    cell.textContent = newCellValue;
   } else {
-    input.parentNode.textContent = oldValue;
+    cell.textContent = oldValue;
   }
 
   input.value = '';
