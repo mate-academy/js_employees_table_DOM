@@ -4,6 +4,9 @@ const body = document.querySelector('body');
 const table = document.querySelector('table');
 const tBody = table.querySelector('tbody');
 const tHead = table.querySelector('thead');
+const minAge = 18;
+const maxAge = 90;
+const minNameLength = 4;
 
 body.insertAdjacentHTML('beforeend', `
   <form
@@ -65,22 +68,22 @@ body.insertAdjacentHTML('beforeend', `
 `);
 
 const pushNotification = (title, description, type) => {
-  const div = document.createElement('div');
-  const h2 = document.createElement('h2');
-  const p = document.createElement('p');
+  const notification = document.createElement('div');
+  const header = document.createElement('h2');
+  const content = document.createElement('p');
 
-  div.setAttribute('class', `notification ${type}`);
-  div.setAttribute('data-qa', 'notification');
-  div.append(h2, p);
+  notification.setAttribute('class', `notification ${type}`);
+  notification.setAttribute('data-qa', 'notification');
+  notification.append(header, content);
 
-  h2.setAttribute('class', 'title');
-  h2.textContent = title;
+  header.setAttribute('class', 'title');
+  header.textContent = title;
 
-  p.textContent = description;
+  content.textContent = description;
 
-  document.body.append(div);
+  document.body.append(notification);
 
-  setTimeout(() => div.remove(), 2000);
+  setTimeout(() => notification.remove(), 2000);
 };
 
 function firtLetterCapitalize(str) {
@@ -98,7 +101,7 @@ form.addEventListener('submit', e => {
 
   const newEmployee = Object.fromEntries(new FormData(form));
 
-  if (newEmployee.name.length < 4) {
+  if (newEmployee.name.length < minNameLength) {
     pushNotification('Error',
       'Name is too short',
       'error');
@@ -106,7 +109,7 @@ form.addEventListener('submit', e => {
     return;
   }
 
-  if (Number(newEmployee.age) < 18) {
+  if (Number(newEmployee.age) < minAge) {
     pushNotification('Error',
       'You are too young!!!',
       'error');
@@ -114,7 +117,7 @@ form.addEventListener('submit', e => {
     return;
   }
 
-  if (Number(newEmployee.age) > 90) {
+  if (Number(newEmployee.age) > maxAge) {
     pushNotification('Error',
       'You are too old!!!',
       'error');
@@ -161,8 +164,8 @@ form.addEventListener('submit', e => {
 
 const rows = Array.from(tBody.querySelectorAll('tr'));
 
-const normalizeNumber = value => {
-  return +value.replace('$', '').replace(',', '');
+const normalizeCurreny = value => {
+  return +value.replace(/\D/g, '');
 };
 
 let modificator;
@@ -174,8 +177,16 @@ tHead.addEventListener('click', e => {
     const aItem = a.children[sortParam].textContent.trim();
     const bItem = b.children[sortParam].textContent.trim();
 
-    return normalizeNumber(aItem) - normalizeNumber(bItem)
-      || aItem.localeCompare(bItem);
+    switch (sortParam) {
+      case 3:
+        return +aItem - +bItem;
+
+      case 4:
+        return normalizeCurreny(aItem) - normalizeCurreny(bItem);
+
+      default:
+        return aItem.localeCompare(bItem);
+    }
   });
 
   if (modificator) {
@@ -196,6 +207,7 @@ tBody.addEventListener('click', e => {
 
 tBody.addEventListener('dblclick', e => {
   const cell = e.target.closest('td');
+  const cellIndex = cell.cellIndex;
 
   if (!cell) {
     return;
@@ -214,27 +226,19 @@ tBody.addEventListener('dblclick', e => {
   input.focus();
 
   const replaceInputValue = () => {
-    const check = input.value.toUpperCase() === input.value.toLowerCase();
+    const hasCheck = input.value.toUpperCase() === input.value.toLowerCase();
 
-    if (cell.cellIndex === 0 && check === false) {
+    if ([0, 1, 2].includes(cellIndex) && !hasCheck) {
       cellValue = firtLetterCapitalize(input.value);
     }
 
-    if (cell.cellIndex === 1 && check === false) {
-      cellValue = firtLetterCapitalize(input.value);
-    }
-
-    if (cell.cellIndex === 2 && check === false) {
-      cellValue = firtLetterCapitalize(input.value);
-    }
-
-    if (cell.cellIndex === 3 && check === true) {
-      if (+input.value >= 18 && +input.value <= 90) {
+    if (cellIndex === 3 && hasCheck) {
+      if (+input.value >= minAge && +input.value <= maxAge) {
         cellValue = input.value;
       }
     }
 
-    if (cell.cellIndex === 4 && check === true) {
+    if (cellIndex === 4 && hasCheck) {
       if (+input.value > 0) {
         cellValue = `$${(+input.value).toLocaleString('en')}`;
       }
@@ -247,8 +251,8 @@ tBody.addEventListener('dblclick', e => {
     replaceInputValue();
   });
 
-  input.addEventListener('keydown', evnt => {
-    if (evnt.key !== 'Enter') {
+  input.addEventListener('keydown', function(press) {
+    if (press.key !== 'Enter') {
       return;
     }
 
