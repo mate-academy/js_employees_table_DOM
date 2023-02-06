@@ -151,7 +151,7 @@ tr.active {
 }
 
 .notification {
-  position: absolute;
+  position: fixed;
   width: 300px;
   min-height: 100px;
   padding: 0 16px;
@@ -160,7 +160,7 @@ tr.active {
   border-radius: 10px;
   background: rgba(132, 132, 132, 0.3);
 
-  top: 10px;
+  top: 70%;
   right: 10px;
 
   .title {
