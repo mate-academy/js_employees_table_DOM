@@ -5,13 +5,37 @@ const head = document.querySelector('thead');
 const titles = [...head.children[0].children];
 const tbody = document.querySelector('tbody');
 
-// #region --Sorting table--
+function compareCurrency(cur1, cur2) {
+  const firstCurrency = +cur1.slice(1).split(',').join('');
+  const secCurrency = +cur2.slice(1).split(',').join('');
+
+  if (firstCurrency > secCurrency) {
+    return true;
+  }
+
+  if (firstCurrency < secCurrency) {
+    return false;
+  }
+}
+
+function compareStrings(str1, str2) {
+  const firstRowLowered = str1.toLowerCase();
+  const secondRowLowered = str2.toLowerCase();
+
+  if (firstRowLowered > secondRowLowered) {
+    return true;
+  }
+
+  if (firstRowLowered < secondRowLowered) {
+    return false;
+  }
+}
 
 function sortTable(index) {
   const table = document.querySelector('tbody');
   let isSwitching = true;
   let countSwitch = 0;
-  let dir = 'asc';
+  let sortDirection = 'asc';
 
   while (isSwitching) {
     isSwitching = false;
@@ -32,28 +56,20 @@ function sortTable(index) {
       const isFirstRowNum = Number(firstRowContent);
       const isSecondRowNum = Number(secondRowContent);
 
-      if (dir === 'asc') {
-        if (isFirstRowNum) {
-          if (isFirstRowNum > isSecondRowNum) {
-            shouldRowsSwitch = true;
-            break;
-          }
+      if (sortDirection === 'asc') {
+        if (isFirstRowNum && (isFirstRowNum > isSecondRowNum)) {
+          shouldRowsSwitch = true;
+          break;
         } else {
           const isCurrency = firstRowContent.indexOf('$');
 
           if (isCurrency !== -1) {
-            const firstCurrency = +firstRowContent.slice(1).split(',').join('');
-            const secCurrency = +secondRowContent.slice(1).split(',').join('');
-
-            if (firstCurrency > secCurrency) {
+            if (compareCurrency(firstRowContent, secondRowContent)) {
               shouldRowsSwitch = true;
               break;
-            }
+            };
           } else {
-            const firstRowLowered = firstRowContent.toLowerCase();
-            const secondRowLowered = secondRowContent.toLowerCase();
-
-            if (firstRowLowered > secondRowLowered) {
+            if (compareStrings(firstRowContent, secondRowContent)) {
               shouldRowsSwitch = true;
               break;
             }
@@ -61,28 +77,20 @@ function sortTable(index) {
         }
       }
 
-      if (dir === 'desc') {
-        if (isFirstRowNum) {
-          if (isFirstRowNum < isSecondRowNum) {
-            shouldRowsSwitch = true;
-            break;
-          }
+      if (sortDirection === 'desc') {
+        if (isFirstRowNum && (isFirstRowNum < isSecondRowNum)) {
+          shouldRowsSwitch = true;
+          break;
         } else {
           const isCurrency = firstRowContent.indexOf('$');
 
           if (isCurrency !== -1) {
-            const firstCurrency = +firstRowContent.slice(1).split(',').join('');
-            const secCurrency = +secondRowContent.slice(1).split(',').join('');
-
-            if (firstCurrency < secCurrency) {
+            if (compareCurrency(firstRowContent, secondRowContent) === false) {
               shouldRowsSwitch = true;
               break;
-            }
+            };
           } else {
-            const firstRowLowered = firstRowContent.toLowerCase();
-            const secondRowLowered = secondRowContent.toLowerCase();
-
-            if (firstRowLowered < secondRowLowered) {
+            if (compareStrings(firstRowContent, secondRowContent) === false) {
               shouldRowsSwitch = true;
               break;
             }
@@ -96,44 +104,13 @@ function sortTable(index) {
       isSwitching = true;
       countSwitch++;
     } else {
-      if (countSwitch === 0 && dir === 'asc') {
-        dir = 'desc';
+      if (countSwitch === 0 && sortDirection === 'asc') {
+        sortDirection = 'desc';
         isSwitching = true;
       }
     }
   }
 }
-
-for (let i = 0; i < titles.length; i++) {
-  titles[i].addEventListener('click', e => {
-    sortTable(i);
-  });
-}
-
-// #endregion
-
-// #region --Select a row--
-
-tbody.addEventListener('click', e => {
-  const row = e.target.parentNode;
-  const activeElements = [...document.querySelectorAll('.active')];
-
-  if (activeElements.length === 0) {
-    row.classList.add('active');
-  } else if (activeElements.length === 1) {
-    row.classList.add('active');
-    activeElements[0].classList.remove('active');
-  }
-});
-
-// #endregion
-
-// #region --Add a form--
-
-const fieldsNames = ['Name', 'Position', 'Age', 'Salary'];
-const selectionItems = [
-  `Tokyo`, `Singapore`, `London`, `New York`, `Edinburgh`, `San Francisco`,
-];
 
 function createForm(parentElement, className) {
   const formElement = document.createElement('form');
@@ -205,16 +182,49 @@ function createSubmitButton(parentElement) {
   return submitButton;
 }
 
-const form = createForm(body, 'new-employee-form');
+function checkLength(inputValue) {
+  if (inputValue.trim().length === 0) {
+    return true;
+  }
 
-createInputs(form, fieldsNames);
-createSelection(form, 'Office', selectionItems);
+  return false;
+}
 
-createSubmitButton(form);
+function checkName(inputValue) {
+  const emptyInputLength = 0;
+  const minInputLength = 4;
 
-// #endregion
+  if ((inputValue.length > emptyInputLength)
+  && (inputValue.length < minInputLength)) {
+    return true;
+  }
 
-// #region --Create notification
+  return false;
+}
+
+function checkAge(inputValue) {
+  const emptyInputLength = 0;
+  const minAge = 18;
+  const maxAge = 89;
+
+  if ((inputValue.length > emptyInputLength)
+  && ((inputValue < minAge) || (inputValue > maxAge))) {
+    return true;
+  }
+
+  return false;
+}
+
+function checkSalary(inputValue) {
+  const emptyInputLength = 0;
+  const minSalary = 1;
+
+  if ((inputValue.length > emptyInputLength) && (inputValue <= minSalary)) {
+    return true;
+  }
+
+  return false;
+}
 
 function notification() {
   const block = document.createElement('div');
@@ -244,6 +254,14 @@ function success() {
   return block;
 }
 
+function showSuccess() {
+  const popUp = success();
+
+  setTimeout(() => {
+    popUp.style.display = 'none';
+  }, 2000);
+}
+
 function error() {
   const block = notification();
 
@@ -252,6 +270,14 @@ function error() {
   block.children[1].textContent = `Please, check the data once again :(`;
 
   return block;
+}
+
+function showError() {
+  const errorPopUp = error();
+
+  setTimeout(() => {
+    errorPopUp.style.display = 'none';
+  }, 2000);
 }
 
 function warning() {
@@ -264,9 +290,13 @@ function warning() {
   return block;
 }
 
-// #endregion
+function showWarning() {
+  const warningPopUp = warning();
 
-// #region --Add an employee--
+  setTimeout(() => {
+    warningPopUp.style.display = 'none';
+  }, 2000);
+}
 
 function convertToCurrency(number) {
   const formatter = new Intl.NumberFormat('en-US', {
@@ -278,52 +308,143 @@ function convertToCurrency(number) {
   return formatter.format(number);
 }
 
+function setNewValue(input, oldValue) {
+  let newCellValue = input.value;
+  const cell = input.parentNode;
+  let incorrectData = false;
+
+  if (checkLength(newCellValue)) {
+    incorrectData = true;
+  }
+
+  const cellIndex = [...cell.parentNode.children].indexOf(cell);
+
+  switch (cellIndex) {
+    case 0:
+      if (checkName(newCellValue)) {
+        incorrectData = true;
+      }
+      break;
+
+    case 3:
+      if (checkAge(newCellValue)) {
+        incorrectData = true;
+      }
+      break;
+
+    case 4:
+      if (checkSalary(newCellValue)) {
+        incorrectData = true;
+      }
+      break;
+  }
+
+  if (incorrectData) {
+    incorrectData = true;
+
+    showError();
+  }
+
+  if (oldValue.indexOf('$') !== -1) {
+    newCellValue = convertToCurrency(+newCellValue);
+  }
+
+  if ((newCellValue.length > 0) && (newCellValue !== '$0')
+  && (incorrectData === false)) {
+    cell.textContent = newCellValue;
+  } else {
+    cell.textContent = oldValue;
+  }
+
+  input.value = '';
+  input.remove();
+  countActiveCells = 0;
+}
+
+for (let i = 0; i < titles.length; i++) {
+  titles[i].addEventListener('click', e => {
+    sortTable(i);
+  });
+}
+
+tbody.addEventListener('click', e => {
+  const row = e.target.parentNode;
+  const activeElements = [...document.querySelectorAll('.active')];
+
+  if (!activeElements.length) {
+    row.classList.add('active');
+  } else if (activeElements.length === 1) {
+    row.classList.add('active');
+    activeElements[0].classList.remove('active');
+  }
+});
+
+const fieldsNames = ['Name', 'Position', 'Age', 'Salary'];
+const selectionItems = [
+  `Tokyo`, `Singapore`, `London`, `New York`, `Edinburgh`, `San Francisco`,
+];
+
+const form = createForm(body, 'new-employee-form');
+
+createInputs(form, fieldsNames);
+createSelection(form, 'Office', selectionItems);
+
+createSubmitButton(form);
+
 let userInputArr = [];
 
 form.addEventListener('submit', e => {
   e.preventDefault();
 
+  let incorrectData = false;
+
   for (let i = 0; i < form.children.length - 1; i++) {
     const label = form.children[i];
     let inputValue = label.children[0].value;
 
-    if (inputValue.length === 0) {
-      const warningPopUp = warning();
+    inputValue = inputValue.trim();
 
-      setTimeout(() => {
-        warningPopUp.style.display = 'none';
-      }, 2000);
+    if (checkLength(inputValue)) {
+      showWarning();
+      incorrectData = true;
+    }
 
+    switch (i) {
+      case 0:
+        if (checkName(inputValue)) {
+          showError();
+          incorrectData = true;
+        }
+
+        break;
+
+      case 3:
+        if (checkAge(inputValue)) {
+          showError();
+          incorrectData = true;
+        }
+
+        break;
+
+      case (form.children.length - 2):
+        if (checkSalary(inputValue)) {
+          showError();
+          incorrectData = true;
+        }
+        inputValue = convertToCurrency(inputValue);
+
+        break;
+    }
+
+    if (incorrectData) {
       userInputArr = [];
 
       return false;
     }
-
-    // // checking name & age
-    if (((i === 0) && (inputValue.length < 4))
-      || ((i === 3) && (inputValue < 18 || inputValue >= 90))) {
-      const errorPopUp = error();
-
-      setTimeout(() => {
-        errorPopUp.style.display = 'none';
-      }, 2000);
-
-      userInputArr = [];
-
-      return false;
-    }
-    //
-
-    // converting number to currency
-    if (i === form.children.length - 2) {
-      inputValue = convertToCurrency(inputValue);
-    }
-    //
 
     userInputArr.push(inputValue);
   }
 
-  // creating new row in table
   const newRow = document.createElement('tr');
 
   tbody.appendChild(newRow);
@@ -334,20 +455,12 @@ form.addEventListener('submit', e => {
     newCell.textContent = userInputArr[j];
     newRow.appendChild(newCell);
   }
-  //
 
-  const popUp = success();
-
-  setTimeout(() => {
-    popUp.style.display = 'none';
-  }, 2000);
+  showSuccess();
 
   userInputArr = [];
   form.reset();
 });
-// #endregion
-
-// #region --Modify cell--
 
 const cellInput = document.createElement('input');
 let countActiveCells = document.querySelectorAll('.modifying').length;
@@ -371,52 +484,6 @@ for (const row of tbody.rows) {
   }
 }
 
-function setNewValue(input, oldValue) {
-  let newCellValue = input.value;
-  const cell = input.parentNode;
-  let incorrectData = false;
-
-  // new value validation
-  if (newCellValue.length === 0) {
-    const warningPopUp = warning();
-
-    setTimeout(() => {
-      warningPopUp.style.display = 'none';
-    }, 2000);
-  }
-
-  const cellIndex = [...cell.parentNode.children].indexOf(cell);
-
-  if (((cellIndex === 0)
-  && ((newCellValue.length > 0) && (newCellValue.length < 4)))
-  || ((cellIndex === 3)
-  && (newCellValue.length > 0) && (newCellValue < 18 || newCellValue >= 90))) {
-    incorrectData = true;
-
-    const errorPopUp = error();
-
-    setTimeout(() => {
-      errorPopUp.style.display = 'none';
-    }, 2000);
-  }
-  //
-
-  if (oldValue.indexOf('$') !== -1) {
-    newCellValue = convertToCurrency(+newCellValue);
-  }
-
-  if ((newCellValue.length > 0) && (newCellValue !== '$0')
-  && (incorrectData === false)) {
-    cell.textContent = newCellValue;
-  } else {
-    cell.textContent = oldValue;
-  }
-
-  input.value = '';
-  input.remove();
-  countActiveCells = 0;
-}
-
 cellInput.addEventListener('keypress', inputEvent => {
   if (inputEvent.key === 'Enter') {
     setNewValue(inputEvent.target, oldCellValue);
@@ -426,4 +493,3 @@ cellInput.addEventListener('keypress', inputEvent => {
 cellInput.addEventListener('blur', inputEvent => {
   setNewValue(inputEvent.target, oldCellValue);
 });
-// #endregion
