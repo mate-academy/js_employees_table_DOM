@@ -221,27 +221,88 @@ tBody.addEventListener('dblclick', e => {
 
   input.setAttribute('class', 'cell-input');
   input.style = `width: ${cell.getBoundingClientRect().width / 2}px`;
+
+  const select = document.createElement('select');
+
+  select.innerHTML = `
+    <select
+      name="office"
+    >
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    </select>
+  `;
+
   cell.innerHTML = '';
-  cell.append(input);
+
+  if (cellIndex === 2) {
+    cell.append(select);
+  } else {
+    cell.append(input);
+  }
+
   input.focus();
 
   const replaceInputValue = () => {
-    const hasCheck = input.value.toUpperCase() === input.value.toLowerCase();
+    const hasCheckNumber = input.value === input.value.replace(/\D/g, '');
 
-    if ([0, 1, 2].includes(cellIndex) && !hasCheck) {
-      cellValue = firtLetterCapitalize(input.value);
+    const hasCheckString = input.value === input.value
+      .replace(/[^a-zA-Z]+/g, ' ');
+
+    if ([0, 1].includes(cellIndex) && hasCheckString) {
+      cellValue = firtLetterCapitalize(input.value.replace(/[^a-zA-Z]+/g, ' '));
+
+      pushNotification('Success',
+        'Employee\'s data has been replaced',
+        'success');
+    } else if ([0, 1].includes(cellIndex) && !hasCheckString) {
+      pushNotification('Error',
+        `Invalid value!!!
+          You must only use letters. For ex. [a-z/A-Z].`,
+        'error');
     }
 
-    if (cellIndex === 3 && hasCheck) {
+    if (cellIndex === 2) {
+      cellValue = select.value;
+    }
+
+    if (cellIndex === 3 && hasCheckNumber) {
       if (+input.value >= minAge && +input.value <= maxAge) {
         cellValue = input.value;
+
+        pushNotification('Success',
+          'Employee\'s data has been replaced',
+          'success');
+      } else {
+        pushNotification('Error',
+          `Invalid value!!!
+            You must be between 18 and 90`,
+          'error');
       }
+    } else if (cellIndex === 3 && !hasCheckNumber) {
+      pushNotification('Error',
+        `Invalid value!!!
+          You must only use numbers.`,
+        'error');
     }
 
-    if (cellIndex === 4 && hasCheck) {
+    if (cellIndex === 4 && hasCheckNumber) {
       if (+input.value > 0) {
         cellValue = `$${(+input.value).toLocaleString('en')}`;
+
+        pushNotification('Success',
+          'Employee\'s data has been replaced',
+          'success');
       }
+    } else if (cellIndex === 4 && !hasCheckNumber) {
+      pushNotification('Error',
+        `Invalid value!!!
+          You must only use numbers and salary must be positive number.`,
+        'error');
     }
 
     cell.textContent = cellValue;
@@ -251,12 +312,34 @@ tBody.addEventListener('dblclick', e => {
     replaceInputValue();
   });
 
-  input.addEventListener('keydown', function(press) {
+  input.addEventListener('keydown', (press) => {
     if (press.key !== 'Enter') {
       return;
     }
 
     replaceInputValue();
+
+    document.activeElement.blur();
+  });
+
+  select.addEventListener('blur', () => {
+    replaceInputValue();
+
+    pushNotification('Success',
+      'Employee\'s data has been replaced',
+      'success');
+  });
+
+  select.addEventListener('keydown', (press) => {
+    if (press.key !== 'Enter') {
+      return;
+    }
+
+    replaceInputValue();
+
+    pushNotification('Success',
+      'Employee\'s data has been replaced',
+      'success');
 
     document.activeElement.blur();
   });
