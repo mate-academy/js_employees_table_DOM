@@ -1,90 +1,55 @@
 'use strict';
 
-const table = document.querySelector('table');
+const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 const tr = tbody.querySelectorAll('tr');
+const rows = [...tbody.children];
 const row = [...tr];
 
 // sort by click
 
-table.addEventListener('click', (e) => {
-  const th = e.target.closest('th');
+thead.addEventListener('click', e => {
+  const header = e.target.closest('th');
 
-  if (!th || !table.contains(th)) {
-    return;
+  if (header.dataset.sort === 'asc') {
+    tbody.append(...sortTableDESC(header));
+  } else {
+    tbody.append(...sortTableASC(header));
   }
-
-  sortASC(th.cellIndex, th.innerHTML);
 });
 
-function sortASC(index, text) {
-  switch (text) {
-    case 'Name':
-    case 'Position':
-    case 'Office':
-      row.sort((a, b) =>
-        a.cells[index].innerHTML.localeCompare(b.cells[index].innerHTML));
-      break;
+function sortTableASC(th) {
+  const i = th.cellIndex;
 
-    case 'Age':
-      row.sort((a, b) =>
-        a.cells[index].innerHTML - b.cells[index].innerHTML);
-      break;
+  th.setAttribute('data-sort', 'asc');
 
+  switch (th.textContent) {
     case 'Salary':
-      row.sort((a, b) =>
-        normalizeNumber(a.cells[index].innerHTML)
-          - normalizeNumber(b.cells[index].innerHTML));
-      break;
-
+      return rows.sort((a, b) => convertToNumber(a.children[i].textContent)
+        - convertToNumber(b.children[i].textContent));
     default:
-      return;
+      return rows.sort((a, b) => a.children[i].textContent
+        .localeCompare(b.children[i].textContent));
   }
-
-  tbody.append(...row);
 }
 
-// sort by double click
+function sortTableDESC(th) {
+  const i = th.cellIndex;
 
-table.addEventListener('dblclick', (e) => {
-  const th = e.target.closest('th');
+  th.setAttribute('data-sort', 'desc');
 
-  if (!th || !table.contains(th)) {
-    return;
-  }
-
-  sortDESC(th.cellIndex, th.innerHTML);
-});
-
-function sortDESC(index, text) {
-  switch (text) {
-    case 'Name':
-    case 'Position':
-    case 'Office':
-      row.sort((a, b) =>
-        b.cells[index].innerHTML.localeCompare(a.cells[index].innerHTML));
-      break;
-
-    case 'Age':
-      row.sort((a, b) =>
-        b.cells[index].innerHTML - a.cells[index].innerHTML);
-      break;
-
+  switch (th.textContent) {
     case 'Salary':
-      row.sort((a, b) =>
-        normalizeNumber(b.cells[index].innerHTML)
-          - normalizeNumber(a.cells[index].innerHTML));
-      break;
-
+      return rows.sort((a, b) => convertToNumber(b.children[i].textContent)
+        - convertToNumber(a.children[i].textContent));
     default:
-      return;
+      return rows.sort((a, b) => b.children[i].textContent
+        .localeCompare(a.children[i].textContent));
   }
-
-  tbody.append(...row);
 }
 
-function normalizeNumber(number) {
-  return +number.slice(1).split(',').join('');
+function convertToNumber(str) {
+  return +str.slice(1).split(',').join('');
 }
 
 // active row
@@ -110,6 +75,7 @@ document.body.insertAdjacentHTML('beforeend', `
       name="name"
       type="text"
       data-qa="name"
+      required
     >
   </label>
 
@@ -118,6 +84,7 @@ document.body.insertAdjacentHTML('beforeend', `
       name="position"
       type="text"
       data-qa="position"
+      required
     >
   </label>
 
@@ -137,6 +104,7 @@ document.body.insertAdjacentHTML('beforeend', `
       name="age"
       type="number"
       data-qa="age"
+      required
     >
   </label>
 
@@ -145,6 +113,7 @@ document.body.insertAdjacentHTML('beforeend', `
       name="salary"
       type="number"
       data-qa="salary"
+      required
     >
   </label>
 
@@ -197,6 +166,8 @@ form.addEventListener('submit', (e) => {
   pushNotification('Success',
     'Great, information add to table', 'success');
 });
+
+//notification
 
 const pushNotification = (title, description, type) => {
   const lastNotification = document.querySelector('.notification');
