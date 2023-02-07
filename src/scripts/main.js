@@ -136,21 +136,29 @@ form.addEventListener('submit', (e) => {
   if (objectForm.name.length < 4) {
     pushNotification('Error message',
       'Name value must be more than 4 letters', 'error');
+
+    return;
   }
 
   if (!objectForm.position) {
     pushNotification('Warning',
       'Write position, please', 'warning');
+
+    return;
   }
 
   if (objectForm.age < 18 || objectForm.age > 90) {
     pushNotification('Error message',
       'Age couldn\'t less than 18 and more than 90 ', 'error');
+
+    return;
   }
 
   if (!objectForm.salary) {
     pushNotification('Warning',
       'Write salary, please', 'warning');
+
+    return;
   }
 
   tbody.insertAdjacentHTML('beforeend', `
@@ -165,9 +173,11 @@ form.addEventListener('submit', (e) => {
 
   pushNotification('Success',
     'Great, information add to table', 'success');
+
+  form.reset();
 });
 
-//notification
+// notification
 
 const pushNotification = (title, description, type) => {
   const lastNotification = document.querySelector('.notification');
