@@ -6,7 +6,6 @@ const titleColumn = titleSort.children[0].children;
 const sumString = string => +string.slice(1).split(',').join('');
 let sortedCell;
 
-// Sort event
 titleSort.addEventListener('click', (e) => {
   const sortRow = e.target.cellIndex;
 
@@ -42,7 +41,6 @@ titleSort.addEventListener('click', (e) => {
   e.target.setAttribute('sorted', 'ASC');
 });
 
-// Select event
 document.addEventListener('click', (e) => {
   if (!e.target.matches('TD')) {
     return;
@@ -55,7 +53,6 @@ document.addEventListener('click', (e) => {
   e.target.parentElement.classList.add('active');
 });
 
-// Create form
 const newForm = document.createElement('form');
 const newButton = document.createElement('button');
 
@@ -65,7 +62,6 @@ newForm.id = 'addForm';
 newForm.className = 'new-employee-form';
 document.body.children[0].after(newForm);
 
-// Function for creating form elements
 const createFormElements = (parentElement, element, child, attributes,) => {
   const newElement = document.createElement('label');
   const newChild = document.createElement(child);
@@ -131,11 +127,11 @@ createFormElements(newForm, 'Salary:', 'input', {
   'data-qa': 'salary',
   id: 'inputSalary',
   required: '',
+  min: 1,
 });
 
 newForm.append(newButton);
 
-// Event submit form
 const form = document.querySelector('#addForm');
 
 form.addEventListener('submit', (e) => {
@@ -151,6 +147,10 @@ form.addEventListener('submit', (e) => {
   if (!validation(nameEmployee, 'Name')) {
     return;
   };
+
+  if (!validation(position, 'Position')) {
+    return;
+  }
 
   if (!validation(age, 'Age')) {
     return;
@@ -173,13 +173,11 @@ form.addEventListener('submit', (e) => {
   form.reset();
 });
 
-// Editing of table cells by double-clicking
 const newCell = document.createElement('input');
 const oldInfo = document.createElement('td');
 
 newCell.classList.add('cell-input');
 
-// Event for double-click
 employeesBody.addEventListener('dblclick', (e) => {
   newCell.value = e.target.textContent;
   oldInfo.textContent = e.target.textContent;
@@ -187,14 +185,12 @@ employeesBody.addEventListener('dblclick', (e) => {
   newCell.focus();
 });
 
-// Event for key Enter
 employeesBody.addEventListener('keyup', (e) => {
   if (e.code === 'Enter' || e.code === 'NumpadEnter') {
     save(e);
   }
 });
 
-// Event for save and data validation
 const save = (e) => {
   const isValid = validation(newCell.value,
     titleColumn[e.target.parentElement.cellIndex].textContent);
@@ -226,7 +222,6 @@ const save = (e) => {
 
 newCell.addEventListener('blur', (save));
 
-// Validation functions
 const validation = (inputValue, columnName) => {
   switch (columnName) {
     case 'Name':
@@ -237,16 +232,34 @@ const validation = (inputValue, columnName) => {
 
     case 'Salary':
       return validateSalary(inputValue);
+
+    case 'Position':
+      return validateLength(inputValue);
+
+    case 'Office':
+      return validateLength(inputValue);
   };
 
   return true;
 };
 
 const validateName = (value) => {
-  if (value.length < 4) {
-    pushNotification(150, 10, `${value} is to short!`,
-      `You enter ${value.length} characters.\n `
-    + 'Please enter more than 4 characters.', 'error');
+  if (value.trim().length < 4) {
+    pushNotification(150, 10, `${value} is not correct!`,
+      `You enter ${value}.\n `
+    + 'Please enter more than 3 characters.', 'error');
+
+    return false;
+  }
+
+  return true;
+};
+
+const validateLength = (value) => {
+  if (value.trim().length < 2) {
+    pushNotification(150, 10, `${value} is not correct!`,
+      `You enter ${value}.\n `
+    + 'Please enter more than 1 characters.', 'error');
 
     return false;
   }
@@ -276,7 +289,7 @@ const validateAge = (value) => {
 
 const validateSalary = (value) => {
   if (value[0] === '$') {
-    if (!isFinite(sumString(value))) {
+    if (!isFinite(sumString(value)) || sumString(value) < 1) {
       pushNotification(290, 10, 'Salary is not correct!',
         `You enter not a number\n `
         + 'Please enter corect number', 'error');
@@ -287,7 +300,7 @@ const validateSalary = (value) => {
     return true;
   }
 
-  if (!isFinite(+value.split(',').join(''))) {
+  if (!isFinite(+value.split(',').join('')) || +value.split(',').join('') < 1) {
     pushNotification(290, 10, 'Salary is not correct!',
       `You enter not a number\n `
       + 'Please enter corect number', 'error');
@@ -298,7 +311,6 @@ const validateSalary = (value) => {
   return true;
 };
 
-// Notification
 const pushNotification = (posTop, posRight, title, description, type) => {
   const box = document.createElement('div');
   const heading = document.createElement('h2');
