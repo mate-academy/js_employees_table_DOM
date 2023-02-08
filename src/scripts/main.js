@@ -156,6 +156,10 @@ function validate(key, value) {
     return false;
   }
 
+  if (key === 'salary' && value < 0) {
+    return false;
+  }
+
   return true;
 }
 
@@ -177,7 +181,7 @@ tableHead.addEventListener('click', (e) => {
 
   const dir = count % 2 === 0 && item === index
     ? 'desc'
-    : 'abs';
+    : 'asc';
 
   usersData = usersData.sort((a, b) => {
     let prev = a[item];
@@ -214,7 +218,7 @@ tableBody.addEventListener('click', (e) => {
   }
 });
 
-form.addEventListener('submit', e => {
+form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const userName = form.querySelector('[name="name"]');
@@ -226,9 +230,15 @@ form.addEventListener('submit', e => {
   = `$${userSalary.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
   const formData = new FormData(form);
 
+  const removeNotification = () => {
+    notification.removeAttribute('class');
+    notification.innerHTML = '';
+  };
+
   for (const [key, value] of formData) {
     if (!validate(key, value)) {
       initNotification('error', 'Please fill out all fields!');
+      setTimeout(removeNotification, 2000);
 
       return false;
     }
@@ -247,29 +257,51 @@ form.addEventListener('submit', e => {
 
   initTableBody();
   e.target.reset();
-
-  setTimeout(() => {
-    notification.removeAttribute('class');
-  }, 6000);
+  setTimeout(removeNotification, 2000);
 });
 
 tableBody.addEventListener('dblclick', (e) => {
   const item = e.target.closest('td');
+  const i = item.cellIndex;
+  const columnHead = tableHead.querySelectorAll('th');
+  const key = columnHead[i].textContent.toLowerCase();
 
   if (!item) {
     return;
   }
 
   let val = item.innerHTML;
-  const input = document.createElement('input');
+
+  let input = document.createElement('input');
+
+  if (key === 'office') {
+    input = document.createElement('select');
+
+    input.innerHTML = `
+    <option value="San Francisco">San Francisco</option>
+    <option value="Tokyo">Tokyo</option>
+    <option value="Singapore" selected="selected">Singapore</option>
+    <option value="London">London</option>
+    <option value="New York">New York</option>
+    <option value="Edinburgh">Edinburgh</option>
+    `;
+
+    input.value = '';
+  }
+
+  if (key === 'age' || key === 'salary') {
+    input.type = 'number';
+  }
 
   input.classList.add('cell-input');
   item.innerHTML = '';
   item.append(input);
 
   function changeCellValue() {
-    if (input.value.length > 0) {
-      val = input.value;
+    val = validate(key, input.value.trim()) ? input.value.trim() : val;
+
+    if (validate(key, input.value.trim()) && key === 'salary') {
+      val = `$${val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
     }
 
     item.innerText = val;
