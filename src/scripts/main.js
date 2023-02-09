@@ -5,84 +5,84 @@ let usersData = [
     name: 'Airi Satou',
     position: 'Accountant',
     office: 'Tokyo',
-    age: 33,
+    age: '33',
     salary: '$162,700',
   },
   {
     name: 'Michael Bruce',
     position: 'Javascript Developer',
     office: 'Singapore',
-    age: 29,
+    age: '29',
     salary: '$162,700',
   },
   {
     name: 'Michael Silva',
     position: 'Marketing Designer',
     office: 'London',
-    age: 66,
+    age: '66',
     salary: '$198,500',
   },
   {
     name: 'Prescott Bartlett',
     position: 'Technical Author',
     office: 'London',
-    age: 27,
+    age: '27',
     salary: '$145,000',
   },
   {
     name: 'Thor Walton',
     position: 'Developer',
     office: 'New York',
-    age: 61,
+    age: '61',
     salary: '$98,540',
   },
   {
     name: 'Rhona Davidson',
     position: 'Integration Specialist',
     office: 'Tokyo',
-    age: 55,
+    age: '55',
     salary: '$327,900',
   },
   {
     name: 'Serge Baldwin',
     position: 'Data Coordinator',
     office: 'Singapore',
-    age: 64,
+    age: '64',
     salary: '$138,575',
   },
   {
     name: 'Shad Decker',
     position: 'Regional Director',
     office: 'Edinburgh',
-    age: 51,
+    age: '51',
     salary: '$183,000',
   },
   {
     name: 'Shou Itou',
     position: 'Regional Marketing',
     office: 'Tokyo',
-    age: 20,
+    age: '20',
     salary: '$163,000',
   },
   {
     name: 'Vivian Harrell',
     position: 'Financial Controller',
     office: 'San Francisco',
-    age: 62,
+    age: '62',
     salary: '$452,500',
   },
   {
     name: 'Zorita Serrano',
     position: 'Software Engineer',
     office: 'San Francisco',
-    age: 56,
+    age: '56',
     salary: '$115,000',
   },
   {
     name: 'Colleen Hurst',
     position: 'Javascript Developer',
     office: 'San Francisco',
-    age: 39,
+    age: '39',
     salary: '$205,500',
   },
 ];
@@ -152,11 +152,11 @@ function validate(key, value) {
     return false;
   }
 
-  if (key === 'age' && (value < 18 || value > 90)) {
+  if (key === 'age' && ((value < 18 || value > 90) || !isFinite(value))) {
     return false;
   }
 
-  if (key === 'salary' && value < 0) {
+  if (key === 'salary' && (value < 0 || !isFinite(value))) {
     return false;
   }
 
@@ -265,6 +265,7 @@ tableBody.addEventListener('dblclick', (e) => {
   const i = item.cellIndex;
   const columnHead = tableHead.querySelectorAll('th');
   const key = columnHead[i].textContent.toLowerCase();
+  const rowIndex = usersData.findIndex(el => el[key] === item.textContent);
 
   if (!item) {
     return;
@@ -289,10 +290,6 @@ tableBody.addEventListener('dblclick', (e) => {
     input.value = '';
   }
 
-  if (key === 'age' || key === 'salary') {
-    input.type = 'number';
-  }
-
   input.classList.add('cell-input');
   item.innerHTML = '';
   item.append(input);
@@ -305,6 +302,7 @@ tableBody.addEventListener('dblclick', (e) => {
     }
 
     item.innerText = val;
+    usersData[rowIndex][key] = val;
   }
 
   input.addEventListener('keydown', (ev) => {
