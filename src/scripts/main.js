@@ -5,111 +5,98 @@ const head = document.querySelector('thead');
 const titles = [...head.children[0].children];
 const tbody = document.querySelector('tbody');
 
-function compareCurrency(cur1, cur2) {
-  const firstCurrency = +cur1.slice(1).split(',').join('');
-  const secCurrency = +cur2.slice(1).split(',').join('');
+const fieldsNames = ['Name', 'Position', 'Age', 'Salary'];
+const selectionItems = [
+  `Tokyo`, `Singapore`, `London`, `New York`, `Edinburgh`, `San Francisco`,
+];
 
-  if (firstCurrency > secCurrency) {
-    return true;
-  }
+const form = createForm(body, 'new-employee-form');
+const cellInput = document.createElement('input');
+let countActiveCells = document.querySelectorAll('.modifying').length;
+let oldCellValue = '';
 
-  if (firstCurrency < secCurrency) {
-    return false;
-  }
+function getColumn(index) {
+  const rows = tbody.rows;
+  const column = [];
+
+  for (const row of rows) {
+    column.push(row.children[index].textContent);
+  };
+
+  return column;
 }
 
-function compareStrings(str1, str2) {
-  const firstRowLowered = str1.toLowerCase();
-  const secondRowLowered = str2.toLowerCase();
-
-  if (firstRowLowered > secondRowLowered) {
-    return true;
+function sortAscArray(array) {
+  if (array.find(el => !isNaN(+el))) {
+    return array.sort((a, b) => a - b);
   }
 
-  if (firstRowLowered < secondRowLowered) {
-    return false;
+  if (array.find(el => el.indexOf('$') !== -1)) {
+    let column = convertCurrencytoNumber(array);
+
+    column = column.sort((a, b) => a - b);
+
+    return column.map(num => convertToCurrency(num));
   }
+
+  return array.sort((a, b) => a.localeCompare(b));
 }
 
-function sortTable(index) {
-  const table = document.querySelector('tbody');
-  let isSwitching = true;
-  let countSwitch = 0;
-  let sortDirection = 'asc';
+function sortDescArray(array) {
+  if (array.find(el => !isNaN(+el))) {
+    return array.sort((a, b) => b - a);
+  }
 
-  while (isSwitching) {
-    isSwitching = false;
+  if (array.find(el => el.indexOf('$') !== -1)) {
+    let column = convertCurrencytoNumber(array);
 
-    const rows = table.rows;
-    let shouldRowsSwitch = false;
-    let i;
+    column = column.sort((a, b) => b - a);
 
-    for (i = 0; i < rows.length - 1; i++) {
-      shouldRowsSwitch = false;
+    return column.map(num => convertToCurrency(num));
+  }
 
-      const firstRow = rows[i].getElementsByTagName('TD')[index];
-      const secondRow = rows[i + 1].getElementsByTagName('TD')[index];
+  return array.sort((a, b) => b.localeCompare(a));
+}
 
-      const firstRowContent = firstRow.innerHTML;
-      const secondRowContent = secondRow.innerHTML;
+function changeRowOrder(sortedArr) {
+  const sortedRows = [];
 
-      const isFirstRowNum = Number(firstRowContent);
-      const isSecondRowNum = Number(secondRowContent);
-
-      if (sortDirection === 'asc') {
-        if (isFirstRowNum && (isFirstRowNum > isSecondRowNum)) {
-          shouldRowsSwitch = true;
-          break;
-        } else {
-          const isCurrency = firstRowContent.indexOf('$');
-
-          if (isCurrency !== -1) {
-            if (compareCurrency(firstRowContent, secondRowContent)) {
-              shouldRowsSwitch = true;
-              break;
-            };
-          } else {
-            if (compareStrings(firstRowContent, secondRowContent)) {
-              shouldRowsSwitch = true;
-              break;
-            }
-          }
-        }
-      }
-
-      if (sortDirection === 'desc') {
-        if (isFirstRowNum && (isFirstRowNum < isSecondRowNum)) {
-          shouldRowsSwitch = true;
-          break;
-        } else {
-          const isCurrency = firstRowContent.indexOf('$');
-
-          if (isCurrency !== -1) {
-            if (compareCurrency(firstRowContent, secondRowContent) === false) {
-              shouldRowsSwitch = true;
-              break;
-            };
-          } else {
-            if (compareStrings(firstRowContent, secondRowContent) === false) {
-              shouldRowsSwitch = true;
-              break;
-            }
-          }
-        }
+  sortedArr.forEach(el => {
+    for (const row of tbody.rows) {
+      if ([...row.children].find(cell => cell.textContent === el)) {
+        sortedRows.push(row);
       }
     }
+  });
 
-    if (shouldRowsSwitch) {
-      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-      isSwitching = true;
-      countSwitch++;
+  [...tbody.rows].forEach(el => el.remove());
+  sortedRows.forEach(el => tbody.appendChild(el));
+
+  return sortedRows;
+}
+
+function sortTableInDirection(index, direction = 'asc') {
+  const column = getColumn(index);
+
+  const sortedColumn = (direction !== 'asc')
+    ? sortDescArray(column)
+    : sortAscArray(column);
+
+  changeRowOrder(sortedColumn);
+}
+
+function sortTableOnClick(index, element) {
+  let clicksCounter = 0;
+
+  element.addEventListener('click', () => {
+    if (clicksCounter % 2 === 0) {
+      sortTableInDirection(index, 'asc');
     } else {
-      if (countSwitch === 0 && sortDirection === 'asc') {
-        sortDirection = 'desc';
-        isSwitching = true;
-      }
+      sortTableInDirection(index, 'desc');
     }
-  }
+
+    clicksCounter++;
+  });
 }
 
 function createForm(parentElement, className) {
@@ -125,6 +112,7 @@ function createInputs(parentElement, fieldsArray) {
   for (let i = 0; i < fieldsArray.length; i++) {
     const label = document.createElement('label');
     const input = document.createElement('input');
+    const inputInfo = fieldsNames[i].toLowerCase();
 
     label.textContent = `${fieldsNames[i]}:`;
     input.type = 'text';
@@ -133,9 +121,9 @@ function createInputs(parentElement, fieldsArray) {
       ? 'number'
       : 'text';
 
-    input.name = fieldsNames[i].toLowerCase();
-    input['data-qa'] = fieldsNames[i].toLowerCase();
-    input.id = fieldsNames[i].toLowerCase();
+    input.name = inputInfo;
+    input['data-qa'] = inputInfo;
+    input.id = inputInfo;
     input.required = true;
 
     label.for = input.id;
@@ -182,6 +170,26 @@ function createSubmitButton(parentElement) {
   return submitButton;
 }
 
+function addForm(formElement, inputNames, selectionTitle, selectionNames) {
+  createInputs(formElement, inputNames);
+  createSelection(formElement, selectionTitle, selectionNames);
+  createSubmitButton(form);
+}
+
+function convertCurrencytoNumber(array) {
+  return array.map(el => +el.slice(1).split(',').join(''));
+}
+
+function convertToCurrency(number) {
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  });
+
+  return formatter.format(number);
+}
+
 function checkLength(inputValue) {
   if (inputValue.trim().length === 0) {
     return true;
@@ -191,11 +199,10 @@ function checkLength(inputValue) {
 }
 
 function checkName(inputValue) {
-  const emptyInputLength = 0;
   const minInputLength = 4;
 
-  if ((inputValue.length > emptyInputLength)
-  && (inputValue.length < minInputLength)) {
+  if ((checkLength(inputValue))
+  || ((!checkLength(inputValue)) && (inputValue.length < minInputLength))) {
     return true;
   }
 
@@ -203,12 +210,11 @@ function checkName(inputValue) {
 }
 
 function checkAge(inputValue) {
-  const emptyInputLength = 0;
   const minAge = 18;
   const maxAge = 89;
 
-  if ((inputValue.length > emptyInputLength)
-  && ((inputValue < minAge) || (inputValue > maxAge))) {
+  if ((checkLength(inputValue))
+  || ((inputValue < minAge) || (inputValue > maxAge))) {
     return true;
   }
 
@@ -216,17 +222,16 @@ function checkAge(inputValue) {
 }
 
 function checkSalary(inputValue) {
-  const emptyInputLength = 0;
   const minSalary = 1;
 
-  if ((inputValue.length > emptyInputLength) && (inputValue <= minSalary)) {
+  if ((checkLength(inputValue)) || (inputValue <= minSalary)) {
     return true;
   }
 
   return false;
 }
 
-function notification() {
+function createNotification() {
   const block = document.createElement('div');
   const title = document.createElement('h2');
   const text = document.createElement('p');
@@ -244,116 +249,192 @@ function notification() {
   return block;
 }
 
-function success() {
-  const block = notification();
+function displayNotification(notification) {
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, 2000);
+}
+
+function showSuccess() {
+  const block = createNotification();
 
   block.classList.add('success');
   block.children[0].textContent = 'New employee is added successfully!';
   block.children[1].textContent = `Your team is getting bigger :)`;
 
-  return block;
+  displayNotification(block);
 }
 
-function showSuccess() {
-  const popUp = success();
-
-  setTimeout(() => {
-    popUp.style.display = 'none';
-  }, 2000);
-}
-
-function error() {
-  const block = notification();
+function showError() {
+  const block = createNotification();
 
   block.classList.add('error');
   block.children[0].textContent = 'Oops... Something went wrong';
   block.children[1].textContent = `Please, check the data once again :(`;
 
-  return block;
+  displayNotification(block);
 }
 
-function showError() {
-  const errorPopUp = error();
-
-  setTimeout(() => {
-    errorPopUp.style.display = 'none';
-  }, 2000);
-}
-
-function warning() {
-  const block = notification();
+function showWarning() {
+  const block = createNotification();
 
   block.classList.add('warning');
   block.children[0].textContent = 'Oops... The data is invalid';
   block.children[1].textContent = `Please, check the data once again :(`;
 
-  return block;
+  displayNotification(block);
 }
 
-function showWarning() {
-  const warningPopUp = warning();
+function getInputError(checkingFunction, checkingValue, notification) {
+  const incorrectData = checkingFunction(checkingValue);
 
-  setTimeout(() => {
-    warningPopUp.style.display = 'none';
-  }, 2000);
+  if (incorrectData && notification) {
+    notification();
+  }
+
+  return incorrectData;
 }
 
-function convertToCurrency(number) {
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
+function selectRow(tableRows) {
+  tableRows.addEventListener('click', e => {
+    const row = e.target.parentNode;
+    const activeElements = [...document.querySelectorAll('.active')];
+
+    if (!activeElements.length) {
+      row.classList.add('active');
+    } else if (activeElements.length === 1) {
+      row.classList.add('active');
+      activeElements[0].classList.remove('active');
+    }
   });
-
-  return formatter.format(number);
 }
 
-function setNewValue(input, oldValue) {
+function addNewRow(dataArr, table, rowLength) {
+  const newRow = document.createElement('tr');
+
+  table.appendChild(newRow);
+
+  for (let j = 0; j < rowLength; j++) {
+    const newCell = document.createElement('td');
+
+    newCell.textContent = dataArr[j];
+    newRow.appendChild(newCell);
+  }
+}
+
+function fillNewRow(formElement, rowLength, table) {
+  let userInputArr = [];
+
+  formElement.addEventListener('submit', e => {
+    e.preventDefault();
+
+    let incorrectData = false;
+
+    for (let i = 0; i < form.children.length - 1; i++) {
+      const label = form.children[i];
+      let inputValue = label.children[0].value.trim();
+
+      if (checkLength(inputValue)) {
+        showWarning();
+        incorrectData = true;
+      }
+
+      const inputName = label.children[0].name;
+
+      switch (inputName) {
+        case 'name':
+          incorrectData = getInputError(checkName, inputValue, showError);
+
+          break;
+
+        case 'age':
+          incorrectData = getInputError(checkAge, inputValue, showError);
+
+          break;
+
+        case 'salary':
+          incorrectData = getInputError(checkSalary, inputValue, showError);
+
+          if (!incorrectData) {
+            inputValue = convertToCurrency(inputValue);
+          }
+
+          break;
+      }
+
+      if (incorrectData) {
+        userInputArr = [];
+
+        return false;
+      }
+
+      userInputArr.push(inputValue);
+    }
+
+    addNewRow(userInputArr, table, rowLength);
+
+    showSuccess();
+
+    userInputArr = [];
+    form.reset();
+  });
+}
+
+function selectCell(table, input) {
+  input.classList.add('cell-input');
+
+  for (const row of table.rows) {
+    for (const cell of row.cells) {
+      cell.addEventListener('dblclick', e => {
+        e.target.classList.add('modifying');
+        oldCellValue = e.target.textContent;
+        input.value = oldCellValue;
+
+        if (countActiveCells <= 1) {
+          e.target.textContent = '';
+          e.target.appendChild(input);
+          input.focus();
+        }
+      });
+    }
+  }
+}
+
+function setNewCellValue(input, oldValue) {
   let newCellValue = input.value;
   const cell = input.parentNode;
   let incorrectData = false;
 
-  if (checkLength(newCellValue)) {
-    incorrectData = true;
-  }
-
   const cellIndex = [...cell.parentNode.children].indexOf(cell);
+  const cellName = titles[cellIndex].textContent.toLowerCase();
 
-  switch (cellIndex) {
-    case 0:
-      if (checkName(newCellValue)) {
-        incorrectData = true;
-      }
+  switch (cellName) {
+    case 'name':
+      incorrectData = getInputError(checkName, newCellValue);
+
       break;
 
-    case 3:
-      if (checkAge(newCellValue)) {
-        incorrectData = true;
-      }
+    case 'age':
+      incorrectData = getInputError(checkAge, newCellValue);
+
       break;
 
-    case 4:
-      if (checkSalary(newCellValue)) {
-        incorrectData = true;
-      }
+    case 'salary':
+      incorrectData = getInputError(checkSalary, newCellValue);
+
       break;
-  }
-
-  if (incorrectData) {
-    incorrectData = true;
-
-    showError();
   }
 
   if (oldValue.indexOf('$') !== -1) {
     newCellValue = convertToCurrency(+newCellValue);
   }
 
-  if ((newCellValue.length > 0) && (newCellValue !== '$0')
-  && (incorrectData === false)) {
+  if ((!checkLength(newCellValue))
+  && (newCellValue !== '$0') && (incorrectData === false)) {
     cell.textContent = newCellValue;
   } else {
     cell.textContent = oldValue;
+    showError();
   }
 
   input.value = '';
@@ -362,134 +443,22 @@ function setNewValue(input, oldValue) {
 }
 
 for (let i = 0; i < titles.length; i++) {
-  titles[i].addEventListener('click', e => {
-    sortTable(i);
-  });
+  sortTableOnClick(i, titles[i]);
 }
 
-tbody.addEventListener('click', e => {
-  const row = e.target.parentNode;
-  const activeElements = [...document.querySelectorAll('.active')];
+selectRow(tbody);
 
-  if (!activeElements.length) {
-    row.classList.add('active');
-  } else if (activeElements.length === 1) {
-    row.classList.add('active');
-    activeElements[0].classList.remove('active');
-  }
-});
+addForm(form, fieldsNames, 'Office', selectionItems);
 
-const fieldsNames = ['Name', 'Position', 'Age', 'Salary'];
-const selectionItems = [
-  `Tokyo`, `Singapore`, `London`, `New York`, `Edinburgh`, `San Francisco`,
-];
-
-const form = createForm(body, 'new-employee-form');
-
-createInputs(form, fieldsNames);
-createSelection(form, 'Office', selectionItems);
-
-createSubmitButton(form);
-
-let userInputArr = [];
-
-form.addEventListener('submit', e => {
-  e.preventDefault();
-
-  let incorrectData = false;
-
-  for (let i = 0; i < form.children.length - 1; i++) {
-    const label = form.children[i];
-    let inputValue = label.children[0].value;
-
-    inputValue = inputValue.trim();
-
-    if (checkLength(inputValue)) {
-      showWarning();
-      incorrectData = true;
-    }
-
-    switch (i) {
-      case 0:
-        if (checkName(inputValue)) {
-          showError();
-          incorrectData = true;
-        }
-
-        break;
-
-      case 3:
-        if (checkAge(inputValue)) {
-          showError();
-          incorrectData = true;
-        }
-
-        break;
-
-      case (form.children.length - 2):
-        if (checkSalary(inputValue)) {
-          showError();
-          incorrectData = true;
-        }
-        inputValue = convertToCurrency(inputValue);
-
-        break;
-    }
-
-    if (incorrectData) {
-      userInputArr = [];
-
-      return false;
-    }
-
-    userInputArr.push(inputValue);
-  }
-
-  const newRow = document.createElement('tr');
-
-  tbody.appendChild(newRow);
-
-  for (let j = 0; j < titles.length; j++) {
-    const newCell = document.createElement('td');
-
-    newCell.textContent = userInputArr[j];
-    newRow.appendChild(newCell);
-  }
-
-  showSuccess();
-
-  userInputArr = [];
-  form.reset();
-});
-
-const cellInput = document.createElement('input');
-let countActiveCells = document.querySelectorAll('.modifying').length;
-let oldCellValue = '';
-
-cellInput.classList.add('cell-input');
-
-for (const row of tbody.rows) {
-  for (const cell of row.cells) {
-    cell.addEventListener('dblclick', e => {
-      e.target.classList.add('modifying');
-      oldCellValue = e.target.textContent;
-      cellInput.value = oldCellValue;
-
-      if (countActiveCells <= 1) {
-        e.target.textContent = '';
-        e.target.appendChild(cellInput);
-        cellInput.focus();
-      }
-    });
-  }
-}
+fillNewRow(form, titles.length, tbody);
+selectCell(tbody, cellInput);
 
 cellInput.addEventListener('keypress', inputEvent => {
   if (inputEvent.key === 'Enter') {
-    setNewValue(inputEvent.target, oldCellValue);
+    setNewCellValue(inputEvent.target, oldCellValue);
   }
 });
 
 cellInput.addEventListener('blur', inputEvent => {
-  setNewValue(inputEvent.target, oldCellValue);
+  setNewCellValue(inputEvent.target, oldCellValue);
 });
