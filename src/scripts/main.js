@@ -87,6 +87,7 @@ let usersData = [
   },
 ];
 
+// Table initialization
 function initTableBody() {
   tableBody.innerHTML = `
     <tbody>
@@ -103,16 +104,20 @@ function initTableBody() {
   `;
 }
 
+// Form initialization
 function initForm() {
   table.insertAdjacentHTML('afterend', `
     <form class="new-employee-form">
-      <label>Name:
+      <label>
+        Name:
         <input name="name" type="text" data-qa="name">
       </label>
-      <label>Position:
+      <label>
+        Position:
         <input name="position" type="text" data-qa="position">
       </label>
-      <label>Office:
+      <label>
+        Office:
         <select name="office" data-qa="office">
           <option value="San Francisco">San Francisco</option>
           <option value="Tokyo">Tokyo</option>
@@ -122,17 +127,22 @@ function initForm() {
           <option value="Edinburgh">Edinburgh</option>
         </select>
       </label>
-      <label>Age:
+      <label>
+        Age:
         <input name="age" type="number" data-qa="age">
       </label>
-      <label>Salary:
+      <label>
+        Salary:
         <input name="salary" type="number" data-qa="salary">
       </label>
-      <button type="submit">Save to table</button>
+      <button type="submit">
+        Save to table
+      </button>
     </form>
   `);
 }
 
+// Notification initialization
 function initNotification(type, message) {
   notification.classList.add('notification', type);
 
@@ -143,22 +153,34 @@ function initNotification(type, message) {
   `;
 }
 
+// Form validation
 function validate(key, value) {
   if (!value) {
+    notifcationMessage = `Please fill out all field!`;
+
     return false;
   }
 
   if (key === 'name' && value.length < 4) {
+    notifcationMessage = `Please write the correct name!`;
+
     return false;
   }
 
   if (key === 'age' && ((value < 18 || value > 90) || !isFinite(value))) {
+    notifcationMessage = `Please write the correct age!`;
+
     return false;
   }
 
   if (key === 'salary' && (value < 0 || !isFinite(value))) {
+    notifcationMessage = `Please write the correct salary!`;
+
     return false;
   }
+
+  notifcationMessage
+    = 'Congratulations! Your data has been entered into the table!'
 
   return true;
 }
@@ -172,10 +194,12 @@ initForm();
 
 const form = document.querySelector('form');
 const notification = document.querySelector('[data-qa="notification"]');
+let notifcationMessage;
 
 let index;
 let count = 1;
 
+// Sorting the table
 tableHead.addEventListener('click', (e) => {
   const item = e.target.textContent.toLowerCase();
 
@@ -212,12 +236,14 @@ tableHead.addEventListener('click', (e) => {
   initTableBody(usersData);
 });
 
+// Add active class
 tableBody.addEventListener('click', (e) => {
   for (const row of tableBody.children) {
     row.classList.toggle('active', row === e.target.closest('tr'));
   }
 });
 
+// Add new data from form
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -237,14 +263,13 @@ form.addEventListener('submit', (e) => {
 
   for (const [key, value] of formData) {
     if (!validate(key, value)) {
-      initNotification('error', 'Please fill out all fields!');
+      initNotification('error', notifcationMessage);
       setTimeout(removeNotification, 2000);
 
       return false;
     }
 
-    initNotification('success',
-      'Congratulations! Your data has been entered into the table!');
+    initNotification('success', notifcationMessage);
   }
 
   usersData.push({
@@ -260,11 +285,12 @@ form.addEventListener('submit', (e) => {
   setTimeout(removeNotification, 2000);
 });
 
+// Add new data by double-click
 tableBody.addEventListener('dblclick', (e) => {
   const item = e.target.closest('td');
-  const i = item.cellIndex;
+  const columnIndex = item.cellIndex;
   const columnHead = tableHead.querySelectorAll('th');
-  const key = columnHead[i].textContent.toLowerCase();
+  const key = columnHead[columnIndex].textContent.toLowerCase();
   const rowIndex = usersData.findIndex(el => el[key] === item.textContent);
 
   if (!item) {
