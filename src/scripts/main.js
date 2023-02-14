@@ -80,7 +80,7 @@ addEmployee.innerHTML = `
   </label>
 
   <label> Position:
-    <input type="text" name = "position" data-qa="position" required>
+    <input type="text" name = "position" data-qa="position">
   </label>
 
   <label> Office:
@@ -109,7 +109,7 @@ addEmployee.innerHTML = `
 body.append(addEmployee);
 
 function validation(data) {
-  if (data.get('name').length < nameLength
+  if (data.get('name').trim().length < nameLength
     || /\d/.test(data.get('name'))) {
     pushNotification(
       580,
@@ -131,8 +131,8 @@ function validation(data) {
     );
 
     isValid = false;
-  } else if (data.get('position') === ' '
-    || data.get('position').length < 4) {
+  } else if (data.get('position').trim().length < nameLength
+    || /\d/.test(data.get('position'))) {
     pushNotification(
       580,
       10,
@@ -159,8 +159,17 @@ function validation(data) {
 
 addEmployee.addEventListener('submit', submitEvent => {
   const employeeInfo = new FormData(addEmployee);
-  const salary = `$${+(employeeInfo.get('salary'))
-    .toLocaleString('en-US')}`;
+  const salaryToNormalize = employeeInfo.get('salary');
+  let normalizedSalary = salaryToNormalize;
+
+  if (salaryToNormalize.length > 3) {
+    normalizedSalary
+    = salaryToNormalize.slice(0, -3)
+    + ','
+    + salaryToNormalize.slice(-3, salaryToNormalize.length);
+  }
+
+  const salary = `$${normalizedSalary}`;
 
   submitEvent.preventDefault();
   validation(employeeInfo);
@@ -324,13 +333,7 @@ function validate(index, cell) {
     case 0:
     case 1:
       if (/\d/.test(cell.value)
-        || cell.value.length < nameLength) {
-        if (cell.value === '') {
-          isCorrect = false;
-
-          return;
-        }
-
+        || cell.value.trim().length < nameLength) {
         isCorrect = false;
 
         pushNotification(
@@ -390,12 +393,7 @@ function editEnd(td, isOk) {
   if (isOk) {
     switch (td.cellIndex) {
       case 4:
-        td.innerHTML = `${(+td.firstChild.value)
-          .toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-          })
-          .slice(0, -3)}`;
+        td.innerHTML = `${(+td.value)}`;
 
         pushNotification(
           460,
