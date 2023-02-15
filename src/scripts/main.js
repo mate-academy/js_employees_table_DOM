@@ -10,7 +10,7 @@ const employeeForm = document.createElement('form');
 
 employeeForm.classList.add('new-employee-form');
 
-employeeForm.innerHTML = `
+employeeForm.insertAdjacentHTML('afterbegin', `
     <label>Name:
       <input type="text" name="name" data-qa="name">
     </label>
@@ -34,7 +34,7 @@ employeeForm.innerHTML = `
       <input type="number" name="salary" data-qa="salary">
     </label>
     <button type="submit">Save to table</button>
-`;
+`);
 
 document.body.append(employeeForm);
 
@@ -76,11 +76,9 @@ function sortingTable(index, nameColumn, directSorting) {
 };
 
 function toNumber(string) {
-  let res = '';
-
-  string.includes('$')
-    ? res = string.slice(1).split(',').join('')
-    : res = string;
+  const res = string.includes('$')
+    ? string.slice(1).split(',').join('')
+    : string;
 
   return Number(res);
 };
@@ -96,7 +94,7 @@ body.addEventListener('click', (e) => {
 let isValid = false;
 
 const startNotification = (title, description, type,
-  possTop = 450, possRight = 275) => {
+  possTop = 450, possRight = 250) => {
   const mainBody = document.querySelector('body');
   const blockNot = document.createElement('div');
   const headerNot = document.createElement('h2');
