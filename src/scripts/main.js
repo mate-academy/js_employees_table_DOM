@@ -41,21 +41,23 @@ const makeColFromForm = (attr, formater, validate) => {
     value = formater(value);
   }
 
-  let isValid = true;
+  let result = {
+    isValid: true, error: '',
+  };
 
   if (validate) {
-    isValid = validate(value);
+    result = validate(value);
 
-    if (!isValid) {
+    if (!result.isValid) {
       return {
-        isValid, col: null,
+        isValid: result.isValid, col: null, error: result.error,
       };
     }
   }
   col.innerHTML = value;
 
   return {
-    isValid, col,
+    isValid: result.isValid, col, error: '',
   };
 };
 
@@ -65,17 +67,31 @@ employeeForm.addEventListener('submit', e => {
   const row = document.createElement('tr');
 
   const cols = [];
-  let result = makeColFromForm('name', null, (val) => val.length >= 4);
+  let result = makeColFromForm('name', null, (val) => {
+    return {
+      isValid: val.length >= 4,
+      error: 'Name length is less than 4 chars',
+    };
+  });
 
   cols.push(result);
 
-  result = makeColFromForm('position', null, (val) => val.length >= 4);
+  result = makeColFromForm('position', null, (val) => {
+    return {
+      isValid: val.length >= 4,
+      error: 'Position length is less than 4 chars',
+    };
+  });
   cols.push(result);
   result = makeColFromForm('office');
   cols.push(result);
 
-  result = makeColFromForm('age', (val) => val.toString(), (val) =>
-    +val >= 18 && +val <= 90);
+  result = makeColFromForm('age', (val) => val.toString(), (val) => {
+    return {
+      isValid: +val >= 18 && +val <= 90,
+      error: 'Age is less than 18 y.o. or grether than 90 y.o.',
+    };
+  });
   cols.push(result);
   result = makeColFromForm('salary', (val) => '$' + (+val).toLocaleString());
   cols.push(result);
@@ -88,7 +104,13 @@ employeeForm.addEventListener('submit', e => {
     body.append(row);
     employeeForm.reset();
   } else {
-    showNotification('Error', 'Validation error', 'error');
+    const errors = cols.reduce((acc, curr) => {
+      acc.error += '\n' + curr.error;
+
+      return acc;
+    }, { error: '' }).error;
+
+    showNotification('Validation error', errors, 'error');
   }
 });
 
@@ -149,6 +171,8 @@ body.addEventListener('click', e => {
 });
 
 const showNotification = (title, description, type) => {
+  clearNotification();
+
   const bodyEl = document.body;
 
   bodyEl.insertAdjacentHTML('afterbegin', `
@@ -165,11 +189,13 @@ const showNotification = (title, description, type) => {
   divEl.style.marginTop = `440px`;
   divEl.style.marginLeft = `5px`;
 
-  setTimeout(() => {
-    const notifications = document.getElementsByClassName('notification');
+  setTimeout(() => clearNotification(), 6000);
+};
 
-    for (const el of notifications) {
-      el.remove();
-    }
-  }, 3000);
+const clearNotification = () => {
+  const notifications = document.getElementsByClassName('notification');
+
+  for (const el of notifications) {
+    el.remove();
+  }
 };
