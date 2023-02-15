@@ -94,7 +94,7 @@ body.addEventListener('click', (e) => {
 let isValid = false;
 
 const startNotification = (title, description, type,
-  possTop = 450, possRight = 250) => {
+  possTop = 450, possRight = 275) => {
   const mainBody = document.querySelector('body');
   const blockNot = document.createElement('div');
   const headerNot = document.createElement('h2');
