@@ -1,6 +1,5 @@
 'use strict';
 
-// write code here
 const head = document.querySelector('thead');
 const body = document.querySelector('tbody');
 
@@ -152,103 +151,213 @@ form.addEventListener('submit', (e) => {
   }
 });
 
-body.addEventListener('dblclick', (e) => {
-  const newInput = document.createElement('input');
+let editingArea;
+let isCorrect = true;
 
-  const cellText = e.target.textContent;
+body.addEventListener('dblclick', doubleClick => {
+  const target = doubleClick.target.closest('td');
+  const newInput = document.querySelector('.cell-input');
 
-  const clickedCell = e.target;
+  if (newInput) {
+    pushNotification(
+      'Error',
+      'Please finish this changes',
+      'error'
+    );
 
-  clickedCell.textContent = '';
+    return editStart(newInput.parentElement);
+  }
 
-  newInput.classList.add('cell-input');
-  newInput.placeholder = cellText;
+  if (!target) {
+    return;
+  }
 
-  clickedCell.append(newInput);
+  editStart(target);
+});
 
-  newInput.focus();
+function editStart(td) {
+  editingArea = {
+    elem: td,
+    data: td.innerHTML,
+  };
 
-  const cellInput = document.querySelector('.cell-input');
+  if (td.cellIndex === 2) {
+    const cellOffice = document.createElement('select');
 
-  if (clickedCell.cellIndex === 2) {
-    clickedCell.innerHTML = `
+    cellOffice.className = 'cell-input';
+
+    cellOffice.innerHTML = `
       <select name="office"
               data-qa="office" 
               type="text"
               class="cell-input"
               class="temporary"
       >
-        <option value="tokyo">Tokyo</option>
-        <option value="singapore">Singapore</option>
-        <option value="london">London</option>
-        <option value="new york">New York</option>
-        <option value="edinburg">Edinburgh</option>
-        <option value="san francisco">San Francisco</option>
+        <option value="Tokyo">Tokyo</option>
+        <option value="Singapore">Singapore</option>
+        <option value="London">London</option>
+        <option value="New York">New York</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="San Francisco">San Francisco</option>
       </select>
-  `;
-  };
+    `;
 
-  newInput.addEventListener('keydown', (ev) => {
-    if (ev.code === 'Enter') {
-      if (cellInput.value.length === 0) {
-        cellInput.value = cellText;
+    td.innerHTML = '';
+    td.append(cellOffice);
+    cellOffice.focus();
+
+    cellOffice.onblur = () => {
+      const office = cellOffice.selectedIndex;
+
+      td.innerHTML = cellOffice[office].value;
+
+      if (cellOffice.selectedIndex === 0) {
+        td.innerHTML = editingArea.data;
       }
 
-      changingTheTable(clickedCell, cellInput, cellText);
-      pushNotification('Success', 'Changes was added', 'success');
+      pushNotification(
+        'Success',
+        'Changes exepted',
+        'success');
+    };
+
+    cellOffice.onkeydown = (enter) => {
+      if (enter.key === 'Enter') {
+        cellOffice.onblur();
+      }
+    };
+  } else {
+    const cellInput = document.createElement('input');
+
+    cellInput.className = 'cell-input';
+    cellInput.innerHTML = td.innerHTML;
+    cellInput.placeholder = td.innerHTML;
+    td.innerHTML = '';
+    td.append(cellInput);
+    cellInput.focus();
+
+    switch (td.cellIndex) {
+      case 0:
+      case 1:
+        cellInput.setAttribute('type', 'text');
+        break;
+
+      case 3:
+      case 4:
+        cellInput.setAttribute('type', 'number');
+        break;
     }
-  });
 
-  newInput.addEventListener('blur', () => {
-    if (cellInput.value.length === 0) {
-      cellInput.value = cellText;
-    }
+    cellInput.onblur = (e) => {
+      validate(td.cellIndex, cellInput);
+      editEnd(editingArea.elem, isCorrect);
+      changeIsCorrect();
+    };
 
-    changingTheTable(clickedCell, cellInput, cellText);
-  });
-});
+    cellInput.onkeydown = (enter) => {
+      if (enter.key === 'Enter') {
+        cellInput.onblur();
+      }
+    };
+  }
+};
 
-function changingTheTable(cell, inputCell, text) {
-  switch (cell.cellIndex) {
+function validate(index, cell) {
+  switch (index) {
     case 0:
-      if (inputCell.value.length < 4) {
-        cell.textContent = text;
-      } else {
-        cell.textContent = inputCell.value;
-      }
-      break;
-
     case 1:
-      cell.textContent = inputCell.value;
-      break;
+      if (/\d/.test(cell.value)
+        || cell.value.trim().length < 4) {
+        isCorrect = false;
 
-    case 2:
-      const option = cell.querySelectorAll('option');
-
-      if (option.textContent === text) {
-        option.setAttribute('selected', true);
+        pushNotification(
+          'Errir',
+          'Name must be longer than 4 letters',
+          'error');
       }
 
-      cell.textContent = option.textContent;
-      document.querySelector('.temporary').remove();
       break;
 
     case 3:
-      if (!Number(inputCell.value)
-        || inputCell.value < 18 || inputCell.value > 90) {
-        cell.textContent = text;
-      } else {
-        cell.textContent = inputCell.value;
+      if (cell.value < 18
+        || cell.value > 90) {
+        if (cell.value === '') {
+          isCorrect = false;
+
+          return;
+        }
+
+        isCorrect = false;
+
+        pushNotification(
+          'Error',
+          'Age must be between 18 & 90 years',
+          'error');
       }
+
       break;
 
     case 4:
-      if (!Number(inputCell.value)) {
-        cell.textContent = text;
-      } else {
-        cell.textContent
-          = '$' + new Intl.NumberFormat('en-GB').format(inputCell.value);
+      if (+cell.value <= 0) {
+        if (cell.value === '') {
+          isCorrect = false;
+
+          return;
+        }
+
+        isCorrect = false;
+
+        pushNotification(
+          'Error',
+          'Enter the salary',
+          'error');
       }
+
       break;
   }
+}
+
+function editEnd(td, isOk) {
+  if (isOk) {
+    switch (td.cellIndex) {
+      case 4:
+        td.innerHTML = `${(+td.firstChild.value)
+          .toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+          })
+          .slice(0, -3)}`;
+
+        pushNotification(
+          'Success',
+          'The salary was changed.',
+          'success');
+        break;
+
+      case 0:
+      case 1:
+      case 3:
+        td.innerHTML = td.firstChild.value;
+
+        pushNotification(
+          'Changed successfully!',
+          'Changes was added',
+          'success');
+        break;
+    }
+  } else {
+    if (td.firstChild.value === '') {
+      td.innerHTML = editingArea.data;
+
+      return;
+    }
+
+    return editStart(td);
+  }
+
+  editingArea = null;
 };
+
+function changeIsCorrect() {
+  isCorrect = true;
+}
