@@ -126,7 +126,7 @@ const onFocusInvalidForm = (field) => {
 };
 
 const validateForm = (data) => {
-  if (data.get('name').length < lengthName
+  if (data.get('name').trim().length < lengthName
     || /\d/.test(data.get('name'))) {
     onFocusInvalidForm(0);
 
@@ -147,7 +147,7 @@ const validateForm = (data) => {
     );
 
     isValid = false;
-  } else if (data.get('position') === '') {
+  } else if (data.get('position').trim() === '') {
     onFocusInvalidForm(1);
 
     startNotification(
