@@ -203,6 +203,13 @@ tableRow.addEventListener('dblclick', (e) => {
     const textInput = createElement.value;
 
     if (ev.code === 'Enter') {
+      if (textInput.length === 0) {
+        createElement.remove();
+        cell.textContent = createElement.getAttribute('placeholder');
+
+        return;
+      }
+
       switch (createElement.name) {
         case 'name':
           if (/[^a-z]/gi.test(textInput) || textInput.length < 4) {
@@ -219,7 +226,7 @@ tableRow.addEventListener('dblclick', (e) => {
           break;
 
         case 'position':
-          if (/[^a-z| ]/gi.textInput || textInput === '') {
+          if (/[^a-z| ]/gi.textInput) {
             pushNotification(
               'Position is not correct',
               'Position must not be empty and must not include numbers',
@@ -249,7 +256,7 @@ tableRow.addEventListener('dblclick', (e) => {
           break;
 
         case 'salary':
-          if (textInput === '' || textInput <= 0) {
+          if (textInput <= 0) {
             pushNotification(
               'Salary is not correct',
               'Salary must be greater than 0',
