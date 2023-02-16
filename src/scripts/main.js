@@ -3,6 +3,12 @@
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 
+const validScheme = {
+  name: (value) => value.length > 4,
+  age: (value) => value > 18 || value < 90,
+  salary: (value) => `$${value}`,
+};
+
 document.body.insertAdjacentHTML('beforeend', `
   <form action="/" method="get" class="new-employee-form">
     <label>
@@ -45,22 +51,6 @@ document.body.insertAdjacentHTML('beforeend', `
 const form = document.forms[0];
 const select = form.querySelector('[data-qa="office"]');
 
-form.name.addEventListener('submit', e => {
-  if (!form.name.validity.valid) {
-    form.name.setCustomValidity(
-      'Error! Less 4 letters are entered in the field'
-    );
-  }
-});
-
-form.age.addEventListener('submit', e => {
-  if (!form.age.validity.valid) {
-    form.age.setCustomValidity(
-      'Error! Age range should be from 18 to 90 years'
-    );
-  }
-});
-
 const createRow = (...arg) => {
   const firstField = form.name.value;
   const secondField = form.position.value;
@@ -80,9 +70,62 @@ const createRow = (...arg) => {
   `);
 };
 
+function showNotifi(type, text) {
+  form.insertAdjacentHTML('afterend', `
+    <div class="notification" data-qa="notification">
+      <h1 class="title">${type.toUpperCase()}</h1>
+      <p>${text}</p>
+    </div>
+  `);
+
+  const notification = document.querySelector('.notification');
+
+  if (type === 'success') {
+    notification.classList.add('success');
+  };
+
+  if (type === 'error') {
+    notification.classList.add('error');
+  }
+
+  setTimeout(() => {
+    notification.remove();
+  }, 5000);
+}
+
+form.name.addEventListener('submit', e => {
+  if (!form.name.validity.valid) {
+    form.name.setCustomValidity(
+      'Error! Less 4 letters are entered in the field'
+    );
+    showNotifi('error', 'Name length should be at least 4 letters');
+  }
+});
+
+form.name.addEventListener('change', e => {
+  if (!form.name.validity.valid) {
+    showNotifi('error', 'Name length should be at least 4 letters');
+  }
+});
+
+form.age.addEventListener('submit', e => {
+  if (!form.age.validity.valid) {
+    form.age.setCustomValidity(
+      'Error! Age range should be from 18 to 90 years'
+    );
+  }
+});
+
+form.age.addEventListener('change', e => {
+  if (!form.age.validity.valid) {
+    showNotifi('error', 'Age range should be from 18 to 90');
+  }
+});
+
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   createRow();
+  showNotifi('success', 'New employee is successfully added to the table');
   e.target.reset();
 });
 
@@ -122,16 +165,56 @@ thead.addEventListener('click', (e) => {
   tbody.append(...data);
 });
 
+let special;
+
+tbody.addEventListener('click', (e) => {
+  if (special) {
+    special.classList.remove('active');
+    special.removeAttribute('class');
+  }
+
+  special = e.target.parentElement;
+  e.target.parentElement.classList.add('active');
+});
+
 tbody.addEventListener('dblclick', (e) => {
   const item = e.target;
   const targetCell = item.cellIndex;
   const prevValue = item.innerText;
   const normValue = prevValue.replace(/[$,]/g, '');
   const targetInput
-    = form.querySelectorAll('input')[targetCell].cloneNode(true);
+    = form.querySelectorAll('[data-qa]')[targetCell].cloneNode(true);
 
   targetInput.classList.add('cell-input');
   targetInput.value = normValue;
   item.firstChild.replaceWith(targetInput);
   targetInput.focus();
+
+  targetInput.addEventListener('keypress', eventKey => {
+    if (eventKey.key === 'Enter') {
+      targetInput.blur();
+    }
+  });
+
+  targetInput.addEventListener('blur', eventBlur => {
+    if (validScheme.name(targetInput.value)
+      || validScheme.age(targetInput.value
+      || validScheme.salary(targetInput.value))) {
+      item.removeChild(targetInput);
+
+      if (targetInput.value.toLowerCase() === targetInput.value.toUpperCase()
+        && targetInput.value.length > 2) {
+        const numb = +targetInput.value;
+
+        item.textContent = `$${numb.toLocaleString('en-US')}`;
+      } else {
+        item.textContent = targetInput.value;
+      }
+
+      return;
+    }
+
+    item.removeChild(targetInput);
+    item.textContent = prevValue;
+  });
 });
