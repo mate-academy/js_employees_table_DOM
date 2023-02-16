@@ -127,7 +127,7 @@ const makeComparableNumber = (row, cellIdx, normalized) => {
 
 const makeComparable = (row, cellIdx, normalized) => {
   return normalized
-    ? row.cells[cellIdx].innerHTML.slice(1).replace(',', '')
+    ? row.cells[cellIdx].innerHTML.slice(1).replaceAll(',', '')
     : row.cells[cellIdx].innerHTML;
 };
 
