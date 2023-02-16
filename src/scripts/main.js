@@ -181,6 +181,10 @@ form.addEventListener('submit', (e) => {
 });
 
 tableRow.addEventListener('dblclick', (e) => {
+  if (e.target.children.length > 0) {
+    return;
+  }
+
   const indexCell = e.target.cellIndex;
   const value = e.target.parentElement.cells[e.target.cellIndex].innerHTML;
   const createElement = form.elements[e.target.cellIndex].cloneNode(true);
@@ -198,7 +202,7 @@ tableRow.addEventListener('dblclick', (e) => {
     }
   }
 
-  createElement.setAttribute('placeholder', value);
+  createElement.value = value;
 
   createElement.addEventListener('keydown', (ev) => {
     const textInput = createElement.value;
@@ -208,7 +212,7 @@ tableRow.addEventListener('dblclick', (e) => {
 
       if (textInput.length === 0) {
         createElement.remove();
-        cell.textContent = createElement.getAttribute('placeholder');
+        cell.textContent = value;
 
         return;
       }
@@ -279,6 +283,6 @@ tableRow.addEventListener('dblclick', (e) => {
       return;
     }
     createElement.remove();
-    cell.textContent = createElement.getAttribute('placeholder');
+    cell.textContent = createElement.value;
   });
 });
