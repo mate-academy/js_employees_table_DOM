@@ -42,7 +42,8 @@ const makeColFromForm = (attr, formater, validate) => {
   }
 
   let result = {
-    isValid: true, error: '',
+    isValid: true,
+    error: '',
   };
 
   if (validate) {
@@ -50,14 +51,18 @@ const makeColFromForm = (attr, formater, validate) => {
 
     if (!result.isValid) {
       return {
-        isValid: result.isValid, col: null, error: result.error,
+        isValid: result.isValid,
+        col: null,
+        error: result.error,
       };
     }
   }
   col.innerHTML = value;
 
   return {
-    isValid: result.isValid, col, error: '',
+    isValid: result.isValid,
+    col,
+    error: '',
   };
 };
 
@@ -89,7 +94,7 @@ employeeForm.addEventListener('submit', e => {
   result = makeColFromForm('age', (val) => val.toString(), (val) => {
     return {
       isValid: +val >= 18 && +val <= 90,
-      error: 'Age is less than 18 y.o. or grether than 90 y.o.',
+      error: 'Age is less than 18 y.o. or greater than 90 y.o.',
     };
   });
   cols.push(result);
@@ -139,18 +144,23 @@ header.addEventListener('click', e => {
   const sorted = [...rows];
 
   sorted.sort((rowA, rowB) => {
-    if (cellIndex === 3) {
-      return makeComparableNumber(sortOrder > 0 ? rowA : rowB, cellIndex)
-        - makeComparableNumber(sortOrder > 0 ? rowB : rowA, cellIndex);
+    switch (cellIndex) {
+      case 3:
+        return makeComparableNumber(sortOrder > 0
+          ? rowA : rowB, cellIndex)
+           - makeComparableNumber(sortOrder > 0
+             ? rowB : rowA, cellIndex);
+      case 4:
+        return makeComparableNumber(sortOrder > 0
+          ? rowA : rowB, cellIndex, true)
+        - makeComparableNumber(sortOrder > 0
+          ? rowB : rowA, cellIndex, true);
+      default:
+        return makeComparable(sortOrder > 0
+          ? rowA : rowB, cellIndex)
+          .localeCompare(makeComparable(sortOrder > 0
+            ? rowB : rowA, cellIndex));
     }
-
-    if (cellIndex === 4) {
-      return makeComparableNumber(sortOrder > 0 ? rowA : rowB, cellIndex, true)
-        - makeComparableNumber(sortOrder > 0 ? rowB : rowA, cellIndex, true);
-    }
-
-    return makeComparable(sortOrder > 0 ? rowA : rowB, cellIndex)
-      .localeCompare(makeComparable(sortOrder > 0 ? rowB : rowA, cellIndex));
   });
   body.append(...sorted);
   sortOrder = -sortOrder;
