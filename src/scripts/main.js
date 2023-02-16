@@ -186,13 +186,14 @@ tableRow.addEventListener('dblclick', (e) => {
   }
 
   const indexCell = e.target.cellIndex;
-  const value = e.target.parentElement.cells[e.target.cellIndex].innerHTML;
+  let value = e.target.parentElement.cells[e.target.cellIndex].innerHTML;
   const createElement = form.elements[e.target.cellIndex].cloneNode(true);
   const cell = document.createElement('td');
   let eventState = false;
 
   cell.append(createElement);
   e.target.parentElement.cells[e.target.cellIndex].replaceWith(cell);
+  createElement.focus();
 
   if (indexCell === 2) {
     for (const option of createElement.children) {
@@ -202,7 +203,11 @@ tableRow.addEventListener('dblclick', (e) => {
     }
   }
 
-  createElement.value = value;
+  if (indexCell === 4) {
+    value = value.slice(1).replaceAll(',', '');
+  }
+
+  createElement.setAttribute('value', value);
 
   createElement.addEventListener('keydown', (ev) => {
     const textInput = createElement.value;
@@ -219,7 +224,7 @@ tableRow.addEventListener('dblclick', (e) => {
 
       switch (createElement.name) {
         case 'name':
-          if (/[^a-z]/gi.test(textInput) || textInput.length < 4) {
+          if (/[^a-z| ]/gi.test(textInput) || textInput.length < 4) {
             pushNotification(
               'Name is not correct',
               'Your name must have at least 4 '
@@ -233,7 +238,7 @@ tableRow.addEventListener('dblclick', (e) => {
           break;
 
         case 'position':
-          if (/[^a-z| ]/gi.textInput) {
+          if (/[^a-z| ]/gi.test(textInput)) {
             pushNotification(
               'Position is not correct',
               'Position must not be empty and must not include numbers',
@@ -272,7 +277,7 @@ tableRow.addEventListener('dblclick', (e) => {
             break;
           }
           createElement.remove();
-          cell.textContent = `$${+textInput.toLocaleString('en-US')}`;
+          cell.textContent = `$${Number(textInput).toLocaleString('en-US')}`;
           break;
       }
     }
