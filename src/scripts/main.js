@@ -9,11 +9,11 @@ let selected;
 thead.addEventListener('click', (e) => {
   const item = e.target.closest('th');
 
-  const cellIndex = item.cellIndex;
-
   if (!item) {
     return;
   }
+
+  const cellIndex = item.cellIndex;
 
   const copyOfData = [...tbody.children];
 
@@ -90,6 +90,7 @@ body.insertAdjacentHTML('beforeend', `
         data-qa="age"
         name="age"
         type="number"
+        min="0"
       >
     </label>
 
@@ -98,6 +99,7 @@ body.insertAdjacentHTML('beforeend', `
         data-qa="salary"
         name="salary"
         type="number"
+        min="0"
       >
     </label>
 
@@ -118,7 +120,7 @@ function submitFormData(e) {
   const employeeSalary = data.get('salary');
   const newEmployeeSalary = '$' + String(employeeSalary);
 
-  if (employeeName.length < 4) {
+  if (employeeName.length < 4 || employeeName.trim() === '') {
     pushNotification('warning', 'Warning',
       'Warning... The name must have more than 4 characters ');
   } else if (employeeAge < 18 || employeeAge > 90) {
@@ -209,7 +211,6 @@ tbody.addEventListener('dblclick', (e) => {
       return;
     } else {
       item.textContent = textItem;
-      pushNotification('success', 'Success', 'Success... ');
     }
 
     if (targetIndex === 3 && input.value > 90) {
