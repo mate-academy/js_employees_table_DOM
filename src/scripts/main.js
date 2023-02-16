@@ -185,6 +185,7 @@ tableRow.addEventListener('dblclick', (e) => {
   const value = e.target.parentElement.cells[e.target.cellIndex].innerHTML;
   const createElement = form.elements[e.target.cellIndex].cloneNode(true);
   const cell = document.createElement('td');
+  let eventState = false;
 
   cell.append(createElement);
   e.target.parentElement.cells[e.target.cellIndex].replaceWith(cell);
@@ -203,6 +204,8 @@ tableRow.addEventListener('dblclick', (e) => {
     const textInput = createElement.value;
 
     if (ev.code === 'Enter') {
+      eventState = true;
+
       if (textInput.length === 0) {
         createElement.remove();
         cell.textContent = createElement.getAttribute('placeholder');
@@ -269,5 +272,13 @@ tableRow.addEventListener('dblclick', (e) => {
           break;
       }
     }
+  });
+
+  createElement.addEventListener('blur', () => {
+    if (eventState) {
+      return;
+    }
+    createElement.remove();
+    cell.textContent = createElement.getAttribute('placeholder');
   });
 });
