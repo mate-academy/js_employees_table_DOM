@@ -145,8 +145,8 @@ form.addEventListener('submit', (e) => {
   }
 
   row.insertAdjacentHTML('beforeend', `
-    <td>${elements.name.value}</td>
-    <td>${elements.position.value}</td>
+    <td>${elements.name.value.trim()}</td>
+    <td>${elements.position.value.trim()}</td>
     <td>${elements.office.value}</td>
     <td>${elements.age.value}</td>
     <td>${normalizeSalary(elements.salary.value)}</td>
@@ -160,7 +160,7 @@ form.addEventListener('submit', (e) => {
 });
 
 function validation(el) {
-  const value = el.value;
+  const value = el.value.trim();
 
   if (value === '') {
     createNotification(
@@ -270,9 +270,17 @@ tbody.addEventListener('dblclick', (e) => {
 
     target.innerHTML = input.name === 'salary'
       ? target.innerHTML = normalizeSalary(input.value)
-      : input.value;
+      : input.value.trim();
 
     input.remove();
+
+    if (input.value.trim() !== init) {
+      createNotification(
+        'Success!',
+        'Employee information was successfully updated',
+        'success'
+      );
+    }
   });
 
   input.addEventListener('keydown', (keyEvent) => {
