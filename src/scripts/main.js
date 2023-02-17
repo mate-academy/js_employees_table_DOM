@@ -116,6 +116,7 @@ function submitFormData(e) {
 
   const data = new FormData(form);
   const employeeName = data.get('name');
+  const employeePosition = data.get('position');
   const employeeAge = data.get('age');
   const employeeSalary = data.get('salary');
   const newEmployeeSalary = '$' + String(employeeSalary);
@@ -123,13 +124,16 @@ function submitFormData(e) {
   if (employeeName.length < 4 || employeeName.trim() === '') {
     pushNotification('warning', 'Warning',
       'Warning... The name must have more than 4 characters ');
+  } else if (employeePosition.length < 1 || employeePosition.trim() === '') {
+    pushNotification('warning', 'Warning',
+      'Warning... The position must have more than 1 characters ');
   } else if (employeeAge < 18 || employeeAge > 90) {
     pushNotification('error', 'Error', 'Error... age must be 18+');
   } else {
     tbody.insertAdjacentHTML('beforeend', `
       <tr>
         <td>${employeeName}</td>
-        <td>${data.get('position')}</td>
+        <td>${employeePosition}</td>
         <td>${data.get('office')}</td>
         <td>${employeeAge}</td>
         <td>${newEmployeeSalary}</td>
