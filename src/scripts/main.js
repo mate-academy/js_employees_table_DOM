@@ -228,7 +228,7 @@ tbody.addEventListener('dblclick', e => {
   const targetCell = item.cellIndex;
   const currentItem = item.textContent;
 
-  if (targetCell < 2) {
+  if (!item.querySelector('input') && targetCell < 2) {
     const input = document.createElement('input');
 
     item.textContent = '';
@@ -270,7 +270,7 @@ tbody.addEventListener('dblclick', e => {
     });
   }
 
-  if (targetCell === 2) {
+  if (!item.querySelector('input') && targetCell === 2) {
     const select = document.createElement('select');
 
     select.className = 'cell-input';
@@ -303,7 +303,7 @@ tbody.addEventListener('dblclick', e => {
     });
   }
 
-  if (targetCell > 2) {
+  if (!item.querySelector('input') && targetCell > 2) {
     const input = document.createElement('input');
 
     item.className = 'cell-input';
