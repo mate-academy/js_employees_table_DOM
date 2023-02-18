@@ -170,14 +170,22 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   }, 2000);
 };
 
+const errorName = [200, 10, 'Invalid name',
+  'The name must consist of at least 4 characters.', 'error'];
+const errorAge = [200, 10, 'Invalid age',
+  'Age must be more than 18 and less than 90.', 'error'];
+const success = [100, 10, 'The operation is successful',
+  'Employee was successfully added', 'success'];
+const errorSalary = [200, 10, 'Invalid salary',
+  'Input correct salary.', 'error'];
+
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const data = Object.fromEntries(new FormData(form));
 
   if (data.salary < 1) {
-    pushNotification(200, 10, 'Invalid salary',
-      'Input correct salary.', 'error');
+    pushNotification(...errorSalary);
 
     return;
   }
@@ -189,15 +197,13 @@ form.addEventListener('submit', (e) => {
   const salary = `$${parseInt(data.salary).toLocaleString('en-US')}`;
 
   if (cellName.length < 4) {
-    pushNotification(200, 10, 'Invalid name',
-      'The name must consist of at least 4 characters.', 'error');
+    pushNotification(...errorName);
 
     return;
   };
 
   if (age < 18 || age > 90) {
-    pushNotification(200, 10, 'Invalid age',
-      'Age must be more than 18 and less than 90.', 'error');
+    pushNotification(...errorAge);
 
     return;
   }
@@ -212,8 +218,9 @@ form.addEventListener('submit', (e) => {
      </tr>
   `);
 
-  pushNotification(100, 10, 'The operation is successful',
-    'Employee was successfully added', 'success');
+  pushNotification(...success);
+
+  form.reset();
 });
 
 tbody.addEventListener('dblclick', e => {
@@ -235,8 +242,7 @@ tbody.addEventListener('dblclick', e => {
     input.addEventListener('keydown', ev => {
       if (ev.key === 'Enter') {
         if (input.value.length < 4) {
-          pushNotification(200, 10, 'Invalid name',
-            'The name must consist of at least 4 characters.', 'error');
+          pushNotification(...errorName);
 
           updateCellInitial(item, currentItem, input);
 
@@ -253,8 +259,7 @@ tbody.addEventListener('dblclick', e => {
       }
 
       if (input.value.length < 4) {
-        pushNotification(200, 10, 'Invalid name',
-          'The name must consist of at least 4 characters.', 'error');
+        pushNotification(...errorName);
 
         updateCellInitial(item, currentItem, input);
 
@@ -317,8 +322,7 @@ tbody.addEventListener('dblclick', e => {
         input.addEventListener('keydown', ev => {
           if (ev.key === 'Enter') {
             if ((input.value < 18 || input.value > 90)) {
-              pushNotification(200, 10, 'Invalid age',
-                'Age must be more than 18 and less than 90.', 'error');
+              pushNotification(...errorAge);
 
               updateCellInitial(item, currentItem, input);
 
@@ -335,8 +339,7 @@ tbody.addEventListener('dblclick', e => {
           }
 
           if (input.value < 18 || input.value > 90) {
-            pushNotification(200, 10, 'Invalid age',
-              'Age must be more than 18 and less than 90.', 'error');
+            pushNotification(...errorAge);
 
             updateCellInitial(item, currentItem, input);
 
