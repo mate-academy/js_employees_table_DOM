@@ -2,57 +2,42 @@
 
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
-
-let flag = true;
+let counterClick = 0;
+let prevSorted = '';
 
 thead.addEventListener('click', (e) => {
   const index = e.target.cellIndex;
   const data = [...tbody.children];
 
-  flag = !flag;
+  if (prevSorted === e.target) {
+    counterClick++;
+  } else {
+    counterClick = 0;
+  }
 
   data.sort((a, b) => {
-    const contentA = a.cells[index].textContent;
-    const contentB = b.cells[index].textContent;
+    const contentA = counterClick % 2 === 0
+      ? a.cells[index].textContent
+      : b.cells[index].textContent;
+    const contentB = counterClick % 2 === 0
+      ? b.cells[index].textContent
+      : a.cells[index].textContent;
 
     switch (index) {
-      case 0 :
-        if (flag) {
-          return contentA.localeCompare(contentB);
-        } else {
-          return contentB.localeCompare(contentA);
-        }
+      case 0 : return contentA.localeCompare(contentB);
 
-      case 1 :
-        if (flag) {
-          return contentA.localeCompare(contentB);
-        } else {
-          return contentB.localeCompare(contentA);
-        }
+      case 1 : return contentA.localeCompare(contentB);
 
-      case 2 :
-        if (flag) {
-          return contentA.localeCompare(contentB);
-        } else {
-          return contentB.localeCompare(contentA);
-        }
+      case 2 : return contentA.localeCompare(contentB);
 
-      case 3 :
-        if (flag) {
-          return contentA - contentB;
-        } else {
-          return contentB - contentA;
-        }
+      case 3 : return contentA - contentB;
 
-      case 4 :
-        if (flag) {
-          return parseInt(contentA.slice(1)) - parseInt(contentB.slice(1));
-        } else {
-          return parseInt(contentB.slice(1)) - parseInt(contentA.slice(1));
-        }
+      case 4 : return parseInt(contentA.slice(1)) - parseInt(contentB.slice(1));
     }
   });
   tbody.append(...data);
+
+  prevSorted = e.target;
 });
 
 tbody.addEventListener('mouseover', (el) => {
