@@ -175,6 +175,13 @@ form.addEventListener('submit', (e) => {
 
   const data = Object.fromEntries(new FormData(form));
 
+  if (data.salary < 1) {
+    pushNotification(200, 10, 'Invalid salary',
+      'Input correct salary.', 'error');
+
+    return;
+  }
+
   const cellName = data.name;
   const position = data.position;
   const office = data.office;
