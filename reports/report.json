@@ -1,0 +1,397 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 14,
+    "passes": 3,
+    "pending": 0,
+    "failures": 11,
+    "start": "2023-02-18T12:40:14.325Z",
+    "end": "2023-02-18T12:41:13.495Z",
+    "duration": 57554,
+    "testsRegistered": 14,
+    "passPercent": 21.428571428571427,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "d3cda75c-9f11-487c-9f8f-3e84ee9a61f9",
+      "title": "",
+      "fullFile": "cypress\\integration\\jsEmployeesTableDOM.spec.js",
+      "file": "cypress\\integration\\jsEmployeesTableDOM.spec.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "2024416e-382d-416f-a10b-85724ff0032c",
+          "title": "Employees table",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "should sort by name ASC",
+              "fullTitle": "Employees table should sort by name ASC",
+              "timedOut": null,
+              "duration": 1860,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Name').click();\ncy.checkValuesSorted('Name', 'ASC');",
+              "err": {
+                "message": "AssertionError: expected false to be true",
+                "estack": "AssertionError: expected false to be true\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress\\integration\\jsEmployeesTableDOM.spec.js:282:78)",
+                "diff": null
+              },
+              "uuid": "4503d941-2ac8-4d3b-93cf-76f65f63f671",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should sort by name DESC",
+              "fullTitle": "Employees table should sort by name DESC",
+              "timedOut": null,
+              "duration": 1345,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Name').dblclick();\ncy.checkValuesSorted('Name', 'DESC');",
+              "err": {
+                "message": "AssertionError: expected false to be true",
+                "estack": "AssertionError: expected false to be true\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress\\integration\\jsEmployeesTableDOM.spec.js:284:78)",
+                "diff": null
+              },
+              "uuid": "33f048f9-22c2-4d33-8cc5-1e95dee364a3",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should sort by age ASC",
+              "fullTitle": "Employees table should sort by age ASC",
+              "timedOut": null,
+              "duration": 1272,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Age').click();\ncy.checkValuesSorted('Age', 'ASC');",
+              "err": {
+                "message": "AssertionError: expected false to be true",
+                "estack": "AssertionError: expected false to be true\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress\\integration\\jsEmployeesTableDOM.spec.js:282:78)",
+                "diff": null
+              },
+              "uuid": "1c80fdfb-b5c5-4465-895b-247037f13566",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should sort by age DESC",
+              "fullTitle": "Employees table should sort by age DESC",
+              "timedOut": null,
+              "duration": 3910,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Age').dblclick();\ncy.checkValuesSorted('Age', 'DESC');",
+              "err": {
+                "message": "AssertionError: expected false to be true",
+                "estack": "AssertionError: expected false to be true\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress\\integration\\jsEmployeesTableDOM.spec.js:284:78)",
+                "diff": null
+              },
+              "uuid": "ae51c05b-d837-44bd-ad6b-adbeda95e4c3",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should sort by salary ASC",
+              "fullTitle": "Employees table should sort by salary ASC",
+              "timedOut": null,
+              "duration": 1480,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Salary').click();\ncy.checkValuesSorted('Salary', 'ASC');",
+              "err": {
+                "message": "AssertionError: expected false to be true",
+                "estack": "AssertionError: expected false to be true\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress\\integration\\jsEmployeesTableDOM.spec.js:282:78)",
+                "diff": null
+              },
+              "uuid": "8a8e6e95-63f1-40d2-8900-77a99214546a",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should sort by salary DESC",
+              "fullTitle": "Employees table should sort by salary DESC",
+              "timedOut": null,
+              "duration": 2628,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Salary').dblclick();\ncy.checkValuesSorted('Salary', 'DESC');",
+              "err": {
+                "message": "AssertionError: expected false to be true",
+                "estack": "AssertionError: expected false to be true\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress\\integration\\jsEmployeesTableDOM.spec.js:284:78)",
+                "diff": null
+              },
+              "uuid": "5c037452-d5d1-47b2-967f-5d6eb931140e",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have proper values in rows after the sorting ASC",
+              "fullTitle": "Employees table should have proper values in rows after the sorting ASC",
+              "timedOut": null,
+              "duration": 799,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.get('th').contains('Name').click();\ncy.compareRowValuesAfterSort('Airi Satou', ['Airi Satou', 'Accountant', 'Tokyo', '33', '$162,700']);",
+              "err": {},
+              "uuid": "2fb6a13b-9dda-4471-ad37-0dfd4e298e17",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have proper values in rows after the sorting DESC",
+              "fullTitle": "Employees table should have proper values in rows after the sorting DESC",
+              "timedOut": null,
+              "duration": 773,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.get('th').contains('Name').dblclick();\ncy.compareRowValuesAfterSort('Zorita Serrano', ['Zorita Serrano', 'Software Engineer', 'San Francisco', '56', '$115,000']);",
+              "err": {},
+              "uuid": "2273d432-5d38-4210-ac29-63848585553a",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "row should have class active after click",
+              "fullTitle": "Employees table row should have class active after click",
+              "timedOut": null,
+              "duration": 1013,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.contains('Airi Satou').parent().should('not.have.class', 'active');\ncy.contains('Airi Satou').click();\ncy.contains('Airi Satou').parent().should('have.class', 'active');",
+              "err": {},
+              "uuid": "97ba0bab-1685-45c7-9246-837db0ba29cd",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should be able to add a new employee",
+              "fullTitle": "Employees table should be able to add a new employee",
+              "timedOut": null,
+              "duration": 10791,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.fillNewEmployeeForm('Adam', 'QA Engineer', 'San Francisco', 18, 50000);\ncy.get('[data-qa=\"notification\"]').should('have.class', 'success');\ncy.compareRowValuesAfterSort('Adam', ['Adam', 'QA Engineer', 'San Francisco', '18', '$50,000']);",
+              "err": {
+                "message": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress\\integration\\jsEmployeesTableDOM.spec.js:332:40)",
+                "diff": null
+              },
+              "uuid": "5d06498d-ebb2-46ef-bf38-e5b147e03444",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have warning notification on name field\n   with invalid input",
+              "fullTitle": "Employees table should have warning notification on name field\n   with invalid input",
+              "timedOut": null,
+              "duration": 8227,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.fillNewEmployeeForm('Ada', 'QA Engineer', 'San Francisco', 18, 50000);\ncy.get('[data-qa=\"notification\"]').should('have.class', 'error');\ncy.checkDataDoesntExist('Ada', 50000);",
+              "err": {
+                "message": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress\\integration\\jsEmployeesTableDOM.spec.js:337:40)",
+                "diff": null
+              },
+              "uuid": "fff2394e-3bf4-4e63-bcec-39971da1b4ff",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have warning notification on position \n  field with invalid input",
+              "fullTitle": "Employees table should have warning notification on position \n  field with invalid input",
+              "timedOut": null,
+              "duration": 7509,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.get('[data-qa=\"name\"]').type('Adam');\ncy.get('[data-qa=\"office\"]').select('San Francisco');\ncy.get('[data-qa=\"age\"]').type('18{enter}');\ncy.get('[data-qa=\"salary\"]').type('50000{enter}');\ncy.get('button').contains('Save to table').click();\ncy.get('[data-qa=\"notification\"]').should('have.class', 'error');\ncy.checkDataDoesntExist('Adam', 50000);",
+              "err": {
+                "message": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress\\integration\\jsEmployeesTableDOM.spec.js:346:40)",
+                "diff": null
+              },
+              "uuid": "9baceaa1-4a3f-4f3a-a765-342a96c10fb2",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have warning notification on age field\n   if the age less than 18",
+              "fullTitle": "Employees table should have warning notification on age field\n   if the age less than 18",
+              "timedOut": null,
+              "duration": 7837,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.fillNewEmployeeForm('Adam', 'QA Engineer', 'San Francisco', 17, 50000);\ncy.get('[data-qa=\"notification\"]').should('have.class', 'error');\ncy.checkDataDoesntExist('Adam', 50000);",
+              "err": {
+                "message": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress\\integration\\jsEmployeesTableDOM.spec.js:351:40)",
+                "diff": null
+              },
+              "uuid": "1b5ddcb1-34de-4274-ac83-aab043cf306f",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should have warning notification on age field\n   if the age bigger than 90",
+              "fullTitle": "Employees table should have warning notification on age field\n   if the age bigger than 90",
+              "timedOut": null,
+              "duration": 8110,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.fillNewEmployeeForm('Adam', 'QA Engineer', 'San Francisco', 91, 50000);\ncy.get('[data-qa=\"notification\"]').should('have.class', 'error');\ncy.checkDataDoesntExist('Adam', 50000);",
+              "err": {
+                "message": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.",
+                "estack": "AssertionError: Timed out retrying: Expected to find element: `[data-qa=\"notification\"]`, but never found it.\n    at Context.eval (http://localhost:8080/__cypress/tests?p=cypress\\integration\\jsEmployeesTableDOM.spec.js:356:40)",
+                "diff": null
+              },
+              "uuid": "db9da2ed-b5ea-4f26-9486-356c0676ebc7",
+              "parentUUID": "2024416e-382d-416f-a10b-85724ff0032c",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "2fb6a13b-9dda-4471-ad37-0dfd4e298e17",
+            "2273d432-5d38-4210-ac29-63848585553a",
+            "97ba0bab-1685-45c7-9246-837db0ba29cd"
+          ],
+          "failures": [
+            "4503d941-2ac8-4d3b-93cf-76f65f63f671",
+            "33f048f9-22c2-4d33-8cc5-1e95dee364a3",
+            "1c80fdfb-b5c5-4465-895b-247037f13566",
+            "ae51c05b-d837-44bd-ad6b-adbeda95e4c3",
+            "8a8e6e95-63f1-40d2-8900-77a99214546a",
+            "5c037452-d5d1-47b2-967f-5d6eb931140e",
+            "5d06498d-ebb2-46ef-bf38-e5b147e03444",
+            "fff2394e-3bf4-4e63-bcec-39971da1b4ff",
+            "9baceaa1-4a3f-4f3a-a765-342a96c10fb2",
+            "1b5ddcb1-34de-4274-ac83-aab043cf306f",
+            "db9da2ed-b5ea-4f26-9486-356c0676ebc7"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 57554,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "6.2.1"
+    },
+    "marge": {
+      "options": {
+        "reportDir": "raw_reports",
+        "overwrite": false,
+        "html": false,
+        "json": true
+      },
+      "version": "5.1.0"
+    }
+  }
+}
