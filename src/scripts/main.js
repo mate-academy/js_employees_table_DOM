@@ -2,6 +2,8 @@
 
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
+const rows = tbody.querySelectorAll('tr');
+
 let counterClick = 0;
 let prevSorted = '';
 
@@ -24,10 +26,8 @@ thead.addEventListener('click', (e) => {
       : a.cells[index].textContent;
 
     switch (index) {
-      case 0 : return contentA.localeCompare(contentB);
-
-      case 1 : return contentA.localeCompare(contentB);
-
+      case 0 :
+      case 1 :
       case 2 : return contentA.localeCompare(contentB);
 
       case 3 : return contentA - contentB;
@@ -40,14 +40,13 @@ thead.addEventListener('click', (e) => {
   prevSorted = e.target;
 });
 
-tbody.addEventListener('mouseover', (el) => {
+tbody.addEventListener('click', (el) => {
   const row = el.target.closest('tr');
+
+  rows.forEach(item => item.classList.remove('active'));
 
   row.classList.add('active');
 
-  row.addEventListener('mouseleave', () => {
-    row.classList.remove('active');
-  });
 });
 
 document.body.insertAdjacentHTML('beforeend', `
@@ -160,7 +159,6 @@ form.addEventListener('submit', e => {
   </tr>
   `);
 
-  setTimeout(() =>
-    document.getElementById('form').reset(), 2000
-  );
+  document.getElementById('form').reset();
+
 });
