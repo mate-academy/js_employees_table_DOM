@@ -5,14 +5,17 @@ function convertSalary(salary) {
 };
 
 function convertNumberToSalary(number) {
-  const symbol = '$';
   const digit = new Intl.NumberFormat('en-US').format(number);
 
-  return symbol + digit;
+  return `$${digit}`;
 }
 
-function sortTableString(columnNumber, inputOrder,
-  inputLastSorted, columnName) {
+function sortTableString(
+  columnNumber,
+  inputOrder,
+  inputLastSorted,
+  columnName
+) {
   let ascOrder = inputOrder;
 
   if (inputLastSorted !== columnName) {
@@ -187,7 +190,7 @@ function showNotification(type, title, message) {
 
   setTimeout(() => {
     notification.remove();
-  }, '3000');
+  }, 3000);
 }
 
 newEmployeeForm.addEventListener('submit', (e) => {
