@@ -124,9 +124,10 @@ const addNewEmployee = (e) => {
     row.children[i].innerText = newEmployee[i];
   });
 
+  rows.push(row);
   form.reset();
 };
 
+form.addEventListener('submit', addNewEmployee);
 table.addEventListener('click', sortTable);
 table.addEventListener('click', selectRow);
-form.addEventListener('submit', addNewEmployee);
