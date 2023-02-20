@@ -204,7 +204,7 @@ function editingTableCells() {
 
   this.parentNode.classList.add('editing');
   this.parentNode.classList.remove('active');
-  input.style.width = `${parseInt(getComputedStyle(this).width)}px`;
+  input.style.width = `${parseInt(getComputedStyle(this).width) + 5}px`;
   input.classList.add('cell-input');
 
   input.value = normalize(input.name, previousCellValue);
