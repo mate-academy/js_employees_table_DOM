@@ -4,7 +4,8 @@ const table = document.querySelector('table');
 const tbody = table.querySelector('tbody');
 const rows = [...tbody.querySelectorAll('tr')];
 
-let sortDirection = 'toDown';
+let sortDirection = 'ASC';
+let previousIndex = null;
 
 table.addEventListener('click', e => {
   if (e.target.tagName === 'TH') {
@@ -14,17 +15,26 @@ table.addEventListener('click', e => {
       const aData = a.children[headerIndex].textContent;
       const bData = b.children[headerIndex].textContent;
 
-      const sortOrder = sortDirection === 'toDown' ? 1 : -1;
+      if (previousIndex === headerIndex) {
+        const sortOrder = sortDirection === 'ASC' ? 1 : -1;
 
-      return sortOrder * aData.localeCompare(bData, undefined, {
-        numeric: true,
-        sensitivity: 'base',
-      });
+        return sortOrder * aData.localeCompare(bData, undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        });
+      } else {
+        return aData.localeCompare(bData, undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        });
+      }
     });
 
-    sortDirection === 'toDown'
-      ? sortDirection = 'toUp'
-      : sortDirection = 'toDown';
+    previousIndex = headerIndex;
+
+    sortDirection === 'ASC'
+      ? sortDirection = 'DESC'
+      : sortDirection = 'ASC';
 
     rows.forEach((row) => tbody.appendChild(row));
   }
