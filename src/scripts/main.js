@@ -200,7 +200,7 @@ newEmployeeForm.addEventListener('submit', (e) => {
   const inputAge = newEmployeeForm.elements.age;
   const inputSalary = newEmployeeForm.elements.salary;
 
-  if (inputName.value.length >= 4
+  if (inputName.value.trim().length >= 4
     && inputAge.value >= 18 && inputAge.value < 90) {
     const newEmployee = basicRow.cloneNode(true);
 
@@ -217,7 +217,7 @@ newEmployeeForm.addEventListener('submit', (e) => {
 
     showNotification('success', 'Green light!',
       'New employee was successfully added.');
-  } else if (inputName.value.length < 4) {
+  } else if (inputName.value.trim().length < 4) {
     showNotification('error', 'Error!',
       'The "name" field must have at least 4 letters.');
   } else if (inputAge.value < 18 || inputAge.value > 90) {
