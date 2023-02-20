@@ -7,7 +7,7 @@ const rows = [...tbody.querySelectorAll('tr')];
 let sortDirection = 'ASC';
 let previousIndex = null;
 
-table.addEventListener('click', e => {
+const sortTable = (e) => {
   if (e.target.tagName === 'TH') {
     const headerIndex = [...e.target.parentNode.children].indexOf(e.target);
 
@@ -38,4 +38,20 @@ table.addEventListener('click', e => {
 
     rows.forEach((row) => tbody.appendChild(row));
   }
-});
+};
+
+const selectRow = (e) => {
+  if (e.target.tagName === 'TD') {
+    const targetRow = e.target.parentNode;
+    const activeRow = rows.find(row => row.classList.contains('active'));
+
+    if (activeRow) {
+      activeRow.classList.remove('active');
+    }
+
+    targetRow.classList.add('active');
+  }
+};
+
+table.addEventListener('click', sortTable);
+table.addEventListener('click', selectRow);
