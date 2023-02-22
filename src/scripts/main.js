@@ -4,7 +4,7 @@ const table = document.querySelector('table');
 const tBody = document.querySelector('tbody');
 
 table.addEventListener('click', (e) => {
-  const employees = document.querySelector('tbody').querySelectorAll('tr');
+  const employees = tBody.querySelectorAll('tr');
 
   if (e.target.tagName === 'TD') {
     const hasActive = [...employees]
@@ -21,6 +21,17 @@ table.addEventListener('click', (e) => {
 
   if (e.target.tagName === 'TH') {
     sortGrid(e.target.cellIndex, [...employees]);
+  }
+});
+
+document.addEventListener('click', (e) => {
+  const employees = tBody.querySelectorAll('tr');
+
+  const hasActive = [...employees]
+    .find(element => element.classList.contains('active'));
+
+  if (e.target.tagName === 'BODY' && hasActive) {
+    hasActive.removeAttribute('class');
   }
 });
 
@@ -188,6 +199,10 @@ tBody.addEventListener('dblclick', (e) => {
   input.addEventListener('keyup', (keyEvent) => {
     if (keyEvent.key === 'Enter' && input.value.length !== 0) {
       td.innerText = input.value;
+
+      if (value.includes('$')) {
+        td.innerText = '$' + td.innerText;
+      }
     }
   });
 });
