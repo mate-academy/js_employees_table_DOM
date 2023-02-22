@@ -174,7 +174,7 @@ tBody.addEventListener('dblclick', (e) => {
   td.append(input);
   input.focus();
 
-  if (!isNaN(td.innerText)) {
+  if (!isNaN(value)) {
     input.type = 'number';
   }
 
