@@ -181,46 +181,46 @@ submitButton.addEventListener('click', function(events) {
     const input = labels[i].firstElementChild;
     let inputValue = input.value;
 
-    if (
-      input.classList.value === 'name'
-    && (inputValue.length < 4
-    || inputValue.includes('  ')
-    || inputValue.includes('. '))) {
-      return showNotification(
-        'Error',
-        'Name must have more than 3 letters!',
-        'error'
-      );
-    };
+    switch (true) {
+      case (input.classList.value === 'name'
+      && (inputValue.trim().length < 4
+      || inputValue.includes('. '))):
+        return showNotification(
+          'Error',
+          'Name must have more than 3 letters!',
+          'error'
+        );
 
-    if (
-      input.classList.value === 'position'
-    && (inputValue.length === 0
-    || inputValue.includes('  ')
-    || inputValue.includes('. '))) {
-      return showNotification(
-        'Error',
-        'You must specify your position!',
-        'error'
-      );
-    };
+      case (input.classList.value === 'position'
+      && inputValue.trim().length === 0):
+        return showNotification(
+          'Error',
+          'You must specify your position!',
+          'error'
+        );
 
-    if (input.classList.value === 'age'
-      && (+inputValue < 18
+      case (input.classList.value === 'age' && (+inputValue < 18
       || +inputValue > 90
-      || !+inputValue)) {
-      return showNotification(
-        'Error', 'Age must be in range from 18 to 90 years!', 'error');
-    };
+      || !+inputValue)):
+        return showNotification(
+          'Error',
+          'Age must be in range from 18 to 90 years!',
+          'error'
+        );
 
-    if (input.classList.value === 'salary') {
-      if (inputValue.length === 0) {
-        return showNotification('Error', 'You must enter the salary!', 'error');
-      };
+      case (input.classList.value === 'salary'):
+        if (inputValue.length === 0) {
+          return showNotification(
+            'Error',
+            'You must enter the salary!',
+            'error'
+          );
+        };
 
-      const salarySize = +inputValue;
+        const salarySize = +inputValue;
 
-      inputValue = '$' + salarySize.toLocaleString('en-US');
+        inputValue = '$' + salarySize.toLocaleString('en-US');
+        break;
     };
 
     row.append(tableData);
