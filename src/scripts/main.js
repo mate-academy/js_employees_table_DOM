@@ -146,17 +146,8 @@ function setNewEmployees() {
       'A new employee is successfully added to the table', 'success');
 
     const info = Object.fromEntries(data.entries());
-    const salary = info.salary.split('');
-    let str = '';
 
-    for (let i = salary.length - 1; i >= 0; i--) {
-      if ((i - 1) % 3 === 0 && i !== salary.length - 1) {
-        salary[i] += ',';
-      }
-      str = salary[i] + str;
-    }
-
-    info.salary = '$' + str;
+    info.salary = `$${Intl.NumberFormat('en-US').format(info.salary)}`;
 
     const tr = document.createElement('tr');
 
@@ -171,7 +162,7 @@ function setNewEmployees() {
       tr.append(td);
     }
 
-    tBody.append(tr);
+    tBody.prepend(tr);
   });
 };
 
@@ -201,7 +192,7 @@ tBody.addEventListener('dblclick', (e) => {
       td.innerText = input.value;
 
       if (value.includes('$')) {
-        td.innerText = '$' + td.innerText;
+        td.innerText = `$${Intl.NumberFormat('en-US').format(input.value)}`;
       }
     }
   });
