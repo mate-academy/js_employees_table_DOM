@@ -2,41 +2,71 @@
 
 const table = document.querySelector('table');
 const tbody = table.querySelector('tbody');
-let nameClick = null;
+let buttonClick = null;
+
+const form = document.createElement('form');
+
+form.className = 'new-employee-form';
+
+form.innerHTML = `
+  <label>Name: 
+    <input required name="name" type="text" data-qa="name">
+  </label>
+  <label>Position: 
+    <input required name="position" type="text" data-qa="position">
+  </label>
+  <label>Office: 
+    <select required data-qa="office">
+      <option> Tokyo </option>
+      <option> Singapore </option>
+      <option> London </option>
+      <option> New York </option>
+      <option> Edinburgh </option>
+      <option> San Francisco </option>
+    </select>
+  </label>
+  <label>Age: 
+    <input required name="age" type="number" data-qa="age">
+  </label>
+  <label>Salary: 
+    <input required name="salary" type="number" data-qa="salary">
+  </label>
+
+  <button type='submit' class='js-button'>Save to table</button>
+  `;
+table.after(form);
 
 table.addEventListener('click', sortPerson);
+form.addEventListener('click', addPersonInTable);
 
 function sortPerson(e) {
-  if(e.target.closest('thead')) {
-    sortTable(e);
+  if (e.target.closest('thead')) {
+    sortTable(e, e.target);
+    buttonClick = e.target.textContent;
   }
 
-  if(e.target.closest('tbody')) {
-    addActiveClass(e.target)
+  if (e.target.closest('tbody')) {
+    addActiveClass(e.target);
   }
-  
 }
 
-
-function sortTable(ev) {
-  let doubleClick = true;
-
-  if (nameClick === ev.target.textContent) {
-    doubleClick = false;
-  } 
-  nameClick = ev.target.textContent;
-
-  const theadArray = [...ev.target.closest('tr').children];
+function sortTable(el, tHeadElem) {
+  const theadArray = [...tHeadElem.closest('tr').children];
   const index = theadArray.findIndex(td => {
-    return td.textContent === ev.target.textContent;
+    return td.textContent === tHeadElem.textContent;
   });
 
-
-  let container = [...tbody.children];
+  const container = [...tbody.children];
 
   container.sort((a, b) => {
     let aSort = a.children[index].textContent;
     let bSort = b.children[index].textContent;
+    const cSort = aSort;
+
+    if (buttonClick === tHeadElem.textContent) {
+      aSort = bSort;
+      bSort = cSort;
+    }
 
     if (index > 2) {
       aSort = +aSort.replace(',', '').replace('$', '');
@@ -48,20 +78,45 @@ function sortTable(ev) {
     return aSort.localeCompare(bSort);
   });
 
-  if (doubleClick) {
-    container.forEach(person => tbody.append(person));
+  container.forEach(person => tbody.append(person));
+}
+
+function addActiveClass(addClass) {
+  [...tbody.children].forEach(elem => {
+    if (elem.className.includes('active')) {
+      elem.removeAttribute('class');
+    }
+  });
+
+  addClass.closest('tr').className = 'active';
+}
+
+function addPersonInTable(elem) {
+  elem.preventDefault();
+
+  if (!elem.target.matches('.js-button')) {
     return;
   }
 
-  container.forEach(person => tbody.prepend(person));
-}
+  const tr = document.createElement('tr');
+  const [item, position, office, age, salary] = elem.currentTarget.children;
 
-function addActiveClass(a) {
-  [...tbody.children].forEach(r => {
-    if (r.className.includes('active')) {
-      r.removeAttribute('class');
-    }
-  })
+  if (
+    !item.firstElementChild.value
+    || !position.firstElementChild.value
+    || !age.firstElementChild.value
+    || !salary.firstElementChild.value
+  ) {
+    return;
+  }
 
-  a.closest('tr').className = 'active';
+  tr.innerHTML = `
+    <td>${item.firstElementChild.value}</td>
+    <td>${position.firstElementChild.value}</td>
+    <td>${office.firstElementChild.value}</td>
+    <td>${age.firstElementChild.value}</td>
+    <td>$${(+salary.firstElementChild.value).toLocaleString('en-US')}</td>
+  `;
+
+  tbody.append(tr);
 }
