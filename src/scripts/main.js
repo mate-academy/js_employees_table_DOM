@@ -111,7 +111,7 @@ function setNewEmployees() {
         Salary: 
         <input 
           data-qa="salary"
-          type="text" 
+          type="number" 
           name="salary"
         >
       </label>
@@ -129,10 +129,10 @@ function setNewEmployees() {
 
     const data = new FormData(form);
 
-    for (const inputName of data) {
-      const input = e.target.elements[inputName[0]];
+    for (const [inputName] of data) {
+      const input = e.target.elements[inputName];
 
-      validateForm(input.value, input);
+      validateForm(input);
 
       if (input.value === '') {
         pushNotification(10, 250, 'Error message',
@@ -141,6 +141,8 @@ function setNewEmployees() {
         return;
       }
     }
+
+    form.reset();
 
     pushNotification(10, 10, 'Success message',
       'A new employee is successfully added to the table', 'success');
@@ -174,25 +176,64 @@ tBody.addEventListener('dblclick', (e) => {
   input.classList.add('cell-input');
   td.innerHTML = '';
   td.append(input);
+  input.style.width = '90px';
   input.focus();
 
-  if (!isNaN(value)) {
-    input.type = 'number';
-  }
+  const title = [...document.querySelectorAll('th')].find(item => {
+    return item.cellIndex === td.cellIndex;
+  });
 
-  input.onblur = () => {
-    if (input.value) {
+  const formInput = title.innerText !== 'Office'
+    ? document.querySelector(`input[name="${title.innerText.toLowerCase()}"]`)
+    : document.querySelector(`select[name="${title.innerText.toLowerCase()}"]`);
+
+  input.name = formInput.name;
+
+  input.addEventListener('focusout', () => {
+    if (e.checked) {
       return;
     }
+
     td.innerText = value;
-  };
+  });
 
   input.addEventListener('keyup', (keyEvent) => {
-    if (keyEvent.key === 'Enter' && input.value.length !== 0) {
-      td.innerText = input.value;
+    const offices = [
+      'tokyo', 'san francisco', 'london',
+      'edinburgh', 'singapore', 'new york',
+    ];
+
+    if (keyEvent.key === 'Enter') {
+      e.checked = true;
+
+      td.innerText = validateForm(input) === ''
+        ? value
+        : normalize(input.value);
+
+      if (formInput.tagName === 'SELECT') {
+        td.innerText = offices.includes(input.value.toLowerCase())
+          ? normalize(input.value.toLowerCase())
+          : pushNotification(10, 10, 'Error message',
+            'Sorry, we don\'t have an office in this city',
+            'error', value);
+      }
 
       if (value.includes('$')) {
         td.innerText = `$${Intl.NumberFormat('en-US').format(input.value)}`;
+
+        if (td.innerText === '$NaN') {
+          td.innerText = value;
+        }
+      }
+
+      if (td.innerText !== value) {
+        pushNotification(10, 10, 'Success message',
+          'A new employee is successfully changed', 'success');
+      }
+
+      if (offices.includes(input.value.toLowerCase())) {
+        pushNotification(10, 10, 'Success message',
+          'A new employee is successfully changed', 'success');
       }
     }
   });
@@ -200,30 +241,35 @@ tBody.addEventListener('dblclick', (e) => {
 
 setNewEmployees();
 
-function validateForm(inputValue, input) {
+function validateForm(input) {
   if (input.name === 'name') {
-    input.value = inputValue.length >= 4
-      ? inputValue
+    input.value = input.value.length >= 4
+      ? input.value
       : pushNotification(10, 10, 'Error message',
         'Value of name has less than 4 letters', 'error');
   }
 
   if (input.name === 'age') {
-    input.value = inputValue >= 18 && inputValue < 90
-      ? inputValue
+    input.value = input.value >= 18 && input.value < 90
+      ? input.value
       : pushNotification(10, 10, 'Error message',
-        'Value of age is less than 18 or more than 90', 'error');
+        'Value of age is less than 18 or more than 90 or not a number',
+        'error');
   }
 
   if (input.name === 'position') {
-    input.value = inputValue.length >= 6
-      ? inputValue
+    input.value = input.value.length >= 6
+      ? input.value
       : pushNotification(10, 10, 'Error message',
         'Value of position is less than 6', 'error');
   }
+
+  return input.value;
 }
 
-const pushNotification = (posTop, posRight, title, description, type = '') => {
+const pushNotification = (
+  posTop, posRight, title, description, type = '', exception
+) => {
   const div = document.createElement('div');
   const h2 = document.createElement('h2');
   const p = document.createElement('p');
@@ -244,5 +290,11 @@ const pushNotification = (posTop, posRight, title, description, type = '') => {
   document.body.append(div);
   setTimeout(() => div.remove(), 3000);
 
-  return '';
+  return exception || '';
+};
+
+function normalize(str) {
+  return str.split(' ')
+    .map(element => element[0].toUpperCase() + element.slice(1))
+    .join(' ');
 };
