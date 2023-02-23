@@ -99,7 +99,7 @@ form.name.addEventListener('change', e => {
   }
 });
 
-form.name.addEventListener('submit', e => {
+form.name.addEventListener('change', e => {
   if (!form.name.validity.valid) {
     form.name.setCustomValidity(
       'Error! Less 4 letters are entered in the field'
@@ -113,7 +113,7 @@ form.age.addEventListener('change', e => {
   }
 });
 
-form.age.addEventListener('submit', e => {
+form.age.addEventListener('change', e => {
   if (!form.age.validity.valid) {
     form.age.setCustomValidity(
       'Error! Age range should be from 18 to 90 years'
