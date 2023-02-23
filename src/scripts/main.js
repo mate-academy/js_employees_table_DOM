@@ -37,6 +37,8 @@ function tableSort(column) {
 
 [...table.rows[0].children].forEach((column, index) =>
   column.addEventListener('click', e => {
+    e.preventDefault();
+
     tableSort(index);
   }));
 // sorting by click
@@ -91,11 +93,11 @@ selectOffice.required = true;
 const officeOptions
   = ['Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco'];
 
-officeOptions.forEach((variable, index) => {
+officeOptions.forEach((variable) => {
   const option = document.createElement('option');
 
   option.innerText = variable;
-  option.setAttribute('value', index);
+  option.setAttribute('value', variable);
 
   selectOffice.append(option);
 });
@@ -120,6 +122,8 @@ inputSalary.setAttribute('type', 'number');
 form.addEventListener(
   'submit',
   (e) => {
+    e.preventDefault();
+
     const formData = new FormData(form);
 
     const toAdd = {
@@ -127,9 +131,57 @@ form.addEventListener(
       position: formData.get('position'),
       office: formData.get('office'),
       age: formData.get('age'),
-      salary: '$' + formData.get('salary'),
+      salary: +formData.get('salary'),
     };
 
-    tbody.insertAdjacentHTML('beforeend', `<tr><td> ${toAdd.name} </td></tr>`);
-  },
+    if (toAdd.name.length < 4) {
+      pushNotification(10, 10, 'Check the correctness of the entered data',
+        'The name field must have more than 4 letters', 'error');
+    }
+
+    if (toAdd.age < 18 || toAdd.age > 90) {
+      pushNotification(160, 10, 'Check the correctness of the entered data',
+        'Your age must be more than 18 and less than 90', 'success');
+    } else {
+      tbody.insertAdjacentHTML('beforeend',
+        `<tr>
+          <td>${toAdd.name}</td>
+          <td>${toAdd.position}</td>
+          <td>${toAdd.office}</td>
+          <td>${toAdd.age}</td>
+          <td>${'$' + toAdd.salary.toLocaleString('en')}</td>
+        </tr>`);
+
+      e.target.reset();
+
+      pushNotification(10, 10, 'Successfully!',
+        'The employee has been added to the table!', 'error');
+    }
+  }
 );
+
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const notification = document.createElement('div');
+
+  notification.setAttribute('data-qa', 'notification');
+
+  const titleOfNotification = document.createElement('h2');
+  const message = document.createElement('p');
+
+  notification.classList.add('notification', type);
+  notification.style.cssText = `top: ${posTop}px; right: ${posRight}px`;
+  notification.style.boxSizing = `content-box`;
+
+  titleOfNotification.classList.add('title');
+  titleOfNotification.textContent = title;
+
+  message.textContent = description;
+
+  notification.append(titleOfNotification, message);
+
+  document.body.append(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 5000);
+};
