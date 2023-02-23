@@ -1,3 +1,331 @@
 'use strict';
 
-// write code here
+const body = document.querySelector('body');
+const tableHeader = document.querySelector('thead');
+const tbody = document.querySelector('tbody');
+const form = document.createElement('form');
+
+const minAge = 18;
+const maxAge = 90;
+const minLength = 4;
+
+form.className = 'new-employee-form';
+
+form.insertAdjacentHTML('afterbegin',
+  `
+  <label>Name:
+    <input
+      name="name"
+      type="text"
+      data-qa="name"
+      required
+    >
+  </label>
+  <label>Position:
+    <input
+      name="position"
+      type="text"
+      data-qa="position"
+      required
+    >
+  </label>
+  <label>Office:
+    <select
+      name="office"
+      type="text"
+      data-qa="office"
+    >
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    </select>
+  </label>
+  <label>Age:
+    <input
+      name="age"
+      type="number"
+      data-qa="age"
+      required
+    >
+  </label>
+  <label>Salary:
+    <input
+      name="salary"
+      type="number"
+      data-qa="salary"
+      required
+    >
+  </label>
+  <button type="submit">Save to table</button>
+  `
+);
+
+body.append(form);
+
+let check = false;
+
+tableHeader.addEventListener('click', e => {
+  const target = e.target;
+
+  sortTable(target.cellIndex, target.innerHTML, check === target.cellIndex);
+
+  check = (check === target.cellIndex) ? false : target.cellIndex;
+});
+
+function sortTable(colNum, attribute, directSorting) {
+  const rowsArray = [...tbody.children];
+
+  let sorter;
+
+  switch (attribute) {
+    case 'Position':
+    case 'Name':
+    case 'Office':
+      sorter = function(rowA, rowB) {
+        const stringA = rowA.cells[colNum].innerHTML;
+        const stringB = rowB.cells[colNum].innerHTML;
+
+        return stringA.localeCompare(stringB);
+      };
+      break;
+
+    default:
+      sorter = function(rowA, rowB) {
+        const num1 = toNumber(rowA.cells[colNum].innerHTML);
+        const num2 = toNumber(rowB.cells[colNum].innerHTML);
+
+        return num1 - num2;
+      };
+  }
+
+  rowsArray.sort(sorter);
+
+  if (directSorting) {
+    tbody.append(...rowsArray.reverse());
+  }
+
+  tbody.append(...rowsArray);
+}
+
+const toNumber = function(string) {
+  const result = string.includes('$')
+    ? string.slice(1).split(',').join('')
+    : string;
+
+  return +result;
+};
+
+tbody.addEventListener('click', (e) => {
+  [...tbody.children].forEach(row => {
+    row.classList.remove('active');
+  });
+
+  e.target.parentElement.classList.add('active');
+});
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  for (const ch of form.name.value) {
+    if (ch.toLowerCase() === ch.toUpperCase()
+      || form.name.value.length < minLength) {
+      pushNotification(
+        'Error!',
+        'It sould be at least 4 letters and must not include numbers',
+        'error'
+      );
+
+      return;
+    }
+  }
+
+  for (const ch of form.position.value) {
+    if (ch.toLowerCase() === ch.toUpperCase()
+      || form.position.value.length < 4) {
+      pushNotification(
+        'Error!',
+        'It sould be at least 4 letters and must not include numbers',
+        'error'
+      );
+
+      return;
+    }
+  }
+
+  if (form.age.value < minAge || form.age.value > maxAge) {
+    pushNotification(
+      'Error!!',
+      'Enter valid age',
+      'error'
+    );
+
+    return;
+  }
+
+  const newRow = document.createElement('tr');
+  const salary = (+form.salary.value).toLocaleString('en');
+  const formName = form.name.value[0].toUpperCase() + form.name.value.slice(1);
+  const formPosition
+    = form.position.value[0].toUpperCase() + form.position.value.slice(1);
+
+  newRow.innerHTML = `
+    <td>${formName}</td>
+    <td>${formPosition}</td>
+    <td>${form.office.value}</td>
+    <td>${form.age.value}</td>
+    <td>$${salary}</td>
+  `;
+
+  tbody.append(newRow);
+  form.reset();
+
+  pushNotification(
+    'Success!',
+    'The employee has been added to the table',
+    'success'
+  );
+});
+
+const pushNotification = (title, description, type) => {
+  const notification = document.createElement('div');
+
+  notification.classList.add('notification', type);
+  notification.dataset.qa = 'notification';
+
+  notification.innerHTML = `
+    <h2 class="title">${title}</h2>
+    <p>${description}</p>
+  `;
+
+  body.append(notification);
+
+  setTimeout(() => notification.remove(), 2000);
+};
+
+tbody.addEventListener('dblclick', (e) => {
+  const targetCell = e.target.closest('td');
+  const input = document.createElement('input');
+
+  input.classList.add('cell-input');
+  input.style.width = getComputedStyle(e.target).width;
+  input.value = targetCell.textContent;
+
+  const value = input.value;
+
+  input.value = '';
+
+  while (targetCell.firstChild) {
+    targetCell.removeChild(targetCell.firstChild);
+  }
+
+  targetCell.appendChild(input);
+  input.focus();
+
+  if (targetCell.cellIndex === 2) {
+    targetCell.removeChild(input);
+
+    targetCell.insertAdjacentHTML('afterbegin', `
+    <select
+      class="cell-input"
+    >
+      <option value="${value}">${value}</option>
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    </select>
+    `);
+
+    const select = targetCell.querySelector('select');
+    const options = [...select.children];
+
+    for (let i = 1; i < options.length; i++) {
+      if (options[i].value === options[0].value) {
+        options[i].dataset.qa = 'forRemove';
+      }
+    }
+
+    select.removeChild(select.querySelector(`[data-qa="forRemove"]`));
+  }
+
+  input.addEventListener('blur', () => {
+    targetCell.removeChild(input);
+
+    if (targetCell.cellIndex === 0 || targetCell.cellIndex === 1) {
+      for (const ch of input.value) {
+        if (ch.toLowerCase() === ch.toUpperCase() || input.value.length < 4) {
+          pushNotification(
+            'Error!',
+            `It sould be at least 4 letters and must not include numbers`,
+            'error'
+          );
+
+          input.value = '';
+        } else {
+          input.value = input.value[0].toUpperCase() + input.value.slice(1);
+
+          pushNotification(
+            'Success!',
+            'Сell content has been changed',
+            'success'
+          );
+        }
+      }
+    }
+
+    if (targetCell.cellIndex === 3) {
+      input.type = 'number';
+
+      if (input.value < 18 || input.value > 90) {
+        pushNotification(
+          'Error!!',
+          'Enter valid age',
+          'error'
+        );
+        input.value = '';
+      } else {
+        pushNotification(
+          'Success!',
+          'Сell content has been changed',
+          'success'
+        );
+      }
+    }
+
+    if (targetCell.cellIndex === 4) {
+      if (input.value <= 0 || isNaN(input.value)) {
+        pushNotification(
+          'Error!!',
+          'Enter valid salary',
+          'error'
+        );
+        input.value = '';
+      } else {
+        input.value = `$${(+input.value).toLocaleString('en')}`;
+
+        pushNotification(
+          'Success!',
+          'Сell content has been changed',
+          'success'
+        );
+      }
+    }
+
+    if (!input.value) {
+      input.value = value;
+    }
+
+    targetCell.appendChild(document.createTextNode(input.value));
+  });
+
+  input.addEventListener('keyup', (evnt) => {
+    if (evnt.key === 'Enter') {
+      input.blur();
+    }
+  });
+});
