@@ -17,8 +17,8 @@ document.body.insertAdjacentHTML('beforeend', `
         name="name"
         type="text"
         data-qa="name"
-        required
         minlength="4"
+        required
       >
     </label>
     <label>
@@ -70,7 +70,7 @@ const createRow = (...arg) => {
   `);
 };
 
-function showNotifi(type, text) {
+function showNotification(type, text) {
   form.insertAdjacentHTML('afterend', `
     <div class="notification" data-qa="notification">
       <h1 class="title">${type.toUpperCase()}</h1>
@@ -93,76 +93,33 @@ function showNotifi(type, text) {
   }, 5000);
 }
 
-form.name.addEventListener('submit', e => {
+form.name.addEventListener('change', e => {
   if (!form.name.validity.valid) {
     form.name.setCustomValidity(
       'Error! Less 4 letters are entered in the field'
     );
-    showNotifi('error', 'Name length should be at least 4 letters');
-  }
-});
-
-form.name.addEventListener('change', e => {
-  if (!form.name.validity.valid) {
-    showNotifi('error', 'Name length should be at least 4 letters');
-  }
-});
-
-form.age.addEventListener('submit', e => {
-  if (!form.age.validity.valid) {
-    form.age.setCustomValidity(
-      'Error! Age range should be from 18 to 90 years'
-    );
+    showNotification('error', 'Name length should be at least 4 letters');
   }
 });
 
 form.age.addEventListener('change', e => {
   if (!form.age.validity.valid) {
-    showNotifi('error', 'Age range should be from 18 to 90');
+    form.age.setCustomValidity(
+      'Error! Age range should be from 18 to 90 years'
+    );
+    showNotification('error', 'Age range should be from 18 to 90');
   }
 });
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   createRow();
-  showNotifi('success', 'New employee is successfully added to the table');
+
+  showNotification(
+    'success', 'New employee is successfully added to the table'
+  );
+
   e.target.reset();
-});
-
-let toggleSwitch = true;
-
-thead.addEventListener('click', (e) => {
-  const item = e.target;
-  const cellIndex = item.cellIndex;
-
-  let data = [...tbody.children];
-
-  data.sort((a, b) => {
-    const contentA = a.cells[cellIndex].textContent;
-    const contentB = b.cells[cellIndex].textContent;
-
-    if (contentA.toUpperCase() !== contentA.toLowerCase()) {
-      return contentA.localeCompare(contentB);
-    }
-
-    if (parseInt(contentA)) {
-      return contentA - contentB;
-    } else {
-      return parseInt(contentA.slice(1)) - parseInt(contentB.slice(1));
-    }
-  });
-
-  if (!toggleSwitch) {
-    data = data.reverse();
-  }
-
-  toggleSwitch = !toggleSwitch;
-
-  data.forEach((elem, i) => {
-    elem.innerHTML = data[i].innerHTML;
-  });
-
-  tbody.append(...data);
 });
 
 let special;
@@ -217,4 +174,40 @@ tbody.addEventListener('dblclick', (e) => {
     item.removeChild(targetInput);
     item.textContent = prevValue;
   });
+});
+
+let toggleSwitch = true;
+
+thead.addEventListener('click', (e) => {
+  const item = e.target;
+  const cellIndex = item.cellIndex;
+
+  let data = [...tbody.children];
+
+  data.sort((a, b) => {
+    const contentA = a.cells[cellIndex].textContent;
+    const contentB = b.cells[cellIndex].textContent;
+
+    if (contentA.toUpperCase() !== contentA.toLowerCase()) {
+      return contentA.localeCompare(contentB);
+    }
+
+    if (parseInt(contentA)) {
+      return contentA - contentB;
+    } else {
+      return parseInt(contentA.slice(1)) - parseInt(contentB.slice(1));
+    }
+  });
+
+  if (!toggleSwitch) {
+    data = data.reverse();
+  }
+
+  toggleSwitch = !toggleSwitch;
+
+  data.forEach((elem, i) => {
+    elem.innerHTML = data[i].innerHTML;
+  });
+
+  tbody.append(...data);
 });
