@@ -219,7 +219,11 @@ tBody.addEventListener('dblclick', (e) => {
       }
 
       if (value.includes('$')) {
-        td.innerText = `$${Intl.NumberFormat('en-US').format(input.value)}`;
+        td.innerText = `
+          $${Intl.NumberFormat('en-US').format(input.value.replaceAll('$', ''))}
+        `;
+
+        [...td.children].forEach(child => child.remove());
 
         if (td.innerText === '$NaN') {
           td.innerText = value;
@@ -228,12 +232,12 @@ tBody.addEventListener('dblclick', (e) => {
 
       if (td.innerText !== value) {
         pushNotification(10, 10, 'Success message',
-          'A new employee is successfully changed', 'success');
+          'Employee\'s information is successfully changed', 'success');
       }
 
       if (offices.includes(input.value.toLowerCase())) {
         pushNotification(10, 10, 'Success message',
-          'A new employee is successfully changed', 'success');
+          'Employee\'s information is successfully changed', 'success');
       }
     }
   });
