@@ -20,7 +20,7 @@ table.addEventListener('click', (e) => {
   }
 
   if (e.target.tagName === 'TH') {
-    sortGrid(e.target.cellIndex, [...employees]);
+    sortGrid(e.target.cellIndex, [...employees], e.target);
   }
 });
 
@@ -35,24 +35,34 @@ document.addEventListener('click', (e) => {
   }
 });
 
-let wasSorted = false;
+function sortGrid(index, array, item) {
+  if (item.direction === 'ASC') {
+    item.direction = 'DESC';
 
-function sortGrid(index, array) {
-  array.sort((a, b) => {
-    const first = a.cells[index].innerText.replace(/[$,]/g, '');
-    const second = b.cells[index].innerText.replace(/[$,]/g, '');
+    array.sort((a, b) => {
+      const first = a.cells[index].innerText.replace(/[$,]/g, '');
+      const second = b.cells[index].innerText.replace(/[$,]/g, '');
 
-    const sortA = wasSorted ? second : first;
-    const sortB = wasSorted ? first : second;
+      if (isNaN(first)) {
+        return first.localeCompare(second);
+      }
 
-    if (isNaN(sortA)) {
-      return sortA.localeCompare(sortB);
-    }
+      return first - second;
+    });
+  } else {
+    item.direction = 'ASC';
 
-    return sortA - sortB;
-  });
+    array.sort((a, b) => {
+      const first = a.cells[index].innerText.replace(/[$,]/g, '');
+      const second = b.cells[index].innerText.replace(/[$,]/g, '');
 
-  wasSorted = !wasSorted;
+      if (isNaN(first)) {
+        return second.localeCompare(first);
+      }
+
+      return second - first;
+    });
+  }
 
   tBody.append(...array);
 }
@@ -135,9 +145,6 @@ function setNewEmployees() {
       validateForm(input);
 
       if (input.value === '') {
-        pushNotification(10, 250, 'Error message',
-          'You need to fill in each field', 'error');
-
         return;
       }
     }
@@ -156,10 +163,7 @@ function setNewEmployees() {
     for (const key in info) {
       const td = document.createElement('td');
 
-      td.innerText = info[key]
-        .split(' ')
-        .map(item => item[0].toUpperCase() + item.slice(1))
-        .join(' ');
+      td.innerText = normalize(info[key]);
 
       tr.append(td);
     }
@@ -173,10 +177,12 @@ tBody.addEventListener('dblclick', (e) => {
   const input = document.createElement('input');
   const td = e.target.closest('td');
 
+  input.style.width = '90px';
   input.classList.add('cell-input');
+  input.style.width = '90px';
+
   td.innerHTML = '';
   td.append(input);
-  input.style.width = '90px';
   input.focus();
 
   const title = [...document.querySelectorAll('th')].find(item => {
@@ -185,9 +191,27 @@ tBody.addEventListener('dblclick', (e) => {
 
   const formInput = title.innerText !== 'Office'
     ? document.querySelector(`input[name="${title.innerText.toLowerCase()}"]`)
-    : document.querySelector(`select[name="${title.innerText.toLowerCase()}"]`);
+    : document.querySelector('select').cloneNode(true);
 
-  input.name = formInput.name;
+  if (formInput.tagName === 'SELECT') {
+    input.innerHTML = '';
+    td.append(formInput);
+    input.remove();
+    formInput.style.backgroundColor = 'inherit';
+    formInput.style.outline = 'none';
+    formInput.style.border = 'none';
+    formInput.style.width = '18px';
+    formInput.style.position = 'relative';
+    formInput.style.left = '80px';
+
+    formInput.addEventListener('change', (selectEvent) => {
+      td.innerText = normalize(selectEvent.target.value);
+      formInput.remove();
+
+      pushNotification(10, 10, 'Success message',
+        'Employee\'s information is successfully changed', 'success');
+    });
+  }
 
   input.addEventListener('focusout', () => {
     if (e.checked) {
@@ -198,25 +222,13 @@ tBody.addEventListener('dblclick', (e) => {
   });
 
   input.addEventListener('keyup', (keyEvent) => {
-    const offices = [
-      'tokyo', 'san francisco', 'london',
-      'edinburgh', 'singapore', 'new york',
-    ];
-
     if (keyEvent.key === 'Enter') {
       e.checked = true;
+      input.name = formInput.name;
 
       td.innerText = validateForm(input) === ''
         ? value
         : normalize(input.value);
-
-      if (formInput.tagName === 'SELECT') {
-        td.innerText = offices.includes(input.value.toLowerCase())
-          ? normalize(input.value.toLowerCase())
-          : pushNotification(10, 10, 'Error message',
-            'Sorry, we don\'t have an office in this city',
-            'error', value);
-      }
 
       if (value.includes('$')) {
         td.innerText = `
@@ -234,11 +246,6 @@ tBody.addEventListener('dblclick', (e) => {
         pushNotification(10, 10, 'Success message',
           'Employee\'s information is successfully changed', 'success');
       }
-
-      if (offices.includes(input.value.toLowerCase())) {
-        pushNotification(10, 10, 'Success message',
-          'Employee\'s information is successfully changed', 'success');
-      }
     }
   });
 });
@@ -250,7 +257,7 @@ function validateForm(input) {
     input.value = input.value.length >= 4
       ? input.value
       : pushNotification(10, 10, 'Error message',
-        'Value of name has less than 4 letters', 'error');
+        'Value of name has less than 4 letters', 'error', input);
   }
 
   if (input.name === 'age') {
@@ -258,25 +265,36 @@ function validateForm(input) {
       ? input.value
       : pushNotification(10, 10, 'Error message',
         'Value of age is less than 18 or more than 90 or not a number',
-        'error');
+        'error', input);
   }
 
   if (input.name === 'position') {
     input.value = input.value.length >= 6
       ? input.value
       : pushNotification(10, 10, 'Error message',
-        'Value of position is less than 6', 'error');
+        'Value of position is less than 6 characters', 'error', input);
+  }
+
+  if (input.name === 'salary') {
+    input.value = input.value > 0
+      ? input.value
+      : pushNotification(10, 10, 'Error message',
+        'Enter correct data', 'error', input);
   }
 
   return input.value;
 }
 
 const pushNotification = (
-  posTop, posRight, title, description, type = '', exception
+  posTop, posRight, title, description, type = '', input
 ) => {
   const div = document.createElement('div');
   const h2 = document.createElement('h2');
   const p = document.createElement('p');
+
+  if (type === 'error') {
+    input.focus();
+  }
 
   div.classList.value = `notification ${type}`;
   div.style.top = `${posTop}px`;
@@ -294,7 +312,7 @@ const pushNotification = (
   document.body.append(div);
   setTimeout(() => div.remove(), 3000);
 
-  return exception || '';
+  return '';
 };
 
 function normalize(str) {
