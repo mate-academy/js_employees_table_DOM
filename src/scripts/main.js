@@ -90,24 +90,34 @@ function showNotification(type, text) {
 
   setTimeout(() => {
     notification.remove();
-  }, 5000);
+  }, 3000);
 }
 
 form.name.addEventListener('change', e => {
   if (!form.name.validity.valid) {
+    showNotification('error', 'Name length should be at least 4 letters');
+  }
+});
+
+form.name.addEventListener('submit', e => {
+  if (!form.name.validity.valid) {
     form.name.setCustomValidity(
       'Error! Less 4 letters are entered in the field'
     );
-    showNotification('error', 'Name length should be at least 4 letters');
   }
 });
 
 form.age.addEventListener('change', e => {
   if (!form.age.validity.valid) {
+    showNotification('error', 'Age range should be from 18 to 90');
+  }
+});
+
+form.age.addEventListener('submit', e => {
+  if (!form.age.validity.valid) {
     form.age.setCustomValidity(
       'Error! Age range should be from 18 to 90 years'
     );
-    showNotification('error', 'Age range should be from 18 to 90');
   }
 });
 
