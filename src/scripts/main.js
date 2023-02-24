@@ -101,7 +101,7 @@ form.name.addEventListener('submit', e => {
   }
 });
 
-form.name.addEventListener('submit', e => {
+form.name.addEventListener('change', e => {
   if (!form.name.validity.valid) {
     showNotification(
       'error', 'Incorrect name', 'Name length should be at least 4 letters'
@@ -112,15 +112,15 @@ form.name.addEventListener('submit', e => {
 form.age.addEventListener('submit', e => {
   if (!form.age.validity.valid) {
     form.age.setCustomValidity(
-      'Error! Age range should be from 18 to 90 years'
+      'Error! Your age must be from 18 to 90 years'
     );
   }
 });
 
-form.age.addEventListener('submit', e => {
+form.age.addEventListener('change', e => {
   if (!form.age.validity.valid) {
     showNotification(
-      'error', 'Enter a correct age', 'Age range should be from 18 to 90'
+      'error', 'Enter a correct age', 'Your age must be from 18 to 90 years'
     );
   }
 });
