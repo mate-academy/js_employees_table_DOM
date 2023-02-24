@@ -141,7 +141,7 @@ form.addEventListener(
 
     if (toAdd.age < 18 || toAdd.age > 90) {
       pushNotification(160, 10, 'Check the correctness of the entered data',
-        'Your age must be more than 18 and less than 90', 'success');
+        'Your age must be more than 18 and less than 90', 'error');
     } else {
       tbody.insertAdjacentHTML('beforeend',
         `<tr>
@@ -155,7 +155,7 @@ form.addEventListener(
       e.target.reset();
 
       pushNotification(10, 10, 'Successfully!',
-        'The employee has been added to the table!', 'error');
+        'The employee has been added to the table!', 'success');
     }
   }
 );
