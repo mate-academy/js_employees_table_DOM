@@ -70,10 +70,10 @@ const createRow = (...arg) => {
   `);
 };
 
-function showNotification(type, text) {
+function showNotification(type, title, text) {
   form.insertAdjacentHTML('afterend', `
     <div class="notification" data-qa="notification">
-      <h1 class="title">${type.toUpperCase()}</h1>
+      <h1 class="title">${title.toUpperCase()}</h1>
       <p>${text}</p>
     </div>
   `);
@@ -101,9 +101,11 @@ form.name.addEventListener('submit', e => {
   }
 });
 
-form.name.addEventListener('change', e => {
+form.name.addEventListener('submit', e => {
   if (!form.name.validity.valid) {
-    showNotification('error', 'Name length should be at least 4 letters');
+    showNotification(
+      'error', 'Incorrect name', 'Name length should be at least 4 letters'
+    );
   }
 });
 
@@ -115,9 +117,11 @@ form.age.addEventListener('submit', e => {
   }
 });
 
-form.age.addEventListener('change', e => {
+form.age.addEventListener('submit', e => {
   if (!form.age.validity.valid) {
-    showNotification('error', 'Age range should be from 18 to 90');
+    showNotification(
+      'error', 'Enter a correct age', 'Age range should be from 18 to 90'
+    );
   }
 });
 
@@ -126,7 +130,7 @@ form.addEventListener('submit', (e) => {
   createRow();
 
   showNotification(
-    'success', 'New employee is successfully added to the table'
+    'success', 'Successful!', 'New employee is successfully added to the table'
   );
 
   e.target.reset();
