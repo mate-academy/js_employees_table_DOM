@@ -93,12 +93,6 @@ function showNotification(type, text) {
   }, 3000);
 }
 
-form.name.addEventListener('change', e => {
-  if (!form.name.validity.valid) {
-    showNotification('error', 'Name length should be at least 4 letters');
-  }
-});
-
 form.name.addEventListener('submit', e => {
   if (!form.name.validity.valid) {
     form.name.setCustomValidity(
@@ -107,9 +101,9 @@ form.name.addEventListener('submit', e => {
   }
 });
 
-form.age.addEventListener('change', e => {
-  if (!form.age.validity.valid) {
-    showNotification('error', 'Age range should be from 18 to 90');
+form.name.addEventListener('change', e => {
+  if (!form.name.validity.valid) {
+    showNotification('error', 'Name length should be at least 4 letters');
   }
 });
 
@@ -118,6 +112,12 @@ form.age.addEventListener('submit', e => {
     form.age.setCustomValidity(
       'Error! Age range should be from 18 to 90 years'
     );
+  }
+});
+
+form.age.addEventListener('change', e => {
+  if (!form.age.validity.valid) {
+    showNotification('error', 'Age range should be from 18 to 90');
   }
 });
 
