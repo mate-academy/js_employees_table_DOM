@@ -126,17 +126,47 @@ tbody.addEventListener('click', (e) => {
   e.target.parentElement.classList.add('active');
 });
 
+const pushNotification = (title, description, type) => {
+  const notification = document.createElement('div');
+
+  notification.classList.add('notification', type);
+  notification.dataset.qa = 'notification';
+
+  notification.innerHTML = `
+    <h2 class="title">${title}</h2>
+    <p>${description}</p>
+  `;
+
+  body.append(notification);
+
+  setTimeout(() => notification.remove(), 2000);
+};
+
+const errorText = (text) => {
+  pushNotification(
+    'Error!',
+    `${text}`,
+    'error'
+  );
+};
+
+const successText = (text) => {
+  pushNotification(
+    'Success!',
+    `${text}`,
+    'success'
+  );
+};
+
+const errorLong = 'It sould be at least 4 letters and must not include numbers';
+
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   for (const ch of form.name.value) {
     if (ch.toLowerCase() === ch.toUpperCase()
       || form.name.value.length < minLength) {
-      pushNotification(
-        'Error!',
-        'It sould be at least 4 letters and must not include numbers',
-        'error'
-      );
+      errorText(errorLong);
 
       return;
     }
@@ -145,22 +175,14 @@ form.addEventListener('submit', (e) => {
   for (const ch of form.position.value) {
     if (ch.toLowerCase() === ch.toUpperCase()
       || form.position.value.length < 4) {
-      pushNotification(
-        'Error!',
-        'It sould be at least 4 letters and must not include numbers',
-        'error'
-      );
+      errorText(errorLong);
 
       return;
     }
   }
 
   if (form.age.value < minAge || form.age.value > maxAge) {
-    pushNotification(
-      'Error!!',
-      'Enter valid age',
-      'error'
-    );
+    errorText('Enter valid age');
 
     return;
   }
@@ -182,28 +204,8 @@ form.addEventListener('submit', (e) => {
   tbody.append(newRow);
   form.reset();
 
-  pushNotification(
-    'Success!',
-    'The employee has been added to the table',
-    'success'
-  );
+  successText('The employee has been added to the table!');
 });
-
-const pushNotification = (title, description, type) => {
-  const notification = document.createElement('div');
-
-  notification.classList.add('notification', type);
-  notification.dataset.qa = 'notification';
-
-  notification.innerHTML = `
-    <h2 class="title">${title}</h2>
-    <p>${description}</p>
-  `;
-
-  body.append(notification);
-
-  setTimeout(() => notification.remove(), 2000);
-};
 
 tbody.addEventListener('dblclick', (e) => {
   const targetCell = e.target.closest('td');
@@ -256,24 +258,18 @@ tbody.addEventListener('dblclick', (e) => {
   input.addEventListener('blur', () => {
     targetCell.removeChild(input);
 
+    const blurText = 'You have successfully changed the contents of the cell!';
+
     if (targetCell.cellIndex === 0 || targetCell.cellIndex === 1) {
       for (const ch of input.value) {
         if (ch.toLowerCase() === ch.toUpperCase() || input.value.length < 4) {
-          pushNotification(
-            'Error!',
-            `It sould be at least 4 letters and must not include numbers`,
-            'error'
-          );
+          errorText(errorLong);
 
           input.value = '';
         } else {
           input.value = input.value[0].toUpperCase() + input.value.slice(1);
 
-          pushNotification(
-            'Success!',
-            'Сell content has been changed',
-            'success'
-          );
+          successText(blurText);
         }
       }
     }
@@ -282,37 +278,22 @@ tbody.addEventListener('dblclick', (e) => {
       input.type = 'number';
 
       if (input.value < 18 || input.value > 90) {
-        pushNotification(
-          'Error!!',
-          'Enter valid age',
-          'error'
-        );
+        errorText('Enter valid age');
         input.value = '';
       } else {
-        pushNotification(
-          'Success!',
-          'Сell content has been changed',
-          'success'
-        );
+        successText(blurText);
       }
     }
 
     if (targetCell.cellIndex === 4) {
       if (input.value <= 0 || isNaN(input.value)) {
-        pushNotification(
-          'Error!!',
-          'Enter valid salary',
-          'error'
-        );
+        errorText('Enter valid salary');
+
         input.value = '';
       } else {
         input.value = `$${(+input.value).toLocaleString('en')}`;
 
-        pushNotification(
-          'Success!',
-          'Сell content has been changed',
-          'success'
-        );
+        successText(blurText);
       }
     }
 
