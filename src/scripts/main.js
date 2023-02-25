@@ -4,8 +4,6 @@ function convert(stringNumber) {
   return Number(stringNumber.toLocaleString().replace(/\D/g, ''));
 }
 
-const array = [0, 0, 0, 0, 0];
-
 function compareVariables(aa, bb, eventFunc, ascOrDesc) {
   let a = aa.children[eventFunc.target.cellIndex].textContent;
   let b = bb.children[eventFunc.target.cellIndex].textContent;
@@ -28,15 +26,7 @@ function ascDesc(table) {
   table.addEventListener('click', (eventFunc) => {
     const bodyRows = document.querySelector('tbody');
 
-    if (array[eventFunc.target.cellIndex] === 0) {
-      ascOrDesc = 1;
-      array[eventFunc.target.cellIndex] = 1;
-    }
-
-    if (array[eventFunc.target.cellIndex] === 1) {
-      ascOrDesc = ascOrDesc * (-1);
-      array[eventFunc.target.cellIndex] = 1;
-    }
+    ascOrDesc = ascOrDesc * (-1);
 
     document.querySelectorAll('span').forEach((element) => {
       element.textContent = '';
