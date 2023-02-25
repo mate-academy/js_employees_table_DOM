@@ -1,13 +1,15 @@
 'use strict';
 
 function sortingTable(table) {
-  table.querySelectorAll('th').forEach(function(item) {
+  const head = table.querySelector('thead');
+
+  head.querySelectorAll('th').forEach(function(item) {
     item.append(document.createElement('span'));
   });
 
   const arrCompare = [1, 1, 1, 1, 1];
 
-  table.addEventListener('click', (eventFunc) => {
+  head.addEventListener('click', (eventFunc) => {
     const cellNumber = eventFunc.target.cellIndex;
     const asc = ' \u25BC';
     const desc = ' \u25B2';
@@ -34,7 +36,7 @@ function sortingTable(table) {
       arrCompare[i] = cellNumber === i ? arrCompare[i] * (-1) : 1;
     }
 
-    table.querySelectorAll('span')[cellNumber]
+    head.querySelectorAll('span')[cellNumber]
       .textContent = arrCompare[cellNumber] === 1 ? asc : desc;
 
     document.querySelector('tbody')
@@ -43,6 +45,6 @@ function sortingTable(table) {
   });
 }
 
-const myTable = document.querySelector('thead');
+const myTable = document.querySelector('table');
 
 sortingTable(myTable);
