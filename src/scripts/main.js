@@ -1,5 +1,11 @@
 'use strict';
 
+const myTable = document.querySelector('table');
+
+sortingTable(myTable);
+selectedTable(myTable);
+createForm();
+
 function sortingTable(table) {
   const head = table.querySelector('thead');
 
@@ -39,6 +45,8 @@ function sortingTable(table) {
     head.querySelectorAll('span')[cellNumber]
       .textContent = arrCompare[cellNumber] === 1 ? asc : desc;
 
+    head.querySelectorAll('span')[cellNumber].style.fontSize = '12px';
+
     document.querySelector('tbody')
       .append(...[...document.querySelector('tbody').children].sort((a, b) =>
         compareVariables(a, b)));
@@ -56,7 +64,29 @@ function selectedTable(table) {
   });
 }
 
-const myTable = document.querySelector('table');
+function createForm() {
+  const form = document.createElement('form');
 
-sortingTable(myTable);
-selectedTable(myTable);
+  form.className = 'new-employee-form';
+
+  form.innerHTML = `
+  <label>Name:<input type="text" name="name" data-qa="name"></label>
+  <label>Position:<input type="text" name="position" data-qa="position"></label>
+  <label>Office:
+     <select name="office" data-qa="office">
+        <option value="Tokyo">Tokyo</option>
+        <option value="Singapore">Singapore</option>
+        <option value="London">London</option>
+        <option value="New York">New York</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="San Francisco">San Francisco</option>
+     </select>
+  </label>
+  <label>Age:<input type="number" name="age" data-qa="age">
+  </label>
+  <label>Salary:<input type="number" name="salary" data-qa="salary">
+  </label>
+  <button type="submit">Save to table</button>
+  `;
+  document.body.insertBefore(form, document.body[1]);
+}
