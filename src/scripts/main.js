@@ -229,10 +229,11 @@ tbody.addEventListener('dblclick', (e) => {
   if (targetCell.cellIndex === 2) {
     targetCell.removeChild(input);
 
-    targetCell.insertAdjacentHTML('afterbegin', `
-    <select
-      class="cell-input"
-    >
+    const select = document.createElement('select');
+
+    select.classList.add('cell-input');
+
+    select.insertAdjacentHTML('afterbegin', `
       <option value="${value}">${value}</option>
       <option value="Tokyo">Tokyo</option>
       <option value="Singapore">Singapore</option>
@@ -240,10 +241,8 @@ tbody.addEventListener('dblclick', (e) => {
       <option value="New York">New York</option>
       <option value="Edinburgh">Edinburgh</option>
       <option value="San Francisco">San Francisco</option>
-    </select>
     `);
 
-    const select = targetCell.querySelector('select');
     const options = [...select.children];
 
     for (let i = 1; i < options.length; i++) {
@@ -253,6 +252,14 @@ tbody.addEventListener('dblclick', (e) => {
     }
 
     select.removeChild(select.querySelector(`[data-qa="forRemove"]`));
+    targetCell.appendChild(select);
+    select.focus();
+
+    select.addEventListener('blur', () => {
+      targetCell.removeChild(select);
+
+      targetCell.appendChild(document.createTextNode(select.value));
+    });
   }
 
   input.addEventListener('blur', () => {
