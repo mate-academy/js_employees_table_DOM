@@ -45,6 +45,18 @@ function sortingTable(table) {
   });
 }
 
+function selectedTable(table) {
+  const rows = table.querySelector('tbody');
+
+  rows.addEventListener('click', (eventFunc) => {
+    for (const i of rows.children) {
+      i.classList.remove('active');
+    }
+    eventFunc.target.parentElement.classList.add('active');
+  });
+}
+
 const myTable = document.querySelector('table');
 
 sortingTable(myTable);
+selectedTable(myTable);
