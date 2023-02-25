@@ -17,7 +17,11 @@ function compareVariables(aa, bb, eventFunc, ascOrDesc) {
 }
 
 function ascDesc(table) {
-  let ascOrDesc = 1;
+  let ascOrDescName = 1;
+  let ascOrDescPosition = 1;
+  let ascOrDescOffice = 1;
+  let ascOrDescAge = 1;
+  let ascOrDescSalary = 1;
 
   table.querySelectorAll('th').forEach(function(item) {
     item.append(document.createElement('span'));
@@ -26,18 +30,85 @@ function ascDesc(table) {
   table.addEventListener('click', (eventFunc) => {
     const bodyRows = document.querySelector('tbody');
 
-    ascOrDesc = ascOrDesc * (-1);
-
     document.querySelectorAll('span').forEach((element) => {
       element.textContent = '';
     });
 
-    table.querySelectorAll('span')[eventFunc.target.cellIndex]
-      .textContent = ascOrDesc === 1 ? ' \u2B07' : ' \u2B06';
+    if (eventFunc.target.cellIndex === 0) {
+      ascOrDescPosition = 1;
+      ascOrDescOffice = 1;
+      ascOrDescAge = 1;
+      ascOrDescSalary = 1;
+      ascOrDescName = ascOrDescName * (-1);
 
-    bodyRows
-      .append(...[...bodyRows.children]
-        .sort((a, b) => compareVariables(a, b, eventFunc, ascOrDesc)));
+      table.querySelectorAll('span')[eventFunc.target.cellIndex]
+        .textContent = ascOrDescName === 1 ? ' \u25BC' : ' \u25B2';
+
+      bodyRows
+        .append(...[...bodyRows.children]
+          .sort((a, b) => compareVariables(a, b, eventFunc, ascOrDescName)));
+    }
+
+    if (eventFunc.target.cellIndex === 1) {
+      ascOrDescName = 1;
+      ascOrDescOffice = 1;
+      ascOrDescAge = 1;
+      ascOrDescSalary = 1;
+      ascOrDescPosition = ascOrDescPosition * (-1);
+
+      table.querySelectorAll('span')[eventFunc.target.cellIndex]
+        .textContent = ascOrDescPosition === 1 ? ' \u25BC' : ' \u25B2';
+
+      bodyRows
+        .append(...[...bodyRows.children]
+          .sort((a, b) =>
+            compareVariables(a, b, eventFunc, ascOrDescPosition)));
+    }
+
+    if (eventFunc.target.cellIndex === 2) {
+      ascOrDescName = 1;
+      ascOrDescPosition = 1;
+      ascOrDescAge = 1;
+      ascOrDescSalary = 1;
+      ascOrDescOffice = ascOrDescOffice * (-1);
+
+      table.querySelectorAll('span')[eventFunc.target.cellIndex]
+        .textContent = ascOrDescOffice === 1 ? ' \u25BC' : ' \u25B2';
+
+      bodyRows
+        .append(...[...bodyRows.children]
+          .sort((a, b) => compareVariables(a, b, eventFunc, ascOrDescOffice)));
+    }
+
+    if (eventFunc.target.cellIndex === 3) {
+      ascOrDescName = 1;
+      ascOrDescPosition = 1;
+      ascOrDescOffice = 1;
+      ascOrDescSalary = 1;
+      ascOrDescAge = ascOrDescAge * (-1);
+
+      table.querySelectorAll('span')[eventFunc.target.cellIndex]
+        .textContent = ascOrDescAge === 1 ? ' \u25BC' : ' \u25B2';
+
+      bodyRows
+        .append(...[...bodyRows.children]
+          .sort((a, b) => compareVariables(a, b, eventFunc, ascOrDescAge)));
+    }
+
+    if (eventFunc.target.cellIndex === 4) {
+      ascOrDescName = 1;
+      ascOrDescPosition = 1;
+      ascOrDescOffice = 1;
+      ascOrDescAge = 1;
+      ascOrDescSalary = ascOrDescSalary * (-1);
+
+      table.querySelectorAll('span')[eventFunc.target.cellIndex]
+        .textContent = ascOrDescSalary === 1 ? ' \u25BC' : ' \u25B2';
+
+      bodyRows
+        .append(...[...bodyRows.children]
+          .sort((a, b) => compareVariables(a, b, eventFunc, ascOrDescSalary)));
+    }
   });
 }
 
