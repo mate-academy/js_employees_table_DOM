@@ -4,7 +4,7 @@ function convert(stringNumber) {
   return Number(stringNumber.toLocaleString().replace(/\D/g, ''));
 }
 
-function compareVariables(aa, bb, events, upOrDown) {
+function compareVariables(aa, bb, events, ascOrDesc) {
   let a = aa.children[events.target.cellIndex].textContent;
   let b = bb.children[events.target.cellIndex].textContent;
 
@@ -13,7 +13,7 @@ function compareVariables(aa, bb, events, upOrDown) {
     b = (convert(b));
   }
 
-  return a < b ? upOrDown : upOrDown * (-1);
+  return a < b ? ascOrDesc : ascOrDesc * (-1);
 }
 
 function ascDesc(table) {
