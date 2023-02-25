@@ -17,11 +17,7 @@ function compareVariables(aa, bb, eventFunc, ascOrDesc) {
 }
 
 function ascDesc(table) {
-  let ascOrDescName = 1;
-  let ascOrDescPosition = 1;
-  let ascOrDescOffice = 1;
-  let ascOrDescAge = 1;
-  let ascOrDescSalary = 1;
+  let array = [1, 1, 1, 1, 1];
 
   table.querySelectorAll('th').forEach(function(item) {
     item.append(document.createElement('span'));
@@ -29,85 +25,67 @@ function ascDesc(table) {
 
   table.addEventListener('click', (eventFunc) => {
     const bodyRows = document.querySelector('tbody');
+    const cellNumber = eventFunc.target.cellIndex;
+    const asc = ' \u25BC';
+    const desc = ' \u25B2';
 
     document.querySelectorAll('span').forEach((element) => {
       element.textContent = '';
     });
 
-    if (eventFunc.target.cellIndex === 0) {
-      ascOrDescPosition = 1;
-      ascOrDescOffice = 1;
-      ascOrDescAge = 1;
-      ascOrDescSalary = 1;
-      ascOrDescName = ascOrDescName * (-1);
+    if (cellNumber === 0) {
+      array = [array[cellNumber] * (-1), 1, 1, 1, 1];
 
-      table.querySelectorAll('span')[eventFunc.target.cellIndex]
-        .textContent = ascOrDescName === 1 ? ' \u25BC' : ' \u25B2';
+      table.querySelectorAll('span')[cellNumber]
+        .textContent = array[cellNumber] === 1 ? asc : desc;
 
       bodyRows
-        .append(...[...bodyRows.children]
-          .sort((a, b) => compareVariables(a, b, eventFunc, ascOrDescName)));
+        .append(...[...bodyRows.children].sort((a, b) =>
+          compareVariables(a, b, eventFunc, array[cellNumber])));
     }
 
-    if (eventFunc.target.cellIndex === 1) {
-      ascOrDescName = 1;
-      ascOrDescOffice = 1;
-      ascOrDescAge = 1;
-      ascOrDescSalary = 1;
-      ascOrDescPosition = ascOrDescPosition * (-1);
+    if (cellNumber === 1) {
+      array = [1, array[cellNumber] * (-1), 1, 1, 1];
 
-      table.querySelectorAll('span')[eventFunc.target.cellIndex]
-        .textContent = ascOrDescPosition === 1 ? ' \u25BC' : ' \u25B2';
+      table.querySelectorAll('span')[cellNumber]
+        .textContent = array[cellNumber] === 1 ? asc : desc;
 
       bodyRows
-        .append(...[...bodyRows.children]
-          .sort((a, b) =>
-            compareVariables(a, b, eventFunc, ascOrDescPosition)));
+        .append(...[...bodyRows.children].sort((a, b) =>
+          compareVariables(a, b, eventFunc, array[cellNumber])));
     }
 
-    if (eventFunc.target.cellIndex === 2) {
-      ascOrDescName = 1;
-      ascOrDescPosition = 1;
-      ascOrDescAge = 1;
-      ascOrDescSalary = 1;
-      ascOrDescOffice = ascOrDescOffice * (-1);
+    if (cellNumber === 2) {
+      array = [1, 1, array[cellNumber] * (-1), 1, 1];
 
-      table.querySelectorAll('span')[eventFunc.target.cellIndex]
-        .textContent = ascOrDescOffice === 1 ? ' \u25BC' : ' \u25B2';
+      table.querySelectorAll('span')[cellNumber]
+        .textContent = array[cellNumber] === 1 ? asc : desc;
 
       bodyRows
-        .append(...[...bodyRows.children]
-          .sort((a, b) => compareVariables(a, b, eventFunc, ascOrDescOffice)));
+        .append(...[...bodyRows.children].sort((a, b) =>
+          compareVariables(a, b, eventFunc, array[cellNumber])));
     }
 
-    if (eventFunc.target.cellIndex === 3) {
-      ascOrDescName = 1;
-      ascOrDescPosition = 1;
-      ascOrDescOffice = 1;
-      ascOrDescSalary = 1;
-      ascOrDescAge = ascOrDescAge * (-1);
+    if (cellNumber === 3) {
+      array = [1, 1, 1, array[cellNumber] * (-1), 1];
 
-      table.querySelectorAll('span')[eventFunc.target.cellIndex]
-        .textContent = ascOrDescAge === 1 ? ' \u25BC' : ' \u25B2';
+      table.querySelectorAll('span')[cellNumber]
+        .textContent = array[cellNumber] === 1 ? asc : desc;
 
       bodyRows
-        .append(...[...bodyRows.children]
-          .sort((a, b) => compareVariables(a, b, eventFunc, ascOrDescAge)));
+        .append(...[...bodyRows.children].sort((a, b) =>
+          compareVariables(a, b, eventFunc, array[cellNumber])));
     }
 
-    if (eventFunc.target.cellIndex === 4) {
-      ascOrDescName = 1;
-      ascOrDescPosition = 1;
-      ascOrDescOffice = 1;
-      ascOrDescAge = 1;
-      ascOrDescSalary = ascOrDescSalary * (-1);
+    if (cellNumber === 4) {
+      array = [1, 1, 1, 1, array[cellNumber] * (-1)];
 
-      table.querySelectorAll('span')[eventFunc.target.cellIndex]
-        .textContent = ascOrDescSalary === 1 ? ' \u25BC' : ' \u25B2';
+      table.querySelectorAll('span')[cellNumber]
+        .textContent = array[cellNumber] === 1 ? asc : desc;
 
       bodyRows
-        .append(...[...bodyRows.children]
-          .sort((a, b) => compareVariables(a, b, eventFunc, ascOrDescSalary)));
+        .append(...[...bodyRows.children].sort((a, b) =>
+          compareVariables(a, b, eventFunc, array[cellNumber])));
     }
   });
 }
