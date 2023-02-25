@@ -136,10 +136,8 @@ form.addEventListener(
 
     if (toAdd.name.length < 4) {
       pushNotification(10, 10, 'Check the correctness of the entered data',
-        'The name field must have more than 4 letters', 'error');
-    }
-
-    if (toAdd.age < 18 || toAdd.age > 90) {
+        'The name field must have more than 4 letters.', 'error');
+    } else if (toAdd.age < 18 || toAdd.age > 90) {
       pushNotification(160, 10, 'Check the correctness of the entered data',
         'Your age must be more than 18 and less than 90', 'error');
     } else {
@@ -183,5 +181,5 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 
   setTimeout(() => {
     notification.remove();
-  }, 5000);
+  }, 3000);
 };
