@@ -1,11 +1,11 @@
 'use strict';
 
-const arrCompare = [1, 1, 1, 1, 1];
-
 function sortingTable(table) {
   table.querySelectorAll('th').forEach(function(item) {
     item.append(document.createElement('span'));
   });
+
+  const arrCompare = [1, 1, 1, 1, 1];
 
   table.addEventListener('click', (eventFunc) => {
     const cellNumber = eventFunc.target.cellIndex;
