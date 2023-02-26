@@ -8,6 +8,7 @@ const form = document.createElement('form');
 const minAge = 18;
 const maxAge = 90;
 const minLength = 4;
+const ERROR = 'It sould be at least 4 letters and must not include numbers';
 
 form.className = 'new-employee-form';
 
@@ -67,41 +68,37 @@ body.append(form);
 
 let check = false;
 
-tableHeader.addEventListener('click', e => {
-  const target = e.target;
+tableHeader.addEventListener('click', ({ target }) => {
+  const isCurrentIndex = check === target.cellIndex;
 
-  sortTable(target.cellIndex, target.innerHTML, check === target.cellIndex);
+  sortTable(target.cellIndex, target.innerHTML, isCurrentIndex);
 
-  check = (check === target.cellIndex) ? false : target.cellIndex;
+  check = isCurrentIndex ? false : target.cellIndex;
 });
 
 function sortTable(colNum, attribute, directSorting) {
   const rowsArray = [...tbody.children];
 
-  let sorter;
-
   switch (attribute) {
     case 'Position':
     case 'Name':
     case 'Office':
-      sorter = function(rowA, rowB) {
+      rowsArray.sort((rowA, rowB) => {
         const stringA = rowA.cells[colNum].innerHTML;
         const stringB = rowB.cells[colNum].innerHTML;
 
         return stringA.localeCompare(stringB);
-      };
+      });
       break;
 
     default:
-      sorter = function(rowA, rowB) {
+      rowsArray.sort((rowA, rowB) => {
         const num1 = toNumber(rowA.cells[colNum].innerHTML);
         const num2 = toNumber(rowB.cells[colNum].innerHTML);
 
         return num1 - num2;
-      };
+      });
   }
-
-  rowsArray.sort(sorter);
 
   if (directSorting) {
     tbody.append(...rowsArray.reverse());
@@ -158,33 +155,31 @@ const successText = (text) => {
   );
 };
 
-const errorLong = 'It sould be at least 4 letters and must not include numbers';
+const isLetter = ch => ch.toLowerCase() === ch.toUpperCase();
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
+const validateString = (
+  value,
+  additionalCondition = value.length < minLength
+) => {
+  if (additionalCondition) {
+    errorText(ERROR);
 
-  const validateString = (
-    value,
-    additionalCondition = value.length < minLength
-  ) => {
-    const isLetter = ch => ch.toLowerCase() === ch.toUpperCase();
+    return false;
+  }
 
-    if (additionalCondition) {
-      errorText(errorLong);
+  for (const ch of value) {
+    if (isLetter(ch)) {
+      errorText(ERROR);
 
       return false;
     }
+  }
 
-    for (const ch of value) {
-      if (isLetter(ch)) {
-        errorText(errorLong);
+  return true;
+};
 
-        return false;
-      }
-    }
-
-    return true;
-  };
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
 
   const validName = validateString(form.position.value);
   const validPosition = validateString(form.name.value);
@@ -279,55 +274,43 @@ tbody.addEventListener('dblclick', (e) => {
 
     const blurText = 'You have successfully changed the contents of the cell!';
 
-    if (targetCell.cellIndex === 0 || targetCell.cellIndex === 1) {
-      for (const ch of input.value) {
-        if (ch.toLowerCase() === ch.toUpperCase() || input.value.length < 4) {
-          errorText(errorLong);
+    switch (targetCell.cellIndex) {
+      case 0:
+      case 1:
+        for (const ch of input.value) {
+          if (isLetter(ch) || input.value.length < 4) {
+            errorText(ERROR);
+
+            input.value = '';
+          } else {
+            input.value = input.value[0].toUpperCase() + input.value.slice(1);
+
+            successText(blurText);
+          }
+        }
+        break;
+
+      case 3:
+        input.type = 'number';
+
+        if (input.value < 18 || input.value > 90) {
+          errorText('Enter valid age');
+          input.value = '';
+        } else {
+          successText(blurText);
+        }
+        break;
+
+      case 4:
+        if (input.value <= 0 || isNaN(input.value)) {
+          errorText('Enter valid salary');
 
           input.value = '';
         } else {
-          input.value = input.value[0].toUpperCase() + input.value.slice(1);
+          input.value = `$${(+input.value).toLocaleString('en')}`;
 
           successText(blurText);
         }
-      }
-    }
-
-    if (targetCell.cellIndex === 0 || targetCell.cellIndex === 1) {
-      for (const ch of input.value) {
-        if (ch.toLowerCase() === ch.toUpperCase() || input.value.length < 4) {
-          errorText(errorLong);
-
-          input.value = '';
-        } else {
-          input.value = input.value[0].toUpperCase() + input.value.slice(1);
-
-          successText(blurText);
-        }
-      }
-    }
-
-    if (targetCell.cellIndex === 3) {
-      input.type = 'number';
-
-      if (input.value < 18 || input.value > 90) {
-        errorText('Enter valid age');
-        input.value = '';
-      } else {
-        successText(blurText);
-      }
-    }
-
-    if (targetCell.cellIndex === 4) {
-      if (input.value <= 0 || isNaN(input.value)) {
-        errorText('Enter valid salary');
-
-        input.value = '';
-      } else {
-        input.value = `$${(+input.value).toLocaleString('en')}`;
-
-        successText(blurText);
-      }
     }
 
     if (!input.value) {
