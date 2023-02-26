@@ -163,22 +163,34 @@ const errorLong = 'It sould be at least 4 letters and must not include numbers';
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  for (const ch of form.name.value) {
-    if (ch.toLowerCase() === ch.toUpperCase()
-      || form.name.value.length < minLength) {
+  const validateString = (
+    value,
+    additionalCondition = value.length < minLength
+  ) => {
+    const isLetter = ch => ch.toLowerCase() === ch.toUpperCase();
+
+    if (additionalCondition) {
       errorText(errorLong);
 
-      return;
+      return false;
     }
-  }
 
-  for (const ch of form.position.value) {
-    if (ch.toLowerCase() === ch.toUpperCase()
-      || form.position.value.length < 4) {
-      errorText(errorLong);
+    for (const ch of value) {
+      if (isLetter(ch)) {
+        errorText(errorLong);
 
-      return;
+        return false;
+      }
     }
+
+    return true;
+  };
+
+  const validName = validateString(form.position.value);
+  const validPosition = validateString(form.name.value);
+
+  if (!validName || !validPosition) {
+    return;
   }
 
   if (form.age.value < minAge || form.age.value > maxAge) {
@@ -266,6 +278,20 @@ tbody.addEventListener('dblclick', (e) => {
     targetCell.removeChild(input);
 
     const blurText = 'You have successfully changed the contents of the cell!';
+
+    if (targetCell.cellIndex === 0 || targetCell.cellIndex === 1) {
+      for (const ch of input.value) {
+        if (ch.toLowerCase() === ch.toUpperCase() || input.value.length < 4) {
+          errorText(errorLong);
+
+          input.value = '';
+        } else {
+          input.value = input.value[0].toUpperCase() + input.value.slice(1);
+
+          successText(blurText);
+        }
+      }
+    }
 
     if (targetCell.cellIndex === 0 || targetCell.cellIndex === 1) {
       for (const ch of input.value) {
