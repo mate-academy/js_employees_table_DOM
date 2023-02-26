@@ -60,7 +60,7 @@ function selectedRows(table) {
 
   rows.addEventListener('click', (eventFunc) => {
     for (const i of rows.children) {
-      i.classList.remove('active');
+      i.removeAttribute('class');
     }
     eventFunc.target.parentElement.classList.add('active');
   });
@@ -95,10 +95,43 @@ function createForm() {
 }
 
 function editingTable(table) {
-  const rows = table.querySelector('tbody');
+  const cells = table.querySelector('tbody');
 
-  rows.addEventListener('dblclick', (eventFunc) => {
-    // eslint-disable-next-line no-console
-    console.log(eventFunc.target);
+  cells.addEventListener('dblclick', (eventFunc) => {
+    const memoryText = eventFunc.target.textContent;
+
+    eventFunc.target.textContent = '';
+
+    const inputButton = document.createElement('input');
+
+    inputButton.className = 'cell-input';
+    inputButton.value = memoryText;
+    eventFunc.target.append(inputButton);
+    inputButton.style.color = 'black';
+    inputButton.style.fontWeight = 'bold';
+    inputButton.focus();
+
+    inputButton.addEventListener('blur', () => {
+      eventFunc.target.textContent = inputButton.value;
+
+      if (inputButton.value === '') {
+        eventFunc.target.textContent = memoryText;
+      }
+
+      eventFunc.target.removeAttribute('input');
+    });
+
+    inputButton.addEventListener('keypress', (eventEnter) => {
+      if (eventEnter.key === 'Enter') {
+        eventFunc.target.textContent
+          = inputButton.value === '' ? memoryText : inputButton.value;
+        eventFunc.target.removeAttribute('input');
+      }
+
+      if (eventEnter.key === 'Escape') {
+        eventFunc.target.textContent = memoryText;
+        eventFunc.target.removeAttribute('input');
+      }
+    });
   });
 }
