@@ -1,16 +1,20 @@
 'use strict';
 
-const myTable = document.querySelector('table');
+const employeeTable = document.querySelector('table');
 
-sortingTable(myTable);
-selectedTable(myTable);
+sortingTable(employeeTable);
+selectedRows(employeeTable);
+editingTable(employeeTable);
 createForm();
 
 function sortingTable(table) {
   const head = table.querySelector('thead');
 
-  head.querySelectorAll('th').forEach(function(item) {
-    item.append(document.createElement('span'));
+  head.querySelectorAll('th').forEach((item) => {
+    const spanElem = document.createElement('span');
+
+    spanElem.style.fontSize = '12px';
+    item.append(spanElem);
   });
 
   const arrCompare = [1, 1, 1, 1, 1];
@@ -45,15 +49,13 @@ function sortingTable(table) {
     head.querySelectorAll('span')[cellNumber]
       .textContent = arrCompare[cellNumber] === 1 ? asc : desc;
 
-    head.querySelectorAll('span')[cellNumber].style.fontSize = '12px';
-
     document.querySelector('tbody')
       .append(...[...document.querySelector('tbody').children].sort((a, b) =>
         compareVariables(a, b)));
   });
 }
 
-function selectedTable(table) {
+function selectedRows(table) {
   const rows = table.querySelector('tbody');
 
   rows.addEventListener('click', (eventFunc) => {
@@ -74,6 +76,7 @@ function createForm() {
   <label>Position:<input type="text" name="position" data-qa="position"></label>
   <label>Office:
      <select name="office" data-qa="office">
+        <option value="Tokyo">choose an office</option>
         <option value="Tokyo">Tokyo</option>
         <option value="Singapore">Singapore</option>
         <option value="London">London</option>
@@ -89,4 +92,13 @@ function createForm() {
   <button type="submit">Save to table</button>
   `;
   document.body.insertBefore(form, document.body[1]);
+}
+
+function editingTable(table) {
+  const rows = table.querySelector('tbody');
+
+  rows.addEventListener('dblclick', (eventFunc) => {
+    // eslint-disable-next-line no-console
+    console.log(eventFunc.target);
+  });
 }
