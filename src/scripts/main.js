@@ -14,13 +14,13 @@ function tableSort(column) {
     .slice(1, table.rows.length - 1);
 
   if (isNaN(numStr(table.rows[1].children[column].textContent))) {
-    sortedRows.sort((rowA, rowB) =>
-      rowA.cells[column].innerHTML > rowB.cells[column].innerHTML ? 1 : -1
+    sortedRows.sort((a, b) =>
+      a.cells[column].innerHTML > b.cells[column].innerHTML ? 1 : -1
     );
   } else {
-    sortedRows.sort((rowA, rowB) =>
-      numStr(rowA.cells[column].innerHTML)
-      < numStr(rowB.cells[column].innerHTML)
+    sortedRows.sort((a, b) =>
+      numStr(a.cells[column].innerHTML)
+      < numStr(b.cells[column].innerHTML)
         ? 1
         : -1
     );
@@ -41,7 +41,6 @@ function tableSort(column) {
 
     tableSort(index);
   }));
-// sorting by click
 
 tbody.addEventListener('click', (e) => {
   const item = e.target;
@@ -50,7 +49,6 @@ tbody.addEventListener('click', (e) => {
 
   item.closest('tr').className = 'active';
 });
-// make row active
 
 const form = document.createElement('form');
 
@@ -58,7 +56,6 @@ form.className = ('new-employee-form');
 
 const labels = ['name', 'position', 'age', 'salary'];
 
-// add inputs
 labels.forEach(element => {
   const attribute = element;
   const labelsName = element[0].toUpperCase() + element.slice(1) + ':';
@@ -138,8 +135,11 @@ form.addEventListener(
       pushNotification(10, 10, 'Check the correctness of the entered data',
         'The name field must have more than 4 letters.', 'error');
     } else if (toAdd.age < 18 || toAdd.age > 90) {
-      pushNotification(160, 10, 'Check the correctness of the entered data',
+      pushNotification(10, 10, 'Check the correctness of the entered data',
         'Your age must be more than 18 and less than 90', 'error');
+    } else if (toAdd.salary <= 0) {
+      pushNotification(10, 10, 'Check the correctness of the entered data',
+        'Your salary must be more than 0', 'error');
     } else {
       tbody.insertAdjacentHTML('beforeend',
         `<tr>
@@ -159,27 +159,44 @@ form.addEventListener(
 );
 
 const pushNotification = (posTop, posRight, title, description, type) => {
+  const notificationContainer = document.createElement('div');
+
+  notificationContainer.classList.add('container');
+
+  notificationContainer.style.cssText = `
+    top: ${posTop}px;
+    right: ${posRight}px;
+    position : absolute;`;
+
   const notification = document.createElement('div');
 
-  notification.setAttribute('data-qa', 'notification');
+  notification.classList.add('notification', type);
+
+  notification.style.cssText = `
+  position: static;
+  border: 1px solid transparent;
+  margin-top: 10px;`;
 
   const titleOfNotification = document.createElement('h2');
-  const message = document.createElement('p');
-
-  notification.classList.add('notification', type);
-  notification.style.cssText = `top: ${posTop}px; right: ${posRight}px`;
-  notification.style.boxSizing = `content-box`;
 
   titleOfNotification.classList.add('title');
   titleOfNotification.textContent = title;
+
+  const message = document.createElement('p');
 
   message.textContent = description;
 
   notification.append(titleOfNotification, message);
 
-  document.body.append(notification);
+  const container = document.querySelector('.container');
+
+  if (!container) {
+    document.body.append(notificationContainer);
+  }
+
+  document.querySelector('.container').prepend(notification);
 
   setTimeout(() => {
     notification.remove();
-  }, 3000);
+  }, 5000);
 };
