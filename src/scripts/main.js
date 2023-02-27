@@ -7,6 +7,40 @@ selectedRows(employeeTable);
 editingTable(employeeTable);
 createForm();
 
+const errorArray = [
+  {
+    title: 'ERROR',
+    description: 'Age must be from 18 to 90',
+    type: 'error',
+  },
+  {
+    title: 'WARNING',
+    description: 'Please input only whole numbers',
+    type: 'warning',
+  },
+  {
+    title: 'SUCCESS',
+    description: 'All changes have been made',
+    type: 'success',
+  },
+  {
+    title: 'WARNING',
+    description: 'Input value must not be empty',
+    type: 'warning',
+  },
+  {
+    title: 'ERROR',
+    description: 'Input value must contain only letters or '
+      + 'only one space between words.',
+    type: 'error',
+  },
+  {
+    title: 'WARNING',
+    description: 'Input value must be more then 4 symbols',
+    type: 'warning',
+  },
+];
+
 function sortingTable(table) {
   const head = table.querySelector('thead');
 
@@ -27,8 +61,8 @@ function sortingTable(table) {
       return Number(stringNumber.toLocaleString().replace(/\D/g, ''));
     };
     const compareVariables = (aa, bb) => {
-      let a = aa.children[cellNumber].textContent;
-      let b = bb.children[cellNumber].textContent;
+      let a = aa.children[cellNumber].textContent.toUpperCase();
+      let b = bb.children[cellNumber].textContent.toUpperCase();
 
       if (convert(a) > 0) {
         a = (convert(a));
@@ -99,6 +133,7 @@ function editingTable(table) {
 
   cells.addEventListener('dblclick', (eventFunc) => {
     const memoryText = eventFunc.target.textContent;
+    const numberColumn = eventFunc.target.cellIndex;
 
     eventFunc.target.textContent = '';
 
@@ -114,17 +149,19 @@ function editingTable(table) {
     inputButton.addEventListener('blur', () => {
       eventFunc.target.textContent = inputButton.value;
 
-      if (inputButton.value === '') {
+      if (tableErrorHandler(numberColumn, inputButton.value) === 0) {
         eventFunc.target.textContent = memoryText;
       }
-
       eventFunc.target.removeAttribute('input');
     });
 
     inputButton.addEventListener('keypress', (eventEnter) => {
       if (eventEnter.key === 'Enter') {
-        eventFunc.target.textContent
-          = inputButton.value === '' ? memoryText : inputButton.value;
+        eventFunc.target.textContent = inputButton.value;
+
+        if (tableErrorHandler(numberColumn, inputButton.value) === 0) {
+          eventFunc.target.textContent = memoryText;
+        }
         eventFunc.target.removeAttribute('input');
       }
 
@@ -134,4 +171,66 @@ function editingTable(table) {
       }
     });
   });
+}
+
+function notification(message) {
+  const element = document.createElement('div');
+
+  element.classList.add('notification', message.type);
+
+  element.innerHTML
+    = `<h2 class="title">${message.title}</h2><p>${message.description}</p>`;
+  document.querySelector('body').append(element);
+
+  setTimeout(function() {
+    document.body.children[3].remove();
+  }, 3000);
+}
+
+function tableErrorHandler(columnNumber, value) {
+  if (value === '') {
+    notification(errorArray[3]);
+
+    return 0;
+  }
+
+  if (columnNumber === 3) {
+    if (value > 90 || value < 18) {
+      notification(errorArray[0]);
+
+      return 0;
+    }
+  }
+
+  if (columnNumber === 3) {
+    if (!value.match(/^\d*\d*$/)) {
+      notification(errorArray[1]);
+
+      return 0;
+    }
+  }
+
+  if (columnNumber === 0) {
+    const words = value.split(' ');
+
+    for (const i of words) {
+      if (!i.match(/^[A-Za-z]+$/)) {
+        notification(errorArray[4]);
+
+        return 0;
+      }
+    }
+  }
+
+  if (columnNumber === 0) {
+    if (value.length < 4) {
+      notification(errorArray[5]);
+
+      return 0;
+    }
+  }
+
+  notification(errorArray[2]);
+
+  return 1;
 }
