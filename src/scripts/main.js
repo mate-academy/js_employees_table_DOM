@@ -133,41 +133,78 @@ function editingTable(table) {
     const memoryText = eventFunc.target.textContent;
     const numberColumn = eventFunc.target.cellIndex;
 
-    eventFunc.target.textContent = '';
+    if (numberColumn === 0 || numberColumn === 1 || numberColumn === 3) {
+      eventFunc.target.textContent = '';
 
-    const inputButton = document.createElement('input');
+      const inputButton = document.createElement('input');
 
-    inputButton.className = 'cell-input';
-    inputButton.value = memoryText;
-    eventFunc.target.append(inputButton);
-    inputButton.style.color = 'black';
-    inputButton.style.fontWeight = 'bold';
-    inputButton.focus();
+      inputButton.className = 'cell-input';
+      inputButton.value = memoryText;
+      eventFunc.target.append(inputButton);
+      inputButton.style.color = 'black';
+      inputButton.style.fontWeight = 'bold';
+      inputButton.focus();
 
-    inputButton.addEventListener('blur', () => {
-      eventFunc.target.textContent = inputButton.value;
-
-      if (tableErrorHandler(numberColumn, inputButton.value) === 0) {
-        eventFunc.target.textContent = memoryText;
-      }
-      eventFunc.target.removeAttribute('input');
-    });
-
-    inputButton.addEventListener('keypress', (eventEnter) => {
-      if (eventEnter.key === 'Enter') {
+      inputButton.addEventListener('blur', () => {
         eventFunc.target.textContent = inputButton.value;
 
         if (tableErrorHandler(numberColumn, inputButton.value) === 0) {
           eventFunc.target.textContent = memoryText;
         }
         eventFunc.target.removeAttribute('input');
-      }
+      });
 
-      if (eventEnter.key === 'Escape') {
-        eventFunc.target.textContent = memoryText;
-        eventFunc.target.removeAttribute('input');
-      }
-    });
+      inputButton.addEventListener('keypress', (eventEnter) => {
+        if (eventEnter.key === 'Enter') {
+          eventFunc.target.textContent = inputButton.value;
+
+          if (tableErrorHandler(numberColumn, inputButton.value) === 0) {
+            eventFunc.target.textContent = memoryText;
+          }
+          eventFunc.target.removeAttribute('input');
+        }
+
+        if (eventEnter.key === 'Escape') {
+          eventFunc.target.textContent = memoryText;
+          eventFunc.target.removeAttribute('input');
+        }
+      });
+    }
+
+    if (numberColumn === 2) {
+      eventFunc.target.textContent = '';
+
+      const inputButton = document.createElement('label');
+
+      inputButton.innerHTML = `
+      <select class="cell-input" style="color: black; font-weight: bold">
+            <option value="Default">choose an office</option>
+            <option value="Tokyo">Tokyo</option>
+            <option value="Singapore">Singapore</option>
+            <option value="London">London</option>
+            <option value="New York">New York</option>
+            <option value="Edinburgh">Edinburgh</option>
+            <option value="San Francisco">San Francisco</option>
+      </select>`;
+
+      eventFunc.target.append(inputButton);
+      inputButton.focus();
+
+      inputButton.querySelector('select')
+        .addEventListener('change', (eventSection) => {
+          const selectedText = eventSection.target.value;
+
+          eventSection.target.parentElement.remove();
+          eventFunc.target.textContent = selectedText;
+          tableErrorHandler(numberColumn);
+        });
+
+      inputButton.querySelector('select')
+        .addEventListener('blur', (eventSection) => {
+          eventSection.target.parentElement.remove();
+          eventFunc.target.textContent = memoryText;
+        });
+    }
   });
 }
 
