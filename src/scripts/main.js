@@ -204,6 +204,14 @@ function editingTable(table) {
           eventSection.target.parentElement.remove();
           eventFunc.target.textContent = memoryText;
         });
+
+      inputButton.querySelector('select')
+        .addEventListener('keypress', (eventKey) => {
+          if (eventKey.key === 'Escape') {
+            eventKey.target.parentElement.remove();
+            eventFunc.target.textContent = memoryText;
+          }
+        });
     }
   });
 }
