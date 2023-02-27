@@ -129,9 +129,7 @@ function createForm() {
 }
 
 function editingTable(table) {
-  const cells = table.querySelector('tbody');
-
-  cells.addEventListener('dblclick', (eventFunc) => {
+  table.querySelector('tbody').addEventListener('dblclick', (eventFunc) => {
     const memoryText = eventFunc.target.textContent;
     const numberColumn = eventFunc.target.cellIndex;
 
