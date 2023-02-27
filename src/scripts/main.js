@@ -142,6 +142,10 @@ function editingTable(table) {
   table.querySelector('tbody').addEventListener('dblclick', (eventFunc) => {
     const memoryText = eventFunc.target.textContent;
     const numberColumn = eventFunc.target.cellIndex;
+    const formatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    });
 
     if (numberColumn === 0 || numberColumn === 1 || numberColumn === 3) {
       eventFunc.target.textContent = '';
@@ -239,11 +243,6 @@ function editingTable(table) {
       inputButton.focus();
 
       inputButton.addEventListener('blur', () => {
-        const formatter = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        });
-
         eventFunc.target.textContent
           = formatter.format(inputButton.value).slice(0, -3);
 
@@ -255,11 +254,6 @@ function editingTable(table) {
 
       inputButton.addEventListener('keypress', (eventEnter) => {
         if (eventEnter.key === 'Enter') {
-          const formatter = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-          });
-
           eventFunc.target.textContent
             = formatter.format(inputButton.value).slice(0, -3);
 
