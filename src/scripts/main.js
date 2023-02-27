@@ -7,7 +7,7 @@ selectedRows(employeeTable);
 editingTable(employeeTable);
 createForm();
 
-const errorArray = [
+const messagesArray = [
   {
     title: 'ERROR',
     description: 'Age must be from 18 to 90',
@@ -232,14 +232,14 @@ function notification(message) {
 
 function tableErrorHandler(columnNumber, value) {
   if (value === '') {
-    notification(errorArray[3]);
+    notification(messagesArray[3]);
 
     return 0;
   }
 
   if (columnNumber === 3) {
     if (value > 90 || value < 18) {
-      notification(errorArray[0]);
+      notification(messagesArray[0]);
 
       return 0;
     }
@@ -247,7 +247,7 @@ function tableErrorHandler(columnNumber, value) {
 
   if (columnNumber === 3) {
     if (!value.match(/^\d*\d*$/)) {
-      notification(errorArray[1]);
+      notification(messagesArray[1]);
 
       return 0;
     }
@@ -258,7 +258,7 @@ function tableErrorHandler(columnNumber, value) {
 
     for (const i of words) {
       if (!i.match(/^[A-Za-z]+$/)) {
-        notification(errorArray[4]);
+        notification(messagesArray[4]);
 
         return 0;
       }
@@ -267,13 +267,13 @@ function tableErrorHandler(columnNumber, value) {
 
   if (columnNumber === 0) {
     if (value.length < 4) {
-      notification(errorArray[5]);
+      notification(messagesArray[5]);
 
       return 0;
     }
   }
 
-  notification(errorArray[2]);
+  notification(messagesArray[2]);
 
   return 1;
 }
