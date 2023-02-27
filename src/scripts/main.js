@@ -39,6 +39,16 @@ const messagesArray = [
     description: 'Input value must be more then 4 symbols',
     type: 'warning',
   },
+  {
+    title: 'ERROR',
+    description: 'Please input only positive number',
+    type: 'error',
+  },
+  {
+    title: 'ERROR',
+    description: 'Input value must not contain letters or symbols',
+    type: 'error',
+  },
 ];
 
 function sortingTable(table) {
@@ -213,6 +223,58 @@ function editingTable(table) {
           }
         });
     }
+
+    if (numberColumn === 4) {
+      eventFunc.target.textContent = '';
+
+      const inputButton = document.createElement('input');
+
+      inputButton.className = 'cell-input';
+
+      inputButton.value = Number(memoryText.toLocaleString()
+        .replace(/\D/g, '')).toString();
+      eventFunc.target.append(inputButton);
+      inputButton.style.color = 'black';
+      inputButton.style.fontWeight = 'bold';
+      inputButton.focus();
+
+      inputButton.addEventListener('blur', () => {
+        const formatter = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        });
+
+        eventFunc.target.textContent
+          = formatter.format(inputButton.value).slice(0, -3);
+
+        if (tableErrorHandler(numberColumn, inputButton.value) === 0) {
+          eventFunc.target.textContent = memoryText;
+        }
+        eventFunc.target.removeAttribute('input');
+      });
+
+      inputButton.addEventListener('keypress', (eventEnter) => {
+        if (eventEnter.key === 'Enter') {
+          const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+          });
+
+          eventFunc.target.textContent
+            = formatter.format(inputButton.value).slice(0, -3);
+
+          if (tableErrorHandler(numberColumn, inputButton.value) === 0) {
+            eventFunc.target.textContent = memoryText;
+          }
+          eventFunc.target.removeAttribute('input');
+        }
+
+        if (eventEnter.key === 'Escape') {
+          eventFunc.target.textContent = memoryText;
+          eventFunc.target.removeAttribute('input');
+        }
+      });
+    }
   });
 }
 
@@ -268,6 +330,22 @@ function tableErrorHandler(columnNumber, value) {
   if (columnNumber === 0) {
     if (value.length < 4) {
       notification(messagesArray[5]);
+
+      return 0;
+    }
+  }
+
+  if (columnNumber === 4) {
+    if (value < 0) {
+      notification(messagesArray[6]);
+
+      return 0;
+    }
+  }
+
+  if (columnNumber === 4) {
+    if (!value.match(/^\d*\d*$/)) {
+      notification(messagesArray[7]);
 
       return 0;
     }
