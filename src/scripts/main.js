@@ -289,7 +289,7 @@ function notification(message) {
 
   setTimeout(function() {
     document.body.children[3].remove();
-  }, 3000);
+  }, 2000);
 }
 
 function tableErrorHandler(columnNumber, value) {
