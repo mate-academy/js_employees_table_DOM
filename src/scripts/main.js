@@ -68,12 +68,25 @@ titles.forEach(th => th.addEventListener('click', (e) => {
 // after user clicks row become selected.
 
 let statusOfRows = false;
+let lastClickOnRow;
 
 for (const row of Array.from(tBody.children)) {
-  row.addEventListener('click', () => {
-    if (statusOfRows === false) {
-      row.classList.add('active');
+  row.addEventListener('click', (e) => {
+    if (statusOfRows === true) {
+      if (lastClickOnRow === e.target) {
+        row.classList.toggle('active');
+        statusOfRows = false;
+      } else {
+        for (const row2 of Array.from(tBody.children)) {
+          row2.classList.remove('active');
+        }
+        row.classList.toggle('active');
+        lastClickOnRow = e.target;
+      }
+    } else {
+      row.classList.toggle('active');
       statusOfRows = true;
+      lastClickOnRow = e.target;
     }
   });
 }
@@ -98,6 +111,10 @@ inputName.setAttribute('name', 'name');
 
 inputName.setAttribute('type', 'text');
 
+inputName.setAttribute('minlength', '4');
+
+inputName.setAttribute('required', '');
+
 const labelName = document.createElement('label');
 
 labelName.insertAdjacentText('afterbegin', 'Name:');
@@ -109,6 +126,8 @@ form.append(labelName);
 // position
 
 const inputPosition = document.createElement('input');
+
+inputPosition.setAttribute('required', '');
 
 const labelPosition = document.createElement('label');
 
@@ -148,6 +167,12 @@ for (let i = 0; i < 6; i++) {
 
 const inputAge = document.createElement('input');
 
+inputAge.setAttribute('min', '18');
+
+inputAge.setAttribute('max', '90');
+
+inputAge.setAttribute('required', '');
+
 inputAge.setAttribute('type', 'number');
 
 const labelAge = document.createElement('label');
@@ -162,12 +187,12 @@ form.append(labelAge);
 
 const inputSalary = document.createElement('input');
 
-inputSalary.setAttribute('type', 'number');
+inputSalary.setAttribute('required', '');
+
+inputSalary.setAttribute('type', 'text');
 
 inputSalary.onchange = function() {
-  const result = `${Number(inputSalary.value).toLocaleString('en-US')}`;
-
-  inputSalary.value = result;
+  inputSalary.value = `$${Number(inputSalary.value).toLocaleString('en-US')}`;
 };
 
 const labelSalary = document.createElement('label');
@@ -181,6 +206,8 @@ form.append(labelSalary);
 // submit
 
 const submit = document.createElement('button');
+
+submit.setAttribute('type', 'submit');
 
 submit.innerHTML = 'Save to table';
 
@@ -197,3 +224,114 @@ for (let i = 0; i < Array.from(inputs).length; i++) {
 }
 
 select.dataset.qa = 'office';
+
+// click on button add employee to table
+
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const notificationElement = document.createElement('div');
+
+  notificationElement.classList.add('notification');
+
+  notificationElement.dataset.qa = 'notification';
+
+  notificationElement.classList.add(`${type}`);
+
+  const titleOfNotification = document.createElement('h2');
+
+  titleOfNotification.classList.add('title');
+
+  titleOfNotification.append(title);
+
+  notificationElement.append(titleOfNotification);
+
+  const descriptionOfNotification = document.createElement('p');
+
+  descriptionOfNotification.append(description);
+
+  notificationElement.append(descriptionOfNotification);
+
+  notificationElement.style.top = `${posTop}px`;
+  notificationElement.style.right = `${posRight}px`;
+
+  body.append(notificationElement);
+
+  setTimeout(() => notificationElement.remove(), 2000);
+};
+
+const addEmployee = function(e) {
+  e.preventDefault();
+
+  if (
+    inputName.value.length < 4 || inputAge.value < 18 || inputAge.value > 90) {
+    pushNotification(450, 190, 'Error message', 'Message example.\n '
+    + 'Notification should contain title and description.', 'error');
+  } else {
+    pushNotification(450, 190, 'Success message', 'Message example.\n '
+    + 'Notification should contain title and description.', 'success');
+
+    tBody.insertAdjacentHTML('beforeend',
+      `<tr>
+        <td>${inputName.value}</td>
+        <td>${inputPosition.value}</td>
+        <td>${select.value}</td>
+        <td>${inputAge.value}</td>
+        <td>${inputSalary.value}</td>
+    </tr>
+    `);
+  }
+};
+
+submit.addEventListener('click', addEmployee);
+
+// editing of table cells by double-clicking
+
+const cells = document.querySelectorAll('td');
+
+const changeCell = function(e) {
+  const inputCell = document.createElement('input');
+
+  inputCell.classList.add('cell-input');
+
+  const saveStartValue = e.target.innerText;
+
+  e.target.innerText = '';
+
+  e.target.append(inputCell);
+
+  inputCell.focus();
+
+  inputCell.onblur = function() {
+    const cellValue = inputCell.value;
+
+    inputCell.remove();
+
+    if (!inputCell.value) {
+      e.target.innerText = saveStartValue;
+
+      return;
+    }
+
+    e.target.innerText = cellValue;
+  };
+
+  inputCell.addEventListener('keydown', function(e2) {
+    if (e2.code === 'Enter') {
+      const cellValue2 = inputCell.value;
+
+      inputCell.remove();
+
+      if (!inputCell.value) {
+        e.target.innerText = saveStartValue;
+
+        return;
+      }
+
+      e.target.innerText = cellValue2;
+    }
+  });
+};
+
+for (let i = 0; i < Array.from(cells).length; i++) {
+  Array.from(cells)[i].setAttribute('tabindex', `${i}`);
+  Array.from(cells)[i].addEventListener('dblclick', changeCell);
+}
