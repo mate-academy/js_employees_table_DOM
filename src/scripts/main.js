@@ -68,6 +68,16 @@ tbodyRef.addEventListener('click', (e) => {
 // Form allows users to add new employees to the spreadsheet.
 // 4. Show notification if form data is invalid
 // (use notification from the previous tasks).
+function standardizeString(str) {
+  return str
+    .split(' ')
+    .map(item => item.trim())
+    .filter(item => item)
+    .map(item => item.toLowerCase())
+    .map(item => item[0].toUpperCase() + item.slice(1) + ' ')
+    .join('');
+}
+
 
 const formEl = document.createElement('form');
 
@@ -169,22 +179,8 @@ formEl.addEventListener('submit', (e) => {
     for (const key in dataObj) {
       const cellEl = document.createElement('td');
 
-      // example of formatting
-      // initial string: 'christian  BALE   '
-      // [christian], [''], [BALE], [''], [''], ['']
-      // [christian], [BALE]
-      // [christian], [bale]
-      // [Christian], [Bale]
-      // Christian Bale
-
       if (isNaN(dataObj[key])) {
-        dataObj[key] = dataObj[key]
-          .split(' ')
-          .map(item => item.trim())
-          .filter(item => item)
-          .map(item => item.toLowerCase())
-          .map(item => item[0].toUpperCase() + item.slice(1) + ' ')
-          .join('');
+        dataObj[key] = standardizeString(dataObj[key]);
       }
 
       cellEl.textContent = dataObj[key];
@@ -219,11 +215,7 @@ tbodyRef.addEventListener('dblclick', (e) => {
         if (!isNaN(inputEl.value) || inputEl.value.length === 0) {
           e.target.textContent = oldText;
         } else {
-          e.target.textContent = inputEl.value
-            .split(' ')
-            .map(item => item.toLowerCase())
-            .map(item => item[0].toUpperCase() + item.slice(1) + ' ')
-            .join('');
+          e.target.textContent = standardizeString(inputEl.value);
         }
         break;
 
