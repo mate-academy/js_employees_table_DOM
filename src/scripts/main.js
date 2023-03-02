@@ -68,6 +68,7 @@ tbodyRef.addEventListener('click', (e) => {
 // Form allows users to add new employees to the spreadsheet.
 // 4. Show notification if form data is invalid
 // (use notification from the previous tasks).
+
 function standardizeString(str) {
   return str
     .split(' ')
@@ -77,7 +78,6 @@ function standardizeString(str) {
     .map(item => item[0].toUpperCase() + item.slice(1) + ' ')
     .join('');
 }
-
 
 const formEl = document.createElement('form');
 
@@ -196,6 +196,7 @@ formEl.addEventListener('submit', (e) => {
 });
 
 // 5. Implement editing of table cells by double-clicking on it.
+
 tbodyRef.addEventListener('dblclick', (e) => {
   const oldText = e.target.textContent;
 
