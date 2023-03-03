@@ -261,13 +261,26 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 const addEmployee = function(e) {
   e.preventDefault();
 
+  if (body.querySelector('.notification')) {
+    return;
+  }
+
   if (
-    inputName.value.length < 4 || inputAge.value < 18 || inputAge.value > 90) {
-    pushNotification(450, 190, 'Error message', 'Message example.\n '
-    + 'Notification should contain title and description.', 'error');
+    inputName.value.length < 4
+    || inputAge.value < 18
+    || inputAge.value > 90
+    || inputPosition.value === ''
+    || inputSalary.value === '') {
+    pushNotification(450, 190, 'Error message', `${
+      inputName.value < 4 ? 'Name must be more than 4 characters long'
+        : inputAge.value < 18 || inputAge.value > 90 ? `Age must be at least 18`
+        + ` and not more than 90`
+          : inputPosition.value === '' ? 'Fill in the Position field'
+            : inputSalary.value === '' ? 'Complete the Salary field'
+              : ''}`, 'error');
   } else {
-    pushNotification(450, 190, 'Success message', 'Message example.\n '
-    + 'Notification should contain title and description.', 'success');
+    pushNotification(450, 190,
+      'Success message', 'User successfully added', 'success');
 
     tBody.insertAdjacentHTML('beforeend',
       `<tr>
