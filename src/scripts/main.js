@@ -4,11 +4,13 @@
 
 const tBody = document.querySelector('tbody');
 
-const data = [...tBody.children];
+let data = [...tBody.children];
 
 const titles = document.querySelectorAll('th');
 
 function sortFn(cellIndex, sortType) {
+  data = [...tBody.children];
+
   data.sort((a, b) => {
     const contentA = a.cells[cellIndex].innerHTML;
     const contentB = b.cells[cellIndex].innerHTML;
