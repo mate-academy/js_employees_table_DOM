@@ -72,12 +72,15 @@ tbodyRef.addEventListener('click', (e) => {
 function standardizeString(str) {
   return str
     .split(' ')
-    .map(item => item.trim())
-    .filter(item => item)
-    .map(item => item.toLowerCase())
-    .map(item => item[0].toUpperCase() + item.slice(1) + ' ')
-    .join('');
-}
+    .reduce((line, word) => {
+      if (isNaN(word.trim())) {
+        return line + word[0].toUpperCase() + word.slice(1) + ' ';
+      }
+
+      return line;
+    }, 0)
+    .slice(1);
+};
 
 const formEl = document.createElement('form');
 
@@ -101,7 +104,6 @@ tableHeaders.forEach(item => {
 
     inputEl.name = headerTitle.toLowerCase();
     inputEl.dataset.qa = headerTitle.toLowerCase();
-    inputEl.required = true;
 
     labelEl.append(inputEl);
   } else {
@@ -118,7 +120,6 @@ tableHeaders.forEach(item => {
 
     selectEl.name = headerTitle.toLowerCase();
     selectEl.dataset.qa = headerTitle.toLowerCase();
-    selectEl.required = true;
     labelEl.append(selectEl);
   }
 
@@ -153,8 +154,6 @@ formEl.addEventListener('submit', (e) => {
 
   notificationTitle.classList.add('title');
 
-  dataObj.salary = '$' + new Intl.NumberFormat('en-US').format(dataObj.salary);
-
   const addError = (message) => {
     notification.classList.add('error');
     notificationTitle.textContent = 'Error';
@@ -170,9 +169,14 @@ formEl.addEventListener('submit', (e) => {
     + 'at least 4 characters and have no numbers');
   } else if (dataObj.age < 18 || dataObj.age > 90) {
     addError('Age must be between 18 and 90');
+  } else if (dataObj.salary === '') {
+    addError('Salary must be filled in');
   } else {
     notification.classList.add('success');
     notificationTitle.textContent = 'Success';
+
+    dataObj.salary = '$' + new Intl.NumberFormat('en-US')
+      .format(dataObj.salary);
 
     notificationDescription.textContent = 'Person was added to the list';
 
