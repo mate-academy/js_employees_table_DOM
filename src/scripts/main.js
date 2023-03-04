@@ -8,34 +8,31 @@ const data = [...tBody.children];
 
 const titles = document.querySelectorAll('th');
 
-function sortFnAsc(cellIndex) {
+function sortFn(cellIndex, sortType) {
   data.sort((a, b) => {
     const contentA = a.cells[cellIndex].innerHTML;
     const contentB = b.cells[cellIndex].innerHTML;
 
-    switch (cellIndex) {
-      case 3:
-        return contentA - contentB;
-      case 4:
-        return getNumber(contentA) - getNumber(contentB);
-      default:
-        return contentA.localeCompare(contentB);
+    if (sortType === 'asc') {
+      switch (cellIndex) {
+        case 3:
+          return contentA - contentB;
+        case 4:
+          return getNumber(contentA) - getNumber(contentB);
+        default:
+          return contentA.localeCompare(contentB);
+      }
     }
-  });
-};
 
-function sortFnDesc(cellIndex) {
-  data.sort((a, b) => {
-    const contentA = a.cells[cellIndex].innerHTML;
-    const contentB = b.cells[cellIndex].innerHTML;
-
-    switch (cellIndex) {
-      case 3:
-        return contentB - contentA;
-      case 4:
-        return getNumber(contentB) - getNumber(contentA);
-      default:
-        return contentB.localeCompare(contentA);
+    if (sortType === 'desc') {
+      switch (cellIndex) {
+        case 3:
+          return contentB - contentA;
+        case 4:
+          return getNumber(contentB) - getNumber(contentA);
+        default:
+          return contentB.localeCompare(contentA);
+      }
     }
   });
 };
@@ -50,14 +47,15 @@ let sortOfType = 'asc';
 titles.forEach(th => th.addEventListener('click', (e) => {
   if (lastClick === e.target.cellIndex) {
     if (sortOfType === 'desc') {
-      sortFnDesc(e.target.cellIndex);
+      sortFn(e.target.cellIndex, sortOfType);
       sortOfType = 'asc';
     } else {
-      sortFnAsc(e.target.cellIndex);
+      sortFn(e.target.cellIndex, sortOfType);
       sortOfType = 'desc';
     }
   } else {
-    sortFnAsc(e.target.cellIndex);
+    sortOfType = 'asc';
+    sortFn(e.target.cellIndex, sortOfType);
     sortOfType = 'desc';
     lastClick = e.target.cellIndex;
   }
@@ -192,7 +190,21 @@ inputSalary.setAttribute('required', '');
 inputSalary.setAttribute('type', 'text');
 
 inputSalary.onchange = function() {
-  inputSalary.value = `$${Number(inputSalary.value).toLocaleString('en-US')}`;
+  inputSalary.value = `${Number(inputSalary.value).toLocaleString('en-US')}`;
+
+  if (inputSalary.value === 'NaN') {
+    inputSalary.value = '';
+
+    return;
+  }
+
+  if (+inputSalary.value < 0) {
+    inputSalary.value = '';
+
+    return;
+  }
+
+  inputSalary.value = `$${inputSalary.value}`;
 };
 
 const labelSalary = document.createElement('label');
@@ -266,16 +278,18 @@ const addEmployee = function(e) {
   }
 
   if (
-    inputName.value.length < 4
+    (inputName.value).trim().length < 4
     || inputAge.value < 18
     || inputAge.value > 90
-    || inputPosition.value === ''
-    || inputSalary.value === '') {
+    || (inputPosition.value).trim() === ''
+    || inputSalary.value === ''
+    || inputSalary.value === '$NaN') {
     pushNotification(450, 190, 'Error message', `${
-      inputName.value < 4 ? 'Name must be more than 4 characters long'
+      (inputName.value).trim().length < 4 ? `Name must be`
+      + ` more than 4 characters long`
         : inputAge.value < 18 || inputAge.value > 90 ? `Age must be at least 18`
         + ` and not more than 90`
-          : inputPosition.value === '' ? 'Fill in the Position field'
+          : (inputPosition.value).trim() === '' ? 'Fill in the Position field'
             : inputSalary.value === '' ? 'Complete the Salary field'
               : ''}`, 'error');
   } else {
@@ -320,6 +334,48 @@ const changeCell = function(e) {
 
     if (!inputCell.value) {
       e.target.innerText = saveStartValue;
+
+      return;
+    }
+
+    if (e.target.cellIndex === 0) {
+      if (Array.from(cellValue).length < 4) {
+        e.target.innerText = saveStartValue;
+
+        return;
+      }
+
+      e.target.innerText = cellValue;
+    }
+
+    if (e.target.cellIndex === 3) {
+      inputCell.setAttribute('type', 'number');
+
+      if (inputCell.value < 18 || inputCell.value > 90) {
+        e.target.innerText = saveStartValue;
+
+        return;
+      }
+
+      e.target.innerText = cellValue;
+    }
+
+    if (e.target.cellIndex === 4) {
+      if (inputCell.value < 0) {
+        e.target.innerText = saveStartValue;
+
+        return;
+      }
+
+      const result = `$${Number(cellValue).toLocaleString('en-US')}`;
+
+      if (result === '$NaN') {
+        e.target.innerText = saveStartValue;
+
+        return;
+      }
+
+      e.target.innerText = result;
 
       return;
     }
