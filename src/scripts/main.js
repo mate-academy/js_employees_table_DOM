@@ -11,6 +11,8 @@ let previouslyActiveRow = null;
 
 const updateRows = () => [...document.querySelector('tbody').children];
 
+const updateCells = () => [...document.querySelectorAll('td')];
+
 const createNotification = (type, title, description) => {
   const notification = document.createElement('div');
 
@@ -19,15 +21,15 @@ const createNotification = (type, title, description) => {
   notification.dataset.qa = 'notification';
 
   notification.innerHTML = `
-  <h2>${title}</h2>
-  <p>${description}</p>
+    <h2>${title}</h2>
+    <p>${description}</p>
   `;
 
   document.body.append(notification);
 };
 
-const pushNotification = createNotification => {
-  createNotification;
+const pushNotification = createNotificationFunc => {
+  createNotificationFunc;
 
   setTimeout(() => {
     document.body.removeChild(document.querySelector('.notification'));
@@ -45,7 +47,11 @@ const saveCell = cell => {
     if (cell.cellIndex === 0) {
       if (input.value.length < 4) {
         pushNotification(
-          createNotification('error', 'Error', 'Name should have at least 4 letters')
+          createNotification(
+            'error',
+            'Error',
+            'Name should have at least 4 letters'
+          )
         );
 
         cell.innerText = initialValue;
@@ -56,14 +62,23 @@ const saveCell = cell => {
     } else if (cell.cellIndex === 3) {
       if (input.value < 18 || input.value > 90) {
         pushNotification(
-          createNotification('error', 'Error', 'Age should be between 18 and 90')
+          createNotification(
+            'error',
+            'Error',
+            'Age should be between 18 and 90'
+          )
         );
 
         cell.innerText = initialValue;
       } else if (isNaN(input.value)) {
         pushNotification(
-          createNotification('error', 'Error', 'Age cannot be string')
+          createNotification(
+            'error',
+            'Error',
+            'Age cannot be string'
+          )
         );
+
         cell.innerText = initialValue;
       } else {
         cell.innerText = input.value;
@@ -72,11 +87,17 @@ const saveCell = cell => {
     } else if (cell.cellIndex === 4) {
       if (isNaN(input.value)) {
         pushNotification(
-          createNotification('error', 'Error', 'Salary cannot be string')
+          createNotification(
+            'error',
+            'Error',
+            'Salary cannot be string'
+          )
         );
+
         cell.innerText = initialValue;
       } else {
-        cell.innerText = '$' + Math.ceil(input.value).toLocaleString('en-US');
+        cell.innerText
+          = '$' + Math.ceil(input.value).toLocaleString('en-US');
       }
     } else {
       cell.innerText = input.value;
@@ -88,6 +109,46 @@ const saveCell = cell => {
   }
 
   cell = null;
+};
+
+const cellConfig = () => {
+  cells.forEach(cell => {
+    cell.addEventListener('dblclick', e => {
+      selectedCell = e.target;
+      selectedCell.dataset.initialValue = selectedCell.innerText.trim();
+      selectedCell.innerText = '';
+
+      const input = document.createElement('input');
+
+      input.className = 'cell-input';
+
+      const select = office.cloneNode(true);
+
+      if (cell.cellIndex === 2) {
+        selectedCell.append(select);
+
+        select.addEventListener('change', () => {
+          input.value = select.value;
+
+          selectedCell.removeChild(select);
+          selectedCell.append(input);
+
+          saveCell(selectedCell);
+        });
+      } else {
+        selectedCell.append(input);
+      }
+
+      input.focus();
+      input.addEventListener('blur', () => saveCell(selectedCell));
+
+      input.addEventListener('keypress', e => {
+        if (e.key === 'Enter') {
+          saveCell(selectedCell);
+        }
+      });
+    });
+  });
 };
 
 table.addEventListener('click', e => {
@@ -138,26 +199,36 @@ table.addEventListener('click', e => {
   }
 });
 
-document.body.insertAdjacentHTML('beforeend',
-  `
-<form class="new-employee-form">
-  <label> Name: <input name="name" type="text" data-qa="name" required></label>
-  <label> Position: <input name="position" type="text" data-qa="position" required></label>
-  <label>
-    Office:
-    <select data-qa="office" required>
-      <option value="Tokyo">Tokyo</option>
-      <option value="Singapore">Singapore</option>
-      <option value="London">London</option>
-      <option value="New York">New York</option>
-      <option value="Edinburgh">Edinburgh</option>
-      <option value="San Francisco">San Francisco</option>
-    </select>
-  </label>
-  <label> Age: <input name="age" type="number" data-qa="age" required></label>
-  <label> Salary: <input name="salary" type="number" data-qa="salary" required></label>
-  <button>Save to table</button>
-</form>`);
+document.body.insertAdjacentHTML('beforeend', `
+  <form class="new-employee-form">
+    <label>
+      Name: <input name="name" type="text" data-qa="name" required>
+    </label>
+    <label>
+       Position: 
+         <input name="position" type="text" data-qa="position" required>
+     </label>
+    <label>
+      Office:
+      <select data-qa="office" required>
+        <option value="Tokyo">Tokyo</option>
+        <option value="Singapore">Singapore</option>
+        <option value="London">London</option>
+        <option value="New York">New York</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="San Francisco">San Francisco</option>
+      </select>
+    </label>
+    <label>
+      Age: <input name="age" type="number" data-qa="age" required>
+    </label>
+    <label>
+      Salary: 
+        <input name="salary" type="number" data-qa="salary" required>
+    </label>
+    <button>Save to table</button>
+  </form>`
+);
 
 const nameInput = document.querySelector('[data-qa="name"]');
 const positionInput = document.querySelector('[data-qa="position"]');
@@ -175,25 +246,41 @@ button.addEventListener('click', e => {
     || age.value === ''
     || salary.value === '') {
     pushNotification(
-      createNotification('error', 'Error', 'All fields should be filled')
+      createNotification(
+        'error',
+        'Error',
+        'All fields should be filled'
+      )
     );
 
     return;
   } else if (nameInput.value.length < 4) {
     pushNotification(
-      createNotification('error', 'Error', 'Name should have at least 4 letters')
+      createNotification(
+        'error',
+        'Error',
+        'Name should have at least 4 letters'
+      )
     );
 
     return;
   } else if (age.value < 18 || age.value > 90) {
     pushNotification(
-      createNotification('error', 'Error', 'Age should be between 18 and 90')
+      createNotification(
+        'error',
+        'Error',
+        'Age should be between 18 and 90'
+      )
     );
 
     return;
   } else {
     pushNotification(
-      createNotification('success', 'Success', 'New employee successfully added')
+      createNotification(
+        'success',
+        'Success',
+        'New employee was successfully added'
+      )
     );
   }
 
@@ -211,50 +298,11 @@ button.addEventListener('click', e => {
 
   tbody.appendChild(newRow);
   rows = updateRows();
+  cells = updateCells();
+  cellConfig();
   form.reset();
-  cells = [...document.querySelectorAll('td')];
-  console.log(cells);
 });
 
 let selectedCell = null;
 
-cells.forEach(cell => {
-  cell.addEventListener('dblclick', e => {
-    selectedCell = e.target;
-    selectedCell.dataset.initialValue = selectedCell.innerText.trim();
-    selectedCell.innerText = '';
-
-    const input = document.createElement('input');
-
-    input.className = 'cell-input';
-
-    const select = office.cloneNode(true);
-
-    if (cell.cellIndex === 2) {
-      select.selectedIndex = 0;
-      input.value = select.value;
-      selectedCell.append(select);
-
-      select.addEventListener('change', e => {
-        input.value = select.value;
-
-        selectedCell.removeChild(select);
-        selectedCell.append(input);
-
-        saveCell(selectedCell);
-      });
-    } else {
-      selectedCell.append(input);
-    }
-
-    input.focus();
-
-    input.addEventListener('blur', () => saveCell(selectedCell));
-
-    input.addEventListener('keypress', e => {
-      if (e.key === 'Enter') {
-        saveCell(selectedCell);
-      }
-    });
-  });
-});
+cellConfig();
