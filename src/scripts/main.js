@@ -1,11 +1,10 @@
 'use strict';
 
-const employeeTable = document.querySelector('table');
-
-sortingTable(employeeTable);
-selectedRows(employeeTable);
-editingTable(employeeTable);
+sortingTable();
+selectedRows();
+editingTable();
 createForm();
+fillForm();
 
 const messagesArray = [
   {
@@ -30,8 +29,7 @@ const messagesArray = [
   },
   {
     title: 'ERROR',
-    description: 'Input value must contain only letters or '
-      + 'only one space between words.',
+    description: 'The name must contain only letters and one space',
     type: 'error',
   },
   {
@@ -49,10 +47,30 @@ const messagesArray = [
     description: 'Input value must not contain letters or symbols',
     type: 'error',
   },
+  {
+    title: 'SUCCESS',
+    description: 'New employee added to table',
+    type: 'success',
+  },
+  {
+    title: 'ERROR',
+    description: 'Name length must be more than 3 characters',
+    type: 'error',
+  },
+  {
+    title: 'ERROR',
+    description: 'Office not defined',
+    type: 'error',
+  },
+  {
+    title: 'ERROR',
+    description: 'Each field is required',
+    type: 'error',
+  },
 ];
 
-function sortingTable(table) {
-  const head = table.querySelector('thead');
+function sortingTable() {
+  const head = document.querySelector('thead');
 
   head.querySelectorAll('th').forEach((item) => {
     const spanElem = document.createElement('span');
@@ -99,8 +117,8 @@ function sortingTable(table) {
   });
 }
 
-function selectedRows(table) {
-  const rows = table.querySelector('tbody');
+function selectedRows() {
+  const rows = document.querySelector('tbody');
 
   rows.addEventListener('click', (eventFunc) => {
     for (const i of rows.children) {
@@ -120,7 +138,7 @@ function createForm() {
   <label>Position:<input type="text" name="position" data-qa="position"></label>
   <label>Office:
      <select name="office" data-qa="office">
-        <option value="Tokyo">choose an office</option>
+        <option value selected disabled>choose an office</option>
         <option value="Tokyo">Tokyo</option>
         <option value="Singapore">Singapore</option>
         <option value="London">London</option>
@@ -133,19 +151,23 @@ function createForm() {
   </label>
   <label>Salary:<input type="number" name="salary" data-qa="salary">
   </label>
-  <button type="submit">Save to table</button>
-  `;
-  document.body.insertBefore(form, document.body[1]);
+  <button type="submit">Save to table</button>`;
+  document.body.insertBefore(form, document.body.children[1]);
 }
 
-function editingTable(table) {
-  table.querySelector('tbody').addEventListener('dblclick', (eventFunc) => {
+function formatter(string) {
+  const numberFormat = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  });
+
+  return numberFormat.format(string).slice(0, -3);
+}
+
+function editingTable() {
+  document.querySelector('tbody').addEventListener('dblclick', (eventFunc) => {
     const memoryText = eventFunc.target.textContent;
     const numberColumn = eventFunc.target.cellIndex;
-    const formatter = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    });
 
     if (numberColumn === 0 || numberColumn === 1 || numberColumn === 3) {
       eventFunc.target.textContent = '';
@@ -192,7 +214,7 @@ function editingTable(table) {
 
       inputButton.innerHTML = `
       <select class="cell-input" style="color: black; font-weight: bold">
-            <option value="Default">choose an office</option>
+            <option value selected disabled>choose an office</option>
             <option value="Tokyo">Tokyo</option>
             <option value="Singapore">Singapore</option>
             <option value="London">London</option>
@@ -244,7 +266,7 @@ function editingTable(table) {
 
       inputButton.addEventListener('blur', () => {
         eventFunc.target.textContent
-          = formatter.format(inputButton.value).slice(0, -3);
+          = formatter(inputButton.value);
 
         if (tableErrorHandler(numberColumn, inputButton.value) === 0) {
           eventFunc.target.textContent = memoryText;
@@ -255,7 +277,7 @@ function editingTable(table) {
       inputButton.addEventListener('keypress', (eventEnter) => {
         if (eventEnter.key === 'Enter') {
           eventFunc.target.textContent
-            = formatter.format(inputButton.value).slice(0, -3);
+            = formatter(inputButton.value);
 
           if (tableErrorHandler(numberColumn, inputButton.value) === 0) {
             eventFunc.target.textContent = memoryText;
@@ -278,7 +300,8 @@ function notification(message) {
   element.classList.add('notification', message.type);
 
   element.innerHTML
-    = `<h2 class="title">${message.title}</h2><p>${message.description}</p>`;
+    = `<h2 class="title" data-qa="notification">${message.title}</h2>
+       <p>${message.description}</p>`;
   document.querySelector('body').append(element);
 
   setTimeout(function() {
@@ -346,6 +369,72 @@ function tableErrorHandler(columnNumber, value) {
   }
 
   notification(messagesArray[2]);
+
+  return 1;
+}
+
+function fillForm() {
+  const form = document.querySelector('form');
+
+  form.addEventListener('submit', (eventForm) => {
+    eventForm.preventDefault();
+
+    const data = new FormData(form);
+    const formData = Object.fromEntries(data.entries());
+    const newRowTable = document.createElement('tr');
+
+    newRowTable.innerHTML = `
+          <td>${formData.name}</td>
+          <td>${formData.position}</td>
+          <td>${formData.office}</td>
+          <td>${formData.age}</td>
+          <td>${formatter(formData.salary)}</td>`;
+
+    if (formErrorHandler(formData) === 1) {
+      document.querySelector('tbody').append(newRowTable);
+      document.querySelector('form').reset();
+    }
+  });
+}
+
+function formErrorHandler(objectOfForm) {
+  for (const key in objectOfForm) {
+    if (objectOfForm[key].length === 0 || objectOfForm[key].length
+      === undefined) {
+      notification(messagesArray[11]);
+
+      return 0;
+    }
+  }
+
+  if (objectOfForm.name.length < 4) {
+    notification(messagesArray[9]);
+
+    return 0;
+  }
+
+  if (objectOfForm.office === undefined) {
+    notification(messagesArray[10]);
+
+    return 0;
+  }
+
+  if (objectOfForm.age < 18 || objectOfForm.age > 90) {
+    notification(messagesArray[0]);
+
+    return 0;
+  }
+
+  const words = objectOfForm.name.split(' ');
+
+  for (const i of words) {
+    if (!i.match(/^[A-Za-z]+$/)) {
+      notification(messagesArray[4]);
+
+      return 0;
+    }
+  }
+  notification(messagesArray[8]);
 
   return 1;
 }
