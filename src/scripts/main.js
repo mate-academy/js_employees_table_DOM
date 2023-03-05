@@ -155,13 +155,13 @@ function createForm() {
   document.body.insertBefore(form, document.body.children[1]);
 }
 
-function formatter(string) {
+function formatter(stringOfNumber) {
   const numberFormat = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
   });
 
-  return numberFormat.format(string).slice(0, -3);
+  return numberFormat.format(stringOfNumber).slice(0, -3);
 }
 
 function editingTable() {
@@ -298,9 +298,10 @@ function notification(message) {
   const element = document.createElement('div');
 
   element.classList.add('notification', message.type);
+  element.setAttribute('data-qa', 'notification');
 
   element.innerHTML
-    = `<h2 class="title" data-qa="notification">${message.title}</h2>
+    = `<h2>${message.title}</h2>
        <p>${message.description}</p>`;
   document.querySelector('body').append(element);
 
@@ -399,8 +400,7 @@ function fillForm() {
 
 function formErrorHandler(objectOfForm) {
   for (const key in objectOfForm) {
-    if (objectOfForm[key].length === 0 || objectOfForm[key].length
-      === undefined) {
+    if (objectOfForm[key].length === 0 || objectOfForm[key] === undefined) {
       notification(messagesArray[11]);
 
       return 0;
