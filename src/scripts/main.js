@@ -307,14 +307,14 @@ const addEmployee = function(e) {
         <td>${inputSalary.value}</td>
     </tr>
     `);
+
+    dblClickListeners();
   }
 };
 
 submit.addEventListener('click', addEmployee);
 
 // editing of table cells by double-clicking
-
-const cells = document.querySelectorAll('td');
 
 const changeCell = function(e) {
   const inputCell = document.createElement('input');
@@ -402,7 +402,13 @@ const changeCell = function(e) {
   });
 };
 
-for (let i = 0; i < Array.from(cells).length; i++) {
-  Array.from(cells)[i].setAttribute('tabindex', `${i}`);
-  Array.from(cells)[i].addEventListener('dblclick', changeCell);
-}
+function dblClickListeners() {
+  const cells = document.querySelectorAll('td');
+
+  for (let i = 0; i < Array.from(cells).length; i++) {
+    Array.from(cells)[i].setAttribute('tabindex', `${i}`);
+    Array.from(cells)[i].addEventListener('dblclick', changeCell);
+  }
+};
+
+dblClickListeners();
