@@ -144,7 +144,7 @@ function AddToTable(e) {
   const EmployeeSalary = `$${newEmployeeSalary.toLocaleString('en-US')}`;
 
   if (newEmployeeName.trim() === '' || newEmployeeName.length < 4
-    || !isNaN(newEmployeeName)) {
+    || !isNaN(parseFloat(newEmployeeName))) {
     pushNotification('Warning',
       'The entered name must be at least 4 characters long', 'warning');
   } else if (newEmployeeAge < 18) {
@@ -154,7 +154,7 @@ function AddToTable(e) {
     pushNotification('Warning',
       'The employee must be no more than 90 years old', 'warning');
   } else if (newEmployeePosition.trim() === '' || newEmployeePosition.length < 2
-    || !isNaN(newEmployeePosition)) {
+    || !isNaN(parseFloat(newEmployeePosition))) {
     pushNotification('Warning',
       'The entered position must be at least 2 characters long', 'warning');
   } else {
@@ -263,6 +263,26 @@ tableBody.addEventListener('dblclick', (e) => {
 
       return;
     };
+
+    if (itemIndex === 0 && (newInput.value.trim() === ''
+      || newInput.value.length < 4
+      || !isNaN(parseFloat(newInput.value)))) {
+      pushNotification('Warning',
+        'The entered name must be at least 4 characters long', 'warning');
+      item.textContent = itemText;
+
+      return;
+    }
+
+    if (itemIndex === 1 && (newInput.value.trim() === ''
+      || newInput.value.length < 2
+      || !isNaN(parseFloat(newInput.value)))) {
+      pushNotification('Warning',
+        'The entered position must be at least 2 characters long', 'warning');
+      item.textContent = itemText;
+
+      return;
+    }
 
     if (!newInput.value) {
       item.textContent = itemText;
