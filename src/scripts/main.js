@@ -1,99 +1,94 @@
 'use strict';
 
 const table = document.querySelector('table');
-const body = document.querySelector('body');
-const listThead = [...table.children[0].children[0].children];
+const tHead = table.querySelector('thead');
+const tBody = table.querySelector('tbody');
 
-table.addEventListener('click', (e) => {
-  const listElements = [...table.children[1].children];
+let currSortIndex = null;
+let selRow = null;
 
-  if (!e.target.parentElement.classList.contains('active')) {
-    listElements.forEach(tr => tr.classList.remove('active'));
-  }
+const reverseTable = () => {
+  tBody.append(...([...tBody.rows].reverse()));
+};
 
-  if (e.target.tagName === 'TD') {
-    e.target.parentElement.classList.add('active');
-  }
+const sortTable = (sortIndex) => {
+  const sorted = [...tBody.rows].sort((a, b) => {
+    const aText = a.cells[sortIndex].innerText;
+    const bText = b.cells[sortIndex].innerText;
 
-  if (e.target.tagName === 'TH') {
-    let sortElements = '';
-    const index = e.target.cellIndex;
-    const tableCell = e.target.textContent;
-
-    if (!e.target.classList.contains(tableCell)) {
-      listThead.forEach(th => {
-        return th.classList
-          .remove('asc', 'Name', 'Position', 'Office', 'Age', 'Salary');
-      });
+    switch (sortIndex) {
+      case 0:
+      case 1:
+      case 2:
+        return +aText.localeCompare(bText);
+      case 3:
+        return +aText - +bText;
+      case 4:
+        return +aText.replace(/\W/g, '')
+          - +bText.replace(/\W/g, '');
+      default:
+        throw new Error('unexpected cell index');
     }
+  });
 
-    switch (tableCell) {
-      case 'Name':
-      case 'Position':
-      case 'Office':
-        e.target.classList.toggle('asc');
+  tBody.append(...sorted);
+};
 
-        sortElements = listElements.sort((a, b) => {
-          return a.children[index].textContent
-            .localeCompare(b.children[index].textContent);
-        });
+tHead.addEventListener('click', e => {
+  const i = e.target.cellIndex;
 
-        if (!e.target.classList.contains('asc')) {
-          sortElements.reverse();
-        };
+  if (i === currSortIndex) {
+    reverseTable();
 
-        e.target.classList.add(tableCell);
-        break;
-      case 'Age':
-        e.target.classList.toggle('asc');
-
-        sortElements = listElements.sort((a, b) => {
-          return (+a.children[index].textContent) - (+b
-            .children[index].textContent);
-        });
-
-        if (!e.target.classList.contains('asc')) {
-          sortElements.reverse();
-        };
-
-        e.target.classList.add(tableCell);
-        break;
-      case 'Salary':
-        e.target.classList.toggle('asc');
-
-        const convertToNumber = (value) => {
-          return +(value.children[index]
-            .textContent.split(',').join('').slice(1));
-        };
-
-        sortElements = listElements.sort((a, b) => {
-          return (convertToNumber(a)) - (convertToNumber(b));
-        });
-
-        if (!e.target.classList.contains('asc')) {
-          sortElements.reverse();
-        };
-
-        e.target.classList.add(tableCell);
-        break;
-    }
-    sortElements.forEach(el => table.children[1].appendChild(el));
+    return;
   }
+
+  sortTable(i);
+  currSortIndex = i;
+});
+
+const selectedRow = row => {
+  if (row === selRow) {
+    return;
+  }
+
+  // #region
+  if (selRow) {
+    selRow.classList.remove('active');
+  }
+
+  row.classList.add('active');
+  selRow = row;
+  // #endregion
+};
+
+tBody.addEventListener('click', e => {
+  const row = e.target.closest('tr');
+
+  if (!row) {
+    return;
+  }
+
+  selectedRow(row);
 });
 
 const form = document.createElement('form');
 
-form.classList.add('new-employee-form');
+form.className = 'new-employee-form';
 
 form.innerHTML = `
-  <label>Name:
+  <label>
+    Name:
     <input name="name" type="text" data-qa="name">
   </label>
-  <label>Position:
+
+  <label>
+    Position:
     <input name="position" type="text" data-qa="position">
   </label>
-  <label>Office:
-    <select name="office" data-qa="office">
+  <label>
+    Office:
+    <select name="office" data-qa="office" required>
       <option value="Tokyo">Tokyo</option>
       <option value="Singapore">Singapore</option>
       <option value="London">London</option>
@@ -102,135 +97,152 @@ form.innerHTML = `
       <option value="San Francisco">San Francisco</option>
     </select>
   </label>
-  <label>Age:
-    <input name="age" type="text" data-qa="age">
+  <label>
+    Age:
+    <input name="age" type="number" data-qa="age">
   </label>
-  <label>Salary:
-    <input name="salary" type="text" data-qa="salary">
+  <label>
+    Salary:
+    <input name="salary" type="number" data-qa="salary">
   </label>
-  <button>Save to table</button>
+  <button type="submit">Save to table</button>
 `;
 
-body.append(form);
+const pushNotification = (title, description, type) => {
+  const errorMessaage = document.createElement('div');
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  const data = new FormData(form);
-  const items = Object.fromEntries(data.entries());
-  const { name: nameEmployee, position, office, age, salary } = items;
-
-  for (const item in items) {
-    if (items[item] === '') {
-      pushNotification(450, 30, `Error ${item}`,
-        `Enter ${item}`, 'error');
-
-      return;
-    }
-  };
-
-  if (isNaN(+age)) {
-    pushNotification(450, 30, 'Error age',
-      'Age must be number', 'error');
-
-    return;
-  } else if (isNaN(+salary)) {
-    pushNotification(450, 30, 'Error age',
-      'Salary must be number', 'error');
-
-    return;
-  } else if (nameEmployee.length < 4) {
-    pushNotification(450, 30, 'Error name',
-      'Name has 4 letters or more.', 'error');
-
-    return;
-  } else if (age < 18) {
-    pushNotification(450, 30, 'Age field',
-      'The employee must be 18 years old', 'error');
-
-    return;
-  } else if (age > 90) {
-    pushNotification(450, 30, 'Age field',
-      'The employee must be under 90 years old', 'error');
-
-    return;
-  }
-
-  const sal = `$${salary.replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1,')}`;
-
-  const tr = document.createElement('tr');
-
-  tr.innerHTML = `
-    <td>${nameEmployee}</td>
-    <td>${position}</td>
-    <td>${office}</td>
-    <td>${age}</td>
-    <td>${sal}</td>
-  `;
-  table.children[1].append(tr);
-
-  pushNotification(450, 30, 'Add to table',
-    'Employee add to table', 'success');
-
-  document.querySelectorAll('input').forEach(input => {
-    input.value = '';
-  });
-});
-
-const pushNotification = (posTop, posRight, title, description, type) => {
-  const div = document.createElement('div');
-
-  div.className = `notification ${type}`;
-  div.setAttribute('data-qa', 'notification');
-  div.style.top = `${posTop}px`;
-  div.style.right = `${posRight}px`;
-
-  div.innerHTML = `
+  errorMessaage.innerHTML = `
     <h2 class="title">${title}</h2>
     <p>${description}</p>
   `;
 
-  body.insertBefore(div, body.lastChild);
+  errorMessaage.classList.add('notification', type);
+  errorMessaage.dataset.qa = 'notification';
 
-  setTimeout(() => div.remove(), 3000);
+  document.body.append(errorMessaage);
+
+  setTimeout(() => errorMessaage.remove(), 3000);
 };
 
-let cellInput = null;
+document.body.append(form);
 
-table.ondblclick = function(e) {
-  if (e.target.tagName !== 'TD') {
-    return;
-  }
+form.addEventListener('submit', e => {
+  e.preventDefault();
 
-  const target = e.target;
-  const text = e.target.textContent;
+  const data = new FormData(form);
 
-  editStart(target, text);
-};
+  for (const key of data.keys()) {
+    const inpVal = data.get(key);
 
-function editStart(target, text) {
-  target.innerHTML = `<input type="text" class="cell-input">`;
-  cellInput = document.querySelector('.cell-input');
+    if (!inpVal) {
+      pushNotification(
+        'Data Error',
+        `The ${key} field could not be ampty`,
+        'error'
+      );
 
-  cellInput.onkeyup = function(evt) {
-    if (evt.key === 'Enter') {
-      this.blur();
+      return;
     }
-  };
 
-  cellInput.onblur = function() {
-    editEnd(target, text);
-  };
+    switch (key) {
+      case 'name':
+        if (inpVal.length < 4) {
+          pushNotification(
+            'Data Error',
+            `Name should be no less than 4 letters long`,
+            'error'
+          );
 
-  target.replaceWith(cellInput);
-  cellInput.focus();
-}
+          return;
+        }
 
-function editEnd(target, text) {
-  if (cellInput.value === '') {
-    target.innerHTML = text;
-  } else {
-    target.innerHTML = cellInput.value;
+        break;
+
+      case 'age':
+        if (inpVal < 18 || inpVal > 90) {
+          pushNotification(
+            'Data Error',
+            `Age limit is between 18 and 90`,
+            'error'
+          );
+
+          return;
+        }
+
+        break;
+    }
   }
-  cellInput.replaceWith(target);
-}
+
+  const rowToAppend = document.createElement('tr');
+
+  rowToAppend.innerHTML = `
+    <td>${data.get('name')}</td>
+    <td>${data.get('position')}</td>
+    <td>${data.get('office')}</td>
+    <td>${data.get('age')}</td>
+    <td>${formatedSalary(data.get('salary'))}</td>
+  `;
+
+  tBody.append(rowToAppend);
+  form.reset();
+
+  pushNotification(
+    'Added!',
+    'New employee was added to the very and',
+    'success'
+  );
+});
+
+const formatedSalary = salaryNumber =>
+  '$' + Number(salaryNumber).toLocaleString('GB-en');
+
+tBody.addEventListener('dblclick', el => {
+  const cell = el.target;
+  const value = el.target.innerText;
+  const cellIndex = cell.cellIndex;
+  const cellInput = document.createElement('input');
+
+  cellInput.className = 'cell-input';
+
+  switch (cellIndex) {
+    case 0:
+    case 1:
+    case 2:
+      cellInput.setAttribute('type', 'text');
+      break;
+    case 3:
+    case 4:
+      cellInput.setAttribute('type', 'number');
+      break;
+    default:
+      throw new Error('Invalid cell index');
+  }
+
+  cell.innerHTML = '';
+  cell.append(cellInput);
+
+  cellInput.addEventListener('blur', () => {
+    let newData = cellInput.value;
+
+    if (cellIndex === 4) {
+      newData = formatedSalary(newData);
+    }
+
+    if (!cellInput.value || cellInput.value.trim() === '') {
+      newData = value;
+    }
+
+    cell.innerHTML = newData;
+
+    cellInput.value = '';
+    cellInput.remove();
+  });
+
+  cellInput.addEventListener('keydown', element => {
+    if (element.key === 'Enter') {
+      cellInput.blur();
+    }
+  });
+
+  cellInput.focus();
+});
