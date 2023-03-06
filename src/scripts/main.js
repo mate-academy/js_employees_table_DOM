@@ -13,7 +13,7 @@ const updateRows = () => [...document.querySelector('tbody').children];
 
 const updateCells = () => [...document.querySelectorAll('td')];
 
-const createNotification = (type, title, description) => {
+const pushNotification = (type, title, description) => {
   const notification = document.createElement('div');
 
   notification.className = 'notification';
@@ -26,10 +26,6 @@ const createNotification = (type, title, description) => {
   `;
 
   document.body.append(notification);
-};
-
-const pushNotification = createNotificationFunc => {
-  createNotificationFunc;
 
   setTimeout(() => {
     document.body.removeChild(document.querySelector('.notification'));
@@ -43,64 +39,71 @@ const saveCell = cell => {
   if (!input.value.length) {
     cell.innerText = initialValue;
   } else {
-    // Name configuration
-    if (cell.cellIndex === 0) {
-      if (input.value.length < 4) {
-        pushNotification(
-          createNotification(
+    switch (cell.cellIndex) {
+      // Name configuration
+      case 0:
+        if (input.value.length < 4) {
+          pushNotification(
             'error',
             'Error',
             'Name should have at least 4 letters'
-          )
-        );
+          );
 
-        cell.innerText = initialValue;
-      } else {
-        cell.innerText = input.value;
-      }
-      // Age configuration
-    } else if (cell.cellIndex === 3) {
-      if (input.value < 18 || input.value > 90) {
-        pushNotification(
-          createNotification(
+          cell.innerText = initialValue;
+        } else {
+          cell.innerText = input.value;
+        }
+
+        break;
+        // Age configuration
+      case 3:
+        if (input.value < 18 || input.value > 90) {
+          pushNotification(
             'error',
             'Error',
             'Age should be between 18 and 90'
-          )
-        );
+          );
 
-        cell.innerText = initialValue;
-      } else if (isNaN(input.value)) {
-        pushNotification(
-          createNotification(
+          cell.innerText = initialValue;
+        } else if (isNaN(input.value)) {
+          pushNotification(
             'error',
             'Error',
             'Age cannot be string'
-          )
-        );
+          );
 
-        cell.innerText = initialValue;
-      } else {
-        cell.innerText = input.value;
-      }
-      // Salary configuration
-    } else if (cell.cellIndex === 4) {
-      if (isNaN(input.value)) {
-        pushNotification(
-          createNotification(
+          cell.innerText = initialValue;
+        } else {
+          cell.innerText = input.value;
+        }
+
+        break;
+        // Salary configuration
+      case 4:
+        if (isNaN(input.value)) {
+          pushNotification(
             'error',
             'Error',
             'Salary cannot be string'
-          )
-        );
+          );
 
-        cell.innerText = initialValue;
-      } else {
-        cell.innerText
-          = '$' + Math.ceil(input.value).toLocaleString('en-US');
-      }
-    } else {
-      cell.innerText = input.value;
+          cell.innerText = initialValue;
+        } else if (input.value < 0) {
+          pushNotification(
+            'error',
+            'Error',
+            'Salary cannot be lower than 0'
+          );
+
+          cell.innerText = initialValue;
+        } else {
+          cell.innerText
+                = '$' + Math.ceil(input.value).toLocaleString('en-US');
+        }
+
+        break;
+
+      default: cell.innerText = input.value;
     }
   }
 
@@ -111,7 +114,7 @@ const saveCell = cell => {
   cell = null;
 };
 
-const cellConfig = () => {
+const configureCells = () => {
   cells.forEach(cell => {
     cell.addEventListener('dblclick', e => {
       selectedCell = e.target;
@@ -178,13 +181,8 @@ table.addEventListener('click', e => {
       rows.forEach(row => tbody.append(row));
     };
 
-    if (headerClicked) {
-      sort(rows, false);
-      headerClicked = false;
-    } else {
-      sort(rows);
-      headerClicked = true;
-    }
+    sort(rows, !headerClicked);
+    headerClicked = !headerClicked;
   }
 
   if (e.target.tagName === 'TD') {
@@ -242,47 +240,43 @@ const form = document.querySelector('.new-employee-form');
 button.addEventListener('click', e => {
   e.preventDefault();
 
-  if (positionInput.value === ''
-    || age.value === ''
-    || salary.value === '') {
+  if (!positionInput.value.trim()
+    || !age.value.trim()
+    || !salary.value.trim()) {
     pushNotification(
-      createNotification(
-        'error',
-        'Error',
-        'All fields should be filled'
-      )
+      'error',
+      'Error',
+      'All fields should be filled'
     );
 
     return;
-  } else if (nameInput.value.length < 4) {
-    pushNotification(
-      createNotification(
-        'error',
-        'Error',
-        'Name should have at least 4 letters'
-      )
-    );
-
-    return;
-  } else if (age.value < 18 || age.value > 90) {
-    pushNotification(
-      createNotification(
-        'error',
-        'Error',
-        'Age should be between 18 and 90'
-      )
-    );
-
-    return;
-  } else {
-    pushNotification(
-      createNotification(
-        'success',
-        'Success',
-        'New employee was successfully added'
-      )
-    );
   }
+
+  if (nameInput.value.length < 4) {
+    pushNotification(
+      'error',
+      'Error',
+      'Name should have at least 4 letters'
+    );
+
+    return;
+  }
+
+  if (age.value < 18 || age.value > 90) {
+    pushNotification(
+      'error',
+      'Error',
+      'Age should be between 18 and 90'
+    );
+
+    return;
+  }
+
+  pushNotification(
+    'success',
+    'Success',
+    'New employee was successfully added'
+  );
 
   const newRow = document.createElement('tr');
   const officeValue = office.value;
@@ -299,10 +293,10 @@ button.addEventListener('click', e => {
   tbody.appendChild(newRow);
   rows = updateRows();
   cells = updateCells();
-  cellConfig();
+  configureCells();
   form.reset();
 });
 
 let selectedCell = null;
 
-cellConfig();
+configureCells();
