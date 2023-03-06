@@ -222,7 +222,7 @@ function validation(e) {
   if (emplName.length < 4) {
     pushNotification(
       'Error',
-      "Oops, something wasn't right\n " + 'Please enter valid data',
+      'Oops, short name\n ' + 'Please enter valid data',
       'error'
     );
 
@@ -232,7 +232,7 @@ function validation(e) {
   if (!isNaN(Number(emplName))) {
     pushNotification(
       'Error',
-      "Oops, something wasn't right\n " + 'Please enter valid data',
+      'Oops, wrong name\n ' + 'Please enter valid data',
       'error'
     );
 
@@ -242,7 +242,7 @@ function validation(e) {
   if (position.length < 2) {
     pushNotification(
       'Error',
-      "Oops, something wasn't right\n " + 'Please enter valid data',
+      'Oops, short position name\n ' + 'Please enter valid data',
       'error'
     );
 
@@ -252,7 +252,7 @@ function validation(e) {
   if (!isNaN(Number(position))) {
     pushNotification(
       'Error',
-      "Oops, something wasn't right\n " + 'Please enter valid data',
+      'Oops, wrong position name\n ' + 'Please enter valid data',
       'error'
     );
 
@@ -262,7 +262,8 @@ function validation(e) {
   if (age < 18 || age > 90) {
     pushNotification(
       'Error',
-      "Oops, something wasn't right\n " + 'Please enter the valid data',
+      "Oops, something wasn't right with age\n "
+      + 'Please enter the valid data',
       'error'
     );
 
@@ -272,7 +273,7 @@ function validation(e) {
   if (!salary) {
     pushNotification(
       'Error',
-      "Oops, something wasn't right\n " + 'Please enter the valid data',
+      "Oops, something wasn't right\n " + 'Please enter the salary',
       'error'
     );
 
@@ -339,7 +340,7 @@ function editing(e) {
     if (ev.code === 'Enter') {
       if (newInput.value) {
         switch (true) {
-          case !Number(newInputValue) && salaryToNumber(newInputValue):
+          case !Number(targetValue) && newInput.type === 'number':
             newInputValue = Number(newInput.value)
               .toLocaleString('es-US', {
                 style: 'currency',
@@ -350,7 +351,7 @@ function editing(e) {
 
           case newInput.type === 'text':
             newInputValue
-                  = newInput.value[0].toUpperCase() + newInput.value.slice(1);
+              = newInput.value[0].toUpperCase() + newInput.value.slice(1);
             break;
 
           default:
