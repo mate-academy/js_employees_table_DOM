@@ -132,7 +132,7 @@ form.addEventListener('submit', e => {
   const data = new FormData(form);
 
   for (const key of data.keys()) {
-    const inpVal = data.get(key);
+    const inpVal = data.get(key).trim();
 
     if (!inpVal) {
       pushNotification(
