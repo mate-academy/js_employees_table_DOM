@@ -83,21 +83,25 @@ function sortingTable() {
 
   head.addEventListener('click', (eventFunc) => {
     const cellNumber = eventFunc.target.cellIndex;
+
     const asc = ' \u25BC';
     const desc = ' \u25B2';
+
     const convert = (stringNumber) => {
       return Number(stringNumber.toLocaleString().replace(/\D/g, ''));
     };
-    const compareVariables = (aa, bb) => {
-      let a = aa.children[cellNumber].textContent.toUpperCase();
-      let b = bb.children[cellNumber].textContent.toUpperCase();
 
-      if (convert(a) > 0) {
-        a = (convert(a));
-        b = (convert(b));
+    const compareVariables = (a, b) => {
+      let firstNumber = a.children[cellNumber].textContent.toUpperCase();
+      let secondNumber = b.children[cellNumber].textContent.toUpperCase();
+
+      if (convert(firstNumber) > 0) {
+        firstNumber = (convert(firstNumber));
+        secondNumber = (convert(secondNumber));
       }
 
-      return a < b ? arrCompare[cellNumber] : arrCompare[cellNumber] * (-1);
+      return firstNumber < secondNumber ? arrCompare[cellNumber]
+        : arrCompare[cellNumber] * (-1);
     };
 
     document.querySelectorAll('span').forEach((element) => {
@@ -111,9 +115,12 @@ function sortingTable() {
     head.querySelectorAll('span')[cellNumber]
       .textContent = arrCompare[cellNumber] === 1 ? asc : desc;
 
+    const sortedList = [...document.querySelector('tbody')
+      .children].sort((a, b) =>
+      compareVariables(a, b));
+
     document.querySelector('tbody')
-      .append(...[...document.querySelector('tbody').children].sort((a, b) =>
-        compareVariables(a, b)));
+      .append(...sortedList);
   });
 }
 
@@ -121,8 +128,8 @@ function selectedRows() {
   const rows = document.querySelector('tbody');
 
   rows.addEventListener('click', (eventFunc) => {
-    for (const i of rows.children) {
-      i.removeAttribute('class');
+    for (const children of rows.children) {
+      children.removeAttribute('class');
     }
     eventFunc.target.parentElement.classList.add('active');
   });
@@ -318,16 +325,8 @@ function tableErrorHandler(columnNumber, value) {
   }
 
   if (columnNumber === 3) {
-    if (value > 90 || value < 18) {
+    if (value > 90 || value < 18 || !value.match(/^\d*\d*$/)) {
       notification(messagesArray[0]);
-
-      return 0;
-    }
-  }
-
-  if (columnNumber === 3) {
-    if (!value.match(/^\d*\d*$/)) {
-      notification(messagesArray[1]);
 
       return 0;
     }
@@ -343,9 +342,7 @@ function tableErrorHandler(columnNumber, value) {
         return 0;
       }
     }
-  }
 
-  if (columnNumber === 0) {
     if (value.length < 4) {
       notification(messagesArray[5]);
 
@@ -359,9 +356,7 @@ function tableErrorHandler(columnNumber, value) {
 
       return 0;
     }
-  }
 
-  if (columnNumber === 4) {
     if (!value.match(/^\d*\d*$/)) {
       notification(messagesArray[7]);
 
