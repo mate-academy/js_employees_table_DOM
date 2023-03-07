@@ -1,69 +1,5 @@
 'use strict';
 
-const tBody = document.querySelector('tbody');
-const arraySpecialists = [...tBody.children];
-const totalTh = document.querySelectorAll('th');
-const elementsTotal = [...totalTh].slice(0, 5);
-let count = 1;
-
-for (let i = 0; i < elementsTotal.length; i++) {
-  elementsTotal[i].id = [i];
-}
-
-const sortTable = (e) => {
-  arraySpecialists.sort((a, b) => {
-    const itemA = a.cells[e.target.id].innerText;
-    const itemB = b.cells[e.target.id].innerText;
-
-    if (count % 2 !== 0) {
-      switch (e.target.innerText) {
-        case 'Name':
-        case 'Position':
-        case 'Office':
-          return itemA.localeCompare(itemB);
-        case 'Age':
-          return itemA - itemB;
-        case 'Salary':
-          return parseInt(itemA.slice(1))
-          - parseInt(itemB.slice(1));
-      }
-    } else {
-      switch (e.target.innerText) {
-        case 'Name':
-        case 'Position':
-        case 'Office':
-          return itemB.localeCompare(itemA);
-        case 'Age':
-          return itemB - itemA;
-        case 'Salary':
-          return parseInt(itemB.slice(1))
-          - parseInt(itemA.slice(1));
-      }
-    }
-  });
-  count++;
-
-  return tBody.append(...arraySpecialists);
-};
-
-for (const element of elementsTotal) {
-  element.addEventListener('click', sortTable);
-}
-
-for (let i = 0; i < arraySpecialists.length; i++) {
-  arraySpecialists[i].addEventListener('click', (e) => {
-    const childHaveActive = arraySpecialists.find(child =>
-      child.classList.contains('active') === true
-    );
-
-    if (childHaveActive) {
-      childHaveActive.classList.remove('active');
-    }
-
-    arraySpecialists[i].classList.add('active');
-  });
-};
-
 document.body.insertAdjacentHTML('beforeend', `
   <form action="/" method="get" class="new-employee-form">
     <label>
@@ -103,6 +39,7 @@ document.body.insertAdjacentHTML('beforeend', `
   </form>
 `);
 
+const tBody = document.querySelector('tbody');
 const form = document.forms[0];
 const select = form.querySelector('[data-qa="office"]');
 
@@ -166,4 +103,73 @@ form.addEventListener('submit', (e) => {
     'success', 'Good!!!', 'New employee is successfully added to the table'
   );
   e.target.reset();
+});
+
+// const arraySpecialists = [...tBody.children];
+const totalTh = document.querySelectorAll('th');
+const elementsTotal = [...totalTh].slice(0, 5);
+let count = 1;
+
+for (let i = 0; i < elementsTotal.length; i++) {
+  elementsTotal[i].id = [i];
+}
+
+const sortTable = (e) => {
+  const arraySpecialists = [...tBody.children];
+
+  arraySpecialists.sort((a, b) => {
+    const itemA = a.cells[e.target.id].innerText;
+    const itemB = b.cells[e.target.id].innerText;
+
+    if (count % 2 !== 0) {
+      switch (e.target.innerText) {
+        case 'Name':
+        case 'Position':
+        case 'Office':
+          return itemA.localeCompare(itemB);
+        case 'Age':
+          return itemA - itemB;
+        case 'Salary':
+          return parseInt(itemA.slice(1))
+          - parseInt(itemB.slice(1));
+      }
+    } else {
+      switch (e.target.innerText) {
+        case 'Name':
+        case 'Position':
+        case 'Office':
+          return itemB.localeCompare(itemA);
+        case 'Age':
+          return itemB - itemA;
+        case 'Salary':
+          return parseInt(itemB.slice(1))
+          - parseInt(itemA.slice(1));
+      }
+    }
+  });
+  count++;
+
+  arraySpecialists.forEach((elem, i) => {
+    elem.innerHTML = arraySpecialists[i].innerHTML;
+  });
+
+  tBody.append(...arraySpecialists);
+};
+
+for (const element of elementsTotal) {
+  element.addEventListener('click', sortTable);
+}
+
+// const arraySpecialists = [...tBody.children];
+
+let special;
+
+tBody.addEventListener('click', (e) => {
+  if (special) {
+    special.classList.remove('active');
+    special.removeAttribute('class');
+  }
+
+  special = e.target.parentElement;
+  e.target.parentElement.classList.add('active');
 });
