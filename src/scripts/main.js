@@ -80,13 +80,7 @@ function showNotification(type, title, text) {
 
   const notification = document.querySelector('.notification');
 
-  if (type === 'success') {
-    notification.classList.add('success');
-  };
-
-  if (type === 'error') {
-    notification.classList.add('error');
-  }
+  notification.classList.add(type);
 
   setTimeout(() => {
     notification.remove();
@@ -102,7 +96,7 @@ form.name.addEventListener('submit', e => {
 });
 
 form.name.addEventListener('change', e => {
-  if (!form.name.validity.valid) {
+  if (!form.name.validity.valid || !form.name.value.trim()) {
     showNotification(
       'error', 'Incorrect name', 'Name length should be at least 4 letters'
     );
@@ -110,7 +104,7 @@ form.name.addEventListener('change', e => {
 });
 
 form.age.addEventListener('submit', e => {
-  if (!form.age.validity.valid) {
+  if (!form.age.validity.valid || !form.name.value.trim()) {
     form.age.setCustomValidity(
       'Error! Your age must be from 18 to 90 years'
     );
@@ -127,11 +121,16 @@ form.age.addEventListener('change', e => {
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-  createRow();
 
-  showNotification(
-    'success', 'Successful!', 'New employee is successfully added to the table'
-  );
+  if (form.name.value.trim()) {
+    createRow();
+
+    showNotification(
+      'success',
+      'Successful!',
+      'New employee is successfully added to the table'
+    );
+  }
 
   e.target.reset();
 });
@@ -169,8 +168,9 @@ tbody.addEventListener('dblclick', (e) => {
 
   targetInput.addEventListener('blur', eventBlur => {
     if (validScheme.name(targetInput.value)
-      || validScheme.age(targetInput.value
-      || validScheme.salary(targetInput.value))) {
+      || validScheme.age(targetInput.value)
+      || validScheme.salary(targetInput.value)
+      || !targetInput.value.trim()) {
       item.removeChild(targetInput);
 
       if (targetInput.value.toLowerCase() === targetInput.value.toUpperCase()
