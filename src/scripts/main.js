@@ -3,7 +3,6 @@
 const table = document.querySelector('table');
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
-const employeeList = tbody.querySelectorAll('tr');
 const thList = thead.querySelectorAll('th');
 const form = document.createElement('form');
 const formHtml = `
@@ -69,7 +68,8 @@ function setOrderTrue(arr) {
   });
 }
 
-function sortList(e) {
+function sortColumn(e) {
+  const employeeList = tbody.querySelectorAll('tr');
   const columnIndex = e.target.cellIndex;
   const currCol = e.target;
   const falseList = thead.querySelectorAll('[data-asc-order="false"]');
@@ -80,28 +80,28 @@ function sortList(e) {
 
     currCol.dataset.ascOrder = false;
 
-    sortedArr = [...employeeList].sort((employee1, employee2) => {
-      const data1 = formatSalary(employee1, columnIndex);
-      const data2 = formatSalary(employee2, columnIndex);
+    sortedArr = [...employeeList].sort((currEmployee, nextEmployee) => {
+      const currData = formatSalary(currEmployee, columnIndex);
+      const nextData = formatSalary(nextEmployee, columnIndex);
 
-      if (Number(data1)) {
-        return data1 - data2;
+      if (Number(currData)) {
+        return currData - nextData;
       }
 
-      return data1.localeCompare(data2);
+      return currData.localeCompare(nextData);
     });
   } else {
     setOrderTrue([...falseList]);
 
-    sortedArr = [...employeeList].sort((employee1, employee2) => {
-      const data1 = formatSalary(employee1, columnIndex);
-      const data2 = formatSalary(employee2, columnIndex);
+    sortedArr = [...employeeList].sort((currEmployee, nextEmployee) => {
+      const currData = formatSalary(currEmployee, columnIndex);
+      const nextData = formatSalary(nextEmployee, columnIndex);
 
-      if (Number(data1)) {
-        return data2 - data1;
+      if (Number(currData)) {
+        return nextData - currData;
       }
 
-      return data2.localeCompare(data1);
+      return nextData.localeCompare(currData);
     });
   }
 
@@ -109,17 +109,15 @@ function sortList(e) {
 }
 
 function selectRow(e) {
-  const isActive = tbody.querySelector('.active');
+  const activeRow = tbody.querySelector('.active');
   const targetRow = e.target.closest('tr');
 
-  if ([...targetRow.classList].includes('active')) {
-    isActive.classList.remove('active');
-
-    return;
+  if (![...targetRow.classList].includes('active')) {
+    targetRow.classList.add('active');
   }
 
-  if (isActive) {
-    isActive.classList.remove('active');
+  if (activeRow) {
+    activeRow.classList.remove('active');
   }
 
   targetRow.classList.add('active');
@@ -243,7 +241,7 @@ function inputText(e) {
 }
 
 setOrderTrue([...thList]);
-thead.addEventListener('click', sortList);
+thead.addEventListener('click', sortColumn);
 tbody.addEventListener('click', selectRow);
 submit.addEventListener('click', addEmployee);
 tbody.addEventListener('dblclick', inputText);
