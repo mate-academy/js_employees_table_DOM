@@ -282,13 +282,13 @@ const dbClickHandler = (clickEvent) => {
     const text = editCell.textContent;
     const input = document.createElement('input');
     const cellStyles = getComputedStyle(editCell);
-    
+
     input.style.width = cellStyles.width;
     input.value = text;
     input.className = 'cell-input';
-    input.focus();
     editCell.textContent = '';
     editCell.append(input);
+    input.focus();
 
     const saveInputValue = e => {
       if (e.key === 'Enter' || e.type === 'blur') {
