@@ -132,7 +132,7 @@ button.addEventListener('click', (inputEvent) => {
   const salaryFinalString = '$' + salary.value.slice(0, -3) + ','
   + salary.value.slice(-3);
 
-  if (checkPerson(inputName.value.length, +age.value) === true) {
+  if (checkPerson(inputName.value.length, +age.value)) {
     const tr = document.createElement('tr');
     const tdName = document.createElement('td');
 
@@ -175,7 +175,7 @@ button.addEventListener('click', (inputEvent) => {
 bd.addEventListener('click', () => {
   const activeElement = document.querySelector('.active');
 
-  if (activeElement !== null) {
+  if (activeElement) {
     activeElement.classList.remove('active');
   }
 });
@@ -185,7 +185,7 @@ tbody[0].addEventListener('click', (selectEvent) => {
 
   const activeElement = document.querySelector('.active');
 
-  if (activeElement !== null) {
+  if (activeElement) {
     activeElement.classList.remove('active');
   }
   selectEvent.target.parentNode.className = 'active';
@@ -220,7 +220,7 @@ tbody[0].addEventListener('dblclick', (inputFieldEvent) => {
 
     data = input.value;
 
-    if (data.length === 0) {
+    if (!data.length) {
       inputFieldEvent.target.innerText = oldData;
     } else {
       inputFieldEvent.target.innerText = data;
@@ -241,7 +241,7 @@ tbody[0].addEventListener('dblclick', (inputFieldEvent) => {
 // SORT SECTION
 
 columns.addEventListener('click', () => {
-  if (counter[event.target.innerText] === true) {
+  if (counter[event.target.innerText]) {
     sortDesc(headers.indexOf(event.target), event.target.innerText);
   } else {
     sortColumn(headers.indexOf(event.target), event.target.innerText);
