@@ -212,11 +212,13 @@ tbody[0].addEventListener('dblclick', (inputFieldEvent) => {
   oldData = inputFieldEvent.target.innerText;
   inputFieldEvent.target.innerText = '';
   inputFieldEvent.target.appendChild(input);
-  let num = [...event.target.parentNode.children]
-  let newInp = document.querySelector('input')
-  if(num.indexOf(newInp.parentNode) === 3 ||
-  num.indexOf(newInp.parentNode) === 4) {
-    input.type = 'number'
+
+  const num = [...event.target.parentNode.children];
+  const newInp = document.querySelector('input');
+
+  if (num.indexOf(newInp.parentNode) === 3
+  || num.indexOf(newInp.parentNode) === 4) {
+    input.type = 'number';
   }
   input.focus();
 
@@ -232,7 +234,7 @@ tbody[0].addEventListener('dblclick', (inputFieldEvent) => {
     }
   }
 
-  // input.addEventListener('blur', inputHandler);
+  input.addEventListener('blur', inputHandler);
 
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
