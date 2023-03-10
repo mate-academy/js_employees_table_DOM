@@ -9,12 +9,18 @@ document.body.insertAdjacentHTML('beforeend', `
         type="text"
         data-qa="name"
         minlength="4"
+        pattern="[A-Za-zа-яёА-ЯЁ0-9]{4,30}"
         required
       >
     </label>
     <label>
       Position:
-      <input name="position" type="text" data-qa="position" required>
+      <input
+      name="position"
+      type="text"
+      data-qa="position"
+      pattern="[A-Za-zа-яёА-ЯЁ0-9]{4,30}"
+      required>
     </label>
     <label for="office">
       Office:
@@ -33,19 +39,20 @@ document.body.insertAdjacentHTML('beforeend', `
     </label>
     <label>
       Salary:
-      <input name="salary" type="number" data-qa="salary" required>
+      <input name="salary" type="number" data-qa="salary" min="1"required>
     </label>
     <button type="submit"> Save to table </button>
   </form>
 `);
 
+const thead = document.querySelector('thead');
 const tBody = document.querySelector('tbody');
 const form = document.forms[0];
 const select = form.querySelector('[data-qa="office"]');
 
 const createRow = (...arr) => {
-  const nameField = form.name.value;
-  const positionField = form.position.value;
+  const nameField = form.name.value.trim();
+  const positionField = form.position.value.trim();
   const officeField = select.value;
   const ageField = form.age.value;
   const salaryField = parseFloat(form.salary.value);
@@ -79,8 +86,16 @@ function showNotification(type, title, text) {
   }, 5000);
 }
 
-form.name.addEventListener('change', e => {
+form.name.addEventListener('submit', e => {
   if (!form.name.validity.valid) {
+    form.name.setCustomValidity(
+      'Error! Less 4 letters are entered in the field'
+    );
+  }
+});
+
+form.name.addEventListener('change', e => {
+  if (!form.name.validity.valid && form.name.innerText.trim().length < 4) {
     showNotification(
       'error', 'Incorrect name', 'Name length should be at least 4 letters'
     );
@@ -105,62 +120,41 @@ form.addEventListener('submit', (e) => {
   e.target.reset();
 });
 
-// const arraySpecialists = [...tBody.children];
-const totalTh = document.querySelectorAll('th');
-const elementsTotal = [...totalTh].slice(0, 5);
-let count = 1;
+let toggleSwitch = true;
 
-for (let i = 0; i < elementsTotal.length; i++) {
-  elementsTotal[i].id = [i];
-}
+thead.addEventListener('click', (e) => {
+  const item = e.target;
+  const cellIndex = item.cellIndex;
 
-const sortTable = (e) => {
-  const arraySpecialists = [...tBody.children];
+  let data = [...tBody.children];
 
-  arraySpecialists.sort((a, b) => {
-    const itemA = a.cells[e.target.id].innerText;
-    const itemB = b.cells[e.target.id].innerText;
+  data.sort((a, b) => {
+    const contentA = a.cells[cellIndex].textContent;
+    const contentB = b.cells[cellIndex].textContent;
 
-    if (count % 2 !== 0) {
-      switch (e.target.innerText) {
-        case 'Name':
-        case 'Position':
-        case 'Office':
-          return itemA.localeCompare(itemB);
-        case 'Age':
-          return itemA - itemB;
-        case 'Salary':
-          return parseInt(itemA.slice(1))
-          - parseInt(itemB.slice(1));
-      }
+    if (contentA.toUpperCase() !== contentA.toLowerCase()) {
+      return contentA.localeCompare(contentB);
+    }
+
+    if (parseInt(contentA)) {
+      return contentA - contentB;
     } else {
-      switch (e.target.innerText) {
-        case 'Name':
-        case 'Position':
-        case 'Office':
-          return itemB.localeCompare(itemA);
-        case 'Age':
-          return itemB - itemA;
-        case 'Salary':
-          return parseInt(itemB.slice(1))
-          - parseInt(itemA.slice(1));
-      }
+      return parseInt(contentA.slice(1)) - parseInt(contentB.slice(1));
     }
   });
-  count++;
 
-  arraySpecialists.forEach((elem, i) => {
-    elem.innerHTML = arraySpecialists[i].innerHTML;
+  if (!toggleSwitch) {
+    data = data.reverse();
+  }
+
+  toggleSwitch = !toggleSwitch;
+
+  data.forEach((elem, i) => {
+    elem.innerHTML = data[i].innerHTML;
   });
 
-  tBody.append(...arraySpecialists);
-};
-
-for (const element of elementsTotal) {
-  element.addEventListener('click', sortTable);
-}
-
-// const arraySpecialists = [...tBody.children];
+  tBody.append(...data);
+});
 
 let special;
 
