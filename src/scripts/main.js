@@ -151,9 +151,9 @@ form.addEventListener('submit', (e) => {
     pushNotification('error', 'Fill in all the fields', 'error');
 
     return;
-  } else {
-    pushNotification('success', 'New person added', 'success');
   }
+
+  pushNotification('success', 'New person added', 'success');
 
   list.insertAdjacentHTML('beforeend', `
     <tr>
@@ -193,13 +193,9 @@ list.addEventListener('dblclick', (e) => {
   field.focus();
 
   field.addEventListener('blur', () => {
-    if (field.value.length === 0) {
-      item.innerHTML = itemValue;
-    } else {
-      field.dataset.qa === 'salary'
-        ? item.innerHTML = getSalary(field.value)
-        : item.innerHTML = field.value;
-    }
+    field.value.length === 0
+      ? item.innerHTML = itemValue
+      : item.innerHTML = field.value;
 
     if (field.name === 'name'
       && field.value.length < 4
@@ -213,6 +209,10 @@ list.addEventListener('dblclick', (e) => {
       && field.value.length > 0) {
       pushNotification('error', 'Invalid age. Range 18-80', 'error');
       item.innerHTML = itemValue;
+    }
+
+    if (field.dataset.qa === 'salary' && field.value.length > 0) {
+      item.innerHTML = getSalary(field.value);
     }
   });
 
