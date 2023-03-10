@@ -143,11 +143,13 @@ const pushNotification = (title, message, result) => {
   notificationTitle.textContent = title;
   notificationMessage.textContent = message;
 
+  notificationTitle.classList.add('title');
   notification.classList.add('notification', result);
   notification.dataset.qa = 'notification';
 
   notification.style.cssText = `
     position: static;
+    border: 1px solid transparent;
   `;
 
   notification.append(
@@ -294,7 +296,7 @@ const dbClickHandler = (clickEvent) => {
       if (e.key === 'Enter' || e.type === 'blur') {
         editCell.textContent = input.value;
 
-        if (input.value.trim() === '') {
+        if (!input.value.trim()) {
           editCell.textContent = text;
         }
 
