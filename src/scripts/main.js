@@ -68,8 +68,8 @@ const formSubmitHandler = (e) => {
   let message = 'New employee has been added to the table';
   let result = 'success';
 
-  employeeName.textContent = form.name.value;
-  employeePosition.textContent = form.position.value;
+  employeeName.textContent = form.name.value.trim();
+  employeePosition.textContent = form.position.value.trim();
   employeeOffice.textContent = form.office.value;
   employeeAge.textContent = form.age.value;
 
