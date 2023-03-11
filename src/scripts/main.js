@@ -1,5 +1,11 @@
 'use strict';
 
+const validField = {
+  name: (value) => value.length > 4,
+  age: (value) => value > 18 || value < 90,
+  salary: (value) => `$${value}`,
+};
+
 document.body.insertAdjacentHTML('beforeend', `
   <form action="/" method="get" class="new-employee-form">
     <label>
@@ -118,6 +124,48 @@ form.addEventListener('submit', (e) => {
     'success', 'Good!!!', 'New employee is successfully added to the table'
   );
   e.target.reset();
+});
+
+tBody.addEventListener('dblclick', (e) => {
+  const item = e.target;
+  const targetCell = item.cellIndex;
+  const prevValue = item.innerText;
+  const normValue = prevValue.replace(/[$,]/g, '');
+  const targetInput
+    = form.querySelectorAll('[data-qa]')[targetCell].cloneNode(true);
+
+  targetInput.classList.add('cell-input');
+  targetInput.value = normValue;
+  item.firstChild.replaceWith(targetInput);
+  targetInput.focus();
+
+  targetInput.addEventListener('keypress', eventKey => {
+    if (eventKey.key === 'Enter') {
+      targetInput.blur();
+    }
+  });
+
+  targetInput.addEventListener('blur', eventBlur => {
+    if (validField.name(targetInput.value)
+      || validField.age(targetInput.value
+      || validField.salary(targetInput.value))) {
+      item.removeChild(targetInput);
+
+      if (targetInput.value.toLowerCase() === targetInput.value.toUpperCase()
+        && targetInput.value.length > 2) {
+        const numb = +targetInput.value;
+
+        item.textContent = `$${numb.toLocaleString('en-US')}`;
+      } else {
+        item.textContent = targetInput.value;
+      }
+
+      return;
+    }
+
+    item.removeChild(targetInput);
+    item.textContent = prevValue;
+  });
 });
 
 let toggleSwitch = true;
