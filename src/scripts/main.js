@@ -83,16 +83,22 @@ form.addEventListener('submit', (e) => {
     );
   } else {
     for (const inputValue in inputValues) {
-      if (inputValue === 'name' || inputValue === 'position') {
-        td.textContent = inputValues[inputValue].charAt(0).toUpperCase()
-        + inputValues[inputValue].slice(1, inputValues[inputValue].length);
-        newTr.append(td.cloneNode(true));
-      } else if (inputValue === 'salary') {
-        td.textContent = toCashString(inputValues[inputValue].toString());
-        newTr.append(td.cloneNode(true));
-      } else {
-        td.textContent = inputValues[inputValue];
-        newTr.append(td.cloneNode(true));
+      switch (inputValue) {
+        case 'name':
+        case 'position':
+          td.textContent = inputValues[inputValue].charAt(0).toUpperCase()
+          + inputValues[inputValue].slice(1, inputValues[inputValue].length);
+          newTr.append(td.cloneNode(true));
+          break;
+
+        case 'salary':
+          td.textContent = toCashString(inputValues[inputValue].toString());
+          newTr.append(td.cloneNode(true));
+          break;
+
+        default:
+          td.textContent = inputValues[inputValue];
+          newTr.append(td.cloneNode(true));
       }
     }
 
@@ -175,10 +181,10 @@ function correctInput(inputValue, columnCell) {
       );
 
       return initialText;
-    } else {
-      return inputValue.charAt(0).toUpperCase()
-        + inputValue.slice(1, inputValue.length);
     }
+
+    return inputValue.charAt(0).toUpperCase()
+      + inputValue.slice(1, inputValue.length);
   }
 
   if (columnIndex === 3) {
@@ -192,17 +198,17 @@ function correctInput(inputValue, columnCell) {
       );
 
       return initialText;
-    } else {
-      return inputValue;
     }
+
+    return inputValue;
   }
 
   if (columnIndex === 4) {
     if (valueHasLetters(inputValue)) {
       return initialText;
-    } else {
-      return toCashString(inputValue);
     }
+
+    return toCashString(inputValue);
   }
 }
 
