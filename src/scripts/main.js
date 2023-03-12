@@ -123,7 +123,7 @@ const formSubmitHandler = (e) => {
   employee.append(employeeName, employeePosition,
     employeeOffice, employeeAge, employeeSalary);
 
-  table.append(employee);
+  tableBody.append(employee);
 
   pushNotification(title, message, result);
 
@@ -292,9 +292,26 @@ const dbClickHandler = (clickEvent) => {
     editCell.append(input);
     input.focus();
 
+    if (clickEvent.target.parentElement.children[3] === clickEvent.target) {
+      input.type = 'number';
+      input.min = 18;
+      input.max = 90;
+    }
+
+    if (clickEvent.target.parentElement.children[4] === clickEvent.target) {
+      input.value = text.replace(/[$,]/g, '');
+      input.type = 'number';
+      input.min = 1000;
+    }
+
     const saveInputValue = e => {
       if (e.key === 'Enter' || e.type === 'blur') {
-        editCell.textContent = input.value;
+        if (+text.replace(/[$,]/g, '') > 90) {
+          editCell.textContent
+            = `$${input.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+        } else {
+          editCell.textContent = input.value;
+        }
 
         if (!input.value.trim()) {
           editCell.textContent = text;
