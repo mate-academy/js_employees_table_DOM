@@ -64,9 +64,9 @@ const formSubmitHandler = (e) => {
   const employeeOffice = document.createElement('td');
   const employeeAge = document.createElement('td');
   const employeeSalary = document.createElement('td');
-  let title = 'Success';
+  const title = 'Success';
   let message = 'New employee has been added to the table';
-  let result = 'success';
+  const result = 'success';
 
   employeeName.textContent = form.name.value.trim();
   employeePosition.textContent = form.position.value.trim();
@@ -78,44 +78,32 @@ const formSubmitHandler = (e) => {
 
   if (employeeName.textContent.length < 4) {
     form.name.focus();
-
-    title = 'Error';
     message = 'Name value should be longer than 3 characters';
-    result = 'error';
 
-    pushNotification(title, message, result);
+    pushNotification(message);
 
     return;
   } else if (employeePosition.textContent.length < 4) {
     form.position.focus();
-
-    title = 'Error';
     message = 'Position value should be longer than 3 characters';
-    result = 'error';
 
-    pushNotification(title, message, result);
+    pushNotification(message);
 
     return;
   } else if (employeeAge.textContent < 18 || employeeAge.textContent > 90) {
     form.age.focus();
 
-    title = 'Error';
-
     message
       = 'Age value should be greater than or equal 18 and less or equal 90';
-    result = 'error';
 
     pushNotification(title, message, result);
 
     return;
   } else if (form.salary.value < 1000) {
     form.salary.focus();
-
-    title = 'Error';
     message = 'Salary value should be greater than or equal 1000';
-    result = 'error';
 
-    pushNotification(title, message, result);
+    pushNotification(message);
 
     return;
   };
@@ -125,7 +113,7 @@ const formSubmitHandler = (e) => {
 
   tableBody.append(employee);
 
-  pushNotification(title, message, result);
+  pushNotification(message, title, result);
 
   form.reset();
 };
@@ -134,7 +122,7 @@ document.body.append(form);
 
 form.addEventListener('submit', formSubmitHandler);
 
-const pushNotification = (title, message, result) => {
+const pushNotification = (message, title = 'Error', result = 'error') => {
   const container = document.createElement('div');
   const notification = document.createElement('div');
   const notificationTitle = document.createElement('h2');
@@ -305,12 +293,25 @@ const dbClickHandler = (clickEvent) => {
     }
 
     const saveInputValue = e => {
+      if (e.key === 'Enter') {
+        input.onblur = '';
+      }
+
       if (e.key === 'Enter' || e.type === 'blur') {
-        if (+text.replace(/[$,]/g, '') > 90) {
+        if (clickEvent.target.parentElement.children[4] === clickEvent.target) {
           editCell.textContent
             = `$${input.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
         } else {
           editCell.textContent = input.value;
+        }
+
+        if ((clickEvent.target.parentElement.children[0] === clickEvent.target
+        || clickEvent.target.parentElement.children[1] === clickEvent.target
+        || clickEvent.target.parentElement.children[2] === clickEvent.target)
+        && isFinite(input.value) && input.value.length < 4) {
+          editCell.textContent = text;
+
+          pushNotification('Wrong input');
         }
 
         if (!input.value.trim()) {
