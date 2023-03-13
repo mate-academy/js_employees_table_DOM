@@ -5,17 +5,19 @@ const table = document.querySelector('table');
 const tbody = document.querySelector('tbody');
 const list = tbody.children;
 
+const strFormat = function(a, cellIndex) {
+  return a.querySelectorAll('td')[cellIndex]
+    .textContent.split('$').join('').split(',').join('');
+};
+
 table.addEventListener('click', (e) => {
   const tableItem = e.target.closest('th');
   const cellIndex = tableItem.cellIndex;
 
   const sortList = function(items) {
     return [...items].sort((a, b) => {
-      const textA = (a.querySelectorAll('td')[cellIndex]
-        .textContent.split('$').join('').split(',').join(''));
-
-      const textB = (b.querySelectorAll('td')[cellIndex]
-        .textContent.split('$').join('').split(',').join(''));
+      const textA = strFormat(a, cellIndex);
+      const textB = strFormat(b, cellIndex);
 
       if (isNaN(textA) && isNaN(textB)) {
         return textA > textB ? 1 : -1;
@@ -34,11 +36,8 @@ table.addEventListener('dblclick', (e) => {
 
   const sortList = function(items) {
     return [...items].sort((a, b) => {
-      const textA = (a.querySelectorAll('td')[cellIndex]
-        .textContent.split('$').join('').split(',').join(''));
-
-      const textB = (b.querySelectorAll('td')[cellIndex]
-        .textContent.split('$').join('').split(',').join(''));
+      const textA = strFormat(a, cellIndex);
+      const textB = strFormat(b, cellIndex);
 
       if (isNaN(textA) && isNaN(textB)) {
         return textB > textA ? 1 : -1;
@@ -88,6 +87,7 @@ const nameInput = document.createElement('input');
 
 nameInput.setAttribute('type', 'text');
 nameInput.setAttribute('data-qa', 'name');
+nameInput.setAttribute('pattern', '[a-zA-Z]+');
 nameLabel.append(nameInput);
 form.appendChild(nameLabel);
 
@@ -99,6 +99,7 @@ const positionInput = document.createElement('input');
 
 positionInput.setAttribute('type', 'text');
 positionInput.setAttribute('data-qa', 'position');
+positionInput.setAttribute('pattern', '[a-zA-Z]+');
 positionLabel.append(positionInput);
 form.appendChild(positionLabel);
 
@@ -162,61 +163,70 @@ const arr = document.getElementsByTagName('input');
 
 [...arr].map(el => el.setAttribute('required', ''));
 
+const pushNotification = (title, description, type) => {
+  const notification = document.createElement('div');
+
+  notification.setAttribute('class', `notification ${type}`);
+  notification.setAttribute('data-qa', 'notification');
+
+  notification.insertAdjacentHTML('afterBegin',
+    `<h2 class = 'title'>${title}</h2><p>${description}</p>`);
+
+  document.body.append(notification);
+
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, 2000);
+};
+
+function validateForm(nameN, ageN) {
+  if (nameN.length < 4) {
+    pushNotification('Error', 'Name length must be more than 4 letters.',
+      'error');
+  } else if (ageN < 18 || ageN > 90) {
+    pushNotification('Error', 'Age must be over 18 but under 90.',
+      'error');
+  } else {
+    pushNotification('Success', 'The form is filled out correctly.',
+      'success');
+
+    return true;
+  }
+};
+
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  const pushNotification = (title, description, type) => {
-    const notification = document.createElement('div');
+  const nameV = document.getElementsByTagName('input')[0].value;
+  const positionV = document.getElementsByTagName('input')[1].value;
+  const ageV = document.getElementsByTagName('input')[2].value;
+  const salaryV = '$' + document.getElementsByTagName('input')[3].value;
 
-    notification.setAttribute('class', `notification ${type}`);
-    notification.setAttribute('data-qa', 'notification');
+  const selectElem = document.querySelector('select');
+  const i = selectElem.selectedIndex;
+  const officeV = selectElem.options[i].text;
+  const newEmp = [nameV, positionV, officeV, ageV, salaryV];
 
-    notification.insertAdjacentHTML('afterBegin',
-      `<h2 class = 'title'>${title}</h2><p>${description}</p>`);
+  if (validateForm(nameV, ageV) === true) {
+    const addForm = function() {
+      const tr = document.createElement('tr');
 
-    document.body.append(notification);
+      for (const elem of newEmp) {
+        const td = document.createElement('td');
 
-    setTimeout(() => {
-      notification.style.display = 'none';
-    }, 2000);
-  };
+        td.textContent = elem;
+        tr.append(td);
+      }
+      tbody.append(tr);
+    };
 
-  function validateForm() {
-    const nameV = document.getElementsByTagName('input')[0].value;
-    const positionV = document.getElementsByTagName('input')[1].value;
-    const ageV = document.getElementsByTagName('input')[2].value;
-    const salaryV = '$' + document.getElementsByTagName('input')[3].value;
+    addForm();
 
-    const selectElem = document.querySelector('select');
-    const i = selectElem.selectedIndex;
-    const officeV = selectElem.options[i].text;
-    const newEmp = [nameV, positionV, officeV, ageV, salaryV];
+    pushNotification('Success', 'The form is filled out correctly.<br>'
+      + 'The new employee is added to the table.', 'success');
 
-    if (nameV.length < 4 || ageV < 18 || ageV > 90) {
-      pushNotification('Error', 'Name length must be more than 4 letters.<br>'
-        + 'Age must be over 18 but under 90.', 'error');
-    } else {
-      const addForm = function() {
-        const tr = document.createElement('tr');
-
-        for (const elem of newEmp) {
-          const td = document.createElement('td');
-
-          td.textContent = elem;
-          tr.append(td);
-        }
-        tbody.append(tr);
-      };
-
-      addForm();
-
-      pushNotification('Success', 'The form is filled out correctly.<br>'
-        + 'The new employee is added to the table.', 'success');
-
-      form.reset();
-    }
+    form.reset();
   }
-  validateForm();
 });
 
 let item = null;
@@ -245,6 +255,7 @@ function editStart(cell) {
   } else if (cell.cellIndex === 0 || cell.cellIndex === 1) {
     item = document.createElement('input');
     item.setAttribute('type', 'text');
+    item.setAttribute('pattern', '[a-zA-Z]+');
   } else if (cell.cellIndex === 3 || cell.cellIndex === 4) {
     item = document.createElement('input');
     item.setAttribute('type', 'number');
@@ -263,11 +274,6 @@ function editStart(cell) {
   };
 
   cell.replaceWith(item);
-
-  if (cell.cellIndex === 4) {
-    item = '$' + 'item';
-  }
-
   item.focus();
 }
 
