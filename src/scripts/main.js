@@ -1,12 +1,36 @@
 'use strict';
 
+// notification function
+const pushNotification = (posTop, posRight, title, description, type) => {
+  document.body.insertAdjacentHTML(`beforeend`, `
+    <div class = 'notification ${type}' data-qa = 'notification'>
+      <h2 class = 'title'>${title}</h2>
+      <p>${description}</p>
+    </div>
+  `);
+
+  const message = document.querySelector(`.${type}`);
+
+  message.style.top = `${posTop}px`;
+  message.style.right = `${posRight}px`;
+
+  setTimeout(() => message.remove(), 2000);
+};
+
+// #region sort region
+
+// we calculate with the help of which we will sort
 const sortBy = document.querySelector('tr');
 
+// helper function to get number from salary
 function toNum(element) {
   return +element.innerText.slice(1).replaceAll(',', '');
 }
 
+// helper variable for changed sort from asc to desc or reverse
 let isSorted = false;
+
+// helper variable for changed isSorted variable
 let previousSort = '';
 
 sortBy.addEventListener('click', el => {
@@ -41,8 +65,13 @@ sortBy.addEventListener('click', el => {
   }
 });
 
+// #endregion
+
+// #region add employee region
+
 const tableBody = document.querySelector('tbody');
 
+// helper variable to check previous active table
 let previousActive = null;
 
 tableBody.addEventListener('click', el => {
@@ -56,6 +85,7 @@ tableBody.addEventListener('click', el => {
 
 const body = document.querySelector('body');
 
+// added a form for add employer
 body.insertAdjacentHTML(`beforeend`, `
   <form class = 'new-employee-form'>
     <label data-qa="name">
@@ -98,22 +128,6 @@ body.insertAdjacentHTML(`beforeend`, `
 
 const submitButton = document.querySelector('button');
 
-const pushNotification = (posTop, posRight, title, description, type) => {
-  document.body.insertAdjacentHTML(`beforeend`, `
-    <div class = 'notification ${type}' data-qa = 'notification'>
-      <h2 class = 'title'>${title}</h2>
-      <p>${description}</p>
-    </div>
-  `);
-
-  const message = document.querySelector(`.${type}`);
-
-  message.style.top = `${posTop}px`;
-  message.style.right = `${posRight}px`;
-
-  setTimeout(() => message.remove(), 2000);
-};
-
 submitButton.addEventListener('click', el => {
   el.preventDefault();
 
@@ -121,6 +135,7 @@ submitButton.addEventListener('click', el => {
 
   const newTable = document.createElement('tr');
 
+  // helper variable for check the input value is empty which return boolean
   const inputsValue = [...inputs].find(element => element.value === '');
 
   for (const input of inputs) {
@@ -129,43 +144,48 @@ submitButton.addEventListener('click', el => {
         'All fields must be filled', 'error');
 
       break;
-    } else {
-      if (input.name === 'name') {
-        if (input.value.length < 4) {
-          pushNotification(10, 10, 'Error',
-            'The name must contain more than 4 letters', 'error');
+    }
 
-          break;
-        } else {
-          continue;
-        }
-      } else if (input.name === 'age') {
-        if (+input.value < 18 || +input.value > 90) {
-          pushNotification(10, 10, 'Error',
-            'The age value should be between 18 and 90 years', 'error');
+    if (input.name === 'name') {
+      if (input.value.length < 4) {
+        pushNotification(10, 10, 'Error',
+          'The name must contain more than 4 letters', 'error');
 
-          break;
-        } else {
-          for (const char of inputs) {
-            const newCell = document.createElement('td');
-
-            if (char.name === 'salary') {
-              newCell.innerText = '$' + `${char.value}`;
-            } else {
-              newCell.innerText = char.value;
-            }
-
-            newTable.append(newCell);
-
-            tableBody.append(newTable);
-
-            char.value = '';
-          }
-
-          pushNotification(10, 10, 'Perfectly',
-            'A new employee is successfully added to the table', 'success');
-        }
+        break;
       }
+    } else if (input.name === 'age') {
+      if (+input.value < 18 || +input.value > 90) {
+        pushNotification(10, 10, 'Error',
+          'The age value should be between 18 and 90 years', 'error');
+
+        break;
+      }
+    } else if (input.name === 'salary') {
+      if (+input.value < 0) {
+        pushNotification(10, 10, 'Error',
+          'Salary cannot be negative', 'error');
+        break;
+      }
+
+      // loop which add input value to table cell
+      for (const char of inputs) {
+        const newCell = document.createElement('td');
+
+        if (char.name === 'salary') {
+          newCell.innerText = '$' + `${char.value}`;
+        } else {
+          newCell.innerText = char.value;
+        }
+
+        newTable.append(newCell);
+
+        tableBody.append(newTable);
+
+        char.value = '';
+      }
+
+      pushNotification(10, 10, 'Perfectly',
+        'A new employee is successfully added to the table', 'success');
     }
   }
 
@@ -176,11 +196,23 @@ submitButton.addEventListener('click', el => {
   newTable.children[1].after(office);
 });
 
+// #endregion
+
+// #region edit data region
+
+// helper variable for save previous data
 let previousText;
+
+// helper variable to change input type
 let typeOfInput;
+
+// helper variable to work with a input in cell
 let cellInput;
+
+// helper variable to change cell which now is open to changed
 let changedCell;
 
+// helper function to add to table cell text from input
 const addTextFromInput = () => {
   const value = cellInput.value;
 
@@ -191,22 +223,29 @@ const addTextFromInput = () => {
   }
 
   if (cellInput.type === 'number') {
+    if (previousText.slice(0, 1) === '$') {
+      if (+value > 0) {
+        changedCell.innerText = '$' + (+value).toLocaleString('en-US');
+
+        return;
+      }
+
+      pushNotification(10, 10, 'Error',
+        'Salary cannot be negative', 'error');
+
+      return;
+    }
+
     if (value > 90 || value < 18) {
       pushNotification(10, 10, 'Error',
         'The age value should be between 18 and 90 years', 'error');
 
       return;
-    } else {
-      if (previousText.slice(0, 1) === '$') {
-        changedCell.innerText = '$' + value.localeCompare('en-US');
-
-        return;
-      } else {
-        changedCell.innerText = value;
-
-        return;
-      }
     }
+
+    changedCell.innerText = value;
+
+    return;
   }
 
   if (cellInput.type === 'text') {
@@ -218,23 +257,25 @@ const addTextFromInput = () => {
 const callback = el => {
   changedCell = el.target;
 
+  // disabled the event until the moment will be added value from input
   tableBody.removeEventListener('dblclick', callback);
 
   previousText = changedCell.innerText;
 
   cellInput = document.createElement('input');
 
+  cellInput.focus();
+
   cellInput.classList.add('cell-input');
 
-  if ('1234567890'.includes(changedCell.innerText.slice(1))) {
+  // check is this cell is number type or not
+  if ('1234567890'.includes(changedCell.innerText.slice(1, 2))) {
     typeOfInput = 'number';
   } else {
     typeOfInput = 'text';
   }
 
   cellInput.type = typeOfInput;
-
-  cellInput.autofocus = true;
 
   changedCell.innerText = '';
 
@@ -254,3 +295,5 @@ const callback = el => {
 };
 
 tableBody.addEventListener('dblclick', callback);
+
+// #endregion
