@@ -153,14 +153,18 @@ submitButton.addEventListener('click', el => {
 
         break;
       }
-    } else if (input.name === 'age') {
+    }
+
+    if (input.name === 'age') {
       if (+input.value < 18 || +input.value > 90) {
         pushNotification(10, 10, 'Error',
           'The age value should be between 18 and 90 years', 'error');
 
         break;
       }
-    } else if (input.name === 'salary') {
+    }
+
+    if (input.name === 'salary') {
       if (+input.value < 0) {
         pushNotification(10, 10, 'Error',
           'Salary cannot be negative', 'error');
