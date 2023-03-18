@@ -5,6 +5,7 @@ const tableBlock = document.querySelector('table');
 const getNumbers = (num) => {
   return num.replaceAll(',', '').replace('$', '');
 };
+
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
@@ -28,7 +29,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 
   setTimeout(function() {
     messageBlock.remove();
-  }, 2000);
+  }, 1000);
 };
 
 function cellEditing(table) {
@@ -50,17 +51,16 @@ function cellEditing(table) {
       ev.preventDefault();
 
       if (input.value) {
-        if (dataType(cellValue) === dataType(input.value)) {
-          cell.textContent = input.value;
-        } else {
+        if (dataType(cellValue) !== dataType(input.value)) {
           pushNotification(430, 255, 'Помилка',
             'Невірний тип даних введення', 'error');
-
           cell.textContent = cellValue;
-        }
+        } else {
+          cell.textContent = input.value;
 
-        if (cellValue.includes('$')) {
-          cell.textContent = formatter.format(input.value);
+          if (cellValue.includes('$')) {
+            cell.textContent = formatter.format(input.value);
+          }
         }
       } else {
         cell.textContent = cellValue;
@@ -135,14 +135,18 @@ function addForm(table) {
     const age = form.elements.age.value;
     const salary = form.elements.salary.value;
 
+    const minLenghtName = 4;
+    const minAge = 18;
+    const maxAge = 90;
+
     switch (true) {
-      case String(newName).length < 4:
+      case String(newName).length < minLenghtName || newName[0] === ' ':
         pushNotification(430, 255, 'Помилка',
           'Довжина імені не може бути менше 4 літер', 'error');
         e.target.reset();
         break;
 
-      case age < 18 || age > 90:
+      case age < minAge || age > maxAge:
         pushNotification(430, 255, 'Помилка',
           'Вік не може бути менше 18 та більше 90', 'error');
         e.target.reset();
