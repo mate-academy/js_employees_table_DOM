@@ -1,11 +1,9 @@
 'use strict';
-// PART ONE. SORTING
+// PART 1. SORTING
 
 const table = document.querySelector('table');
-
+const tbody = document.querySelector('tbody');
 const sortTableASC = function(index, type) {
-  const tbody = table.querySelector('tbody');
-
   const compare = function(rowA, rowB) {
     const rowADate = rowA.cells[index].innerHTML;
     const rowBDate = rowB.cells[index].innerHTML;
@@ -45,7 +43,6 @@ const sortTableASC = function(index, type) {
 };
 
 const sortTableDESC = function(index, type) {
-  const tbody = table.querySelector('tbody');
 
   const compare = function(rowA, rowB) {
     const rowADate = rowA.cells[index].innerHTML;
@@ -145,4 +142,18 @@ table.addEventListener('click', (e) => {
     sortTableDESC(index, type);
     salaryCount = 0;
   }
+});
+
+// PART 2. SELECTED ROW
+
+tbody.addEventListener('click', e => {
+  if (e.target.tagName !== 'TD') {
+    return;
+  }
+
+  const tr = document.querySelectorAll('tr');
+
+  [...tr].map(x => x.classList.remove('active'));
+
+  e.target.parentNode.classList.add('active');
 });
