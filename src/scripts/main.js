@@ -160,6 +160,8 @@ button.addEventListener('click', e => {
 
     tbody.append(newRow);
 
+    tr.push(newRow);
+
     form.querySelectorAll('input').forEach(field => {
       field.value = '';
     });
