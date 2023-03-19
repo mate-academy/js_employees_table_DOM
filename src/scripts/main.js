@@ -30,6 +30,10 @@ table.addEventListener('click', (e) => {
   document.querySelector('tbody').append(...sortList(list, cellIndex));
 });
 
+function numberWithComma(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 table.addEventListener('dblclick', (e) => {
   const tableItem = e.target.closest('th');
   const cellIndex = tableItem.cellIndex;
@@ -151,6 +155,16 @@ const salaryInput = document.createElement('input');
 
 salaryInput.setAttribute('type', 'number');
 salaryInput.setAttribute('data-qa', 'salary');
+
+function salaryCheck(value) {
+  if (salaryInput.value < 0) {
+    pushNotification('Error', 'Salary must be over 0.',
+      'error');
+  } else {
+    return true;
+  }
+}
+
 salaryLabel.append(salaryInput);
 form.appendChild(salaryLabel);
 
@@ -187,9 +201,6 @@ function validateForm(nameN, ageN) {
     pushNotification('Error', 'Age must be over 18 but under 90.',
       'error');
   } else {
-    pushNotification('Success', 'The form is filled out correctly.',
-      'success');
-
     return true;
   }
 };
@@ -207,7 +218,8 @@ form.addEventListener('submit', (e) => {
   const officeV = selectElem.options[i].text;
   const newEmp = [nameV, positionV, officeV, ageV, salaryV];
 
-  if (validateForm(nameV, ageV) === true) {
+  if (validateForm(nameV, ageV) === true
+    && salaryCheck(salaryInput.value) === true) {
     const addForm = function() {
       const tr = document.createElement('tr');
 
@@ -229,55 +241,117 @@ form.addEventListener('submit', (e) => {
   }
 });
 
-let item = null;
-
 table.addEventListener('dblclick',
   function() {
     event.preventDefault();
 
-    const cell = event.target.closest('td');
+    const cell = event.target;
 
-    editStart(cell);
-  });
-
-function editStart(cell) {
-  const innitText = cell.textContent;
-
-  if (cell.cellIndex === 2) {
-    item = document.createElement('select');
-
-    item.innerHTML = `<option value="Tokyo">Tokyo</option>
-    <option value="Singapore">Singapore</option>
-    <option value="London">London</option>
-    <option value="New York">New York</option>
-    <option value="Edinburgh">Edinburgh</option>
-    <option value="San Francisco">San Francisco</option>`;
-  } else if (cell.cellIndex === 0 || cell.cellIndex === 1) {
-    item = document.createElement('input');
-    item.setAttribute('type', 'text');
-    item.setAttribute('pattern', '[a-zA-Z]+');
-  } else if (cell.cellIndex === 3 || cell.cellIndex === 4) {
-    item = document.createElement('input');
-    item.setAttribute('type', 'number');
-  }
-
-  item.className = 'cell-input';
-
-  item.onkeydown = function() {
-    if (event.key === 'Enter') {
-      this.blur();
+    if (!cell || !table.contains(cell)) {
+      return;
     }
-  };
 
-  item.onblur = function() {
-    editEnd(cell, item.value || innitText);
-  };
+    const cellItems = table.querySelectorAll('td');
+    const index = Array.from(cellItems).findIndex(n => n === cell) % 5;
+    const tempValue = cell.innerText;
+    let item;
 
-  cell.replaceWith(item);
-  item.focus();
-}
+    switch (index) {
+      case 2:
+        item = document.createElement('select');
 
-function editEnd(cell, value) {
-  cell.innerHTML = value;
-  item.replaceWith(cell);
-}
+        item.innerHTML = `<option value="Tokyo">Tokyo</option>
+  <option value="Singapore">Singapore</option>
+  <option value="London">London</option>
+  <option value="New York">New York</option>
+  <option value="Edinburgh">Edinburgh</option>
+  <option value="San Francisco">San Francisco</option>`;
+        break;
+
+      case 0:
+      case 1:
+        item = document.createElement('input');
+        item.setAttribute('type', 'text');
+        break;
+
+      case 3:
+        item = document.createElement('input');
+        item.setAttribute('type', 'number');
+        break;
+
+      case 4:
+        item = document.createElement('input');
+        item.setAttribute('type', 'number');
+
+        break;
+    }
+
+    cell.innerText = '';
+    cell.append(item);
+    item.focus();
+
+    item.onblur = () => {
+      itemValidation(index);
+    };
+
+    item.addEventListener('keydown', (evt) => {
+      if (evt.code !== 'Enter') {
+        return;
+      }
+
+      itemValidation(index);
+    });
+
+    const itemValidation = (i) => {
+      if (!item.value) {
+        cell.innerText = tempValue;
+      }
+
+      switch (i) {
+        case 0:
+          if (item.value.trim().length < 4) {
+            cell.innerText = tempValue;
+
+            pushNotification('Error',
+              'Name length must be more than 4 letters.',
+              'error');
+            break;
+          }
+          cell.innerText = item.value;
+          break;
+        case 1:
+          if (item.value.trim().length < 1) {
+            cell.innerText = tempValue;
+
+            pushNotification('Error', `Position: cannot be empty`,
+              'error');
+            break;
+          }
+          cell.innerText = item.value;
+          break;
+        case 3:
+          if (item.value < 18 || item.value > 90) {
+            cell.innerText = tempValue;
+
+            pushNotification('Error', 'Age must be over 18 but under 90.',
+              'error');
+            break;
+          }
+          cell.innerText = item.value;
+          break;
+        case 4:
+          if (item.value < 0 || item.value.trim().length < 1) {
+            cell.innerText = tempValue;
+
+            pushNotification('Error', 'Salary must be over 0.',
+              'error');
+            break;
+          }
+          cell.innerText = `$${numberWithComma(item.value)}`;
+          break;
+        default:
+          cell.innerText = item.value;
+      }
+      item.remove();
+    };
+  });
