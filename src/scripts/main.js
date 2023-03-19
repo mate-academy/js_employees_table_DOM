@@ -11,12 +11,6 @@ const normalize = (number) => {
   return +number.slice(1).split(',').join('');
 };
 
-const abcCheck = (x) => {
-  const result = [...x].every(el => el.toLowerCase() !== el.toUpperCase());
-
-  return result;
-};
-
 headRow.addEventListener('click', e => {
   let sorted = [];
 
@@ -133,8 +127,6 @@ button.addEventListener('click', e => {
 
   if (dataObject.name.length < 4) {
     notification('error', 'Error', 'Name should have more than 4 letters.');
-  } else if (!abcCheck(dataObject.name) || !abcCheck(dataObject.position)) {
-    notification('error', 'Error', 'Enter correct information.');
   } else if (+dataObject.age < 18 || +dataObject.age > 90) {
     notification('error', 'Error',
       'Age should be more than 18 and less than 90');
@@ -206,7 +198,7 @@ tbody.addEventListener('dblclick', e => {
   input.addEventListener('blur', () => {
     switch (index) {
       case 0:
-        if (input.value.length < 4 || !abcCheck(input.value)) {
+        if (input.value.length < 4) {
           notification('error', 'Error',
             'Name should have more than 4 letters.');
           e.target.textContent = initialText;
@@ -216,7 +208,7 @@ tbody.addEventListener('dblclick', e => {
         break;
 
       case 1:
-        if (input.value && abcCheck(input.value)) {
+        if (input.value) {
           e.target.textContent = input.value;
         } else {
           notification('error', 'Error', 'You should enter correct data.');
