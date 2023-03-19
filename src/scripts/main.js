@@ -7,9 +7,14 @@ const tr = [...tbody.children];
 document.querySelector('body').style.userSelect = 'none';
 document.querySelector('body').style.alignItems = 'flex-start';
 
-// #region sortedList
 const normalize = (number) => {
   return +number.slice(1).split(',').join('');
+};
+
+const abcCheck = (x) => {
+  const result = [...x].every(el => el.toLowerCase() !== el.toUpperCase());
+
+  return result;
 };
 
 headRow.addEventListener('click', e => {
@@ -41,16 +46,12 @@ headRow.addEventListener('click', e => {
 
   sorted.forEach(item => tbody.append(item));
 });
-// #endregion
 
-// #region row
 tbody.addEventListener('click', e => {
   [...tbody.children].forEach(el => el.classList.remove('active'));
   e.target.parentNode.classList.add('active');
 });
-// #endregion
 
-// #region citiesChoise
 const citiesChoise = function() {
   const select = document.createElement('select');
   const options = [`Tokyo`, `Singapore`, `London`,
@@ -65,9 +66,7 @@ const citiesChoise = function() {
 
   return select;
 };
-// #endregion
 
-// #region form
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
@@ -101,9 +100,7 @@ form.classList.add('new-employee-form');
 });
 
 document.body.append(form);
-// #endregion
 
-// #region notification
 const notification = (type, title, text) => {
   const message = document.createElement('div');
   const h2 = document.createElement('h2');
@@ -125,9 +122,7 @@ const notification = (type, title, text) => {
     message.remove();
   }, 2000);
 };
-// #endregion
 
-// #region button
 const button = document.createElement('button');
 
 button.addEventListener('click', e => {
@@ -138,6 +133,8 @@ button.addEventListener('click', e => {
 
   if (dataObject.name.length < 4) {
     notification('error', 'Error', 'Name should have more than 4 letters.');
+  } else if (!abcCheck(dataObject.name) || !abcCheck(dataObject.position)) {
+    notification('error', 'Error', 'Enter correct information.');
   } else if (+dataObject.age < 18 || +dataObject.age > 90) {
     notification('error', 'Error',
       'Age should be more than 18 and less than 90');
@@ -148,7 +145,8 @@ button.addEventListener('click', e => {
 
     const newRow = document.createElement('tr');
 
-    dataObject.salary = `$${Number(dataObject.salary).toLocaleString('en-US')}`;
+    dataObject.salary
+      = `$${Math.abs(Number(dataObject.salary)).toLocaleString('en-US')}`;
 
     Object.values(dataObject).forEach(str => {
       const cell = document.createElement('td');
@@ -171,9 +169,7 @@ button.addEventListener('click', e => {
 button.textContent = 'Save to table';
 
 form.append(button);
-// #endregion
 
-// #region editing
 tbody.addEventListener('dblclick', e => {
   const index = e.target.cellIndex;
   const initialText = e.target.textContent;
@@ -210,7 +206,7 @@ tbody.addEventListener('dblclick', e => {
   input.addEventListener('blur', () => {
     switch (index) {
       case 0:
-        if (input.value.length < 4) {
+        if (input.value.length < 4 || !abcCheck(input.value)) {
           notification('error', 'Error',
             'Name should have more than 4 letters.');
           e.target.textContent = initialText;
@@ -220,10 +216,10 @@ tbody.addEventListener('dblclick', e => {
         break;
 
       case 1:
-        if (input.value) {
+        if (input.value && abcCheck(input.value)) {
           e.target.textContent = input.value;
         } else {
-          notification('error', 'Error', 'You should enter data.');
+          notification('error', 'Error', 'You should enter correct data.');
           e.target.textContent = initialText;
         }
         break;
@@ -249,9 +245,9 @@ tbody.addEventListener('dblclick', e => {
       case 4:
         if (input.value) {
           e.target.textContent
-            = `$${Number(input.value).toLocaleString('en-US')}`;
+            = `$${Math.abs(Number(input.value)).toLocaleString('en-US')}`;
         } else {
-          notification('error', 'Error', 'You should enter data.');
+          notification('error', 'Error', 'You should enter correct data.');
           e.target.textContent = initialText;
         }
         break;
@@ -266,4 +262,3 @@ tbody.addEventListener('dblclick', e => {
     }
   });
 });
-// #endregion
