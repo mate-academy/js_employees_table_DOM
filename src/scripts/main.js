@@ -275,14 +275,9 @@ table.addEventListener('dblclick',
         break;
 
       case 3:
-        item = document.createElement('input');
-        item.setAttribute('type', 'number');
-        break;
-
       case 4:
         item = document.createElement('input');
         item.setAttribute('type', 'number');
-
         break;
     }
 
