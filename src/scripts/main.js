@@ -168,6 +168,8 @@ submit.addEventListener('click', function(e) {
   });
 
   if (withoutMistakes) {
+    pushNotification('success', 'Success', 'Success');
+
     tbody.append(newRow);
 
     form.querySelectorAll('input').forEach(field => {
