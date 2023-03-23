@@ -1,9 +1,8 @@
 'use strict';
 
 const tbody = document.querySelector('tbody');
-const employees = [...tbody.rows];
 const thead = document.querySelector('thead');
-const titles = [...thead.querySelectorAll('th')];
+const titles = thead.querySelectorAll('th');
 
 // #region Sort
 thead.addEventListener('click', (evnt) => {
@@ -16,7 +15,7 @@ thead.addEventListener('click', (evnt) => {
   evnt.target.classList.toggle('asc');
 
   const index = evnt.target.cellIndex;
-  const sorted = employees.sort((a, b) => {
+  const sorted = [...tbody.rows].sort((a, b) => {
     let cellA = a.cells[index].innerHTML;
     let cellB = b.cells[index].innerHTML;
 
@@ -56,7 +55,7 @@ thead.addEventListener('click', (evnt) => {
 
 // #region Select
 tbody.addEventListener('click', (evnt) => {
-  employees.forEach((person) => {
+  [...tbody.rows].forEach((person) => {
     person.classList.remove('active');
   });
 
@@ -93,6 +92,7 @@ titles.forEach((title) => {
 
     selectCity.name = titleName;
     selectCity.dataset.qa = titleName;
+
     label.append(selectCity);
   } else {
     const input = document.createElement('input');
@@ -105,6 +105,7 @@ titles.forEach((title) => {
 
     input.name = titleName;
     input.dataset.qa = titleName;
+
     label.append(input);
   }
 
@@ -124,17 +125,21 @@ form.append(submitButton);
 submitButton.addEventListener('click', (evnt) => {
   evnt.preventDefault();
 
-  if (form.querySelector('.message')) {
-    form.querySelector('.message').remove();
-  }
-
   const data = new FormData(form);
   const dataObj = Object.fromEntries(data.entries());
 
   if (dataObj.name.length < 4) {
     showNotification('error', 'Name value should have more than 4 letters');
   } else if (+dataObj.age < 18 || +dataObj.age > 90) {
-    showNotification('error', 'Age value is not valid');
+    showNotification(
+      'error',
+      'Age value is not valid. Employee must be an adult'
+    );
+  } else if (dataObj.salary < 0) {
+    showNotification(
+      'error',
+      'Salary value is not valid. It must be more than zero'
+    );
   } else if (!dataObj.position || !dataObj.salary) {
     showNotification('error', 'All fields are required');
   } else {
@@ -154,6 +159,10 @@ submitButton.addEventListener('click', (evnt) => {
     });
 
     tbody.append(newRow);
+
+    form.querySelectorAll('input').forEach((field) => {
+      field.value = '';
+    });
   }
 });
 // #endregion
@@ -182,31 +191,100 @@ const showNotification = (type, description) => {
 // #region Edit by double-clicking
 tbody.addEventListener('dblclick', (evnt) => {
   const text = evnt.target.textContent;
+  const index = evnt.target.cellIndex;
 
   evnt.target.textContent = '';
 
-  const input = document.createElement('input');
+  let input = document.createElement('input');
 
   input.classList.add('.cell-input');
-  input.value = text;
+
+  if (index === 2) {
+    const selectCity = document.createElement('select');
+    const cityList = [
+      `Tokyo`,
+      `Singapore`,
+      `London`,
+      `New York`,
+      `Edinburgh`,
+      `San Francisco`,
+    ];
+
+    cityList.forEach((option) => {
+      const city = document.createElement('option');
+
+      city.textContent = option;
+      selectCity.append(city);
+    });
+    input = selectCity;
+  }
+
   evnt.target.append(input);
   input.focus();
 
   input.addEventListener('blur', () => {
-    if (input.value.length === 0) {
-      evnt.target.textContent = text;
-    } else {
-      evnt.target.textContent = input.value;
+    switch (index) {
+      case 0:
+        if (input.value.length < 4) {
+          showNotification(
+            'error',
+            'Name value should have more than 4 letters'
+          );
+          evnt.target.textContent = text;
+        } else {
+          evnt.target.textContent = input.value;
+        }
+        break;
+
+      case 1:
+        if (input.value) {
+          evnt.target.textContent = input.value;
+        } else {
+          showNotification('error', 'All fields are required');
+          evnt.target.textContent = text;
+        }
+        break;
+
+      case 2:
+        if (input.value) {
+          evnt.target.textContent = input.value;
+        } else {
+          evnt.target.textContent = text;
+        }
+        break;
+
+      case 3:
+        if (input.value < 18 || input.value > 90) {
+          showNotification(
+            'error',
+            'Age value is not valid. Employee must be an adult'
+          );
+
+          evnt.target.textContent = text;
+        } else {
+          evnt.target.textContent = input.value;
+        }
+        break;
+
+      case 4:
+        if (input.value && input.value > 0) {
+          evnt.target.textContent
+            = '$' + Number(input.value).toLocaleString('en-US');
+        } else {
+          showNotification(
+            'error',
+            'Salary value is not valid. It must be more than zero'
+          );
+          evnt.target.textContent = text;
+        }
+        break;
     }
+    input.remove();
   });
 
   input.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter') {
-      if (input.value.length === 0) {
-        evnt.target.textContent = text;
-      } else {
-        evnt.target.textContent = input.value;
-      }
+      input.blur();
     }
   });
 });
