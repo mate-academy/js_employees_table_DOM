@@ -115,8 +115,8 @@ buttonAdd.addEventListener('click', e => {
 
   if (nameEmployee.value.length < 4) {
     getNotification(
-      `Ім'я закоротке!`,
-      `Ім'я повино бути мінімум 4 символи.`,
+      `Invalid name!`,
+      `Name is to short, enter the correct one.`,
       'error'
     );
 
@@ -125,8 +125,8 @@ buttonAdd.addEventListener('click', e => {
 
   if (position.value.length < 4) {
     getNotification(
-      `Посаду введено некоректно!`,
-      `Посада повина бути мінімум 4 символи.`,
+      `Invalid position!`,
+      `Position is to short, enter the correct one.`,
       'error'
     );
 
@@ -135,8 +135,8 @@ buttonAdd.addEventListener('click', e => {
 
   if (age.value < 18 || age.value > 90) {
     getNotification(
-      `Вік працівника не задовольняє умови!`,
-      `Вік повинен бути в межах від 18 до 90 років.`,
+      `Invalid age!`,
+      `Enter the correct age.`,
       'error'
     );
 
@@ -145,8 +145,8 @@ buttonAdd.addEventListener('click', e => {
 
   if (salary.value < 1) {
     getNotification(
-      `За такі гроші ніхто не буде працювати`,
-      `Зарплата має бути мінімум 1$:)`,
+      `Invalid salary!`,
+      `Enter the correct salary.`,
       'error'
     );
 
@@ -164,8 +164,8 @@ buttonAdd.addEventListener('click', e => {
   `);
 
   getNotification(
-    `Справу виконано!`,
-    `Працівника додано до таблиці!`,
+    `Completed!`,
+    `The employee has been added to the table!`,
     'success'
   );
 });
@@ -175,7 +175,13 @@ function getNotification(title, description, type) {
 
   notification.classList.add(`${type}`);
   notification.dataset.qa = 'notification';
+  notification.style.position = 'absolute';
   notification.style.textAlign = 'center';
+  notification.style.padding = '0 10px';
+  notification.style.top = '10px';
+  notification.style.right = '10px';
+  notification.style.backgroundColor = 'purple';
+  notification.style.borderRadius = '5px';
 
   notification.insertAdjacentHTML('beforeend', `
     <h2 class="title">
@@ -190,7 +196,7 @@ function getNotification(title, description, type) {
 
   setTimeout(
     () => notification.remove(),
-    5000);
+    3000);
 }
 
 // Task 4. Finished.
@@ -242,8 +248,8 @@ tableBody.addEventListener('dblclick', e => {
       case 0:
         if (input.value.length < 4) {
           getNotification(
-            `Ім'я закоротке!`,
-            `Ім'я повино бути мінімум 4 символи.`,
+            `Invalid name!`,
+            `Name is to short, enter the correct one.`,
             'error'
           );
           input.value = defaultCell;
@@ -252,8 +258,8 @@ tableBody.addEventListener('dblclick', e => {
       case 1:
         if (input.value.length < 3) {
           getNotification(
-            `Посаду введено некоректно!`,
-            `Посада повина бути мінімум 4 символи.`,
+            `Invalid position!`,
+            `Position is to short, enter the correct one.`,
             'error'
           );
           input.value = defaultCell;
@@ -266,8 +272,8 @@ tableBody.addEventListener('dblclick', e => {
       case 3:
         if (input.value < 18 || input.value > 90) {
           getNotification(
-            `Вік працівника не задовольняє умови!`,
-            `Вік повинен бути в межах від 18 до 90 років.`,
+            `Invalid age!`,
+            `Enter the correct age.`,
             'error'
           );
           input.value = defaultCell;
@@ -277,8 +283,8 @@ tableBody.addEventListener('dblclick', e => {
       case 4:
         if (input.value < 1) {
           getNotification(
-            `За такі гроші ніхто не буде працювати`,
-            `Зарплата має бути мінімум 1$:)`,
+            `Invalid salary!`,
+            `Enter the correct salary.`,
             'error'
           );
           cell.innerText = defaultCell;
@@ -289,8 +295,8 @@ tableBody.addEventListener('dblclick', e => {
 
       default:
         getNotification(
-          `Невідома помилка!`,
-          `Будь ласка перевірте правильність введених даних`,
+          `Unknown error!`,
+          `Please check the correctness of the entered data.`,
           'error'
         );
     }
