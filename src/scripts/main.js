@@ -168,6 +168,8 @@ buttonAdd.addEventListener('click', e => {
     `The employee has been added to the table!`,
     'success'
   );
+
+  document.querySelector('.new-employee-form').reset();
 });
 
 function getNotification(title, description, type) {
