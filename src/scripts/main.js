@@ -182,8 +182,8 @@ const position = form.querySelectorAll('[data-qa="position"]');
 const age = form.querySelector('[data-qa="age"]');
 const salary = form.querySelector('[data-qa="salary"]');
 const salaryReg = /^\d{1,}$/;
-const nameReg = /^[a-zA-Z ]{4,30}$/;
-const positionReg = /^[a-zA-Z ]{2,50}$/;
+const nameReg = /^([a-z]+( [a-z]+)?){4,30}$/i;
+const positionReg = /^([a-z]+( [a-z]+)?){2,50}$/i;
 
 form.addEventListener('submit', function(e) {
   e.preventDefault();
