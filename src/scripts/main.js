@@ -162,8 +162,6 @@ function addNewEmploye() {
       newCell.textContent = capitalizedFirstWordLetter(child);
     }
 
-    newRow.classList.add('active');
-
     newRow.appendChild(newCell);
   });
 
@@ -218,8 +216,8 @@ employeForm.addEventListener('submit', function(e) {
   e.preventDefault();
 
   const isNameValid = nameValidation(firstName);
-
   const isAgeValid = ageValidation(age);
+
   const isFormValid = isNameValid && isAgeValid;
 
   if (!isFormValid && messageOfAcception.hidden === false) {
@@ -250,6 +248,16 @@ const messageOfAcception = createNotification(
   'success',
   textOfAcception,
   titleOfAcception);
+const warningMessageTitle = 'Warning';
+const warningMessageText = 'Field cannot be blank';
+const warningMessage
+  = createNotification('warning', warningMessageText, warningMessageTitle);
+const warningDigitsMessageText
+  = 'Only digits are allowed to enter in this cell';
+const warningDigitsMessage = createNotification(
+  'warning',
+  warningDigitsMessageText,
+  warningMessageTitle);
 
 function createNotification(nameOfClass, text, titleText) {
   employeForm.insertAdjacentHTML('afterbegin', `
@@ -296,29 +304,11 @@ list.addEventListener('dblclick', (e) => {
   inputInsteadOfCell.focus();
 
   inputInsteadOfCell.addEventListener('blur', () => {
-    if (
-      clickedCellIndex === getCellIndex(columnName1)
-      && inputInsteadOfCell.value.length > 0
-      && !ageValidation(inputInsteadOfCell)
-    ) {
-      clickedCell.textContent = cellsText;
-
-      setTimeout(() => {
-        ageErrorMessage.hidden = true;
-      }, 5000);
-    } else if (
-      clickedCellIndex === getCellIndex(columnName2)
-      && inputInsteadOfCell.value.length > 0
-      && !nameValidation(inputInsteadOfCell)
-    ) {
-      clickedCell.textContent = cellsText;
-
-      setTimeout(() => {
-        nameErrorMessage.hidden = true;
-      }, 5000);
-    } else {
-      addNewTextOrSavePreviousOne(clickedCell, inputInsteadOfCell, cellsText);
-    };
+    defineCasesToRejectNewText(
+      clickedCell,
+      clickedCellIndex,
+      cellsText,
+      inputInsteadOfCell);
   });
 
   inputInsteadOfCell.addEventListener('keydown', (ev) => {
@@ -326,33 +316,15 @@ list.addEventListener('dblclick', (e) => {
       return;
     }
 
-    if (
-      clickedCellIndex === getCellIndex(columnName1)
-      && inputInsteadOfCell.value.length > 0
-      && !ageValidation(inputInsteadOfCell)
-    ) {
-      clickedCell.textContent = cellsText;
-
-      setTimeout(() => {
-        ageErrorMessage.hidden = true;
-      }, 5000);
-    } else if (
-      clickedCellIndex === getCellIndex(columnName2)
-      && inputInsteadOfCell.value.length > 0
-      && !nameValidation(inputInsteadOfCell)
-    ) {
-      clickedCell.textContent = cellsText;
-
-      setTimeout(() => {
-        nameErrorMessage.hidden = true;
-      }, 5000);
-    } else {
-      addNewTextOrSavePreviousOne(clickedCell, inputInsteadOfCell, cellsText);
-    }
+    defineCasesToRejectNewText(
+      clickedCell,
+      clickedCellIndex,
+      cellsText,
+      inputInsteadOfCell);
   });
 });
 
-function addNewTextOrSavePreviousOne(cell, input, text) {
+function replaceTextToCellAndRemoveInput(cell, input, text) {
   if (input.value) {
     cell.textContent
     = list.rows[0].cells[cell.cellIndex].cellIndex === getCellIndex(columnName3)
@@ -386,7 +358,67 @@ function formatNumberToMoney(input) {
 }
 
 function capitalizedFirstWordLetter(input) {
-  const word = input.value;
+  const word = input.value.trim();
 
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
+
+const isValue = someData => someData.value.trim() !== '';
+const isDigits = (input) => {
+  const re = /^[0-9]+$/;
+
+  return input.value.match(re);
+};
+
+function defineCasesToRejectNewText(cell, index, text, input) {
+  if (!isValue(input)) {
+    cell.textContent = text;
+    warningMessage.hidden = false;
+
+    return setTimeout(() => {
+      warningMessage.hidden = true;
+    }, 3000);
+  } else if (
+    !isDigits(input)
+    && index === getCellIndex(columnName3)
+  ) {
+    cell.textContent = text;
+    warningDigitsMessage.hidden = false;
+
+    return setTimeout(() => {
+      warningDigitsMessage.hidden = true;
+    }, 4000);
+  } else if (
+    !isDigits(input)
+    && index === getCellIndex(columnName1)
+  ) {
+    cell.textContent = text;
+    warningDigitsMessage.hidden = false;
+
+    return setTimeout(() => {
+      warningDigitsMessage.hidden = true;
+    }, 4000);
+  } else if (
+    index === getCellIndex(columnName1)
+    && input.value.length > 0
+    && !ageValidation(input)
+  ) {
+    cell.textContent = text;
+
+    return setTimeout(() => {
+      ageErrorMessage.hidden = true;
+    }, 5000);
+  } else if (
+    index === getCellIndex(columnName2)
+    && input.value.length > 0
+    && !nameValidation(input)
+  ) {
+    cell.textContent = text;
+
+    return setTimeout(() => {
+      nameErrorMessage.hidden = true;
+    }, 5000);
+  } else {
+    replaceTextToCellAndRemoveInput(cell, input, text);
+  }
+};
