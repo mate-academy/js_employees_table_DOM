@@ -66,64 +66,80 @@ tBodies.addEventListener('click', (e) => {
 });
 
 table.insertAdjacentHTML('afterend', `
-  <form class="new-employee-form">
-    <label>
-      Name:
-        <input
-          name="name"
-          type="text"
-          data-qa="name"
-          placeholder="Joe Black"
-        >
-    </label>
+<form class="new-employee-form">
+  <label>
+    Name:
+    <input
+      name="name"
+      type="text"
+      data-qa="name"
+      placeholder="Joe Black"
+    >
+  </label>
 
-    <label>
-      Position:
-        <input
-          name="position"
-          type="text"
-          data-qa="position"
-          placeholder="Employee position"
-        >
-    </label>
+  <label>
+    Position:
+    <input
+      name="position"
+      type="text"
+      data-qa="position"
+      placeholder="Employee position"
+    >
+  </label>
 
-    <label>
-      Office:
-      <select name="office" data-qa="office"
-      required>
-        <option value="Tokyo">Tokyo</option>
-        <option value="Singapore">Singapore</option>
-        <option value="London">London</option>
-        <option value="New York">New York</option>
-        <option value="Edinburgh">Edinburgh</option>
-        <option value="San Francisco">San Francisco</option>
-      </select>
-    </label>
+  <label>
+    Office:
+    <select
+      name="office"
+      type="select"
+      data-qa="office"
+    >
+      <option value="Tokyo">
+        Tokyo
+      </option>
+      <option value="Singapore">
+        Singapore
+      </option>
+      <option value="London">
+        London
+      </option>
+      <option value="New York">
+        New York
+      </option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">
+        San Francisco
+      </option>
+    </select>
+  </label>
 
-    <label>
-      Age:
-        <input
-          name="age"
-          type="number"
-          data-qa="age"
-          placeholder="Employee age"
-        >
-    </label>
+  <label>
+    Age:
+    <input
+      name="age"
+      type="number"
+      data-qa="age" placeholder="Employee age"
+    >
+  </label>
 
-    <label>
-      Salary:
-        <input
-          name="salary"
-          type="number"
-          data-qa="salary"
-          placeholder="Employee salary"
-        >
-    </label>
+  <label>
+    Salary:
+    <input
+      name="salary"
+      type="number"
+      data-qa="salary"
+      placeholder="Employee salary"
+    >
+  </label>
 
-    <button type="submit" class="validate__btn" value="Submit">
-      Save to table
-    </button>
-  </form>`);
+  <button
+    type="submit"
+    class="validate__btn"
+    value="Submit"
+  >
+    Save to table
+  </button>
+</form>`);
 
 const pushNotification = ({ title, description, type }) => {
   const message = document.createElement('div');
@@ -139,40 +155,37 @@ const pushNotification = ({ title, description, type }) => {
   setTimeout(() => message.remove(), 2000);
 };
 
-const wrong = {
-  title: 'Wrong!',
-  description: 'All form fields must be completed',
-  type: 'error',
-};
-
-const wrongName = {
-  title: 'Wrong Name!',
-  description: 'The name must contain 4 to 30 letters!',
-  type: 'error',
-};
-
-const wrongPosition = {
-  title: 'Wrong Position name!',
-  description: 'The position name should have more than 2 letters!',
-  type: 'error',
-};
-
-const wrongAge = {
-  title: 'Wrong Age!',
-  description: 'The employee must be over 18 and under 90!',
-  type: 'error',
-};
-
-const wrongSalary = {
-  title: 'Wrong Salary!',
-  description: 'The salary should be a positive number!',
-  type: 'error',
-};
-
-const success = {
-  title: 'Success!',
-  description: 'A new employee was added to the table!',
-  type: 'success',
+const notifications = {
+  wrong: {
+    title: 'WRONG!',
+    description: 'All form fields must be completed',
+    type: 'error',
+  },
+  wrongName: {
+    title: 'WRONG NAME!',
+    description: 'The name must contain 4 to 30 letters!',
+    type: 'error',
+  },
+  wrongPosition: {
+    title: 'WRONG POSITION NAME!',
+    description: 'The position name should have more than 2 letters!',
+    type: 'error',
+  },
+  wrongAge: {
+    title: 'WRONG AGE!',
+    description: 'The employee must be over 18 and under 90!',
+    type: 'error',
+  },
+  wrongSalary: {
+    title: 'WRONG SALARY!',
+    description: 'The salary should be a positive number!',
+    type: 'error',
+  },
+  success: {
+    title: 'SUCCESS!',
+    description: 'A new employee was added to the table!',
+    type: 'success',
+  },
 };
 
 const form = document.querySelector('.new-employee-form');
@@ -197,30 +210,30 @@ form.addEventListener('submit', function(e) {
 
   for (let i = 0; i < formInputs.length; i++) {
     if (!formInputs[i].value) {
-      pushNotification(wrong);
+      pushNotification(notifications.wrong);
 
       return;
     }
   }
 
   if (!nameReg.test(nameVal)) {
-    pushNotification(wrongName);
+    pushNotification(notifications.wrongName);
 
     return;
   }
 
   if (!positionReg.test(positionVal)) {
-    pushNotification(wrongPosition);
+    pushNotification(notifications.wrongPosition);
   }
 
   if (ageVal <= 18 || ageVal >= 90) {
-    pushNotification(wrongAge);
+    pushNotification(notifications.wrongAge);
 
     return;
   }
 
   if (!salaryReg.test(salaryVal)) {
-    pushNotification(wrongSalary);
+    pushNotification(notifications.wrongSalary);
 
     return;
   }
@@ -240,7 +253,7 @@ form.addEventListener('submit', function(e) {
 
   document.querySelector('table tbody').appendChild(tr);
 
-  pushNotification(success);
+  pushNotification(notifications.success);
 
   document.querySelector('form').reset();
 });
