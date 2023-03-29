@@ -4,6 +4,8 @@ const body = document.querySelector('body');
 const sortBy = document.querySelector('tr');
 const tBody = document.querySelector('tbody');
 const rows = tBody.querySelectorAll('tr');
+const minAge = 18;
+const maxAge = 90;
 
 body.insertAdjacentHTML('beforeend', `
 <form class="new-employee-form">
@@ -62,8 +64,8 @@ form.addEventListener('submit', (e) => {
 
 button.addEventListener('click', e => {
   if (inputName.value.length < 4
-    || inputAge.value < 18
-    || inputAge.value > 90) {
+    || inputAge.value < minAge
+    || inputAge.value > maxAge) {
     pushNotification('Title of Error message',
       'Message example.\n '
       + 'Notification should contain title and description.', 'error');
@@ -101,34 +103,39 @@ sortBy.addEventListener('click', e => {
       const sort = parents.querySelectorAll('tr');
       let sorted;
 
+      const sortForAge = (arr) => {
+        return arr.sort((a, b) =>
+          toNumAge(a.children[i]) - toNumAge(b.children[i]));
+      };
+
+      const sortForSalary = (arr) => {
+        return arr.sort((a, b) =>
+          toNum(a.children[i]) - toNum(b.children[i]));
+      };
+
+      const sortForString = (arr) => {
+        return arr.sort((a, b) =>
+          a.children[i].innerText.localeCompare(b.children[i].innerText));
+      };
+
       switch (e.target.parentNode.children[i].innerText) {
         case 'Salary':
-          sort[0] === [...sort].sort((a, b) =>
-            toNum(a.children[i]) - toNum(b.children[i]))[0]
-            ? sorted = [...sort].sort((a, b) =>
-              toNum(a.children[i]) - toNum(b.children[i])).reverse()
-            : sorted = [...sort].sort((a, b) =>
-              toNum(a.children[i]) - toNum(b.children[i]));
+          sort[0] === sortForSalary([...sort])[0]
+            ? sorted = sortForSalary([...sort]).reverse()
+            : sorted = sortForSalary([...sort]);
           break;
 
         case 'Age':
-          sort[0] === [...sort].sort((a, b) =>
-            toNumAge(a.children[i]) - toNumAge(b.children[i]))[0]
-            ? sorted = [...sort].sort((a, b) =>
-              toNumAge(a.children[i]) - toNumAge(b.children[i])).reverse()
-            : sorted = [...sort].sort((a, b) =>
-              toNumAge(a.children[i]) - toNumAge(b.children[i]));
+          sort[0] === sortForAge([...sort])[0]
+            ? sorted = sortForAge([...sort]).reverse()
+            : sorted = sortForAge([...sort]);
 
           break;
 
         default:
-          sort[0] === [...sort].sort((a, b) =>
-            a.children[i].innerText.localeCompare(b.children[i].innerText))[0]
-            ? sorted = [...sort].sort((a, b) =>
-              a.children[i].innerText.localeCompare(b.children[i].innerText)
-            ).reverse()
-            : sorted = [...sort].sort((a, b) =>
-              a.children[i].innerText.localeCompare(b.children[i].innerText));
+          sort[0] === sortForString([...sort])[0]
+            ? sorted = sortForString([...sort]).reverse()
+            : sorted = sortForString([...sort]);
       }
 
       parents.append(...sorted);
@@ -180,16 +187,17 @@ function setEditedCellValue() {
   if (isEditing) {
     const cellIndex = Array.from(cell.parentNode.children).indexOf(cell);
     const inputValue = input.value.trim();
+    const inputWithDolar = `$${parseInt(inputValue.split(',').join('').slice(1)
+    ).toLocaleString('en-US')}`;
+    const inputWithoutDolar = `$${parseInt(inputValue.split(',').join('')
+    ).toLocaleString('en-US')}`;
 
     switch (true) {
       case inputValue && cellIndex === 4:
         cell.textContent
           = inputValue.slice(0, 1) === '$'
-            ? `$${parseInt(
-              inputValue.split(',').join('').slice(1)
-            ).toLocaleString('en-US')}`
-            : `$${parseInt(inputValue.split(',').join('')
-            ).toLocaleString('en-US')}`;
+            ? inputWithDolar
+            : inputWithoutDolar;
         break;
       case inputValue && cellIndex !== 4:
         cell.textContent = inputValue;
