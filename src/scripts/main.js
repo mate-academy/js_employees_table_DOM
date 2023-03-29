@@ -40,14 +40,14 @@ required>
 
 <label>
 Age:
-<input name="number" type="text"
+<input name="number" type="number"
 data-qa="age"
 required>
 </label>
 
 <label>
 Salary:
-<input name="number" type="text
+<input name="number" type="number"
 data-qa="salary"
 required>
 </label>
@@ -113,9 +113,21 @@ body.addEventListener('click', event => {
 
     const nameInput = document.querySelector('form').children[0].children[0];
     const ageInput = document.querySelector('form').children[3].children[0];
+    const positionInput = document.querySelector('form').children[1]
+      .children[0];
+    const salaryInput = document.querySelector('form').children[4].children[0];
+
+    if (nameInput.value === ''
+      || ageInput.value === ''
+      || positionInput.value === ''
+      || salaryInput.value === '') {
+      createNotification('error');
+
+      return;
+    }
 
     if (nameInput.value.length < 4
-      || (ageInput.value < 18 && ageInput.value > 90)) {
+      || (+ageInput.value < 18 || +ageInput.value > 90)) {
       createNotification('error');
 
       return;
