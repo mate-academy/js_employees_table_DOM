@@ -10,49 +10,52 @@ const strFormat = function(a, cellIndex) {
     .textContent.split('$').join('').split(',').join('');
 };
 
-table.addEventListener('click', (e) => {
-  const tableItem = e.target.closest('th');
-  const cellIndex = tableItem.cellIndex;
+let i;
 
-  const sortList = function(items) {
-    return [...items].sort((a, b) => {
-      const textA = strFormat(a, cellIndex);
-      const textB = strFormat(b, cellIndex);
+const sortList = function(items, sortType) {
+  return [...items].sort((a, b) => {
+    const textA = strFormat(a, i);
+    const textB = strFormat(b, i);
 
+    if (sortType === 'asc') {
       if (isNaN(textA) && isNaN(textB)) {
         return textA > textB ? 1 : -1;
       } else {
         return (textA - textB);
       }
-    });
-  };
+    }
 
-  document.querySelector('tbody').append(...sortList(list, cellIndex));
-});
-
-function numberWithComma(x) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
-
-table.addEventListener('dblclick', (e) => {
-  const tableItem = e.target.closest('th');
-  const cellIndex = tableItem.cellIndex;
-
-  const sortList = function(items) {
-    return [...items].sort((a, b) => {
-      const textA = strFormat(a, cellIndex);
-      const textB = strFormat(b, cellIndex);
-
+    if (sortType === 'desc') {
       if (isNaN(textA) && isNaN(textB)) {
         return textB > textA ? 1 : -1;
       } else {
         return (textB - textA);
       }
-    });
-  };
+    }
+  });
+};
 
-  document.querySelector('tbody').append(...sortList(list, cellIndex));
+let sortOfType = 'asc';
+
+table.addEventListener('click', (e) => {
+  const tableItem = e.target.closest('th');
+  const cellIndex = tableItem.cellIndex;
+
+  i = cellIndex;
+
+  if (sortOfType === 'desc') {
+    document.querySelector('tbody').append(...sortList(list, 'asc', cellIndex));
+    sortOfType = 'asc';
+  } else {
+    document.querySelector('tbody').append(...sortList(list,
+      'desc', cellIndex));
+    sortOfType = 'desc';
+  }
 });
+
+function numberWithComma(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
 
 let selectedTr;
 
@@ -83,29 +86,30 @@ const form = document.createElement('form');
 form.setAttribute('class', 'new-employee-form');
 document.body.appendChild(form);
 
-const nameLabel = document.createElement('label');
+function createLabeledInput(labelText, inputType, dataQaValue) {
+  const label = document.createElement('label');
 
-nameLabel.textContent = 'Name:';
+  label.textContent = labelText;
 
-const nameInput = document.createElement('input');
+  const input = document.createElement('input');
 
-nameInput.setAttribute('type', 'text');
-nameInput.setAttribute('data-qa', 'name');
-nameInput.setAttribute('pattern', '[a-zA-Z]+');
-nameLabel.append(nameInput);
-form.appendChild(nameLabel);
+  input.setAttribute('type', inputType);
+  input.setAttribute('data-qa', dataQaValue);
+  input.setAttribute('pattern', '[a-zA-Z]+');
 
-const positionLabel = document.createElement('label');
+  label.append(input);
 
-positionLabel.textContent = 'Position:';
+  return label;
+}
 
-const positionInput = document.createElement('input');
+const nameLabeledInput = createLabeledInput('Name:', 'text', 'name');
 
-positionInput.setAttribute('type', 'text');
-positionInput.setAttribute('data-qa', 'position');
-positionInput.setAttribute('pattern', '[a-zA-Z]+');
-positionLabel.append(positionInput);
-form.appendChild(positionLabel);
+form.appendChild(nameLabeledInput);
+
+const positionLabeledInput = createLabeledInput('Position:',
+  'text', 'position');
+
+form.appendChild(positionLabeledInput);
 
 const selectLabel = document.createElement('label');
 
@@ -208,17 +212,16 @@ function validateForm(nameN, ageN) {
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  const nameV = document.getElementsByTagName('input')[0].value;
+  const nameValue = document.getElementsByTagName('input')[0].value;
   const positionV = document.getElementsByTagName('input')[1].value;
   const ageV = document.getElementsByTagName('input')[2].value;
   const salaryV = '$' + document.getElementsByTagName('input')[3].value;
 
   const selectElem = document.querySelector('select');
-  const i = selectElem.selectedIndex;
   const officeV = selectElem.options[i].text;
-  const newEmp = [nameV, positionV, officeV, ageV, salaryV];
+  const newEmp = [nameValue, positionV, officeV, ageV, salaryV];
 
-  if (validateForm(nameV, ageV) === true
+  if (validateForm(nameValue, ageV) === true
     && salaryCheck(salaryInput.value) === true) {
     const addForm = function() {
       const tr = document.createElement('tr');
@@ -297,12 +300,12 @@ table.addEventListener('dblclick',
       itemValidation(index);
     });
 
-    const itemValidation = (i) => {
+    const itemValidation = (k) => {
       if (!item.value) {
         cell.innerText = tempValue;
       }
 
-      switch (i) {
+      switch (k) {
         case 0:
           if (item.value.trim().length < 4) {
             cell.innerText = tempValue;
