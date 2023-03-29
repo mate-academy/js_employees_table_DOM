@@ -63,9 +63,10 @@ form.addEventListener('submit', (e) => {
 });
 
 button.addEventListener('click', e => {
-  if (inputName.value.length < 4
-    || inputAge.value < minAge
-    || inputAge.value > maxAge) {
+  const nameLength = inputName.value.length;
+  const age = inputAge.value;
+
+  if (nameLength < 4 || age < minAge || age > maxAge) {
     pushNotification('Title of Error message',
       'Message example.\n '
       + 'Notification should contain title and description.', 'error');
