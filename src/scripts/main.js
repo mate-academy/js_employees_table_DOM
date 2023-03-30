@@ -8,9 +8,7 @@ const tBodies = table.querySelector('tbody');
 let selectedRow = null;
 let activeCell = null;
 
-const directions = Array.from(headers).map(function(header) {
-  return '';
-});
+const directions = Array.from(headers).map((header) => '');
 
 headers.forEach(header => {
   header.addEventListener('click', () => {
@@ -199,7 +197,7 @@ const salaryReg = /^\d{1,}$/;
 const nameReg = /^([a-z]+( [a-z]+)?){4,30}$/i;
 const positionReg = /^([a-z]+( [a-z]+)?){2,50}$/i;
 
-form.addEventListener('submit', function(e) {
+form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const tr = document.createElement('tr');
@@ -227,7 +225,7 @@ form.addEventListener('submit', function(e) {
     pushNotification(notifications.wrongPosition);
   }
 
-  if (ageVal <= 18 || ageVal >= 90) {
+  if (ageVal < 18 || ageVal >= 90) {
     pushNotification(notifications.wrongAge);
 
     return;
@@ -239,14 +237,14 @@ form.addEventListener('submit', function(e) {
     return;
   }
 
-  for (let q = 0; q < cols.length; ++q) {
+  for (let i = 0; i < cols.length; ++i) {
     const tdCell = document.createElement('td');
 
-    tdCell.textContent = document.getElementsByName(cols[q])[0].value;
+    tdCell.textContent = document.getElementsByName(cols[i])[0].value;
 
-    if (cols[q] === 'salary') {
+    if (cols[i] === 'salary') {
       tdCell.textContent = `$`
-        + document.getElementsByName(cols[q])[0].value
+        + document.getElementsByName(cols[i])[0].value
           .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
     tr.appendChild(tdCell);
@@ -270,10 +268,10 @@ table.addEventListener('dblclick', (e) => {
     return;
   };
 
-  editor(td);
+  editCell(td);
 });
 
-function editor(cell) {
+function editCell(cell) {
   if (activeCell) {
     return;
   }
@@ -291,7 +289,7 @@ function editor(cell) {
   input.addEventListener('blur', function() {
     const value = input.value.trim();
 
-    if (value === '') {
+    if (!value) {
       activeCell.innerHTML = activeCell.getAttribute('data-original-value');
     } else {
       activeCell.innerHTML = value;
@@ -301,16 +299,16 @@ function editor(cell) {
     activeCell = null;
   });
 
-  function saveChanges(inPut) {
-    const value = inPut.value.trim();
+  function saveChanges(inputChange) {
+    const value = inputChange.value.trim();
 
-    if (value === '') {
+    if (!value) {
       activeCell.innerHTML = activeCell.getAttribute('data-original-value');
     } else {
       activeCell.innerHTML = value;
     }
     activeCell.removeAttribute('data-original-value');
-    inPut.removeEventListener('blur', saveChanges);
+    inputChange.removeEventListener('blur', saveChanges);
     activeCell = null;
   }
 }
