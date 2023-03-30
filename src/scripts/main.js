@@ -17,25 +17,26 @@ headers.forEach(header => {
     const index = header.cellIndex;
     const rows = table.tBodies[0].querySelectorAll('tr');
     const rowsArray = [...rows];
-
     const direction = directions[index] || 'asc';
 
     const multiplier = (direction === 'asc') ? 1 : -1;
 
     rowsArray.sort((a, b) => {
-      const cellA = a.querySelectorAll('td')[index].textContent;
-      const cellB = b.querySelectorAll('td')[index].textContent;
-
-      function num(str) {
+      function numOrSrting(str) {
         const hasDigits = /\d/.test(str);
 
         return hasDigits ? +str.replace(/\D/g, '') : str;
       };
 
-      switch (true) {
-        case num(cellA) > num(cellB): return 1 * multiplier;
-        case num(cellA) < num(cellB): return -1 * multiplier;
-        case num(cellA) === num(cellB): return 0;
+      const cellA = numOrSrting(a.querySelectorAll('td')[index].textContent);
+      const cellB = numOrSrting(b.querySelectorAll('td')[index].textContent);
+
+      if (cellA > cellB) {
+        return 1 * multiplier;
+      } else if (cellA < cellB) {
+        return -1 * multiplier;
+      } else {
+        return 0;
       }
     });
 
