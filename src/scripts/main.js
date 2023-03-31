@@ -62,14 +62,14 @@ function convertToNumber(string) {
 });
 
 const commonBody = document.querySelector('body');
-const employeForm = document.createElement('form');
+const employeeForm = document.createElement('form');
 
-employeForm.className = `new-employee-form`;
-commonBody.append(employeForm);
+employeeForm.className = `new-employee-form`;
+commonBody.append(employeeForm);
 
 // script to add a form to the document
 
-employeForm.innerHTML = `
+employeeForm.innerHTML = `
   <label>
     Name:
     <input
@@ -136,6 +136,7 @@ for (const city of selectOptions) {
 
 const firstName = document.querySelector('[name="name"]');
 const age = document.querySelector('[name="age"]');
+const position = document.querySelector('[name="position"]');
 
 const minNameLength = 4;
 const youngest = 18;
@@ -143,7 +144,7 @@ const oldest = 90;
 
 const form = document.querySelector('form');
 
-function addNewEmploye() {
+function addNewEmployee() {
   const labels = form.querySelectorAll('label');
   const labelsChildren = [];
 
@@ -178,14 +179,34 @@ function addNewEmploye() {
   return list.appendChild(newRow);
 }
 
+const validInput = (value) => {
+  const re = /^[a-zA-Z]+( [a-zA-Z]+){0,}$/;
+
+  return re.test(value);
+};
+
+const positionValidation = (place) => {
+  let valid = false;
+  const value = place.value.trim();
+
+  if (!isValue(value) || !validInput(value)) {
+    warningLettersMessage.hidden = false;
+  } else {
+    warningLettersMessage.hidden = true;
+    valid = true;
+  }
+
+  return valid;
+};
+
 const nameValidation = (givenName) => {
   let valid = false;
+  const value = givenName.value.trim();
 
-  nameErrorMessage.hidden = true;
-
-  if (givenName.value.length < minNameLength) {
+  if (value.length < minNameLength || !validInput(value)) {
     nameErrorMessage.hidden = false;
   } else {
+    nameErrorMessage.hidden = true;
     valid = true;
   }
 
@@ -195,63 +216,57 @@ const nameValidation = (givenName) => {
 const ageValidation = (input) => {
   let valid = false;
 
-  ageErrorMessage.hidden = true;
-
   if (input.value < youngest || input.value > oldest) {
     ageErrorMessage.hidden = false;
-
-    if (nameErrorMessage.hidden === false) {
-      ageErrorMessage.style.top = '170%';
-    } else {
-      ageErrorMessage.style.top = '110%';
-    }
   } else {
     valid = true;
+    ageErrorMessage.hidden = true;
   }
 
   return valid;
 };
 
-employeForm.addEventListener('submit', function(e) {
+employeeForm.addEventListener('submit', function(e) {
   e.preventDefault();
 
   const isNameValid = nameValidation(firstName);
   const isAgeValid = ageValidation(age);
+  const isPositionValid = positionValidation(position);
 
-  const isFormValid = isNameValid && isAgeValid;
-
-  if (!isFormValid && messageOfAcception.hidden === false) {
-    messageOfAcception.hidden = true;
-  }
+  const isFormValid = isNameValid && isAgeValid && isPositionValid;
 
   if (isFormValid) {
-    messageOfAcception.hidden = false;
-
-    setTimeout(() => {
-      messageOfAcception.hidden = true;
-    }, 3000);
-    addNewEmploye();
-    employeForm.reset();
+    addNewEmployee();
+    createSuccessNotification(firstName);
+    employeeForm.reset();
   }
 });
+
+const formsCoords = employeeForm.getBoundingClientRect();
+
+const noteContainer = document.createElement('div');
+
+employeeForm.append(noteContainer);
+
+noteContainer.style.position = 'absolute';
+noteContainer.style.top = `${formsCoords.height}px`;
+noteContainer.style.left = 0;
+noteContainer.style.width = 'max-content';
 
 const ageErrorText
   = 'Employees younger than 18 y.o and older than 90 y.o. are not allowed';
 const errorTitle = 'Error';
-const nameErrorText
-  = 'Employees with name shoter than 4 letters are not allowed';
-const nameErrorMessage = createNotification('error', nameErrorText, errorTitle);
 const ageErrorMessage = createNotification('error', ageErrorText, errorTitle);
-const titleOfAcception = 'Accepted';
-const textOfAcception = `New employe is successfully added`;
-const messageOfAcception = createNotification(
-  'success',
-  textOfAcception,
-  titleOfAcception);
+
+const nameErrorText
+  = 'Field `Name` allows to enter only letters and not less than 4';
+const nameErrorMessage = createNotification('error', nameErrorText, errorTitle);
+
 const warningMessageTitle = 'Warning';
-const warningMessageText = 'Field cannot be blank';
+const warningMessageText = 'No new data were entered';
 const warningMessage
   = createNotification('warning', warningMessageText, warningMessageTitle);
+
 const warningDigitsMessageText
   = 'Only digits are allowed to enter in this cell';
 const warningDigitsMessage = createNotification(
@@ -259,28 +274,65 @@ const warningDigitsMessage = createNotification(
   warningDigitsMessageText,
   warningMessageTitle);
 
-function createNotification(nameOfClass, text, titleText) {
-  employeForm.insertAdjacentHTML('afterbegin', `
-    <div class="notification" data-qa="notification"></div>
-  `);
+const warningLettersMessageText = 'Fill the field please with letters only';
+const warningLettersMessage = createNotification(
+  'warning',
+  warningLettersMessageText,
+  warningMessageTitle);
 
-  const notification = document.querySelector('[data-qa="notification"]');
+function createNotification(nameOfClass, text, titleText) {
+  const notification = document.createElement('div');
+
+  notification.className = 'notification';
+  notification.dataset.qa = 'notification';
 
   notification.classList.add(`${nameOfClass}`);
-  notification.style.top = '110%';
-  notification.style.right = '0';
+  notification.style.position = 'static';
   notification.style.color = 'white';
 
-  const notificationTitle = document.createElement('h1');
+  const notificationTitle = document.createElement('p');
   const notificationText = document.createElement('p');
 
-  notification.appendChild(notificationTitle);
-  notification.appendChild(notificationText);
-  notification.classList.add('title');
+  notificationTitle.className = 'title';
   notificationTitle.textContent = `${titleText}`;
   notificationText.textContent = `${text}`;
+  notification.appendChild(notificationTitle);
+  notification.appendChild(notificationText);
 
   notification.hidden = true;
+
+  noteContainer.appendChild(notification);
+
+  return notification;
+}
+
+function createSuccessNotification(employeeName) {
+  const newEmployeeName = employeeName.value;
+  const notification = document.createElement('div');
+
+  notification.className = 'notification';
+  notification.dataset.qa = 'notification';
+
+  notification.classList.add('success');
+  notification.style.position = 'static';
+  notification.style.color = 'white';
+
+  const notificationTitle = document.createElement('p');
+  const notificationText = document.createElement('p');
+
+  notificationTitle.className = 'title';
+  notificationTitle.textContent = 'Accepted';
+
+  notificationText.textContent
+    = `New employe ${newEmployeeName} is successfully added`;
+  notification.appendChild(notificationTitle);
+  notification.appendChild(notificationText);
+
+  noteContainer.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 5000);
 
   return notification;
 }
@@ -340,6 +392,8 @@ function replaceTextToCellAndRemoveInput(cell, input, text) {
 const columnName1 = 'age';
 const columnName2 = 'name';
 const columnName3 = 'salary';
+const columnName4 = 'position';
+const columnName5 = 'office';
 
 function getCellIndex(columnName) {
   const headTitles = headlines.cells;
@@ -363,62 +417,79 @@ function capitalizedFirstWordLetter(input) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
-const isValue = someData => someData.value.trim() !== '';
-const isDigits = (input) => {
+const isValue = value => value !== '';
+const isDigits = (value) => {
   const re = /^[0-9]+$/;
 
-  return input.value.match(re);
+  return re.test(value);
 };
 
 function defineCasesToRejectNewText(cell, index, text, input) {
-  if (!isValue(input)) {
-    cell.textContent = text;
-    warningMessage.hidden = false;
+  const value = input.value.trim();
 
-    return setTimeout(() => {
-      warningMessage.hidden = true;
-    }, 3000);
-  } else if (
-    !isDigits(input)
-    && index === getCellIndex(columnName3)
-  ) {
-    cell.textContent = text;
-    warningDigitsMessage.hidden = false;
+  switch (true) {
+    case !isValue(value):
+      cell.textContent = text;
+      warningMessage.hidden = false;
 
-    return setTimeout(() => {
-      warningDigitsMessage.hidden = true;
-    }, 4000);
-  } else if (
-    !isDigits(input)
-    && index === getCellIndex(columnName1)
-  ) {
-    cell.textContent = text;
-    warningDigitsMessage.hidden = false;
+      setTimeout(() => {
+        warningMessage.hidden = true;
+      }, 2000);
+      break;
 
-    return setTimeout(() => {
-      warningDigitsMessage.hidden = true;
-    }, 4000);
-  } else if (
-    index === getCellIndex(columnName1)
-    && input.value.length > 0
-    && !ageValidation(input)
-  ) {
-    cell.textContent = text;
+    case (index === getCellIndex(columnName3) && !isDigits(value)):
+      cell.textContent = text;
+      warningDigitsMessage.hidden = false;
 
-    return setTimeout(() => {
-      ageErrorMessage.hidden = true;
-    }, 5000);
-  } else if (
-    index === getCellIndex(columnName2)
-    && input.value.length > 0
-    && !nameValidation(input)
-  ) {
-    cell.textContent = text;
+      setTimeout(() => {
+        warningDigitsMessage.hidden = true;
+      }, 4000);
+      break;
 
-    return setTimeout(() => {
-      nameErrorMessage.hidden = true;
-    }, 5000);
-  } else {
-    replaceTextToCellAndRemoveInput(cell, input, text);
+    case (index === getCellIndex(columnName1) && !isDigits(value)):
+      cell.textContent = text;
+      warningDigitsMessage.hidden = false;
+
+      setTimeout(() => {
+        warningDigitsMessage.hidden = true;
+      }, 4000);
+      break;
+
+    case (index === getCellIndex(columnName1) && !ageValidation(input)):
+      cell.textContent = text;
+
+      setTimeout(() => {
+        ageErrorMessage.hidden = true;
+      }, 5000);
+      break;
+
+    case (index === getCellIndex(columnName2) && !nameValidation(input)):
+      cell.textContent = text;
+
+      setTimeout(() => {
+        nameErrorMessage.hidden = true;
+      }, 5000);
+      break;
+
+    case (index === getCellIndex(columnName4) && !validInput(value)):
+      cell.textContent = text;
+      warningLettersMessage.hidden = false;
+
+      setTimeout(() => {
+        warningLettersMessage.hidden = true;
+      }, 3000);
+      break;
+
+    case (index === getCellIndex(columnName5) && !validInput(value)):
+      cell.textContent = text;
+      warningLettersMessage.hidden = false;
+
+      setTimeout(() => {
+        warningLettersMessage.hidden = true;
+      }, 3000);
+      break;
+
+    default:
+      replaceTextToCellAndRemoveInput(cell, input, text);
   }
 };
