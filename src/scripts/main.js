@@ -2,7 +2,10 @@
 
 const table = document.querySelector('table');
 const tbody = document.querySelector('tbody');
-const sortTableASC = function(index, type) {
+
+let isAscending = true;
+
+const sortTable = function(index, type) {
   const compare = function(rowA, rowB) {
     const rowADate = rowA.cells[index].innerHTML;
     const rowBDate = rowB.cells[index].innerHTML;
@@ -12,19 +15,19 @@ const sortTableASC = function(index, type) {
       case 'Position':
       case 'Office':
         if (rowADate < rowBDate) {
-          return -1;
+          return isAscending ? -1 : 1;
         } else if (rowADate > rowBDate) {
-          return 1;
+          return isAscending ? 1 : -1;
         }
 
         return 0;
       case 'Age':
-        return rowADate - rowBDate;
+        return isAscending ? rowADate - rowBDate : rowBDate - rowADate;
       case 'Salary':
-        const dateA = rowADate.split('$').join('').split(',').join('');
-        const dateB = rowBDate.split('$').join('').split(',').join('');
+        const dateA = rowADate.replace(/[$,]/g, '');
+        const dateB = rowBDate.replace(/[$,]/g, '');
 
-        return dateA - dateB;
+        return isAscending ? dateA - dateB : dateB - dateA;
     }
   };
 
@@ -39,45 +42,8 @@ const sortTableASC = function(index, type) {
   }
 
   table.appendChild(tbody);
-};
 
-const sortTableDESC = function(index, type) {
-  const compare = function(rowA, rowB) {
-    const rowADate = rowA.cells[index].innerHTML;
-    const rowBDate = rowB.cells[index].innerHTML;
-
-    switch (type) {
-      case 'Name':
-      case 'Position':
-      case 'Office':
-        if (rowADate < rowBDate) {
-          return 1;
-        } else if (rowADate > rowBDate) {
-          return -1;
-        }
-
-        return 0;
-      case 'Age':
-        return rowBDate - rowADate;
-      case 'Salary':
-        const dateA = rowADate.split('$').join('').split(',').join('');
-        const dateB = rowBDate.split('$').join('').split(',').join('');
-
-        return dateB - dateA;
-    }
-  };
-
-  const rows = [].slice.call(tbody.rows);
-
-  rows.sort(compare);
-
-  table.removeChild(tbody);
-
-  for (let i = 0; i < rows.length; i++) {
-    tbody.appendChild(rows[i]);
-  }
-
-  table.appendChild(tbody);
+  isAscending = !isAscending;
 };
 
 let nameCount = 0;
@@ -96,7 +62,7 @@ table.addEventListener('click', (e) => {
   const index = el.cellIndex;
   const type = el.innerText;
 
-  sortTableASC(index, type);
+  sortTable(index, type);
 
   switch (type) {
     case 'Name':
@@ -117,27 +83,27 @@ table.addEventListener('click', (e) => {
   }
 
   if (nameCount === 2) {
-    sortTableDESC(index, type);
+    isAscending = true;
     nameCount = 0;
   }
 
   if (positionCount === 2) {
-    sortTableDESC(index, type);
+    isAscending = true;
     positionCount = 0;
   }
 
   if (officeCount === 2) {
-    sortTableDESC(index, type);
+    isAscending = true;
     officeCount = 0;
   }
 
   if (ageCount === 2) {
-    sortTableDESC(index, type);
+    isAscending = true;
     ageCount = 0;
   }
 
   if (salaryCount === 2) {
-    sortTableDESC(index, type);
+    isAscending = true;
     salaryCount = 0;
   }
 });
@@ -173,10 +139,11 @@ table.insertAdjacentHTML('afterend', `
     </select>
   </label>
   <label>Age: 
-    <input name="age" type="number" data-qa="age" required>
+    <input name="age" type="number" data-qa="age" min="18" 
+    max="90" required>
   </label>
   <label>Salary: 
-    <input name="salary" type="number" data-qa="salary" required>
+    <input name="salary" type="number" data-qa="salary" min="1" required>
   </label>
   <button>Save to table</button>
 </form>
@@ -226,11 +193,18 @@ button.addEventListener('click', (e) => {
 
   let isValid = true;
 
-  if (inputName[0].value.length < 4) {
+  if ((inputName[0].value.length
+    - (inputName[0].value.split(' ').length - 1)) < 4) {
     isValid = false;
 
     pushNotification('Error message',
       'Name should be at least 4 characters long.', 'error');
+  } else if ((inputPosition[0].value.length
+    - (inputPosition[0].value.split(' ').length - 1)) < 4) {
+    isValid = false;
+
+    pushNotification('Error message',
+      'Position should be at least 4 characters long.', 'error');
   } else if (inputAge[0].value < 18 || inputAge[0].value > 90) {
     isValid = false;
 
@@ -251,8 +225,7 @@ button.addEventListener('click', (e) => {
           <td>${inputPosition[0].value}</td>
           <td>${inputOffice[0].value}</td>
           <td>${inputAge[0].value}</td>
-          <td>$${inputSalary[0].value.slice(0, 3)},
-          ${inputSalary[0].value.slice(3)}</td>
+          <td>$${Number(inputSalary[0].value).toLocaleString('en-US')}</td>
         `);
 
     pushNotification('Success message',
@@ -262,39 +235,55 @@ button.addEventListener('click', (e) => {
 });
 
 tbody.addEventListener('dblclick', (e) => {
-  const target = e.target;
-  const input = document.createElement('input');
-  const initialValue = target.textContent;
+  const item = e.target;
+  const targetCell = item.cellIndex;
+  const prevValue = item.innerText;
+  const normValue = prevValue.replace(/[$,]/g, '');
+  const targetInput
+    = form.querySelectorAll('[data-qa]')[targetCell].cloneNode(true);
 
-  input.classList.add('cell-input');
-  target.innerText = '';
-  target.append(input);
-  input.focus();
+  targetInput.classList.add('cell-input');
+  targetInput.value = normValue;
+  item.firstChild.replaceWith(targetInput);
+  targetInput.focus();
 
-  function changeCellContent(value = initialValue) {
-    target.innerText = value;
-    input.remove();
-  }
+  targetInput.addEventListener('keypress', eventKey => {
+    if (eventKey.key === 'Enter') {
+      targetInput.blur();
+    }
+  });
 
-  function saveEditedField() {
-    if (!input.value) {
-      changeCellContent();
+  targetInput.addEventListener('blur', eventBlur => {
+    if ((targetInput.name === 'name' || 'position' || 'office')
+    && targetInput.value.length >= 4) {
+      item.textContent = targetInput.value;
+
+      pushNotification('Success message',
+        'Success!', 'success');
+
+      return;
+    } else if (targetInput.name === 'age'
+    && targetInput.value >= 18
+    && targetInput.value <= 90) {
+      item.textContent = targetInput.value;
+
+      pushNotification('Success message',
+        'Success!', 'success');
+
+      return;
+    } else if (targetInput.name === 'salary'
+    && targetInput.value >= 1) {
+      item.textContent
+      = `$${Number(targetInput.value).toLocaleString('en-US')}`;
+
+      pushNotification('Success message',
+        'Success!', 'success');
 
       return;
     }
+    item.textContent = prevValue;
 
-    changeCellContent(input.value);
-  }
-
-  input.onblur = () => {
-    saveEditedField();
-  };
-
-  input.onkeydown = (keyboardEvent) => {
-    const isEnter = keyboardEvent.code === 'Enter';
-
-    if (isEnter) {
-      saveEditedField();
-    }
-  };
+    pushNotification('Error message',
+      'Input error', 'error');
+  });
 });
