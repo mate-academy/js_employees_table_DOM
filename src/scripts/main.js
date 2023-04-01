@@ -125,50 +125,35 @@ submit.addEventListener('click', function(e) {
 
   const data = new FormData(form);
   const dataObject = Object.fromEntries(data.entries());
-  let withoutMistakes = true;
 
-  const validations = {
-    name: {
-      isValid: dataObject.name.length >= 4,
-      message: 'Name could not be less than 4 letters',
-    },
-    age: {
-      isValid: dataObject.age >= 18 && dataObject.age <= 90,
-      message: 'Age must be between 18 to 90',
-    },
-    position: {
-      isValid: dataObject.position && dataObject.position.length >= 2,
-      message: 'Enter valid position',
-    },
-    salary: {
-      isValid: !isNaN(dataObject.salary) && dataObject.salary > 0,
-      message: 'Enter valid salary',
-    },
-  };
+  if (dataObject.name.trim().length < 4) {
+    pushNotification('error', 'Error',
+      'Name should contain more than 4 letters');
+  } else if (+dataObject.age < 18 || +dataObject.age > 90) {
+    pushNotification('error', 'Error',
+      'Age does not meet the requirements');
+  } else if (dataObject.salary.length > 12) {
+    pushNotification('error', 'Error',
+      'Enter actual salary');
+  } else if (!dataObject.position
+      || dataObject.position.trim().length < 3
+      || !dataObject.salary) {
+    pushNotification('error', 'Error',
+      'All fields are required');
+  } else {
+    pushNotification('success', 'Success', 'New employee was added');
 
-  Object.keys(validations).forEach(key => {
-    const validation = validations[key];
+    const newRow = document.createElement('tr');
 
-    if (!validation.isValid) {
-      pushNotification('error', 'Error', validation.message);
-      withoutMistakes = false;
-    }
-  });
+    dataObject.salary = '$' + Number(dataObject.salary).toLocaleString('en-US');
 
-  const newRow = document.createElement('tr');
+    Object.values(dataObject).forEach(value => {
+      const cell = document.createElement('td');
 
-  dataObject.salary = '$' + Number(dataObject.salary).toLocaleString('en-US');
+      cell.textContent = value;
 
-  Object.values(dataObject).forEach(value => {
-    const cell = document.createElement('td');
-
-    cell.textContent = value;
-
-    newRow.append(cell);
-  });
-
-  if (withoutMistakes) {
-    pushNotification('success', 'Success', 'Success');
+      newRow.append(cell);
+    });
 
     tbody.append(newRow);
 
