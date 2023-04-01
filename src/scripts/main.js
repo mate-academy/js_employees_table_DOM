@@ -88,7 +88,7 @@ function createNotification(type) {
   if (divNotification.className === 'error') {
     divNotification.style.background = 'rgba(253, 0, 0, 0.3)';
     h1.textContent = 'Error';
-    p.textContent = 'invalid value. Try again';
+    p.textContent = '';
   }
 
   if (divNotification.className === 'success') {
@@ -123,12 +123,47 @@ body.addEventListener('click', event => {
       || salaryInput.value === '') {
       createNotification('error');
 
+      document.querySelector('.error')
+        .querySelector('p').textContent = 'All fields must be field';
+
       return;
     }
 
-    if (nameInput.value.length < 4
-      || (+ageInput.value < 18 || +ageInput.value > 90)) {
+    if (nameInput.value === ''
+      || ageInput.value === ''
+      || positionInput.value === ''
+      || salaryInput.value === '') {
       createNotification('error');
+
+      document.querySelector('.error')
+        .querySelector('p').textContent = 'All fields must be field';
+
+      return;
+    }
+
+    if (nameInput.value.length < 4) {
+      createNotification('error');
+
+      document.querySelector('.error')
+        .querySelector('p').textContent = 'A name is too short. Try again';
+
+      return;
+    }
+
+    if (+ageInput.value < 18) {
+      createNotification('error');
+
+      document.querySelector('.error')
+        .querySelector('p').textContent = 'Age is less than 18. Try again';
+
+      return;
+    }
+
+    if (+ageInput.value > 90) {
+      createNotification('error');
+
+      document.querySelector('.error')
+        .querySelector('p').textContent = 'Age is more than 90. Try again';
 
       return;
     }
