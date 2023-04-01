@@ -1,5 +1,4 @@
 'use strict';
-// PART 1. SORTING
 
 const table = document.querySelector('table');
 const tbody = document.querySelector('tbody');
@@ -143,8 +142,6 @@ table.addEventListener('click', (e) => {
   }
 });
 
-// PART 2. SELECTED ROW
-
 tbody.addEventListener('click', e => {
   if (e.target.tagName !== 'TD') {
     return;
@@ -156,8 +153,6 @@ tbody.addEventListener('click', e => {
 
   e.target.parentNode.classList.add('active');
 });
-
-// PART 3. ADD FORM
 
 table.insertAdjacentHTML('afterend', `
 <form class="new-employee-form" action="get">
@@ -187,8 +182,6 @@ table.insertAdjacentHTML('afterend', `
 </form>
 `);
 
-// PART 4. NO RESET
-
 document.querySelector('form').addEventListener('submit', function(e) {
   e.preventDefault();
 });
@@ -199,7 +192,6 @@ form.addEventListener('submit', function handleSubmit(e) {
   e.preventDefault();
 });
 
-// PART 5. SAVE TO TABLE
 const pushNotification = (title, description, type) => {
   const body = document.querySelector('body');
   const notification = document.createElement('div');
@@ -264,7 +256,45 @@ button.addEventListener('click', (e) => {
         `);
 
     pushNotification('Success message',
-    'Employee added successfully!', 'success');
+      'Employee added successfully!', 'success');
     form.reset();
   }
+});
+
+tbody.addEventListener('dblclick', (e) => {
+  const target = e.target;
+  const input = document.createElement('input');
+  const initialValue = target.textContent;
+
+  input.classList.add('cell-input');
+  target.innerText = '';
+  target.append(input);
+  input.focus();
+
+  function changeCellContent(value = initialValue) {
+    target.innerText = value;
+    input.remove();
+  }
+
+  function saveEditedField() {
+    if (!input.value) {
+      changeCellContent();
+
+      return;
+    }
+
+    changeCellContent(input.value);
+  }
+
+  input.onblur = () => {
+    saveEditedField();
+  };
+
+  input.onkeydown = (keyboardEvent) => {
+    const isEnter = keyboardEvent.code === 'Enter';
+
+    if (isEnter) {
+      saveEditedField();
+    }
+  };
 });
