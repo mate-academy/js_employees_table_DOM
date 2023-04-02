@@ -116,6 +116,8 @@ function doHighlight(e) {
     list.forEach(a => a.classList.remove('active'));
 
     item.classList.add('active');
+  } else {
+    list.forEach(a => a.classList.remove('active'));
   }
 }
 
