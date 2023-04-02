@@ -1,55 +1,13 @@
 'use strict';
 
+const minNameLength = 4;
+const minAge = 18;
+const maxAge = 90;
+
 const table = document.querySelector('table');
 const ths = table.querySelectorAll('thead th');
-const tbody = table.querySelector('tbody');
-const rows = Array.from(tbody.querySelectorAll('tr'));
-
-ths.forEach(function(th) {
-  th.addEventListener('click', function() {
-    const direction = th.getAttribute('data-sort') === 'asc' ? 'desc' : 'asc';
-
-    // Определяем номер столбца, по которому нужно сортировать
-    const column = th.cellIndex;
-
-    // Создаем функцию для сортировки строк таблицы
-    const sortFunction = makeSortFunction(column, direction);
-
-    // Сортируем строки таблицы и добавляем их обратно в tbody
-    const sortedRows = rows.sort(sortFunction);
-
-    tbody.append(...sortedRows);
-
-    // Задаем направление сортировки в атрибуте data-sort заголовка таблицы
-    th.setAttribute('data-sort', direction);
-  });
-});
-
-function makeSortFunction(column, direction) {
-  return function(a, b) {
-    const aValue = a.children[column].textContent;
-    const bValue = b.children[column].textContent;
-
-    if (aValue === bValue) {
-      return 0;
-    }
-
-    // Определяем, какое значение больше, и возвращаем соответствующее число
-    const greater = (aValue > bValue ? 1 : -1);
-
-    return (direction === 'asc' ? greater : -greater);
-  };
-}
-
-// Добавить класс "active" выбранной строке таблицы
-rows.forEach(row => {
-  row.addEventListener('click', () => {
-    // Убрать класс "active" у всех строк таблицы
-    rows.forEach(rowItem => rowItem.classList.remove('active'));
-
-    row.classList.add('active');
-  });
-});
+let tbody = table.querySelector('tbody');
+let rows = Array.from(tbody.querySelectorAll('tr'));
 
 // создаем форму
 const form = document.createElement('form');
@@ -158,7 +116,7 @@ ageInput.setAttribute('data-qa', 'salary');
 salaryInput.setAttribute('required', true);
 salaryLabel.appendChild(salaryInput);
 
-// создаем кнопку отправки
+// создаем кнопку отправки:
 const submitButton = document.createElement('button');
 
 submitButton.setAttribute('type', 'submit');
@@ -167,6 +125,11 @@ form.appendChild(submitButton);
 
 form.addEventListener('submit', (evt) => {
   evt.preventDefault();
+
+  function capitalizeWords(str) {
+    return str.split(' ').map(word => word.charAt(0).toUpperCase()
+    + word.slice(1)).join(' ');
+  }
 
   const nameValue = nameInput.value.trim();
   const positionValue = positionInput.value.trim();
@@ -177,14 +140,16 @@ form.addEventListener('submit', (evt) => {
   let isValid = true;
 
   // Проверяем на валидность каждое поле формы
-  if (nameValue.length < 4) {
+  if (nameValue.length < minNameLength) {
     isValid = false;
-    showNotification('error', 'Name should contain at least 4 letters.');
+
+    showNotification('error',
+      `Name should contain at least ${minNameLength} letters.`);
   }
 
-  if (ageValue < 18 || ageValue > 90) {
+  if (ageValue < minAge || ageValue > maxAge) {
     isValid = false;
-    showNotification('error', 'Age should be between 18 and 90.');
+    showNotification('error', `Age should be between ${minAge} and ${maxAge}.`);
   }
 
   if (isValid) {
@@ -196,11 +161,13 @@ form.addEventListener('submit', (evt) => {
     const ageCell = document.createElement('td');
     const salaryCell = document.createElement('td');
 
-    nameCell.textContent = nameValue;
-    positionCell.textContent = positionValue;
+    nameCell.textContent = capitalizeWords(nameValue);
+    positionCell.textContent = capitalizeWords(positionValue);
     officeCell.textContent = officeValue;
     ageCell.textContent = ageValue;
-    salaryCell.textContent = salaryValue;
+
+    salaryCell.textContent = '$'
+    + parseInt(salaryValue).toLocaleString('en-US');
 
     row.appendChild(nameCell);
     row.appendChild(positionCell);
@@ -209,6 +176,10 @@ form.addEventListener('submit', (evt) => {
     row.appendChild(salaryCell);
 
     tbody.appendChild(row);
+
+    row.addEventListener('click', () => {
+      makeRowActive(row);
+    });
 
     showNotification('success', 'New employee added to the table.');
     form.reset();
@@ -227,4 +198,65 @@ function showNotification(type, message) {
   setTimeout(() => {
     notification.remove();
   }, 3000);
+}
+
+// Если кликаем на ряд, ему добавляется класс 'active';
+rows.forEach(row => {
+  row.addEventListener('click', () => {
+    makeRowActive(row);
+  });
+});
+
+function makeRowActive(row) {
+  rows = Array.from(tbody.querySelectorAll('tr'));
+
+  rows.forEach(rowItem => {
+    if (rowItem.classList.contains('active')) {
+      rowItem.classList.remove('active');
+    }
+  });
+
+  if (!row.classList.contains('active')) {
+    row.classList.add('active');
+  }
+}
+
+// сортировка таблицы:
+ths.forEach(function(th) {
+  th.addEventListener('click', function() {
+    tbody = table.querySelector('tbody');
+    rows = Array.from(tbody.querySelectorAll('tr'));
+
+    const direction = th.getAttribute('data-sort') === 'asc' ? 'desc' : 'asc';
+
+    // Определяем номер столбца, по которому нужно сортировать
+    const column = th.cellIndex;
+
+    // Создаем функцию для сортировки строк таблицы
+    const sortFunction = makeSortFunction(column, direction);
+
+    // Сортируем строки таблицы и добавляем их обратно в tbody
+    const sortedRows = rows.sort(sortFunction);
+
+    tbody.append(...sortedRows);
+
+    // Задаем направление сортировки в атрибуте data-sort заголовка таблицы
+    th.setAttribute('data-sort', direction);
+  });
+});
+
+function makeSortFunction(column, direction) {
+  return function(a, b) {
+    const aValue = a.children[column].textContent;
+    const bValue = b.children[column].textContent;
+
+    if (aValue === bValue) {
+      return 0;
+    }
+
+    // Определяем, какое значение больше, и возвращаем соответствующее число
+    const greater = (aValue > bValue ? 1 : -1);
+
+    return (direction === 'asc' ? greater : -greater);
+  };
 }
