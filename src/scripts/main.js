@@ -126,6 +126,7 @@ form.appendChild(submitButton);
 form.addEventListener('submit', (evt) => {
   evt.preventDefault();
 
+  //исправление строки на заглавную
   function capitalizeWords(str) {
     return str.split(' ').map(word => word.charAt(0).toUpperCase()
     + word.slice(1)).join(' ');
