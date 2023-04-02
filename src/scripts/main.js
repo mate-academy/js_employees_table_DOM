@@ -9,13 +9,13 @@ const ths = table.querySelectorAll('thead th');
 let tbody = table.querySelector('tbody');
 let rows = Array.from(tbody.querySelectorAll('tr'));
 
-// создаем форму
+// create a form
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
 document.body.appendChild(form);
 
-// создаем поле ввода для имени
+// create an input field for the name
 const nameLabel = document.createElement('label');
 
 nameLabel.textContent = 'Name:';
@@ -30,7 +30,7 @@ nameInput.setAttribute('autocomplete', 'name');
 nameInput.setAttribute('required', true);
 nameLabel.appendChild(nameInput);
 
-// создаем поле ввода для position
+// create an input field for position
 const positionLabel = document.createElement('label');
 
 positionLabel.textContent = 'Position:';
@@ -43,7 +43,7 @@ positionInput.setAttribute('data-qa', 'position');
 positionInput.setAttribute('required', true);
 positionLabel.appendChild(positionInput);
 
-// создаем поле ввода для office
+// create an input field for office
 const officeLabel = document.createElement('label');
 
 officeLabel.textContent = 'Office:';
@@ -54,43 +54,24 @@ const officeSelect = document.createElement('select');
 officeSelect.setAttribute('required', true);
 officeLabel.appendChild(officeSelect);
 
-const option1 = document.createElement('option');
+const cities = [
+  'Tokyo', 
+  'Singapore', 
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco'
+];
 
-option1.value = 'Tokyo';
-option1.textContent = 'Tokyo';
-officeSelect.appendChild(option1);
+cities.forEach(function(city) {
+  const option = document.createElement('option');
 
-const option2 = document.createElement('option');
+  option.value = city;
+  option.textContent = city;
+  officeSelect.appendChild(option);
+});
 
-option2.value = 'Singapore';
-option2.textContent = 'Singapore';
-officeSelect.appendChild(option2);
-
-const option3 = document.createElement('option');
-
-option3.value = 'London';
-option3.textContent = 'London';
-officeSelect.appendChild(option3);
-
-const option4 = document.createElement('option');
-
-option4.value = 'New-York';
-option4.textContent = 'New York';
-officeSelect.appendChild(option4);
-
-const option5 = document.createElement('option');
-
-option5.value = 'Edinburgh';
-option5.textContent = 'Edinburgh';
-officeSelect.appendChild(option5);
-
-const option6 = document.createElement('option');
-
-option6.value = 'San-Francisco';
-option6.textContent = 'San Francisco';
-officeSelect.appendChild(option6);
-
-// создаем поле ввода для age
+// create an input field for age
 const ageLabel = document.createElement('label');
 
 ageLabel.textContent = 'Age:';
@@ -103,7 +84,7 @@ ageInput.setAttribute('data-qa', 'age');
 ageInput.setAttribute('required', true);
 ageLabel.appendChild(ageInput);
 
-// создаем поле ввода для salary
+// create an input field for salary
 const salaryLabel = document.createElement('label');
 
 salaryLabel.textContent = 'Salary:';
@@ -116,7 +97,7 @@ ageInput.setAttribute('data-qa', 'salary');
 salaryInput.setAttribute('required', true);
 salaryLabel.appendChild(salaryInput);
 
-// создаем кнопку отправки:
+// create a submit button:
 const submitButton = document.createElement('button');
 
 submitButton.setAttribute('type', 'submit');
@@ -126,7 +107,7 @@ form.appendChild(submitButton);
 form.addEventListener('submit', (evt) => {
   evt.preventDefault();
 
-  // исправление введенной строки на заглавные буквы в каждом слове
+  // correction of the entered string to capital letters in each word
   function capitalizeWords(str) {
     return str.split(' ').map(word => word.charAt(0).toUpperCase()
     + word.slice(1)).join(' ');
@@ -136,11 +117,11 @@ form.addEventListener('submit', (evt) => {
   const positionValue = positionInput.value.trim();
   const officeValue = officeSelect.value;
   const ageValue = parseInt(ageInput.value);
-  const salaryValue = salaryInput.value.trim();
+  const salaryValue = parseInt(salaryInput.value.trim());
 
   let isValid = true;
 
-  // Проверяем на валидность каждое поле формы
+  // Check for validity of each form field
   if (nameValue.length < minNameLength) {
     isValid = false;
 
@@ -153,8 +134,13 @@ form.addEventListener('submit', (evt) => {
     showNotification('error', `Age should be between ${minAge} and ${maxAge}.`);
   }
 
+  if (salaryValue < 0) {
+    isValid = false;
+    showNotification('error', 'Заработная плата не может быть отрицательной.');
+  }
+
   if (isValid) {
-    // Если все поля валидны, добавляем нового сотрудника в таблицу
+    // If all fields are valid, add a new employee to the table
     const row = document.createElement('tr');
     const nameCell = document.createElement('td');
     const positionCell = document.createElement('td');
@@ -201,7 +187,7 @@ function showNotification(type, message) {
   }, 3000);
 }
 
-// Если кликаем на ряд, ему добавляется класс 'active';
+// If we click on a row, the class 'active' is added to it
 rows.forEach(row => {
   row.addEventListener('click', () => {
     makeRowActive(row);
@@ -222,7 +208,7 @@ function makeRowActive(row) {
   }
 }
 
-// сортировка таблицы:
+// sort table
 ths.forEach(function(th) {
   th.addEventListener('click', function() {
     tbody = table.querySelector('tbody');
@@ -230,18 +216,18 @@ ths.forEach(function(th) {
 
     const direction = th.getAttribute('data-sort') === 'asc' ? 'desc' : 'asc';
 
-    // Определяем номер столбца, по которому нужно сортировать
+    // Determine the number of the column by which to sort
     const column = th.cellIndex;
 
-    // Создаем функцию для сортировки строк таблицы
+    // Create a function to sort table rows
     const sortFunction = makeSortFunction(column, direction);
 
-    // Сортируем строки таблицы и добавляем их обратно в tbody
+    // Sort table rows and add them back to tbody
     const sortedRows = rows.sort(sortFunction);
 
     tbody.append(...sortedRows);
 
-    // Задаем направление сортировки в атрибуте data-sort заголовка таблицы
+    // Set the sort direction in the data-sort attribute of the table header
     th.setAttribute('data-sort', direction);
   });
 });
@@ -255,7 +241,7 @@ function makeSortFunction(column, direction) {
       return 0;
     }
 
-    // Определяем, какое значение больше, и возвращаем соответствующее число
+    // Determine which value is bigger and return the corresponding number
     const greater = (aValue > bValue ? 1 : -1);
 
     return (direction === 'asc' ? greater : -greater);
