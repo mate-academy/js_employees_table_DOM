@@ -55,12 +55,12 @@ officeSelect.setAttribute('required', true);
 officeLabel.appendChild(officeSelect);
 
 const cities = [
-  'Tokyo', 
-  'Singapore', 
+  'Tokyo',
+  'Singapore',
   'London',
   'New York',
   'Edinburgh',
-  'San Francisco'
+  'San Francisco',
 ];
 
 cities.forEach(function(city) {
@@ -234,16 +234,30 @@ ths.forEach(function(th) {
 
 function makeSortFunction(column, direction) {
   return function(a, b) {
-    const aValue = a.children[column].textContent;
-    const bValue = b.children[column].textContent;
+    if (column === 4) { // check if column is salary
+      const salaryA = parseInt(a.children[4]
+        .textContent.slice(1).replace(',', ''));
+      const salaryB = parseInt(b.children[4]
+        .textContent.slice(1).replace(',', ''));
 
-    if (aValue === bValue) {
-      return 0;
+      if (salaryA === salaryB) {
+        return 0;
+      }
+
+      const greater = (salaryA > salaryB ? 1 : -1);
+
+      return (direction === 'asc' ? greater : -greater);
+    } else { // use existing sorting logic for other columns
+      const aValue = a.children[column].textContent;
+      const bValue = b.children[column].textContent;
+
+      if (aValue === bValue) {
+        return 0;
+      }
+
+      const greater = (aValue > bValue ? 1 : -1);
+
+      return (direction === 'asc' ? greater : -greater);
     }
-
-    // Determine which value is bigger and return the corresponding number
-    const greater = (aValue > bValue ? 1 : -1);
-
-    return (direction === 'asc' ? greater : -greater);
   };
 }
