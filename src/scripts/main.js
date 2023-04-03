@@ -95,11 +95,17 @@ const pushNotification = (title, description, type) => {
 
   setTimeout(() => {
     notification.remove();
-  }, 3000);
+  }, 2000);
 };
 
 form.addEventListener('submit', e => {
   e.preventDefault();
+
+  const notification = document.querySelector('.notification');
+
+  if (document.contains(notification)) {
+    notification.remove();
+  };
 
   const formData = new FormData(e.target);
   const formValues = Object.fromEntries(formData.entries());
@@ -134,6 +140,7 @@ form.addEventListener('submit', e => {
   `;
 
   tbody.append(tr);
+  form.reset();
 
   pushNotification('Success', 'New employee was added', 'success');
 });
