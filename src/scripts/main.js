@@ -1,22 +1,24 @@
 'use strict';
 
 const headerList = [...document.querySelectorAll('th')];
-let listBody = document.querySelector('tbody');
+const listBody = document.querySelector('tbody');
 let list = [...document.querySelectorAll('tr')].slice(1, -1);
 let headerIndex;
-const form = document.querySelector('.new-employee-form');
 const formButton = document.querySelector('.form-button');
 
 document.addEventListener('click', sort);
 document.addEventListener('click', doHighlight);
 document.addEventListener('dblclick', cellRevision);
-form.addEventListener('submit', addNewPerson);
-formButton.addEventListener('click', addErrorNotification);
+formButton.addEventListener('click', addNewPerson);
 
 function cellRevision(e) {
   if (e.target.tagName === 'TD') {
     const cell = e.target;
-    const input = document.createElement('input');
+    const perent = e.target.closest('TR');
+    const select = document.querySelector('select');
+    const selectCopy = select.cloneNode(true);
+    const input = perent.children[2] === cell
+      ? selectCopy : document.createElement('input');
     const startValue = cell.innerHTML;
 
     input.classList.add('cell-input');
@@ -43,31 +45,23 @@ function cellRevision(e) {
   }
 }
 
-function addErrorNotification(e) {
-  if (document.querySelector('.notification')) {
-    document.querySelector('.notification').remove();
-  }
-
-  listBody = document.querySelector('tbody');
-
-  const errorNotification
-    = `<div class="notification error" data-qa="notification">
-    <h2 class="title">Please enter correct data</h2>
-    </div>`;
-
-  document.body.insertAdjacentHTML('beforeend', errorNotification);
-}
-
 function addNewPerson(e) {
   e.preventDefault();
 
-  const formData = new FormData(form);
-  const personName = formData.get('name');
-  const position = formData.get('position');
-  const office = formData.get('office');
-  const age = formData.get('age');
-  const salary = formData.get('salary');
-  const newPerson = `
+  let errors = '';
+  const inputs = document.querySelectorAll('.input');
+  const personName = inputs[0].value;
+  const position = inputs[1].value;
+  const office = inputs[2].value;
+  const age = inputs[3].value;
+  const salary = inputs[4].value;
+
+  checkString(personName, 'Name');
+  checkString(position, 'Position');
+  checkAge(age);
+
+  if (!errors.length) {
+    const newPerson = `
     <tr>
     <td>${personName}</td>
     <td>${position}</td>
@@ -77,22 +71,68 @@ function addNewPerson(e) {
     </tr>
     `;
 
-  listBody.insertAdjacentHTML('beforeend', newPerson);
+    listBody.insertAdjacentHTML('beforeend', newPerson);
 
-  const inputs = document.querySelectorAll('.input');
+    const successNotification
+    = `<div class="notification success" data-qa="notification">
+    <h2 class="title">A new employee has been added</h2>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', successNotification);
+
+    setTimeout(() => {
+      document.querySelector('.notification').remove();
+    }, 2000);
+  } else {
+    const errorNotification
+    = `<div 
+    class="notification error" data-qa="notification">
+    <h2 class="title" style = "margin: 0">
+    Error
+    </h2>
+    <p style = "margin-top: 0;">${errors}</p>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', errorNotification);
+
+    setTimeout(() => {
+      document.querySelector('.notification').remove();
+    }, 2000);
+  }
 
   inputs.forEach(a => (a.value = ''));
 
   inputs[2].value = 'Tokyo';
 
-  document.querySelector('.notification').remove();
+  function checkString(string, input) {
+    const notValidCharacters = '?/|{})(*&^%$#@!~.`"';
 
-  const successNotification
-    = `<div class="notification success" data-qa="notification">
-    <h2 class="title">A new employee has been added</h2>
-    </div>`;
+    if (string[0] === ' ') {
+      errors += `${input} must start with a letter\n`;
 
-  document.body.insertAdjacentHTML('beforeend', successNotification);
+      return;
+    }
+
+    if (string.length < 4) {
+      errors += `${input} must be at least 4 in length \n`;
+
+      return;
+    }
+
+    for (const ch of string) {
+      if (notValidCharacters.includes(ch)) {
+        errors += `Characters are not allowed in ${input} \n`;
+
+        return;
+      }
+    }
+  }
+
+  function checkAge(number) {
+    if (+number < 18 || +number > 90) {
+      return (errors += `Age must be between 18 and 90`);
+    }
+  }
 
   function addCorrectSalary(string) {
     let formatSalary = '';
