@@ -117,7 +117,9 @@ form.addEventListener('submit', e => {
     return;
   }
 
-  if (+(formValues.age) < 18 || +(formValues.age) > 90) {
+  const ageCheck = +(formValues.age) < 18 || +(formValues.age) > 90;
+
+  if (ageCheck) {
     pushNotification('Error', 'Age must be between 18 and 90', 'error');
 
     return;
