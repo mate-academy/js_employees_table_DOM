@@ -5,6 +5,7 @@ const listBody = document.querySelector('tbody');
 let list = [...document.querySelectorAll('tr')].slice(1, -1);
 let headerIndex;
 const formButton = document.querySelector('.form-button');
+let errors = '';
 
 document.addEventListener('click', sort);
 document.addEventListener('click', doHighlight);
@@ -27,18 +28,66 @@ function cellRevision(e) {
     cell.appendChild(input);
     cell.lastChild.focus();
 
-    input.addEventListener('blur', () =>
-      (cell.innerHTML = input.value));
+    input.addEventListener('blur', () => {
+      if (cell === perent.children[4]) {
+        if (!+input.value.slice(1).replace(',', '')) {
+          errors += 'Salary must be a number';
+        }
+
+        if (input.value[0] !== '$') {
+          input.value = addCorrectSalary(input.value);
+        }
+      } else {
+        perent.children[3] === cell
+          ? checkAge(input.value) : checkString(input.value);
+      }
+
+      if (input.value === startValue) {
+        return;
+      }
+
+      addNotification();
+
+      if (!errors.length) {
+        cell.innerHTML = input.value;
+        errors = '';
+
+        return;
+      }
+
+      cell.innerHTML = startValue;
+      errors = '';
+    });
 
     cell.addEventListener('keydown', (keyEvent) => {
       if (keyEvent.code === 'Enter') {
-        if (!input.value.length) {
-          cell.innerHTML = startValue;
+        if (cell === perent.children[4]) {
+          if (!+input.value.slice(1).replace(',', '')) {
+            errors += 'Salary must be a number';
+          }
+
+          if (input.value[0] !== '$') {
+            input.value = addCorrectSalary(input.value);
+          }
+        } else {
+          perent.children[3] === cell
+            ? checkAge(input.value) : checkString(input.value);
+        }
+
+        if (input.value === startValue) {
+          input.blur();
 
           return;
         }
-        cell.lastElementChild.remove();
-        cell.innerHTML = input.value;
+        addNotification();
+
+        if (!errors.length) {
+          cell.innerHTML = input.value;
+          errors = '';
+        } else {
+          cell.innerHTML = startValue;
+          errors = '';
+        }
       }
     }
     );
@@ -48,7 +97,6 @@ function cellRevision(e) {
 function addNewPerson(e) {
   e.preventDefault();
 
-  let errors = '';
   const inputs = document.querySelectorAll('.input');
   const personName = inputs[0].value;
   const position = inputs[1].value;
@@ -60,93 +108,24 @@ function addNewPerson(e) {
   checkString(position, 'Position');
   checkAge(age);
 
+  const newPerson = `
+  <tr>
+  <td>${personName}</td>
+  <td>${position}</td>
+  <td>${office}</td>
+  <td>${age}</td>
+  <td>${addCorrectSalary(salary)}</td>
+  </tr>
+  `;
+
+  addNotification();
+
   if (!errors.length) {
-    const newPerson = `
-    <tr>
-    <td>${personName}</td>
-    <td>${position}</td>
-    <td>${office}</td>
-    <td>${age}</td>
-    <td>${'$' + addCorrectSalary(salary)}</td>
-    </tr>
-    `;
-
     listBody.insertAdjacentHTML('beforeend', newPerson);
-
-    const successNotification
-    = `<div class="notification success" data-qa="notification">
-    <h2 class="title">A new employee has been added</h2>
-    </div>`;
-
-    document.body.insertAdjacentHTML('beforeend', successNotification);
-
-    setTimeout(() => {
-      document.querySelector('.notification').remove();
-    }, 2000);
-  } else {
-    const errorNotification
-    = `<div 
-    class="notification error" data-qa="notification">
-    <h2 class="title" style = "margin: 0">
-    Error
-    </h2>
-    <p style = "margin-top: 0;">${errors}</p>
-    </div>`;
-
-    document.body.insertAdjacentHTML('beforeend', errorNotification);
-
-    setTimeout(() => {
-      document.querySelector('.notification').remove();
-    }, 2000);
+    inputs.forEach(input => (input.value = ''));
+    inputs[2].value = 'Tokyo';
   }
-
-  inputs.forEach(a => (a.value = ''));
-
-  inputs[2].value = 'Tokyo';
-
-  function checkString(string, input) {
-    const notValidCharacters = '?/|{})(*&^%$#@!~.`"';
-
-    if (string[0] === ' ') {
-      errors += `${input} must start with a letter\n`;
-
-      return;
-    }
-
-    if (string.length < 4) {
-      errors += `${input} must be at least 4 in length \n`;
-
-      return;
-    }
-
-    for (const ch of string) {
-      if (notValidCharacters.includes(ch)) {
-        errors += `Characters are not allowed in ${input} \n`;
-
-        return;
-      }
-    }
-  }
-
-  function checkAge(number) {
-    if (+number < 18 || +number > 90) {
-      return (errors += `Age must be between 18 and 90`);
-    }
-  }
-
-  function addCorrectSalary(string) {
-    let formatSalary = '';
-
-    for (let i = 0; i < string.length; i++) {
-      if (i === string.length - 4) {
-        formatSalary += (string[i] + ',');
-      } else {
-        formatSalary += string[i];
-      }
-    }
-
-    return formatSalary;
-  }
+  errors = '';
 }
 
 function doHighlight(e) {
@@ -214,4 +193,88 @@ function getCorrectSalary(string) {
   }
 
   return +salary;
+}
+
+function checkString(string, input = 'Field') {
+  const notValidCharacters = '?/|{:;})(*&^%$#@!~._-=+`"';
+
+  if (string[0] === ' ') {
+    errors += `${input} must start with a letter \n`;
+
+    return;
+  }
+
+  if (string.length < 4) {
+    errors += `${input}  must be at least 4 in length \n`;
+
+    return;
+  }
+
+  for (const ch of string) {
+    if (notValidCharacters.includes(ch)) {
+      errors += `Characters in ${input} are not allowed\n`;
+
+      return;
+    }
+
+    if (+ch === Number(ch) && ch !== ' ') {
+      errors += `Numbers in ${input} are not supported\n`;
+
+      return;
+    }
+  }
+}
+
+function checkAge(number) {
+  if (!+number) {
+    return (errors += `Age must be a number \n`);
+  }
+
+  if (+number < 18 || +number > 90) {
+    return (errors += `Age must be between 18 and 90 \n`);
+  }
+}
+
+function addCorrectSalary(string) {
+  let formatSalary = '$';
+
+  for (let i = 0; i < string.length; i++) {
+    if (i === string.length - 4) {
+      formatSalary += (string[i] + ',');
+    } else {
+      formatSalary += string[i];
+    }
+  }
+
+  return formatSalary;
+}
+
+function addNotification() {
+  if (document.querySelector('.notification')) {
+    document.querySelector('.notification').remove();
+  }
+
+  const success = `
+    <div class="notification success" data-qa="notification">
+      <h2 class="title">Data saved</h2>
+    </div>`;
+
+  const error = `
+    <div 
+      class="notification error" data-qa="notification">
+      <h2 class="title" style = "margin: 0">
+      Error
+      </h2>
+      <p style = "margin-top: 0;">${errors}</p>
+    </div>`;
+
+  const notification = !errors.length ? success : error;
+
+  document.body.insertAdjacentHTML('beforeend', notification);
+
+  setTimeout(() => {
+    if (document.querySelector('.notification')) {
+      document.querySelector('.notification').remove();
+    }
+  }, 2000);
 }
