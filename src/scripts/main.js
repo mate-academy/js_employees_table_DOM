@@ -258,7 +258,9 @@ employeesTable.addEventListener('dblclick', (e) => {
 });
 
 function editTableCell(cell) {
-  const initialText = cell.innerText;
+  const initialText = cell.innerText || cell.firstElementChild.value;
+
+  const cellWidth = getComputedStyle(cell).width;
 
   cell.innerText = '';
 
@@ -267,6 +269,8 @@ function editTableCell(cell) {
   input.classList.add('cell-input');
 
   input.value = initialText;
+
+  input.style.width = parseFloat(cellWidth) + 'px';
 
   cell.append(input);
 
