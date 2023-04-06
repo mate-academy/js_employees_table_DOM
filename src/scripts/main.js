@@ -98,6 +98,7 @@ document.body.insertAdjacentHTML('beforeend', `
       <input
         name="salary"
         type="number"
+        min = "0"
         data-qa="salary"
         required
       >
@@ -155,12 +156,22 @@ form.name.addEventListener('change', e => {
   }
 });
 
-form.age.addEventListener('change', e => {
+form.age.addEventListener('change', () => {
   if (!form.age.validity.valid) {
     showNotification(
       'error',
       'Enter a correct age',
       'Your age must be from 18 to 90 years'
+    );
+  }
+});
+
+form.salary.addEventListener('change', e => {
+  if (!form.salary.validity.valid) {
+    showNotification(
+      'error',
+      'Enter a correct salary',
+      'Your salary must be greater than or equal to 0'
     );
   }
 });
@@ -188,14 +199,14 @@ const maxAgeLegth = 90;
 const validScheme = {
   name: item => item.length > minNameLength,
   age: item => item > minAgeLength || item < maxAgeLegth,
-  salary: item => `$${item}`,
+  salary: item => item > 0,
 };
 
 tableBody.addEventListener('dblclick', e => {
   const item = e.target;
   const itemIndex = item.cellIndex;
   const itemText = item.innerText;
-  const itemTextNormalize = itemText.replace(/[,$]/g, '');
+  const itemTextNormalize = itemText.replace(/[$,]/g, '');
   const itemInput
     = form.querySelectorAll('[data-qa]')[itemIndex].cloneNode(true);
 
@@ -204,13 +215,14 @@ tableBody.addEventListener('dblclick', e => {
   item.firstChild.replaceWith(itemInput);
   itemInput.focus();
 
-  itemInput.addEventListener('keypress', e => {
+  itemInput.addEventListener('keypress', () => {
     if (e.key === 'Enter') {
       itemInput.blur();
     }
   });
 
   itemInput.addEventListener('blur', () => {
+
     if (
       validScheme.name(itemInput.value)
       || validScheme.age(itemInput.value)
@@ -219,14 +231,42 @@ tableBody.addEventListener('dblclick', e => {
     ) {
       item.removeChild(itemInput);
 
-      if (itemInput.value.toLowerCase() === itemInput.value.toUpperCase()
-      && itemInput.value.length > 2) {
-        const num = +itemInput.value;
-
-        item.textContent = `$${num.toLocaleString('en-US')}`;
-      } else {
+      if (
+        itemInput.name === 'name'
+        || itemInput.name === 'position'
+        || itemInput.name === 'office'
+      ) {
         item.textContent = itemInput.value;
       }
+
+      if (itemInput.name === 'age' && itemInput.value > 0) {
+        item.textContent = itemInput.value;
+      }
+
+      if (itemInput.name === 'age' && itemInput.value < 0) {
+        showNotification(
+          'error',
+          'Enter a correct age',
+          'Your age must be from 18 to 90 years'
+        );
+
+        item.textContent = itemText;
+      }
+
+      if (itemInput.name === 'salary' && itemInput.value >= 0) {
+        item.textContent = itemInput.value;
+      }
+
+      if (itemInput.name === 'salary' && itemInput.value < 0) {
+        showNotification(
+          'error',
+          'Enter a correct salary',
+          'Your salary must be greater than or equal to 0'
+        );
+        item.textContent = itemText;
+      }
+
+      item.textContent = itemText;
 
       return;
     }
