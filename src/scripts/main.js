@@ -135,6 +135,12 @@ function addFormSelect(form) {
 newEmployeeForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
+  const nameInput = document.querySelector('input[name="name"]');
+  const positionInput = document.querySelector('input[name="position"]');
+
+  nameInput.value = nameInput.value.trim();
+  positionInput.value = nameInput.value.trim();
+
   const data = new FormData(newEmployeeForm);
 
   const inputsData = Object.fromEntries(data.entries());
@@ -234,12 +240,8 @@ function createNewEmployee(employeeData) {
 function getFormattedNumber(number) {
   const thousands = number / 1000;
 
-  if ((number % 10 === 0) && (number < 1000)) {
-    const dotIndex = `${thousands}`.indexOf('.');
-    const beforeDot = `${thousands}`.slice(0, dotIndex);
-    const afterDot = `${thousands}`.slice(dotIndex + 1);
-
-    return `${beforeDot},${afterDot.padEnd(3, 0)}`;
+  if (number < 1000) {
+    return number;
   }
 
   if ((number % 10 === 0) && (number >= 1000)) {
@@ -277,7 +279,8 @@ function editTableCell(cell) {
   input.focus();
 
   input.addEventListener('blur', (e) => {
-    const textNode = document.createTextNode(e.target.value || initialText);
+    const textNode
+      = document.createTextNode(e.target.value.trim() || initialText);
 
     input.replaceWith(textNode);
   });
