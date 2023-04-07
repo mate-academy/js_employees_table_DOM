@@ -89,6 +89,31 @@ const newEmployeeForm = document.createElement('form');
 newEmployeeForm.className = 'new-employee-form';
 body.append(newEmployeeForm);
 
+const selectBoxOptions = `
+  <option value="Tokyo">
+    Tokyo
+  </option>
+
+  <option value="Singapore">
+    Singapore
+  </option>
+
+  <option value="London">
+    London
+  </option>
+
+  <option value="New York">
+    New York
+  </option>
+
+  <option value="Edinburgh">
+    Edinburgh
+  </option>
+
+  <option value="San Francisco">
+    San Francisco
+  </option>`;
+
 newEmployeeForm.innerHTML = `
   <label>
     Name:
@@ -103,29 +128,7 @@ newEmployeeForm.innerHTML = `
   <label>
     Office:
     <select name="office" data-qa="office">
-      <option value="Tokyo">
-        Tokyo
-      </option>
-
-      <option value="Singapore">
-        Singapore
-      </option>
-
-      <option value="London">
-        London
-      </option>
-
-      <option value="New York">
-        New York
-      </option>
-
-      <option value="Edinburgh">
-        Edinburgh
-      </option>
-
-      <option value="San Francisco">
-        San Francisco
-      </option>
+      ${selectBoxOptions}
     </select>
   </label>
 
@@ -201,7 +204,9 @@ function showNotification(notificationTitle, notificationMessage) {
 
   body.append(notification);
 
-  newEmployeeForm.reset();
+  if (notificationTitle === 'success') {
+    newEmployeeForm.reset();
+  }
 
   setTimeout(() =>
     notification.remove(), 3000);
@@ -220,7 +225,22 @@ employeeDataTable.addEventListener('dblclick', e => {
 function editCell(selectedCell) {
   const temp = selectedCell.innerHTML;
 
-  editableArea = document.createElement('input');
+  switch (selectedCell.cellIndex) {
+    case 0:
+    case 1:
+      editableArea = document.createElement('input');
+      break;
+    case 2:
+      editableArea = document.createElement('select');
+
+      editableArea.innerHTML = selectBoxOptions;
+      break;
+    case 3:
+    case 4:
+      editableArea = document.createElement('input');
+      editableArea.setAttribute('type', 'number');
+      break;
+  }
   editableArea.className = 'cell-input';
   selectedCell.innerHTML = '';
 
@@ -234,11 +254,14 @@ function editCell(selectedCell) {
   };
 
   editableArea.onblur = function() {
-    if (editableArea.value === '') {
+    if (editableArea.value.trim() === '') {
       editableArea.replaceWith(temp);
+    } else if (selectedCell.cellIndex === 4) {
+      selectedCell.innerHTML
+        = `$${(+editableArea.value).toLocaleString('en-US')}`;
     } else {
       selectedCell.innerHTML = editableArea.value;
-      editableArea.replaceWith(selectedCell);
     }
+    editableArea.replaceWith(selectedCell);
   };
 }
