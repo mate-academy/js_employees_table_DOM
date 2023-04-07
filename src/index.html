@@ -113,6 +113,84 @@
         </tr>
       </tfoot>
     </table>
+
+    <form
+      class="new-employee-form"
+      action="/"
+      method="GET"
+    >
+      <label for="name">
+        Name:
+        <input
+          type="text"
+          name="name"
+          id="name"
+          data-qa="name"
+          minlength="4"
+          required
+        >
+      </label>
+
+      <label for="position">
+        Position:
+        <input
+          type="text"
+          name="position"
+          id="position"
+          data-qa="position"
+          required
+        >
+      </label>
+
+      <label for="office">
+        Office:
+        <select
+          name="office"
+          id="office"
+          required
+          data-qa="office"
+        >
+          <option value="Tokyo">Tokyo</option>
+          <option value="Singapore">Singapore</option>
+          <option value="London">London</option>
+          <option value="New York">New York</option>
+          <option value="Edinburgh">Edinburgh</option>
+          <option value="San Francisco">San Francisco</option>
+        </select>
+      </label>
+
+      <label for="age">
+        Age:
+        <input
+          type="number"
+          name="age"
+          id="age"
+          data-qa="age"
+          required
+          min="18"
+          max="90"
+        >
+      </label>
+
+      <label for="salary">
+        Salary:
+        <input
+          type="number"
+          name="salary"
+          id="salary"
+          data-qa="salary"
+          required
+        >
+      </label>
+
+      <button type="submit">Save to table</button>
+    </form>
+
+    <div class="notification success" hidden>
+      <h2 class="title">Success</h2>
+      <p>New employee was added</p>
+    </div>
+
     <script type="text/javascript" src="scripts/main.js"></script>
   </body>
 </html>
