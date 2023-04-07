@@ -4,6 +4,8 @@ const body = document.querySelector('body');
 const tableHeader = document.querySelector('thead');
 const employeeDataTable = document.querySelector('tbody');
 
+// table sorting
+
 tableHeader.addEventListener('click', e => {
   [...tableHeader.firstElementChild.children].forEach((button) => {
     if (button !== e.target) {
@@ -68,6 +70,8 @@ function parseSalaryStringToNumber(salaryString) {
   return salaryString.slice(1).split(',').join('');
 }
 
+// highlight selected row
+
 let activeRow;
 
 employeeDataTable.addEventListener('click', e => {
@@ -83,6 +87,8 @@ function highlightSelectedRow(selectedRow) {
   activeRow = selectedRow;
   activeRow.classList.add('active');
 }
+
+// form for adding new employees
 
 const newEmployeeForm = document.createElement('form');
 
@@ -150,17 +156,18 @@ newEmployeeForm.innerHTML = `
 newEmployeeForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  const nameInput = newEmployeeForm.name.value;
-  const positionInput = newEmployeeForm.position.value;
+  const nameInput = (newEmployeeForm.name.value).trim();
+  const positionInput = (newEmployeeForm.position.value).trim();
   const officeInput = newEmployeeForm.office.value;
   const ageInput = newEmployeeForm.age.value;
   const salaryInput = newEmployeeForm.salary.value;
 
-  if (nameInput.length < 4
-      || +ageInput < 18
-      || +ageInput > 90
-      || positionInput === '') {
-    showNotification('error', 'Check your information.');
+  if (nameInput.length < 4) {
+    showNotification('error', 'Please, provide a name with minimum 4 letters.');
+  } else if (positionInput === '') {
+    showNotification('error', 'Please, provide a position name.');
+  } else if (+ageInput < 18 || +ageInput > 90) {
+    showNotification('error', 'The age should be between 18 to 90.');
   } else {
     const newEmployeeInfo = [nameInput, positionInput, officeInput,
       ageInput, `$${(+salaryInput).toLocaleString('en-US')}`];
@@ -184,6 +191,8 @@ function submitForm(newEmployeeInfo) {
 
   showNotification('success', 'New employee was added!');
 }
+
+// show notification
 
 function showNotification(notificationTitle, notificationMessage) {
   const notification = document.createElement('div');
@@ -211,6 +220,8 @@ function showNotification(notificationTitle, notificationMessage) {
   setTimeout(() =>
     notification.remove(), 3000);
 }
+
+// editing of table
 
 let editableArea = null;
 
@@ -259,6 +270,11 @@ function editCell(selectedCell) {
     } else if (selectedCell.cellIndex === 4) {
       selectedCell.innerHTML
         = `$${(+editableArea.value).toLocaleString('en-US')}`;
+    } else if (selectedCell.cellIndex === 3
+        && (+editableArea.value < 18
+        || +editableArea.value > 90)) {
+      editableArea.replaceWith(temp);
+      showNotification('error', 'The age should be between 18 to 90.');
     } else {
       selectedCell.innerHTML = editableArea.value;
     }
