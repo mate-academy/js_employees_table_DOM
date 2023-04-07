@@ -139,7 +139,7 @@ newEmployeeForm.addEventListener('submit', (e) => {
   const positionInput = document.querySelector('input[name="position"]');
 
   nameInput.value = nameInput.value.trim();
-  positionInput.value = nameInput.value.trim();
+  positionInput.value = positionInput.value.trim();
 
   const data = new FormData(newEmployeeForm);
 
@@ -260,6 +260,8 @@ employeesTable.addEventListener('dblclick', (e) => {
 });
 
 function editTableCell(cell) {
+  const cellIndex = cell.cellIndex;
+
   const initialText = cell.innerText || cell.firstElementChild.value;
 
   const cellWidth = getComputedStyle(cell).width;
@@ -278,9 +280,25 @@ function editTableCell(cell) {
 
   input.focus();
 
+  input.addEventListener('input', (e) => {
+    input.style.width = input.scrollWidth + 'px';
+
+    if (cellIndex === 3 || cellIndex === 4) {
+      input.value = input.value.replace(/[^0-9]/g, '');
+    }
+  });
+
   input.addEventListener('blur', (e) => {
+    let newValue = e.target.value.trim();
+
+    if (cellIndex === 4) {
+      const newSalary = getFormattedNumber(newValue);
+
+      newValue = `$${newSalary || initialText.slice(1)}`;
+    }
+
     const textNode
-      = document.createTextNode(e.target.value.trim() || initialText);
+      = document.createTextNode(newValue || initialText);
 
     input.replaceWith(textNode);
   });
