@@ -240,7 +240,7 @@ function createNewEmployee(employeeData) {
 }
 
 function getFormattedNumber(number) {
-  const parsedToDecimal = parseInt(number, 10);
+  const parsedToDecimal = parseInt(Math.abs(number), 10);
 
   if (parsedToDecimal < 1000) {
     return parsedToDecimal;
