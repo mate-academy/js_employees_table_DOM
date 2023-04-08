@@ -124,6 +124,47 @@ function editCell(cell) {
 
   cell.innerText = '';
 
+  const fieldEdit = addFieldEdit(cellText, cell);
+
+  fieldEdit.addEventListener('keyup', (ev) => {
+    if (ev.code === 'Enter' && fieldEdit.value.length > 0) {
+      getFinallyValue(cell, fieldEdit, cellText);
+    }
+
+    if (ev.code === 'Enter' && fieldEdit.value.length === 0) {
+      cell.textContent = cellText;
+    }
+  });
+
+  fieldEdit.addEventListener('blur', (ev) => {
+    if (fieldEdit.value.length > 0) {
+      getFinallyValue(cell, fieldEdit, cellText);
+    }
+
+    if (fieldEdit.value.length === 0) {
+      cell.innerHTML = cellText;
+    }
+  });
+}
+
+function getCorrectAge(prevAge, currentAge) {
+  return (currentAge >= 18 && currentAge <= 90) ? currentAge : prevAge;
+}
+
+function getCorrectSalary(prevSalary, currentSalary) {
+  return currentSalary >= 1
+    ? formatToSting(currentSalary) : prevSalary;
+}
+
+function getFinallyValue(cell, fieldEdit, cellText) {
+  cell.textContent = cellText.startsWith('$')
+    ? getCorrectSalary(cellText, fieldEdit.value) : fieldEdit.value;
+
+  cell.textContent = fieldEdit.type === 'text' || cellText.startsWith('$')
+    ? cell.textContent : getCorrectAge(cellText, cell.textContent);
+}
+
+function addFieldEdit(cellText, cell) {
   const fieldEdit = document.createElement('input');
 
   fieldEdit.className = 'cell-input';
@@ -142,25 +183,5 @@ function editCell(cell) {
   cell.append(fieldEdit);
   fieldEdit.focus();
 
-  fieldEdit.addEventListener('keyup', (ev) => {
-    if (ev.code === 'Enter' && fieldEdit.value.length > 0) {
-      cell.textContent = cellText.startsWith('$')
-        ? formatToSting(fieldEdit.value) : fieldEdit.value;
-    }
-
-    if (ev.code === 'Enter' && fieldEdit.value.length === 0) {
-      cell.textContent = cellText;
-    }
-  });
-
-  fieldEdit.addEventListener('blur', (ev) => {
-    if (fieldEdit.value.length > 0) {
-      cell.innerHTML = cellText.startsWith('$')
-        ? formatToSting(fieldEdit.value) : fieldEdit.value;
-    }
-
-    if (fieldEdit.value.length === 0) {
-      cell.innerHTML = cellText;
-    }
-  });
+  return fieldEdit;
 }
