@@ -153,6 +153,8 @@ newEmployeeForm.addEventListener('submit', (e) => {
     const tBody = document.querySelector('table > tbody');
 
     tBody.append(newEmployee);
+
+    newEmployeeForm.reset();
   }
 });
 
@@ -238,17 +240,27 @@ function createNewEmployee(employeeData) {
 }
 
 function getFormattedNumber(number) {
-  const thousands = number / 1000;
+  const parsedToDecimal = parseInt(number, 10);
 
-  if (number < 1000) {
-    return number;
+  if (parsedToDecimal < 1000) {
+    return parsedToDecimal;
   }
 
-  if ((number % 10 === 0) && (number >= 1000)) {
+  const thousands = parsedToDecimal / 1000;
+
+  const numberAsString = String(thousands);
+
+  const decimalIndex = numberAsString.indexOf('.');
+
+  if (decimalIndex === -1) {
     return `${thousands},000`;
   }
 
-  return `${thousands}`.replace('.', ',');
+  const wholelPart = numberAsString.slice(0, decimalIndex);
+
+  const fractionalPart = numberAsString.slice(decimalIndex + 1).padEnd(3, 0);
+
+  return `${wholelPart},${fractionalPart}`;
 }
 
 employeesTable.addEventListener('dblclick', (e) => {
@@ -281,10 +293,16 @@ function editTableCell(cell) {
   input.focus();
 
   input.addEventListener('input', (e) => {
-    input.style.width = input.scrollWidth + 'px';
+    if (cellIndex !== 3) {
+      input.style.width = input.scrollWidth + 'px';
+    }
 
     if (cellIndex === 3 || cellIndex === 4) {
       input.value = input.value.replace(/[^0-9]/g, '');
+    }
+
+    if (cellIndex === 3) {
+      input.value = Math.min(input.value, 100);
     }
   });
 
@@ -292,13 +310,14 @@ function editTableCell(cell) {
     let newValue = e.target.value.trim();
 
     if (cellIndex === 4) {
+      newValue = newValue.replace(/[^0-9]/g, '');
+
       const newSalary = getFormattedNumber(newValue);
 
       newValue = `$${newSalary || initialText.slice(1)}`;
     }
 
-    const textNode
-      = document.createTextNode(newValue || initialText);
+    const textNode = document.createTextNode(newValue || initialText);
 
     input.replaceWith(textNode);
   });
