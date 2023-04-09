@@ -1,7 +1,5 @@
 'use strict';
 
-const log = console.log;
-
 // Sorting:
 const tableHead = document.querySelector('thead');
 const allRows = [...document.querySelector('table').rows];
@@ -88,3 +86,48 @@ const selectRow = (e) => {
 };
 
 tableBody.addEventListener('click', selectRow);
+
+// 3 - Form
+const log = console.log;
+const body = document.body;
+const form = document.createElement('form');
+
+for (let i = 0; i < 5; i++) {
+  const input = document.createElement('input');
+  const label = document.createElement('label');
+
+  input.name = allRows[0].cells[i].innerText.toLocaleLowerCase();
+  input.dataset.qa = allRows[0].cells[i].innerText.toLocaleLowerCase();
+  input.type = 'text';
+
+  label.innerText = allRows[0].cells[i].innerText;
+  label.append(input);
+  form.append(label);
+}
+
+form.className = 'new-employee-form';
+
+body.append(form);
+
+const officeInput = document.querySelector('input[name="office"]');
+const officeSelect = document.createElement('select');
+
+const cities = ['Tokyo', 'Singapore', 'London', 'New York',
+  'Edinburgh', 'San Francisco'];
+
+for (let i = 0; i < cities.length; i++) {
+  const option = document.createElement('option');
+
+  option.text = cities[i];
+  officeSelect.appendChild(option);
+}
+
+officeSelect.name = allRows[0].cells[2].innerText.toLocaleLowerCase();
+officeSelect.dataset.qa = allRows[0].cells[2].innerText.toLocaleLowerCase();
+
+officeInput.replaceWith(officeSelect);
+
+const button = document.createElement('button');
+
+button.innerText = 'Save to table';
+form.append(button);
