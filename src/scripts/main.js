@@ -280,7 +280,20 @@ function editTableCell(cell) {
 
   cell.innerText = '';
 
-  const input = document.createElement('input');
+  let input = document.createElement('input');
+
+  if (cellIndex === 2) {
+    input = document.createElement('select');
+
+    input.insertAdjacentHTML('afterbegin', `
+    <option>Tokyo</option>
+    <option>Singapore</option>
+    <option>London</option>
+    <option>New York</option>
+    <option>Edinburgh</option>
+    <option>San Francisco</option>
+    `);
+  }
 
   input.classList.add('cell-input');
 
