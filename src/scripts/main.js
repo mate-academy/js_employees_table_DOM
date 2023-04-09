@@ -2,25 +2,24 @@
 
 const table = document.querySelector('table');
 let tbodyRows = [...table.tBodies[0].rows];
+
 const form = document.querySelector('.new-employee-form');
 const notification = document.querySelector('.notification');
 let order = 'asc';
 
 form.addEventListener('submit', e => {
-  if (!form.checkValidity()) {
-    e.preventDefault();
-  }
+  e.preventDefault();
 
   if (form.checkValidity()) {
     e.preventDefault();
-    onSuccessSubmit();
     addEmployee();
-    clearForm();
+    showNotification('Success', 'New employee was added', 'success')
+    form.reset();
   }
 });
 
 table.addEventListener('click', function(e) {
-  if (e.target.matches('thead tr th')) {
+  if (e.target.tagName === 'TH') {
     const thIndex = e.target.cellIndex;
 
     if (order === 'asc') {
@@ -38,24 +37,18 @@ table.addEventListener('click', function(e) {
 });
 
 table.addEventListener('dblclick', function(e) {
-  if (!e.target.matches('tbody tr td')) {
+  if (e.target.tagName !== 'TD') {
     return;
   }
 
   const cellIndex = e.target.cellIndex;
   const rowIndex = e.target.parentElement.sectionRowIndex;
 
-  for (const row of tbodyRows) {
-    if (row.sectionRowIndex === rowIndex) {
-      const cell = row.cells[cellIndex];
-
-      editCell(cell);
-    }
-  }
+  editCell(tbodyRows[rowIndex].cells[cellIndex]);
 });
 
 table.tBodies[0].addEventListener('click', e => {
-  if (e.target.matches('tbody tr td')) {
+  if (e.target.tagName === 'TD') {
     const rowIndex = e.target.parentElement.sectionRowIndex;
 
     for (const row of tbodyRows) {
@@ -90,13 +83,13 @@ function formatToSting(str) {
   return '$' + str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-function onSuccessSubmit() {
-  notification.hidden = false;
+// function onSuccessSubmit() {
+//   notification.hidden = false;
 
-  setInterval(() => {
-    notification.hidden = true;
-  }, 1500);
-}
+//   setInterval(() => {
+//     notification.hidden = true;
+//   }, 1500);
+// }
 
 function addEmployee() {
   const data = new FormData(form);
@@ -113,75 +106,117 @@ function addEmployee() {
   tbodyRows = [...table.tBodies[0].rows];
 }
 
-function clearForm() {
-  for (const elem of [...form.elements]) {
-    elem.value = '';
-  }
-}
-
 function editCell(cell) {
   const cellText = cell.innerText;
 
   cell.innerText = '';
 
-  const fieldEdit = addFieldEdit(cellText, cell);
+  const editFild = addEditField(cellText, cell);
 
-  fieldEdit.addEventListener('keyup', (ev) => {
-    if (ev.code === 'Enter' && fieldEdit.value.length > 0) {
-      getFinallyValue(cell, fieldEdit, cellText);
-    }
-
-    if (ev.code === 'Enter' && fieldEdit.value.length === 0) {
-      cell.textContent = cellText;
+  editFild.addEventListener('keyup', (ev) => {
+    if (ev.code === 'Enter') {
+      handleEventsEditFild(editFild, cell, cellText);
     }
   });
 
-  fieldEdit.addEventListener('blur', (ev) => {
-    if (fieldEdit.value.length > 0) {
-      getFinallyValue(cell, fieldEdit, cellText);
-    }
-
-    if (fieldEdit.value.length === 0) {
-      cell.innerHTML = cellText;
-    }
+  editFild.addEventListener('blur', (ev) => {
+    handleEventsEditFild(editFild, cell, cellText);
   });
 }
 
 function getCorrectAge(prevAge, currentAge) {
-  return (currentAge >= 18 && currentAge <= 90) ? currentAge : prevAge;
+  if (currentAge >= 18 && currentAge <= 90) {
+    return currentAge;
+  } else {
+    showNotification('Error', 'Age must be between 18 and 90', 'error');
+
+    return prevAge;
+  }
 }
 
 function getCorrectSalary(prevSalary, currentSalary) {
-  return currentSalary >= 1
-    ? formatToSting(currentSalary) : prevSalary;
+  if (currentSalary >= 1) {
+    return formatToSting(currentSalary);
+  } else {
+    showNotification('Error', 'Salary must be greater than zero', 'error');
+
+    return prevSalary;
+  }
 }
 
-function getFinallyValue(cell, fieldEdit, cellText) {
-  cell.textContent = cellText.startsWith('$')
-    ? getCorrectSalary(cellText, fieldEdit.value) : fieldEdit.value;
+function getCorrectName(prevName, currentName) {
+  if (currentName.length >= 4) {
+    return currentName;
+  } else {
+    showNotification(
+      'Error',
+      'The name must be longer than 4 characters',
+      'error'
+    );
 
-  cell.textContent = fieldEdit.type === 'text' || cellText.startsWith('$')
-    ? cell.textContent : getCorrectAge(cellText, cell.textContent);
+    return prevName;
+  }
 }
 
-function addFieldEdit(cellText, cell) {
-  const fieldEdit = document.createElement('input');
+function getFinallyValue(cell, prevText, currentText) {
+  switch (cell.cellIndex) {
+    case 0:
+      cell.textContent = getCorrectName(currentText, prevText);
+      break;
 
-  fieldEdit.className = 'cell-input';
+    case 3:
+      cell.textContent = getCorrectAge(currentText, prevText);
+      break;
+
+    case 4:
+      cell.textContent = getCorrectSalary(currentText, prevText);
+      break;
+
+    default:
+      cell.textContent = prevText;
+  }
+}
+
+function addEditField(cellText, cell) {
+  const editField = document.createElement('input');
+
+  editField.className = 'cell-input';
 
   if (Number.parseFloat(cellText)) {
-    fieldEdit.type = 'number';
-    fieldEdit.min = 18;
-    fieldEdit.max = 90;
+    editField.type = 'number';
+    editField.min = 18;
+    editField.max = 90;
   }
 
   if (cellText.startsWith('$')) {
-    fieldEdit.type = 'number';
-    fieldEdit.min = 1;
+    editField.type = 'number';
+    editField.min = 1;
   }
 
-  cell.append(fieldEdit);
-  fieldEdit.focus();
+  cell.append(editField);
+  editField.focus();
 
-  return fieldEdit;
+  return editField;
+}
+
+function handleEventsEditFild(editFildValue, cell, cellText) {
+  if (editFildValue.value.length > 0) {
+    getFinallyValue(cell, editFildValue.value, cellText);
+  }
+
+  if (editFildValue.value.length === 0) {
+    cell.textContent = cellText;
+  }
+}
+
+function showNotification(title, textContent, classType) {
+  notification.classList.add(classType);
+  notification.hidden = false;
+  notification.querySelector('h2').innerHTML = title;
+  notification.querySelector('p').innerHTML = textContent;
+
+  setInterval(() => {
+    notification.hidden = true;
+    notification.classList.remove(classType);
+  }, 2200);
 }
