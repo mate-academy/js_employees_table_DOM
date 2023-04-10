@@ -4,7 +4,12 @@ const tableHead = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
 const tableRows = tableBody.rows;
 let toggle = true;
+let valueForSort = 0;
 let special;
+
+function setSalaryValue(num) {
+  return `$${num.toLocaleString('en-US')}`;
+};
 
 function getSalaryValue(str) {
   return +str.replace(/[,$]/g, '');
@@ -12,28 +17,38 @@ function getSalaryValue(str) {
 
 tableHead.addEventListener('click', e => {
   const index = e.target.cellIndex;
+  const headTitle = e.target.innerHTML;
 
-  const sortedTable = [...tableRows].sort((a, b) => {
-    const cellA = a.cells[index].innerHTML;
-    const cellB = b.cells[index].innerHTML;
+  const sortRows = [...tableRows].sort((a, b) => {
+    let prev = a.cells[index].innerHTML;
+    let next = b.cells[index].innerHTML;
 
-    if (cellA.includes('$')) {
-      return (getSalaryValue(cellA) - getSalaryValue(cellB));
+    if (headTitle === 'Salary' || headTitle === 'Age') {
+      prev = getSalaryValue(prev);
+      next = getSalaryValue(next);
+
+      return prev - next;
     }
 
-    return cellA.localeCompare(cellB);
+    return prev.localeCompare(next);
   });
 
   if (!toggle) {
-    sortedTable.reverse();
+    sortRows.reverse();
+  }
+
+  tableBody.append(...sortRows);
+
+  if (valueForSort !== index) {
+    toggle = !toggle;
   }
 
   toggle = !toggle;
 
-  tableBody.append(...sortedTable);
+  valueForSort = index;
 });
 
-tableBody.addEventListener('click', e => {
+tableBody.addEventListener('click', (e) => {
   if (special) {
     special.classList.remove('active');
   }
@@ -116,7 +131,7 @@ function createRow() {
   const officeCell = officeList.value;
   const ageCell = form.age.value;
   const salary = parseFloat(form.salary.value);
-  const salaryCell = salary.toLocaleString('en-US');
+  const salaryCell = setSalaryValue(salary);
 
   tableBody.insertAdjacentHTML('beforeend', `
   <tr>
@@ -197,9 +212,9 @@ const minAgeLength = 18;
 const maxAgeLegth = 90;
 
 const validScheme = {
-  name: item => item.length > minNameLength,
-  age: item => item > minAgeLength || item < maxAgeLegth,
-  salary: item => item > 0,
+  name: item => item.length >= minNameLength,
+  age: item => +item >= minAgeLength && +item <= maxAgeLegth,
+  salary: item => +item > 0,
 };
 
 tableBody.addEventListener('dblclick', e => {
@@ -215,63 +230,75 @@ tableBody.addEventListener('dblclick', e => {
   item.firstChild.replaceWith(itemInput);
   itemInput.focus();
 
-  itemInput.addEventListener('keypress', () => {
-    if (e.key === 'Enter') {
+  itemInput.addEventListener('keydown', (eKey) => {
+    if (eKey.key === 'Enter') {
       itemInput.blur();
     }
   });
 
   itemInput.addEventListener('blur', () => {
 
-    if (
-      validScheme.name(itemInput.value)
-      || validScheme.age(itemInput.value)
-      || validScheme.salary(itemInput.value)
-      || !itemInput.value.trim()
-    ) {
-      item.removeChild(itemInput);
+    if (itemInput.dataset.qa === 'age' && validScheme.age(itemInput.value)) {
+      item.textContent = itemInput.value;
 
-      if (
-        itemInput.name === 'name'
-        || itemInput.name === 'position'
-        || itemInput.name === 'office'
-      ) {
-        item.textContent = itemInput.value;
-      }
+      return;
+    }
 
-      if (itemInput.name === 'age' && itemInput.value > 0) {
-        item.textContent = itemInput.value;
-      }
-
-      if (itemInput.name === 'age' && itemInput.value < 0) {
-        showNotification(
-          'error',
-          'Enter a correct age',
-          'Your age must be from 18 to 90 years'
-        );
-
-        item.textContent = itemText;
-      }
-
-      if (itemInput.name === 'salary' && itemInput.value >= 0) {
-        item.textContent = itemInput.value;
-      }
-
-      if (itemInput.name === 'salary' && itemInput.value < 0) {
-        showNotification(
-          'error',
-          'Enter a correct salary',
-          'Your salary must be greater than or equal to 0'
-        );
-        item.textContent = itemText;
-      }
+    if (itemInput.dataset.qa === 'age' && !validScheme.age(itemInput.value)) {
+      showNotification(
+        'error',
+        'Enter a correct age',
+        'Your age must be from 18 to 90 years'
+      );
 
       item.textContent = itemText;
 
       return;
     }
 
-    item.removeChild(itemInput);
-    item.textContent = itemText;
+    if (itemInput.dataset.qa === 'salary' && validScheme.salary(itemInput.value)) {
+      item.textContent = setSalaryValue(+itemInput.value);
+
+      return;
+    }
+
+    if (itemInput.dataset.qa === 'salary' && !validScheme.salary(itemInput.value)) {
+      showNotification(
+        'error',
+        'Enter a correct salary',
+        'Your salary must be greater than or equal to 0'
+      );
+
+      item.textContent = itemText;
+
+      return;
+    }
+
+    if (itemInput.dataset.qa === 'name' && validScheme.name(itemInput.value)) {
+      item.textContent = itemInput.value;
+
+      return;
+    }
+
+    if (itemInput.dataset.qa === 'name' && !validScheme.name(itemInput.value)) {
+      showNotification(
+        'error',
+        'Incorrect name',
+        'Name length should be at least 4 letters'
+      );
+
+      item.textContent = itemText;
+
+      return;
+    }
+
+    if (itemInput.dataset.qa === 'name') {
+      item.textContent = itemInput.value;
+
+      return;
+    }
+
+    item.textContent = itemInput.value;
+
   });
 });
