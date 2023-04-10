@@ -140,7 +140,7 @@ button.addEventListener('click', (e) => {
 
     addPerson(inputResult);
 
-    showMessage('success', 'Person added to table');
+    showMessage('success', 'You have successfully added a person to the table');
     form.reset();
   }
 });
@@ -214,7 +214,7 @@ table.addEventListener('dblclick', (e) => {
   newInput.focus();
 
   newInput.addEventListener('blur', () => {
-    if (newInput.value.trim().length < 4 || typeof +newInput === 'number') {
+    if (newInput.value.trim().length < 4 || !isNaN(newInput.value)) {
       e.target.innerText = prev;
 
       showMessage('error', `check the correctness of the data,
@@ -227,14 +227,16 @@ table.addEventListener('dblclick', (e) => {
 
   newInput.onkeydown = (evt) => {
     if (evt.key === 'Enter') {
-      if (newInput.value.trim().length < 4 || typeof +newInput === 'number') {
+      if (newInput.value.trim().length < 4 || !isNaN(newInput.value)) {
         newInput.value = prev;
 
         showMessage('error', `check the correctness of the data,
         there can only be letters`);
+      } else {
+        showMessage('success', 'You have changed the table data');
+        e.target.innerText = getName(newInput.value);
+        newInput.blur();
       }
-      e.target.innerText = getName(newInput.value);
-      newInput.blur();
     }
   };
 });
@@ -259,6 +261,7 @@ table.addEventListener('dblclick', (e) => {
 
     tableSelect.onblur = () => {
       e.target.innerText = tableSelect.value;
+      showMessage('success', 'You have changed the table data');
       tableSelect.blur();
     };
   }
@@ -295,6 +298,7 @@ table.addEventListener('dblclick', (e) => {
         e.target.innerText = prev;
         showMessage('error', 'check the correctness of the age data');
       }
+      showMessage('success', 'You have changed the table data');
       newInput.blur();
     };
 
@@ -304,6 +308,7 @@ table.addEventListener('dblclick', (e) => {
           newInput.value = prev;
           showMessage('error', 'check the correctness of the age data');
         }
+        showMessage('success', 'You have changed the table data');
         newInput.blur();
         e.target.innerText = newInput.value;
       }
@@ -333,6 +338,7 @@ table.addEventListener('dblclick', (e) => {
         showMessage('error', 'check the correctness of the salary data');
       } else {
         e.target.innerText = `$${(+newInput.value).toLocaleString('en-US')}`;
+        showMessage('success', 'You have changed the table data');
         newInput.blur();
       }
     };
@@ -345,6 +351,7 @@ table.addEventListener('dblclick', (e) => {
           showMessage('error', 'check the correctness of the salary data');
         } else {
           e.target.innerText = `$${(+newInput.value).toLocaleString('en-US')}`;
+          showMessage('success', 'You have changed the table data');
           newInput.blur();
         }
       }
