@@ -5,11 +5,12 @@ const tableHead = document.querySelector('thead');
 const allRows = [...document.querySelector('table').rows];
 
 const sortingColumns = (e) => {
+  const updatedAllRows = [...document.querySelector('table').rows];
   const sortByColumn = e.target.innerText;
   const tableDataToSort = [];
 
-  for (let i = 1; i < allRows.length - 1; i++) {
-    const cells = allRows[i].cells;
+  for (let i = 1; i < updatedAllRows.length - 1; i++) {
+    const cells = updatedAllRows[i].cells;
     const person = {};
 
     person.Name = cells[0].innerText;
@@ -49,8 +50,8 @@ const sortingColumns = (e) => {
     e.target.dataset.clicked = true;
   }
 
-  for (let i = 1; i < allRows.length - 1; i++) {
-    const tableRow = allRows[i];
+  for (let i = 1; i < updatedAllRows.length - 1; i++) {
+    const tableRow = updatedAllRows[i];
 
     tableRow.innerHTML = `
       <td>${tableDataToSort[i - 1].Name}</td>
@@ -88,7 +89,6 @@ const selectRow = (e) => {
 tableBody.addEventListener('click', selectRow);
 
 // 3 - Form
-const log = console.log;
 const body = document.body;
 const form = document.createElement('form');
 
@@ -99,6 +99,7 @@ for (let i = 0; i < 5; i++) {
   input.name = allRows[0].cells[i].innerText.toLocaleLowerCase();
   input.dataset.qa = allRows[0].cells[i].innerText.toLocaleLowerCase();
   input.type = 'text';
+  input.setAttribute('required', true);
 
   label.innerText = allRows[0].cells[i].innerText;
   label.append(input);
@@ -106,10 +107,17 @@ for (let i = 0; i < 5; i++) {
 }
 
 form.className = 'new-employee-form';
-
 body.append(form);
 
+const nameInput = document.querySelector('[data-qa="name"]');
+const positionInput = document.querySelector('[data-qa="position"]');
 const officeInput = document.querySelector('input[name="office"]');
+const ageInput = document.querySelector('[data-qa="age"]');
+const salaryInput = document.querySelector('[data-qa="salary"]');
+
+ageInput.type = 'number';
+salaryInput.type = 'number';
+
 const officeSelect = document.createElement('select');
 
 const cities = ['Tokyo', 'Singapore', 'London', 'New York',
@@ -131,3 +139,75 @@ const button = document.createElement('button');
 
 button.innerText = 'Save to table';
 form.append(button);
+
+// notification
+const pushNotification = (type) => {
+  const block = document.createElement('div');
+  const titleBlock = document.createElement('h2');
+  const messageBlock = document.createElement('p');
+
+  block.classList.add('notification', type);
+  block.dataset.qa = 'notification';
+  console.log(block);
+
+  titleBlock.className = 'title';
+  titleBlock.innerText = `${type[0].toUpperCase() + type.slice(1)}`;
+
+  if (type === 'success') {
+    messageBlock.innerText = 'Person is added to the table';
+  } else {
+    messageBlock.innerText = 'Person was not added to the table, please'
+      + ' check input data';
+  }
+
+  block.append(titleBlock);
+  block.append(messageBlock);
+
+  block.style.top = `0px`;
+  block.style.right = `0px`;
+
+  const parentElement = document.querySelector('body');
+
+  parentElement.append(block);
+
+  setTimeout(() => {
+    block.remove();
+  }, 2000);
+};
+
+// button
+const buttonHandler = (e) => {
+  e.preventDefault();
+
+  const newPerosn = {};
+
+  newPerosn.Name = nameInput.value;
+  newPerosn.Position = positionInput.value;
+  newPerosn.Office = officeSelect.value;
+  newPerosn.Age = ageInput.value;
+  newPerosn.Salary = `$${Number(salaryInput.value).toLocaleString()}`;
+
+  const newRow = document.createElement('tr');
+
+  for (const key in newPerosn) {
+    const newTd = document.createElement('td');
+
+    newTd.innerText = newPerosn[key];
+    newRow.append(newTd);
+  }
+
+  if (newPerosn.Name.length < 4
+      || newPerosn.Age < 18
+      || newPerosn.Age > 90
+      || newPerosn.Position.length < 2
+      || newPerosn.Salary.length < 3) {
+    pushNotification('error');
+
+    return;
+  }
+
+  tableBody.append(newRow);
+  pushNotification('success');
+};
+
+button.addEventListener('click', buttonHandler);
