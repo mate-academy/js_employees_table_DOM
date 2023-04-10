@@ -83,14 +83,6 @@ function formatToSting(str) {
   return '$' + str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-// function onSuccessSubmit() {
-//   notification.hidden = false;
-
-//   setInterval(() => {
-//     notification.hidden = true;
-//   }, 1500);
-// }
-
 function addEmployee() {
   const data = new FormData(form);
 
