@@ -25,7 +25,11 @@ function sortRows(tab, row) {
     const first = isOdd ? formatSecond : formatFirst;
     const second = isOdd ? formatFirst : formatSecond;
 
-    return first.localeCompare(second);
+    if (isNaN(formatFirst)) {
+      return first.localeCompare(second);
+    } else {
+      return first - second;
+    }
   });
 
   table.tBodies[0].append(...result);
@@ -120,17 +124,19 @@ button.addEventListener('click', (e) => {
   const inputAge = document.querySelector('.input_age').value;
   const inputSalary = document.querySelector('.input_salary').value;
 
-  if (inputName.length < 4) {
+  if (!isNaN(inputName) || !isNaN(inputPosition)) {
+    showMessage('error', 'you can\'t write num in name or position row');
+  } else if (inputName.length < 4) {
     showMessage('error', 'check the correctness of the field name data');
   } else if (inputPosition === '') {
     showMessage('error', 'check the correctness of the field position data');
   } else if (inputAge < 18 || inputAge > 90) {
     showMessage('error', 'check the correctness of the field age data');
-  } else if (inputSalary.length < 3) {
+  } else if (inputSalary.length < 1) {
     showMessage('error', 'check the correctness of the field salary data');
   } else {
-    const inputResult = [inputName, inputPosition, inputbtnOffice,
-      inputAge, `$${(+inputSalary).toLocaleString('en-US')}`];
+    const inputResult = [getName(inputName), getName(inputPosition),
+      inputbtnOffice, inputAge, `$${(+inputSalary).toLocaleString('en-US')}`];
 
     addPerson(inputResult);
 
@@ -197,29 +203,37 @@ table.addEventListener('dblclick', (e) => {
 
   const newInput = document.createElement('input');
 
+  newInput.style.width = '90px';
+
   newInput.setAttribute('type', 'text');
 
   e.target.innerText = '';
 
   e.target.append(newInput);
   newInput.className = 'cell-input';
+  newInput.focus();
 
-  newInput.onblur = () => {
-    if (newInput.value.trim().length < 4) {
+  newInput.addEventListener('blur', () => {
+    if (newInput.value.trim().length < 4 || typeof +newInput === 'number') {
       e.target.innerText = prev;
-      showMessage('error', 'check the correctness of the data');
+
+      showMessage('error', `check the correctness of the data,
+      there can only be letters`);
+    } else {
+      e.target.innerText = getName(newInput.value);
+      newInput.blur();
     }
-    e.target.innerText = newInput.value;
-    newInput.blur();
-  };
+  });
 
   newInput.onkeydown = (evt) => {
     if (evt.key === 'Enter') {
-      if (newInput.value.trim().length < 4) {
+      if (newInput.value.trim().length < 4 || typeof +newInput === 'number') {
         newInput.value = prev;
-        showMessage('error', 'check the correctness of the data');
+
+        showMessage('error', `check the correctness of the data,
+        there can only be letters`);
       }
-      e.target.innerText = newInput.value;
+      e.target.innerText = getName(newInput.value);
       newInput.blur();
     }
   };
@@ -231,6 +245,8 @@ table.addEventListener('dblclick', (e) => {
 
     const tableSelect = document.createElement('select');
 
+    tableSelect.style.width = '90px';
+
     tableSelect.className = 'cell-input';
 
     addTableOptionOffice('Tokyo', tableSelect);
@@ -239,6 +255,12 @@ table.addEventListener('dblclick', (e) => {
     addTableOptionOffice('New York', tableSelect);
     addTableOptionOffice('Edinburgh', tableSelect);
     addTableOptionOffice('San Francisco', tableSelect);
+    tableSelect.focus();
+
+    tableSelect.onblur = () => {
+      e.target.innerText = tableSelect.value;
+      tableSelect.blur();
+    };
   }
 
   function addTableOptionOffice(optionName, tableOff) {
@@ -261,10 +283,12 @@ table.addEventListener('dblclick', (e) => {
     const newInput = document.createElement('input');
 
     newInput.setAttribute('type', 'number');
+    newInput.style.width = '40px';
 
     e.target.innerText = '';
     e.target.append(newInput);
     newInput.className = 'cell-input';
+    newInput.focus();
 
     newInput.onblur = () => {
       if (newInput.value < 18 || newInput.value > 90) {
@@ -289,24 +313,25 @@ table.addEventListener('dblclick', (e) => {
 
 table.addEventListener('dblclick', (e) => {
   if (e.target.classList.contains('salary')) {
-    const prev = e.target.innerText;
+    const prev = e.target.innerText.replace(/\W/g, '');
 
     const newInput = document.createElement('input');
 
     newInput.setAttribute('type', 'number');
+    newInput.style.width = '90px';
 
     e.target.innerText = '';
 
     e.target.append(newInput);
     newInput.className = 'cell-input';
+    newInput.focus();
 
     newInput.onblur = () => {
-      if (newInput.value.length < 3) {
+      if (newInput.value.length < 1) {
         newInput.setAttribute('type', 'text');
-        newInput.value = prev;
+        e.target.innerText = `$${(+prev).toLocaleString('en-US')}`;
         showMessage('error', 'check the correctness of the salary data');
       } else {
-        newInput.setAttribute('type', 'text');
         e.target.innerText = `$${(+newInput.value).toLocaleString('en-US')}`;
         newInput.blur();
       }
@@ -314,12 +339,11 @@ table.addEventListener('dblclick', (e) => {
 
     newInput.onkeydown = (evt) => {
       if (evt.key === 'Enter') {
-        if (newInput.value.length < 3) {
+        if (newInput.value.length < 1) {
           newInput.setAttribute('type', 'text');
-          newInput.value = prev;
+          e.target.innerText = `$${(+prev).toLocaleString('en-US')}`;
           showMessage('error', 'check the correctness of the salary data');
         } else {
-          newInput.setAttribute('type', 'text');
           e.target.innerText = `$${(+newInput.value).toLocaleString('en-US')}`;
           newInput.blur();
         }
@@ -327,3 +351,7 @@ table.addEventListener('dblclick', (e) => {
     };
   }
 });
+
+function getName(personName) {
+  return personName[0].toLocaleUpperCase() + personName.slice(1);
+}
