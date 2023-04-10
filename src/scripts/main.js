@@ -18,22 +18,15 @@ table.addEventListener('click', (e) => {
 function sortRows(tab, row) {
   const rowArray = Array.from(tab.rows).slice(1, tab.rows.length - 1);
   const result = rowArray.sort((a, b) => {
-    let one = a.cells[row].innerText.replace(/\W/g, '');
-    let two = b.cells[row].innerText.replace(/\W/g, '');
+    const formatFirst = a.cells[row].innerText.replace(/\W/g, '');
+    const formatSecond = b.cells[row].innerText.replace(/\W/g, '');
 
-    if (countForSort % 2 !== 0) {
-      one = b.cells[row].innerText.replace(/\W/g, '');
-      two = a.cells[row].innerText.replace(/\W/g, '');
-    }
+    const isOdd = countForSort % 2 !== 0;
+    const first = isOdd ? formatSecond : formatFirst;
+    const second = isOdd ? formatFirst : formatSecond;
 
-    if (!isNaN(one)) {
-      return one - two;
-    }
-
-    return one.localeCompare(two);
+    return first.localeCompare(second);
   });
-
-  // console.log(rowArray)
 
   table.tBodies[0].append(...result);
 };
@@ -52,7 +45,6 @@ table.addEventListener('click', (e) => {
   });
 });
 
-// create form
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
@@ -128,11 +120,14 @@ button.addEventListener('click', (e) => {
   const inputAge = document.querySelector('.input_age').value;
   const inputSalary = document.querySelector('.input_salary').value;
 
-  if (inputName.length < 4
-    || inputPosition === ''
-    || inputAge < 18 || inputAge > 90
-    || inputSalary.length < 3) {
-    showMessage('error', 'check');
+  if (inputName.length < 4) {
+    showMessage('error', 'check the correctness of the field name data');
+  } else if (inputPosition === '') {
+    showMessage('error', 'check the correctness of the field position data');
+  } else if (inputAge < 18 || inputAge > 90) {
+    showMessage('error', 'check the correctness of the field age data');
+  } else if (inputSalary.length < 3) {
+    showMessage('error', 'check the correctness of the field salary data');
   } else {
     const inputResult = [inputName, inputPosition, inputbtnOffice,
       inputAge, `$${(+inputSalary).toLocaleString('en-US')}`];
@@ -202,6 +197,8 @@ table.addEventListener('dblclick', (e) => {
 
   const newInput = document.createElement('input');
 
+  newInput.setAttribute('type', 'text');
+
   e.target.innerText = '';
 
   e.target.append(newInput);
@@ -210,7 +207,16 @@ table.addEventListener('dblclick', (e) => {
   newInput.onblur = () => {
     if (newInput.value.trim().length < 4) {
       newInput.value = prev;
-      showMessage('error', 'check');
+      showMessage('error', 'check the correctness of the data');
+    }
+  };
+
+  newInput.onkeydown = (evt) => {
+    if (evt.key === 'Enter') {
+      if (newInput.value.trim().length < 4) {
+        newInput.value = prev;
+        showMessage('error', 'check the correctness of the data');
+      }
     }
   };
 });
@@ -260,7 +266,16 @@ table.addEventListener('dblclick', (e) => {
     newInput.onblur = () => {
       if (newInput.value < 18 || newInput.value > 90) {
         newInput.value = prev;
-        showMessage('error', 'check');
+        showMessage('error', 'check the correctness of the age data');
+      }
+    };
+
+    newInput.onkeydown = (evt) => {
+      if (evt.key === 'Enter') {
+        if (newInput.value < 18 || newInput.value > 90) {
+          newInput.value = prev;
+          showMessage('error', 'check the correctness of the age data');
+        }
       }
     };
   }
@@ -268,7 +283,7 @@ table.addEventListener('dblclick', (e) => {
 
 table.addEventListener('dblclick', (e) => {
   if (e.target.classList.contains('salary')) {
-    const prev = e.target.innerText.slice(1).replace(',', '');
+    const prev = e.target.innerText;
 
     const newInput = document.createElement('input');
 
@@ -282,10 +297,24 @@ table.addEventListener('dblclick', (e) => {
     newInput.onblur = () => {
       if (newInput.value.length < 3) {
         newInput.setAttribute('type', 'text');
-        newInput.value = `$${(+prev).toLocaleString('en-US')}`;
+        newInput.value = prev;
       } else {
         newInput.setAttribute('type', 'text');
         newInput.value = `$${(+newInput.value).toLocaleString('en-US')}`;
+        showMessage('error', 'check the correctness of the salary data');
+      }
+    };
+
+    newInput.onkeydown = (evt) => {
+      if (evt.key === 'Enter') {
+        if (newInput.value.length < 3) {
+          newInput.setAttribute('type', 'text');
+          newInput.value = prev;
+        } else {
+          newInput.setAttribute('type', 'text');
+          newInput.value = `$${(+newInput.value).toLocaleString('en-US')}`;
+          showMessage('error', 'check the correctness of the salary data');
+        }
       }
     };
   }
