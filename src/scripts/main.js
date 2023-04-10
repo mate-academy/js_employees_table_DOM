@@ -206,9 +206,11 @@ table.addEventListener('dblclick', (e) => {
 
   newInput.onblur = () => {
     if (newInput.value.trim().length < 4) {
-      newInput.value = prev;
+      e.target.innerText = prev;
       showMessage('error', 'check the correctness of the data');
     }
+    e.target.innerText = newInput.value;
+    newInput.blur();
   };
 
   newInput.onkeydown = (evt) => {
@@ -217,6 +219,8 @@ table.addEventListener('dblclick', (e) => {
         newInput.value = prev;
         showMessage('error', 'check the correctness of the data');
       }
+      e.target.innerText = newInput.value;
+      newInput.blur();
     }
   };
 });
@@ -259,15 +263,15 @@ table.addEventListener('dblclick', (e) => {
     newInput.setAttribute('type', 'number');
 
     e.target.innerText = '';
-
     e.target.append(newInput);
     newInput.className = 'cell-input';
 
     newInput.onblur = () => {
       if (newInput.value < 18 || newInput.value > 90) {
-        newInput.value = prev;
+        e.target.innerText = prev;
         showMessage('error', 'check the correctness of the age data');
       }
+      newInput.blur();
     };
 
     newInput.onkeydown = (evt) => {
@@ -276,6 +280,8 @@ table.addEventListener('dblclick', (e) => {
           newInput.value = prev;
           showMessage('error', 'check the correctness of the age data');
         }
+        newInput.blur();
+        e.target.innerText = newInput.value;
       }
     };
   }
@@ -298,10 +304,11 @@ table.addEventListener('dblclick', (e) => {
       if (newInput.value.length < 3) {
         newInput.setAttribute('type', 'text');
         newInput.value = prev;
+        showMessage('error', 'check the correctness of the salary data');
       } else {
         newInput.setAttribute('type', 'text');
-        newInput.value = `$${(+newInput.value).toLocaleString('en-US')}`;
-        showMessage('error', 'check the correctness of the salary data');
+        e.target.innerText = `$${(+newInput.value).toLocaleString('en-US')}`;
+        newInput.blur();
       }
     };
 
@@ -310,10 +317,11 @@ table.addEventListener('dblclick', (e) => {
         if (newInput.value.length < 3) {
           newInput.setAttribute('type', 'text');
           newInput.value = prev;
+          showMessage('error', 'check the correctness of the salary data');
         } else {
           newInput.setAttribute('type', 'text');
-          newInput.value = `$${(+newInput.value).toLocaleString('en-US')}`;
-          showMessage('error', 'check the correctness of the salary data');
+          e.target.innerText = `$${(+newInput.value).toLocaleString('en-US')}`;
+          newInput.blur();
         }
       }
     };
