@@ -1,6 +1,5 @@
 'use strict';
 
-// Sorting:
 const tableHead = document.querySelector('thead');
 const allRows = [...document.querySelector('table').rows];
 
@@ -65,8 +64,6 @@ const sortingColumns = (e) => {
 
 tableHead.addEventListener('click', sortingColumns);
 
-// 2 task
-
 const tableBody = document.querySelector('tbody');
 
 const selectRow = (e) => {
@@ -88,7 +85,6 @@ const selectRow = (e) => {
 
 tableBody.addEventListener('click', selectRow);
 
-// 3 - Form
 const body = document.body;
 const form = document.createElement('form');
 
@@ -140,7 +136,6 @@ const button = document.createElement('button');
 button.innerText = 'Save to table';
 form.append(button);
 
-// notification
 const pushNotification = (type) => {
   const block = document.createElement('div');
   const titleBlock = document.createElement('h2');
@@ -148,7 +143,6 @@ const pushNotification = (type) => {
 
   block.classList.add('notification', type);
   block.dataset.qa = 'notification';
-  console.log(block);
 
   titleBlock.className = 'title';
   titleBlock.innerText = `${type[0].toUpperCase() + type.slice(1)}`;
@@ -175,7 +169,6 @@ const pushNotification = (type) => {
   }, 2000);
 };
 
-// button
 const buttonHandler = (e) => {
   e.preventDefault();
 
@@ -211,3 +204,42 @@ const buttonHandler = (e) => {
 };
 
 button.addEventListener('click', buttonHandler);
+
+// task-5 edit cells
+const editCells = (e) => {
+  const target = e.target;
+  const cellInput = document.createElement('input');
+  const originalText = target.innerHTML;
+
+  target.innerText = '';
+  cellInput.className = 'cell-input';
+  target.append(cellInput);
+  cellInput.focus();
+
+  cellInput.onblur = () => {
+    if (cellInput.value < 18 || cellInput.value > 90) {
+      e.target.innerText = originalText;
+      pushNotification('error');
+
+      return;
+    }
+    pushNotification('success');
+    cellInput.blur();
+  };
+
+  cellInput.onkeydown = (evt) => {
+    if (evt.key === 'Enter') {
+      if (cellInput.value < 18 || cellInput.value > 90) {
+        cellInput.value = originalText;
+        pushNotification('error');
+
+        return;
+      }
+      pushNotification('success');
+      cellInput.blur();
+      e.target.innerText = cellInput.value;
+    }
+  };
+};
+
+tableBody.addEventListener('dblclick', editCells);
