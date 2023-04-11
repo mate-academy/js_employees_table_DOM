@@ -2,15 +2,22 @@
 
 const table = document.querySelector('table');
 
-let countForSort = 0;
+let countForSort = 2;
+let prevIndex = null;
 
 table.addEventListener('click', (e) => {
   const colum = e.target;
 
+  const newTarg = e.target.cellIndex;
+
+  if (newTarg !== prevIndex) {
+    prevIndex = newTarg;
+    countForSort = 1;
+  }
+
   if (colum.tagName !== 'TH') {
     return false;
   }
-
   sortRows(table, colum.cellIndex);
   countForSort++;
 });
@@ -21,7 +28,7 @@ function sortRows(tab, row) {
     const formatFirst = a.cells[row].innerText.replace(/\W/g, '');
     const formatSecond = b.cells[row].innerText.replace(/\W/g, '');
 
-    const isOdd = countForSort % 2 !== 0;
+    const isOdd = countForSort % 2 === 0;
     const first = isOdd ? formatSecond : formatFirst;
     const second = isOdd ? formatFirst : formatSecond;
 
@@ -125,15 +132,16 @@ button.addEventListener('click', (e) => {
   const inputSalary = document.querySelector('.input_salary').value;
 
   if (!isNaN(inputName) || !isNaN(inputPosition)) {
-    showMessage('error', 'you can\'t write num in name or position row');
+    showMessage('error', `only letters can be entered
+      in the name and position field`);
   } else if (inputName.length < 4) {
-    showMessage('error', 'check the correctness of the field name data');
+    showMessage('error', 'Can only be letters and length more 3');
   } else if (inputPosition === '') {
-    showMessage('error', 'check the correctness of the field position data');
+    showMessage('error', 'Can only be letters and length more 3');
   } else if (inputAge < 18 || inputAge > 90) {
-    showMessage('error', 'check the correctness of the field age data');
+    showMessage('error', 'Age must be over 18 and not over 90');
   } else if (inputSalary.length < 1) {
-    showMessage('error', 'check the correctness of the field salary data');
+    showMessage('error', 'Salary must be greater than zero');
   } else {
     const inputResult = [getName(inputName), getName(inputPosition),
       inputbtnOffice, inputAge, `$${(+inputSalary).toLocaleString('en-US')}`];
@@ -143,6 +151,8 @@ button.addEventListener('click', (e) => {
     showMessage('success', 'You have successfully added a person to the table');
     form.reset();
   }
+
+  addClassForChangeCells();
 });
 
 const showMessage = (title, messag) => {
@@ -170,6 +180,18 @@ const showMessage = (title, messag) => {
   }, 2000);
 };
 
+function addClassForChangeCells() {
+  return [...document.querySelectorAll('td')].forEach((item) => {
+    item.parentElement.children[0].classList.add('name');
+    item.parentElement.children[1].classList.add('position');
+    item.parentElement.children[2].classList.add('office');
+    item.parentElement.children[3].classList.add('age');
+    item.parentElement.children[4].classList.add('salary');
+  });
+}
+
+addClassForChangeCells();
+
 function addPerson(data) {
   const tr = document.createElement('tr');
 
@@ -183,17 +205,7 @@ function addPerson(data) {
   table.tBodies[0].append(tr);
 }
 
-const last = document.querySelectorAll('td');
-
-[...last].forEach((item) => {
-  item.parentElement.children[0].classList.add('name');
-  item.parentElement.children[1].classList.add('position');
-  item.parentElement.children[2].classList.add('office');
-  item.parentElement.children[3].classList.add('age');
-  item.parentElement.children[4].classList.add('salary');
-});
-
-table.addEventListener('dblclick', (e) => {
+table.tBodies[0].addEventListener('dblclick', (e) => {
   if (!e.target.classList.contains('name')
     && !e.target.classList.contains('position')) {
     return false;
@@ -216,10 +228,9 @@ table.addEventListener('dblclick', (e) => {
   newInput.addEventListener('blur', () => {
     if (newInput.value.trim().length < 4 || !isNaN(newInput.value)) {
       e.target.innerText = prev;
-
-      showMessage('error', `check the correctness of the data,
-      there can only be letters`);
+      showMessage('error', 'Can only be letters and length more 3');
     } else {
+      showMessage('success', 'You have changed the table data');
       e.target.innerText = getName(newInput.value);
       newInput.blur();
     }
@@ -230,8 +241,7 @@ table.addEventListener('dblclick', (e) => {
       if (newInput.value.trim().length < 4 || !isNaN(newInput.value)) {
         newInput.value = prev;
 
-        showMessage('error', `check the correctness of the data,
-        there can only be letters`);
+        showMessage('error', 'Can only be letters and length more 3');
       } else {
         showMessage('success', 'You have changed the table data');
         e.target.innerText = getName(newInput.value);
@@ -296,21 +306,24 @@ table.addEventListener('dblclick', (e) => {
     newInput.onblur = () => {
       if (newInput.value < 18 || newInput.value > 90) {
         e.target.innerText = prev;
-        showMessage('error', 'check the correctness of the age data');
+        showMessage('error', 'Age must be over 18 and not over 90');
+      } else {
+        showMessage('success', 'You have changed the table data');
+        newInput.blur();
+        e.target.innerText = newInput.value;
       }
-      showMessage('success', 'You have changed the table data');
-      newInput.blur();
     };
 
     newInput.onkeydown = (evt) => {
       if (evt.key === 'Enter') {
         if (newInput.value < 18 || newInput.value > 90) {
           newInput.value = prev;
-          showMessage('error', 'check the correctness of the age data');
+          showMessage('error', 'Age must be over 18 and not over 90');
+        } else {
+          showMessage('success', 'You have changed the table data');
+          newInput.blur();
+          e.target.innerText = newInput.value;
         }
-        showMessage('success', 'You have changed the table data');
-        newInput.blur();
-        e.target.innerText = newInput.value;
       }
     };
   }
@@ -323,6 +336,7 @@ table.addEventListener('dblclick', (e) => {
     const newInput = document.createElement('input');
 
     newInput.setAttribute('type', 'number');
+
     newInput.style.width = '90px';
 
     e.target.innerText = '';
@@ -332,10 +346,10 @@ table.addEventListener('dblclick', (e) => {
     newInput.focus();
 
     newInput.onblur = () => {
-      if (newInput.value.length < 1) {
+      if (newInput.value.length < 1 || newInput.value <= 0) {
         newInput.setAttribute('type', 'text');
         e.target.innerText = `$${(+prev).toLocaleString('en-US')}`;
-        showMessage('error', 'check the correctness of the salary data');
+        showMessage('error', 'Salary must be greater than zero');
       } else {
         e.target.innerText = `$${(+newInput.value).toLocaleString('en-US')}`;
         showMessage('success', 'You have changed the table data');
@@ -345,10 +359,10 @@ table.addEventListener('dblclick', (e) => {
 
     newInput.onkeydown = (evt) => {
       if (evt.key === 'Enter') {
-        if (newInput.value.length < 1) {
+        if (newInput.value <= 0 || newInput.value.length < 1) {
           newInput.setAttribute('type', 'text');
           e.target.innerText = `$${(+prev).toLocaleString('en-US')}`;
-          showMessage('error', 'check the correctness of the salary data');
+          showMessage('error', 'Salary must be greater than zero');
         } else {
           e.target.innerText = `$${(+newInput.value).toLocaleString('en-US')}`;
           showMessage('success', 'You have changed the table data');
