@@ -139,7 +139,7 @@ function createRow() {
     <td>${positionCell}</td>
     <td>${officeCell}</td>
     <td>${ageCell}</td>
-    <td>$${salaryCell}</td>
+    <td>${salaryCell}</td>
   </tr>
   `);
 };
@@ -237,14 +237,19 @@ tableBody.addEventListener('dblclick', e => {
   });
 
   itemInput.addEventListener('blur', () => {
-
-    if (itemInput.dataset.qa === 'age' && validScheme.age(itemInput.value)) {
+    if (
+      itemInput.dataset.qa === 'age'
+      && validScheme.age(itemInput.value)
+    ) {
       item.textContent = itemInput.value;
 
       return;
     }
 
-    if (itemInput.dataset.qa === 'age' && !validScheme.age(itemInput.value)) {
+    if (
+      itemInput.dataset.qa === 'age'
+      && !validScheme.age(itemInput.value)
+    ) {
       showNotification(
         'error',
         'Enter a correct age',
@@ -256,13 +261,19 @@ tableBody.addEventListener('dblclick', e => {
       return;
     }
 
-    if (itemInput.dataset.qa === 'salary' && validScheme.salary(itemInput.value)) {
+    if (
+      itemInput.dataset.qa === 'salary'
+      && validScheme.salary(itemInput.value)
+    ) {
       item.textContent = setSalaryValue(+itemInput.value);
 
       return;
     }
 
-    if (itemInput.dataset.qa === 'salary' && !validScheme.salary(itemInput.value)) {
+    if (
+      itemInput.dataset.qa === 'salary'
+      && !validScheme.salary(itemInput.value)
+    ) {
       showNotification(
         'error',
         'Enter a correct salary',
@@ -274,13 +285,19 @@ tableBody.addEventListener('dblclick', e => {
       return;
     }
 
-    if (itemInput.dataset.qa === 'name' && validScheme.name(itemInput.value)) {
+    if (
+      itemInput.dataset.qa === 'name'
+      && validScheme.name(itemInput.value)
+    ) {
       item.textContent = itemInput.value;
 
       return;
     }
 
-    if (itemInput.dataset.qa === 'name' && !validScheme.name(itemInput.value)) {
+    if (
+      itemInput.dataset.qa === 'name'
+      && !validScheme.name(itemInput.value)
+    ) {
       showNotification(
         'error',
         'Incorrect name',
@@ -299,6 +316,5 @@ tableBody.addEventListener('dblclick', e => {
     }
 
     item.textContent = itemInput.value;
-
   });
 });
