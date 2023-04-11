@@ -35,6 +35,12 @@ const sortingColumns = (e) => {
     }
     e.target.dataset.clicked = false;
   } else {
+    const clicedTitile = document.querySelector('[data-clicked="true"]');
+
+    if (clicedTitile) {
+      clicedTitile.dataset.clicked = false;
+    }
+
     if (sortByColumn === 'Salary') {
       tableDataToSort.sort((a, b) => {
         const toNumberA = a.Salary.match(/\d+/g).join('');
@@ -136,7 +142,7 @@ const button = document.createElement('button');
 button.innerText = 'Save to table';
 form.append(button);
 
-const pushNotification = (type) => {
+const pushNotification = (type, message) => {
   const block = document.createElement('div');
   const titleBlock = document.createElement('h2');
   const messageBlock = document.createElement('p');
@@ -147,12 +153,7 @@ const pushNotification = (type) => {
   titleBlock.className = 'title';
   titleBlock.innerText = `${type[0].toUpperCase() + type.slice(1)}`;
 
-  if (type === 'success') {
-    messageBlock.innerText = 'Person is added to the table';
-  } else {
-    messageBlock.innerText = 'Person was not added to the table, please'
-      + ' check input data';
-  }
+  messageBlock.innerText = message;
 
   block.append(titleBlock);
   block.append(messageBlock);
@@ -191,54 +192,72 @@ const buttonHandler = (e) => {
 
   if (newPerosn.Name.length < 4
       || newPerosn.Age < 18
-      || newPerosn.Age > 90
-      || newPerosn.Position.length < 2
-      || newPerosn.Salary.length < 3) {
-    pushNotification('error');
+      || newPerosn.Age > 90) {
+    pushNotification('error', 'Age must be greater 18 and bellow 90');
 
     return;
   }
 
   tableBody.append(newRow);
-  pushNotification('success');
+  pushNotification('success', 'Person is successfully added to the table!');
 };
 
 button.addEventListener('click', buttonHandler);
 
-// task-5 edit cells
 const editCells = (e) => {
   const target = e.target;
   const cellInput = document.createElement('input');
   const originalText = target.innerHTML;
 
+  cellInput.style.width = '50px';
   target.innerText = '';
   cellInput.className = 'cell-input';
   target.append(cellInput);
   cellInput.focus();
 
-  cellInput.onblur = () => {
-    if (cellInput.value < 18 || cellInput.value > 90) {
-      e.target.innerText = originalText;
-      pushNotification('error');
+  const cellEditHandler = () => {
+    const cellIndex = target.cellIndex;
 
-      return;
-    }
-    pushNotification('success');
-    cellInput.blur();
-  };
+    if (cellIndex === 3 || cellIndex === 4) {
+      if (!+cellInput.value) {
+        e.target.innerText = originalText;
 
-  cellInput.onkeydown = (evt) => {
-    if (evt.key === 'Enter') {
+        pushNotification('error',
+          'Only numbers for Age and Salary fields. Thank you!');
+
+        return;
+      };
+    };
+
+    if (cellIndex === 3) {
       if (cellInput.value < 18 || cellInput.value > 90) {
-        cellInput.value = originalText;
-        pushNotification('error');
+        e.target.innerText = originalText;
+        pushNotification('error', 'Age must be greater 18 and bellow 90');
 
         return;
       }
-      pushNotification('success');
-      cellInput.blur();
-      e.target.innerText = cellInput.value;
     }
+
+    if (cellIndex === 4) {
+      target.innerText = `$${Number(cellInput.value).toLocaleString()}`;
+    } else {
+      target.innerText = cellInput.value || originalText;
+    }
+
+    if (!target.innerText.trim()) {
+      target.innerText = originalText;
+      pushNotification('error', 'Table data can\'t be empty string');
+    }
+    cellInput.replaceWith(target.innerText);
+    cellInput.blur();
+  };
+
+  cellInput.onblur = cellEditHandler;
+
+  cellInput.onkeydown = (eve) => {
+    if (eve.key === 'Enter') {
+      cellEditHandler();
+    };
   };
 };
 
