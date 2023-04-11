@@ -190,9 +190,20 @@ const buttonHandler = (e) => {
     newRow.append(newTd);
   }
 
-  if (newPerosn.Name.length < 4
-      || newPerosn.Age < 18
-      || newPerosn.Age > 90) {
+  if (!newPerosn.Name.trim() || newPerosn.Name.length < 4) {
+    pushNotification('error',
+      'Name can\'t be empty string or shorter than 4 characters');
+
+    return;
+  }
+
+  if (!newPerosn.Position.trim()) {
+    pushNotification('error', 'Position can\'t be empty string');
+
+    return;
+  }
+
+  if (newPerosn.Age < 18 || newPerosn.Age > 90) {
     pushNotification('error', 'Age must be greater 18 and bellow 90');
 
     return;
