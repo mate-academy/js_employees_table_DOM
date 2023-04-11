@@ -140,7 +140,7 @@ button.addEventListener('click', (e) => {
     showMessage('error', 'Can only be letters and length more 3');
   } else if (inputAge < 18 || inputAge > 90) {
     showMessage('error', 'Age must be over 18 and not over 90');
-  } else if (inputSalary.length < 1) {
+  } else if (inputSalary.length < 1 || inputSalary <= 0) {
     showMessage('error', 'Salary must be greater than zero');
   } else {
     const inputResult = [getName(inputName), getName(inputPosition),
