@@ -209,50 +209,62 @@ const buttonHandler = (e) => {
     return;
   }
 
-  if (Number(salaryInput.value < 0)) {
-    pushNotification('error', 'Salary can\'t be less than $0');
+  if (Number(salaryInput.value < 0 || !salaryInput.value.trim())) {
+    pushNotification('error', 'Salary can\'t be less than $0 or empty field');
 
     return;
   }
 
   tableBody.append(newRow);
   pushNotification('success', 'Person is successfully added to the table!');
+
+  form.reset();
 };
 
 button.addEventListener('click', buttonHandler);
 
 const editCells = (e) => {
   const target = e.target;
-  const cellInput = document.createElement('input');
+  const cellIndex = target.cellIndex;
   const originalText = target.innerHTML;
+  const newInput = document.createElement('input');
+  const newSelect = document.createElement('select');
+  const cellInput = cellIndex === 2 ? newSelect : newInput;
 
-  cellInput.style.width = '50px';
   target.innerText = '';
-  cellInput.className = 'cell-input';
-  target.append(cellInput);
-  cellInput.focus();
+
+  if (target.cellIndex === 2) {
+    for (let i = 0; i < cities.length; i++) {
+      const option = document.createElement('option');
+
+      option.text = cities[i];
+      cellInput.appendChild(option);
+    }
+
+    target.append(cellInput);
+    cellInput.blur();
+  } else {
+    cellInput.style.width = '50px';
+    cellInput.className = 'cell-input';
+    target.append(cellInput);
+    cellInput.focus();
+  }
 
   const cellEditHandler = () => {
-    const cellIndex = target.cellIndex;
+    if ((cellIndex === 3 || cellIndex === 4) && !+cellInput.value) {
+      e.target.innerText = originalText;
 
-    if (cellIndex === 3 || cellIndex === 4) {
-      if (!+cellInput.value) {
-        e.target.innerText = originalText;
+      pushNotification('error',
+        'Only numbers for Age and Salary fields. Thank you!');
 
-        pushNotification('error',
-          'Only numbers for Age and Salary fields. Thank you!');
-
-        return;
-      };
+      return;
     };
 
-    if (cellIndex === 3) {
-      if (cellInput.value < 18 || cellInput.value > 90) {
-        e.target.innerText = originalText;
-        pushNotification('error', 'Age must be greater 18 and bellow 90');
+    if (cellIndex === 3 && (cellInput.value < 18 || cellInput.value > 90)) {
+      e.target.innerText = originalText;
+      pushNotification('error', 'Age must be greater 18 and bellow 90');
 
-        return;
-      }
+      return;
     }
 
     if (cellIndex === 4) {
@@ -266,6 +278,15 @@ const editCells = (e) => {
       target.innerText = `$${Number(cellInput.value).toLocaleString()}`;
     } else {
       target.innerText = cellInput.value || originalText;
+    }
+
+    if (cellIndex === 0 && cellInput.value.length < 4) {
+      pushNotification('error',
+        'Name can\'t be empty string or shorter than 4 characters');
+
+      target.innerText = originalText;
+
+      return;
     }
 
     if (!target.innerText.trim()) {
