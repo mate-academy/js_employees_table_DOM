@@ -8,6 +8,18 @@ function convertToNumber(str) {
   return numb;
 }
 
+const listElements = document.querySelector('tbody').children;
+
+document.querySelector('tbody').addEventListener('click', (e) => {
+  for (const element of listElements) {
+    if (element.className === 'active') {
+      element.className = '';
+    }
+  }
+
+  e.target.parentNode.className = 'active';
+});
+
 let clickNumber0 = 0;
 let clickNumber1 = 0;
 let clickNumber2 = 0;
@@ -129,8 +141,6 @@ const sortAll = (e) => {
   }
 };
 
-const listElements = document.querySelector('tbody').children;
-
 document.querySelectorAll('th')[0].addEventListener('click', sortAll);
 
 document.querySelectorAll('th')[1].addEventListener('click', sortAll);
@@ -140,17 +150,6 @@ document.querySelectorAll('th')[2].addEventListener('click', sortAll);
 document.querySelectorAll('th')[3].addEventListener('click', sortAll);
 
 document.querySelectorAll('th')[4].addEventListener('click', sortAll);
-
-for (const item of listElements) {
-  item.addEventListener('click', () => {
-    for (const element of listElements) {
-      if (element.className === 'active') {
-        element.className = '';
-      }
-    }
-    item.className = 'active';
-  });
-};
 
 const formElement = document.createElement('form');
 
@@ -190,10 +189,10 @@ formElement.addEventListener('submit', (e) => {
 
   const data = new FormData(formElement);
 
-  if (data.get('name').length < 4
+  if (data.get('name').trim().length < 4
   || data.get('age') < 18
   || data.get('age') > 90
-  || data.get('position') === '') {
+  || data.get('position').trim() === '') {
     pushNotification(150, 10, 'Error', 'Please correct the data', 'error');
   } else {
     const newEmployee = Object.fromEntries(data.entries());
@@ -218,42 +217,58 @@ formElement.addEventListener('submit', (e) => {
   }
 });
 
-for (const item of listElements) {
-  item.addEventListener('dblclick', (e) => {
-    const inputData = document.createElement('input');
+document.querySelector('tbody').addEventListener('dblclick', (e) => {
+  const inputData = document.createElement('input');
 
-    inputData.className = 'cell-input';
-    inputData.setAttribute('value', `${e.target.textContent}`);
+  inputData.className = 'cell-input';
+  inputData.setAttribute('value', `${e.target.textContent}`);
 
-    const initialValue = e.target.textContent;
+  const initialValue = e.target.textContent;
 
-    e.target.textContent = '';
+  if (/^[0-9]+$/.test(e.target.textContent)) {
+    inputData.setAttribute('type', `number`);
+  }
 
-    e.target.append(inputData);
+  if (/[$]/.test(e.target.textContent)) {
+    inputData.setAttribute('type', `number`);
+  }
 
-    inputData.addEventListener('blur', () => {
-      e.target.textContent = inputData.value;
+  e.target.textContent = '';
 
-      if (e.target.textContent === '') {
-        e.target.textContent = initialValue;
-      }
+  e.target.append(inputData);
 
-      inputData.remove();
-    });
+  const saveData = () => {
+    if (/[$]/.test(initialValue)) {
+      const salaryNumberCell = +inputData.value;
 
-    inputData.addEventListener('keydown', (x) => {
-      if (x.code === 'Enter') {
-        e.target.textContent = inputData.value;
+      e.target.textContent
+      = '$' + salaryNumberCell.toLocaleString('en-US');
+    } else {
+      e.target.textContent = inputData.value.trim();
+    }
 
-        if (e.target.textContent === '') {
-          e.target.textContent = initialValue;
-        }
+    if (/^[0-9]+$/.test(initialValue)
+    && (inputData.value < 18
+    || inputData.value > 90)) {
+      e.target.textContent = initialValue;
+    }
 
-        inputData.remove();
-      }
-    });
+    if (e.target.textContent === ''
+    || e.target.textContent === '$0') {
+      e.target.textContent = initialValue;
+    }
+
+    inputData.remove();
+  };
+
+  inputData.addEventListener('blur', saveData);
+
+  inputData.addEventListener('keydown', (x) => {
+    if (x.code === 'Enter') {
+      saveData();
+    }
   });
-};
+});
 
 const pushNotification = (posTop, posRight, title, description, type) => {
   const notif = document.createElement('div');
