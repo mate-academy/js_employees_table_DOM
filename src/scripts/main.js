@@ -209,6 +209,12 @@ const buttonHandler = (e) => {
     return;
   }
 
+  if (Number(salaryInput.value < 0)) {
+    pushNotification('error', 'Salary can\'t be less than $0');
+
+    return;
+  }
+
   tableBody.append(newRow);
   pushNotification('success', 'Person is successfully added to the table!');
 };
@@ -250,6 +256,13 @@ const editCells = (e) => {
     }
 
     if (cellIndex === 4) {
+      if (Number(cellInput.value) < 0) {
+        target.innerText = originalText;
+        pushNotification('error', 'Salary can\'t be less than $0');
+
+        return;
+      }
+
       target.innerText = `$${Number(cellInput.value).toLocaleString()}`;
     } else {
       target.innerText = cellInput.value || originalText;
