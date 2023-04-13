@@ -1,7 +1,5 @@
 'use strict';
 
-// write code here
-
 function convertToNumber(str) {
   const numb = +str.replace(/\D/g, '');
 
@@ -20,53 +18,15 @@ document.querySelector('tbody').addEventListener('click', (e) => {
   e.target.parentNode.className = 'active';
 });
 
-let clickNumber0 = 0;
-let clickNumber1 = 0;
-let clickNumber2 = 0;
-let clickNumber3 = 0;
-let clickNumber4 = 0;
+const clickNumber = [0, 0, 0, 0, 0];
 
 const sortAll = (e) => {
-  switch (e.target) {
-    case document.querySelectorAll('th')[0]:
-      clickNumber0 += 1;
-      clickNumber1 = 0;
-      clickNumber2 = 0;
-      clickNumber3 = 0;
-      clickNumber4 = 0;
-      break;
-
-    case document.querySelectorAll('th')[1]:
-      clickNumber0 = 0;
-      clickNumber1 += 1;
-      clickNumber2 = 0;
-      clickNumber3 = 0;
-      clickNumber4 = 0;
-      break;
-
-    case document.querySelectorAll('th')[2]:
-      clickNumber0 = 0;
-      clickNumber1 = 0;
-      clickNumber2 += 1;
-      clickNumber3 = 0;
-      clickNumber4 = 0;
-      break;
-
-    case document.querySelectorAll('th')[3]:
-      clickNumber0 = 0;
-      clickNumber1 = 0;
-      clickNumber2 = 0;
-      clickNumber3 += 1;
-      clickNumber4 = 0;
-      break;
-
-    case document.querySelectorAll('th')[4]:
-      clickNumber0 = 0;
-      clickNumber1 = 0;
-      clickNumber2 = 0;
-      clickNumber3 = 0;
-      clickNumber4 += 1;
-      break;
+  for (let i = 0; i < clickNumber.length; i++) {
+    if (i === e.target.cellIndex) {
+      clickNumber[i] += 1;
+    } else {
+      clickNumber[i] = 0;
+    }
   }
 
   const arraySort = [...listElements].sort((a, b) => {
@@ -75,7 +35,7 @@ const sortAll = (e) => {
         const strA1 = a.firstElementChild.textContent;
         const strB1 = b.firstElementChild.textContent;
 
-        if (clickNumber0 % 2 !== 0) {
+        if (clickNumber[0] % 2 !== 0) {
           return strA1.localeCompare(strB1);
         }
 
@@ -85,7 +45,7 @@ const sortAll = (e) => {
         const strA2 = a.firstElementChild.nextElementSibling.textContent;
         const strB2 = b.firstElementChild.nextElementSibling.textContent;
 
-        if (clickNumber1 % 2 !== 0) {
+        if (clickNumber[1] % 2 !== 0) {
           return strA2.localeCompare(strB2);
         }
 
@@ -97,14 +57,14 @@ const sortAll = (e) => {
         const strB3
         = b.firstElementChild.nextElementSibling.nextElementSibling.textContent;
 
-        if (clickNumber2 % 2 !== 0) {
+        if (clickNumber[2] % 2 !== 0) {
           return strA3.localeCompare(strB3);
         }
 
         return strB3.localeCompare(strA3);
 
       case document.querySelectorAll('th')[3]:
-        if (clickNumber3 % 2 !== 0) {
+        if (clickNumber[3] % 2 !== 0) {
           return a.lastElementChild.previousElementSibling.textContent
           - b.lastElementChild.previousElementSibling.textContent;
         }
@@ -116,7 +76,7 @@ const sortAll = (e) => {
         const salaryA = convertToNumber(a.lastElementChild.textContent);
         const salaryB = convertToNumber(b.lastElementChild.textContent);
 
-        if (clickNumber4 % 2 !== 0) {
+        if (clickNumber[4] % 2 !== 0) {
           return salaryA - salaryB;
         }
 
@@ -142,13 +102,9 @@ const sortAll = (e) => {
 };
 
 document.querySelectorAll('th')[0].addEventListener('click', sortAll);
-
 document.querySelectorAll('th')[1].addEventListener('click', sortAll);
-
 document.querySelectorAll('th')[2].addEventListener('click', sortAll);
-
 document.querySelectorAll('th')[3].addEventListener('click', sortAll);
-
 document.querySelectorAll('th')[4].addEventListener('click', sortAll);
 
 const formElement = document.createElement('form');
@@ -158,19 +114,27 @@ formElement.className = 'new-employee-form';
 document.body.append(formElement);
 
 formElement.innerHTML += `
-<label>Name: <input name="name" type="text" data-qa="name" required></label>
-<label>Position: <input name="position" type="text" data-qa="position">
+<label>Name: 
+  <input name="name" type="text" data-qa="name" required>
 </label>
-<label>Office: <select name="office" data-qa="office" required>
-<option value="Tokyo">Tokyo</option>
-<option value="Singapore">Singapore</option>
-<option value="London">London</option>
-<option value="New York">New York</option>
-<option value="Edinburgh">Edinburgh</option>
-<option value="San Francisco">San Francisco</option>
-</select></label>
-<label>Age: <input name="age" type="number" data-qa="age" required></label>
-<label>Salary: <input name="salary" type="number" data-qa="salary" required>
+<label>Position: 
+  <input name="position" type="text" data-qa="position">
+</label>
+<label>Office: 
+  <select name="office" data-qa="office" required>
+    <option value="Tokyo">Tokyo</option>
+    <option value="Singapore">Singapore</option>
+    <option value="London">London</option>
+    <option value="New York">New York</option>
+    <option value="Edinburgh">Edinburgh</option>
+    <option value="San Francisco">San Francisco</option>
+  </select>
+</label>
+<label>Age: 
+  <input name="age" type="number" data-qa="age" required>
+</label>
+<label>Salary: 
+  <input name="salary" type="number" data-qa="salary" required>
 </label>
 <button type="submit">Save to table</button>
 `;
@@ -190,13 +154,17 @@ formElement.addEventListener('submit', (e) => {
   const data = new FormData(formElement);
 
   if (data.get('name').trim().length < 4
-  || data.get('age') < 18
-  || data.get('age') > 90
-  || data.get('position').trim() === '') {
-    pushNotification(150, 10, 'Error', 'Please correct the data', 'error');
+    || data.get('age') < 18
+    || data.get('age') > 90
+    || data.get('salary') < 0
+    || data.get('position').trim() === '') {
+    pushNotification(150, 10, 'Error',
+      'Please correct the data. All fields are required.'
+      + ' Name length: min - 4 characters. Age: min - 18, max - 90.'
+      + ' Salary: min - 0.',
+      'error');
   } else {
     const newEmployee = Object.fromEntries(data.entries());
-
     const salaryNumber = +newEmployee.salary;
 
     newEmployee.salary = '$' + salaryNumber.toLocaleString('en-US');
@@ -237,6 +205,7 @@ document.querySelector('tbody').addEventListener('dblclick', (e) => {
   }
 
   inputData.className = 'cell-input';
+
   inputData.setAttribute('value', `${e.target.textContent}`);
 
   const initialValue = e.target.textContent;
@@ -252,7 +221,6 @@ document.querySelector('tbody').addEventListener('dblclick', (e) => {
   e.target.textContent = '';
 
   e.target.append(inputData);
-
   inputData.focus();
 
   const saveData = () => {
@@ -266,13 +234,13 @@ document.querySelector('tbody').addEventListener('dblclick', (e) => {
     }
 
     if (/^[0-9]+$/.test(initialValue)
-    && (inputData.value < 18
-    || inputData.value > 90)) {
+      && (inputData.value < 18
+      || inputData.value > 90)) {
       e.target.textContent = initialValue;
     }
 
     if (e.target.textContent === ''
-    || e.target.textContent === '$0') {
+      || e.target.textContent === '$0') {
       e.target.textContent = initialValue;
     }
 
@@ -308,17 +276,12 @@ const pushNotification = (posTop, posRight, title, description, type) => {
     notif.className += ' error';
   }
 
-  if (type === 'warning') {
-    notif.className += ' warning';
-  }
-
   notif.setAttribute('data-qa', 'notification');
-
   notif.append(titleEl);
   notif.append(descriptionEl);
   document.body.append(notif);
 
   setTimeout(() => {
     notif.remove();
-  }, 2000);
+  }, 3000);
 };
