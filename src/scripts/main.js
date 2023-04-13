@@ -75,7 +75,6 @@ function createForm(form) {
   nameInput.type = 'text';
   nameInput.name = 'name';
   nameInput.setAttribute('data-qa', 'name');
-  nameInput.required = true;
   nameLabel.append(nameInput);
 
   const positionLabel = document.createElement('label');
@@ -85,7 +84,6 @@ function createForm(form) {
   positionInput.type = 'text';
   positionInput.name = 'position';
   positionInput.setAttribute('data-qa', 'position');
-  positionInput.required = true;
   positionLabel.append(positionInput);
 
   const officeLabel = document.createElement('label');
@@ -104,7 +102,6 @@ function createForm(form) {
 
   officeSelect.name = 'office';
   officeSelect.setAttribute('data-qa', 'office');
-  officeSelect.required = true;
   officeLabel.textContent = 'Office:';
   officeLabel.append(officeSelect);
 
@@ -115,7 +112,6 @@ function createForm(form) {
   ageInput.type = 'number';
   ageInput.name = 'age';
   ageInput.setAttribute('data-qa', 'age');
-  ageInput.required = true;
   ageLabel.append(ageInput);
 
   const salaryLabel = document.createElement('label');
@@ -125,7 +121,6 @@ function createForm(form) {
   salaryInput.type = 'number';
   salaryInput.name = 'salary';
   salaryInput.setAttribute('data-qa', 'salary');
-  salaryInput.required = true;
   salaryLabel.append(salaryInput);
 
   const button = document.createElement('button');
@@ -145,6 +140,7 @@ function createForm(form) {
 // add the new row in table
 formToAddRow.addEventListener('submit', e => {
   e.preventDefault();
+  // console.log(e.target.elements);
 
   if (formValidation(e.target)) {
     const newRow = table.tBodies[0].insertRow();
@@ -177,8 +173,15 @@ function formValidation(checkForm) {
   const maxAge = 90;
   const nameValid = checkForm.elements.name.value;
   const minNameLength = 4;
-  const positionValid = checkForm.elements.position.value;
-  const minPositionLength = 3;
+
+  if (areFieldNotEmpty(checkForm.querySelectorAll('input')) === false) {
+    pushNotification(
+      10, 10, 'No empty fields',
+      'All fields must be filled', 'error'
+    );
+
+    return false;
+  }
 
   if (ageValid < minAge || ageValid > maxAge) {
     pushNotification(
@@ -197,21 +200,24 @@ function formValidation(checkForm) {
     return false;
   }
 
-  if (positionValid.length < minPositionLength) {
-    pushNotification(
-      10, 10, 'Incorect position',
-      'Name of position should contain at least 3 symbols', 'error'
-    );
-
-    return false;
-  }
-
   pushNotification(
     10, 10, 'Employee added',
     'Employee was successfully added to the table', 'success'
   );
 
   return true;
+}
+
+function areFieldNotEmpty(inputs) {
+  let isNotEmpty = true;
+
+  inputs.forEach(input => {
+    if (input.value.trim() === '') {
+      isNotEmpty = false;
+    }
+  });
+
+  return isNotEmpty;
 }
 
 // notifications constructor
