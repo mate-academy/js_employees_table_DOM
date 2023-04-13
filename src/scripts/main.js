@@ -218,7 +218,23 @@ formElement.addEventListener('submit', (e) => {
 });
 
 document.querySelector('tbody').addEventListener('dblclick', (e) => {
-  const inputData = document.createElement('input');
+  let inputData;
+
+  if (e.target === e.target.parentNode.firstElementChild
+    .nextElementSibling.nextElementSibling) {
+    inputData = document.createElement('select');
+
+    inputData.innerHTML = `
+    <option value="Tokyo">Tokyo</option>
+    <option value="Singapore">Singapore</option>
+    <option value="London">London</option>
+    <option value="New York">New York</option>
+    <option value="Edinburgh">Edinburgh</option>
+    <option value="San Francisco">San Francisco</option>
+    `;
+  } else {
+    inputData = document.createElement('input');
+  }
 
   inputData.className = 'cell-input';
   inputData.setAttribute('value', `${e.target.textContent}`);
@@ -236,6 +252,8 @@ document.querySelector('tbody').addEventListener('dblclick', (e) => {
   e.target.textContent = '';
 
   e.target.append(inputData);
+
+  inputData.focus();
 
   const saveData = () => {
     if (/[$]/.test(initialValue)) {
