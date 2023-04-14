@@ -231,27 +231,40 @@ const editCells = (e) => {
   const newSelect = document.createElement('select');
   const cellInput = cellIndex === 2 ? newSelect : newInput;
 
+  cellInput.className = 'cell-input';
+
+  const nameColumn = 0;
+  const officeColumn = 2;
+  const ageGolumn = 3;
+  const salaryColumn = 4;
+
   target.innerText = '';
 
-  if (target.cellIndex === 2) {
-    for (let i = 0; i < cities.length; i++) {
-      const option = document.createElement('option');
+  if (cellIndex === ageGolumn) {
+    cellInput.style.width = '30px';
+  }
 
-      option.text = cities[i];
-      cellInput.appendChild(option);
-    }
+  if (cellIndex === officeColumn) {
+    newSelect.innerHTML = `
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    `;
 
-    target.append(cellInput);
-    cellInput.blur();
+    target.append(newSelect);
+    // cellInput.blur();
   } else {
-    cellInput.style.width = '50px';
-    cellInput.className = 'cell-input';
+    cellInput.value = originalText;
     target.append(cellInput);
     cellInput.focus();
   }
 
   const cellEditHandler = () => {
-    if ((cellIndex === 3 || cellIndex === 4) && !+cellInput.value) {
+    if ((cellIndex === ageGolumn || cellIndex === salaryColumn)
+      && !+cellInput.value) {
       e.target.innerText = originalText;
 
       pushNotification('error',
@@ -260,14 +273,15 @@ const editCells = (e) => {
       return;
     };
 
-    if (cellIndex === 3 && (cellInput.value < 18 || cellInput.value > 90)) {
+    if (cellIndex === ageGolumn
+      && (cellInput.value < 18 || cellInput.value > 90)) {
       e.target.innerText = originalText;
       pushNotification('error', 'Age must be greater 18 and bellow 90');
 
       return;
     }
 
-    if (cellIndex === 4) {
+    if (cellIndex === salaryColumn) {
       if (Number(cellInput.value) < 0) {
         target.innerText = originalText;
         pushNotification('error', 'Salary can\'t be less than $0');
@@ -280,7 +294,7 @@ const editCells = (e) => {
       target.innerText = cellInput.value || originalText;
     }
 
-    if (cellIndex === 0 && cellInput.value.length < 4) {
+    if (cellIndex === nameColumn && cellInput.value.length < 4) {
       pushNotification('error',
         'Name can\'t be empty string or shorter than 4 characters');
 
@@ -293,6 +307,7 @@ const editCells = (e) => {
       target.innerText = originalText;
       pushNotification('error', 'Table data can\'t be empty string');
     }
+
     cellInput.replaceWith(target.innerText);
     cellInput.blur();
   };
