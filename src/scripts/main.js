@@ -2,6 +2,8 @@
 
 const tableHead = document.querySelector('thead');
 const allRows = [...document.querySelector('table').rows];
+const minAge = 18;
+const maxAge = 90;
 
 const sortingColumns = (e) => {
   const updatedAllRows = [...document.querySelector('table').rows];
@@ -203,7 +205,7 @@ const buttonHandler = (e) => {
     return;
   }
 
-  if (newPerosn.Age < 18 || newPerosn.Age > 90) {
+  if (newPerosn.Age < minAge || newPerosn.Age > maxAge) {
     pushNotification('error', 'Age must be greater 18 and bellow 90');
 
     return;
@@ -245,7 +247,10 @@ const editCells = (e) => {
   }
 
   if (cellIndex === officeColumn) {
+    cellInput.style.width = '60px';
+
     newSelect.innerHTML = `
+      <option selected disabled=true">Please choose the city</option>
       <option value="Tokyo">Tokyo</option>
       <option value="Singapore">Singapore</option>
       <option value="London">London</option>
@@ -255,7 +260,7 @@ const editCells = (e) => {
     `;
 
     target.append(newSelect);
-    // cellInput.blur();
+    cellInput.focus();
   } else {
     cellInput.value = originalText;
     target.append(cellInput);
@@ -263,6 +268,14 @@ const editCells = (e) => {
   }
 
   const cellEditHandler = () => {
+    if (cellIndex === officeColumn) {
+      if (cellInput.value === 'Please choose the city') {
+        target.innerText = originalText;
+
+        return;
+      }
+    }
+
     if ((cellIndex === ageGolumn || cellIndex === salaryColumn)
       && !+cellInput.value) {
       e.target.innerText = originalText;
@@ -274,7 +287,7 @@ const editCells = (e) => {
     };
 
     if (cellIndex === ageGolumn
-      && (cellInput.value < 18 || cellInput.value > 90)) {
+      && (cellInput.value < minAge || cellInput.value > maxAge)) {
       e.target.innerText = originalText;
       pushNotification('error', 'Age must be greater 18 and bellow 90');
 
