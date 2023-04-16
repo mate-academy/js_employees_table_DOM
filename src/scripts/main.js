@@ -12,36 +12,26 @@ let sortPrevTarget;
 function sortTable(index, array, type) {
   const text = rows[0].cells[index].innerText;
 
+  const getSortedRow = (a, b) => {
+    if (!isNaN(Number(text))) {
+      return a.cells[index].innerText - b.cells[index].innerText;
+    };
+
+    if (text[0] === '$') {
+      return convertToNumber(a.cells[index].innerText)
+        - convertToNumber(b.cells[index].innerText);
+    };
+
+    return a.cells[index].innerText
+      .localeCompare(b.cells[index].innerText);
+  };
+
   const sortedRow = type === 'ASC'
-    ? array.sort((rowA, rowB) => {
-      if (!isNaN(Number(text))) {
-        return rowA.cells[index].innerText - rowB.cells[index].innerText;
-      };
-
-      if (text[0] === '$') {
-        return convertToNumber(rowA.cells[index].innerText)
-          - convertToNumber(rowB.cells[index].innerText);
-      };
-
-      return rowA.cells[index].innerText
-        .localeCompare(rowB.cells[index].innerText);
-    })
-    : array.sort((rowB, rowA) => {
-      if (!isNaN(Number(text))) {
-        return rowA.cells[index].innerText - rowB.cells[index].innerText;
-      };
-
-      if (text[0] === '$') {
-        return convertToNumber(rowA.cells[index].innerText)
-        - convertToNumber(rowB.cells[index].innerText);
-      };
-
-      return rowA.cells[index].innerText
-        .localeCompare(rowB.cells[index].innerText);
-    });
+    ? array.sort((rowA, rowB) => getSortedRow(rowA, rowB))
+    : array.sort((rowA, rowB) => getSortedRow(rowB, rowA));
 
   tableBody.append(...sortedRow);
-}
+};
 
 tableHead.addEventListener('click', (e) => {
   const index = [...tableHead.rows[0].cells].indexOf(e.target);
@@ -205,33 +195,45 @@ buttonSumbit.addEventListener('click', e => {
   e.preventDefault();
   e.valid = true;
 
-  if (inputName.firstElementChild.value.length < 4) {
+  const nameValue = inputName.firstElementChild.value;
+  const ageValue = inputAge.firstElementChild.value;
+  const positionValue = inputPosition.firstElementChild.value;
+  const salaryValue = inputSalary.firstElementChild.value;
+
+  if (nameValue.length < 4) {
     pushNotification(10, 10, 'Name input error',
       'The Name field\n '
     + 'contain more than three letters.', 'error');
     e.valid = false;
+
+    return;
   };
 
-  if (inputAge.firstElementChild.value < 18
-    || inputAge.firstElementChild.value > 90) {
-    pushNotification(140, 10, 'Age input error',
+  if (ageValue < 18 || ageValue > 90) {
+    pushNotification(10, 10, 'Age input error',
       'The age of the employee\n '
     + 'must be between 18 and 90.', 'error');
     e.valid = false;
+
+    return;
   };
 
-  if (inputPosition.firstElementChild.value.length < 4) {
-    pushNotification(270, 10, 'Position input error',
+  if (positionValue.length < 4) {
+    pushNotification(10, 10, 'Position input error',
       'The Position field\n '
     + 'contain more than three letters.', 'error');
     e.valid = false;
+
+    return;
   };
 
-  if (!inputSalary.firstElementChild.value.length) {
-    pushNotification(400, 10, 'Salary input error',
+  if (!salaryValue.length) {
+    pushNotification(10, 10, 'Salary input error',
       'The Salary field\n '
     + 'must contain the employee actual salary.', 'error');
     e.valid = false;
+
+    return;
   };
 
   if (e.valid === true) {
