@@ -102,10 +102,6 @@ formBtn.addEventListener('click', (e) => {
 
     newTd.innerText = item.children[0].value;
 
-    if (!item.children[0].value) {
-      exValue = false;
-    }
-
     if (item.children[0].dataset.qa === 'salary') {
       const text
       = Number(item.children[0].value).toLocaleString({ numeric: true });
@@ -113,10 +109,18 @@ formBtn.addEventListener('click', (e) => {
       newTd.innerHTML = `$${text}`;
     }
 
+    if (Math.sign(Number(item.children[0].value)) === -1) {
+      exValue = false
+    }
+
+    if (!item.children[0].value) {
+      exValue = false;
+    }
+
     newTr.appendChild(newTd);
   });
-  
+
   if (exValue) {
-    tbody.appendChild(newTr)
+    tbody.appendChild(newTr);
   }
 });
