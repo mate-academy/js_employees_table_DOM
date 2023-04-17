@@ -109,8 +109,14 @@ form.addEventListener('submit', (ev) => {
   const formData = new FormData(form);
   const data = Object.fromEntries(formData.entries());
 
-  if (data.name.length < 4) {
+  if (data.name.trim().length < 4) {
     showNotification('Error', 'Name must be at least 4 letters');
+
+    return;
+  }
+
+  if (data.position.trim().length < 4) {
+    showNotification('Error', 'Position must be at least 4 letters');
 
     return;
   }
@@ -207,27 +213,15 @@ function saveChanges(cell, input, columnName) {
     removeNotification();
   }
 
-  let regex;
+  const regex = {
+    'Name': /^[a-zA-Z]+\s[a-zA-Z]+$/,
+    'Position': /^[a-zA-Z\s]+$/,
+    'Office': /^[a-zA-Z\s]+$/,
+    'Age': /^\d+$/,
+    'Salary': /^\$\d+(,\d{3})*(\.\d{2})?$/,
+  };
 
-  switch (columnName) {
-    case 'Name':
-      regex = /^[a-zA-Z]+\s[a-zA-Z]+$/;
-      break;
-    case 'Position':
-      regex = /^[a-zA-Z\s]+$/;
-      break;
-    case 'Office':
-      regex = /^[a-zA-Z\s]+$/;
-      break;
-    case 'Age':
-      regex = /^\d+$/;
-      break;
-    case 'Salary':
-      regex = /^\$\d+(,\d{3})*(\.\d{2})?$/;
-      break;
-  }
-
-  if (!regex.test(newText)) {
+  if (!regex[columnName].test(newText)) {
     newText = textValue;
 
     showNotification('Error',
