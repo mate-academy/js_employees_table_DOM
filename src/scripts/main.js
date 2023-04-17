@@ -10,12 +10,11 @@ let textValue = '';
 form.classList.add('new-employee-form');
 
 form.insertAdjacentHTML('afterbegin', `
-  <label>Name: <input name="name" type="text" required></label>
+  <label>Name: <input name="name" type="text" data-qa="name" required></label>
   <label>Position: 
     <input
       name="position"
       type="text"
-      data-qa="name"
       data-qa="position"
       required
     >
