@@ -4,7 +4,8 @@ const body = document.querySelector('body');
 const table = document.querySelector('table');
 const tbody = document.querySelector('tbody');
 
-let clickCounter = 0;
+// let clickCounter = 0;
+let isDescOrder;
 let LastClickedTarget;
 
 // sorting
@@ -14,14 +15,15 @@ table.addEventListener('click', (e) => {
   }
 
   if (LastClickedTarget !== e.target) {
-    clickCounter = 0;
+    isDescOrder = true;
   }
   LastClickedTarget = e.target;
-  clickCounter++;
 
   const rows = Array.from(tbody.querySelectorAll('tr'));
 
-  if (clickCounter === 1) {
+  if (isDescOrder) {
+    isDescOrder = false;
+
     rows.sort((a, b) => {
       const cell1 = a.cells[e.target.cellIndex].textContent;
       const cell2 = b.cells[e.target.cellIndex].textContent;
@@ -35,10 +37,8 @@ table.addEventListener('click', (e) => {
 
       return cell1.localeCompare(cell2);
     });
-  }
-
-  if (clickCounter === 2) {
-    clickCounter = 0;
+  } else {
+    isDescOrder = true;
 
     rows.sort((a, b) => {
       const cell1 = a.cells[e.target.cellIndex].textContent;
@@ -131,9 +131,11 @@ document.querySelector('button').addEventListener('click', (e) => {
   e.preventDefault();
 
   let validity = true;
+  let errorText = '';
 
-  for (const i of form) {
-    if (!i.checkValidity()) {
+  for (const input of form) {
+    if (!input.checkValidity()) {
+      errorText += `Invalid value in '${input.name}' field. `;
       validity = false;
     }
   }
@@ -148,12 +150,12 @@ document.querySelector('button').addEventListener('click', (e) => {
 
     const tr = document.createElement('tr');
 
-    for (let i = 0; i < form.length - 1; i++) {
+    for (let inputIndex = 0; inputIndex < form.length - 1; inputIndex++) {
       const td = document.createElement('td');
 
-      let value = form[i].value;
+      let value = form[inputIndex].value;
 
-      if (form[i] === form.salary) {
+      if (form[inputIndex] === form.salary) {
         value = +value;
         value = '$' + value.toLocaleString('en-US');
       }
@@ -162,9 +164,9 @@ document.querySelector('button').addEventListener('click', (e) => {
     }
     tbody.append(tr);
   } else {
-    div.textContent = 'INVALID INPUT';
+    div.textContent = errorText;
     div.classList.add('error');
   }
   body.append(div);
-  setTimeout(() => div.remove(), 2000);
+  setTimeout(() => div.remove(), 3000);
 });
