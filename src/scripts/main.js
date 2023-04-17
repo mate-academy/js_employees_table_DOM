@@ -12,7 +12,6 @@ let currentCell = false;
 const offices = [`Tokyo`, `Singapore`, `London`,
   `New York`, `Edinburgh`, `San Francisco`];
 
-// Create form
 const form = document.createElement('form');
 const saveBtn = document.createElement('button');
 
@@ -53,7 +52,6 @@ function normaliseNumber(num) {
 };
 editTableCell(table);
 
-// Add table sorting
 thead.addEventListener('click', (e) => {
   const header = e.target.closest('TH');
   const index = header.cellIndex;
@@ -89,7 +87,6 @@ thead.addEventListener('click', (e) => {
   });
 });
 
-// Add selected for table row
 table.addEventListener('click', (e) => {
   const tableRows = [...tableBody.querySelectorAll('.active')];
   const tableRow = e.target.closest('TR');
@@ -98,7 +95,6 @@ table.addEventListener('click', (e) => {
   tableRow.classList.add('active');
 });
 
-// Create select field
 function createSelect(value) {
   const select = document.createElement('select');
 
@@ -117,7 +113,6 @@ function createSelect(value) {
   return select;
 }
 
-// Create notification
 function notification(text, description, type) {
   const message = document.createElement('div');
 
@@ -134,12 +129,11 @@ function notification(text, description, type) {
   setTimeout(() => message.remove(), 4000);
 };
 
-// Generate notification message
 function generateNotificationMessage(data) {
-  if (data.name.length < 4) {
+  if (data.name.length < 4 || data.position.length < 4) {
     notification(
       'Error',
-      'Name should have at least 4 characters',
+      'Each field should have at least 4 characters',
       'error'
     );
 
@@ -150,6 +144,16 @@ function generateNotificationMessage(data) {
     notification(
       'Error',
       'Please enter valid age!',
+      'error'
+    );
+
+    return false;
+  };
+
+  if (data.salary <= 0) {
+    notification(
+      'Error',
+      'Please enter valid salary amount!',
       'error'
     );
 
@@ -175,7 +179,6 @@ function generateNotificationMessage(data) {
   return true;
 };
 
-// Save data to the table
 saveBtn.addEventListener('click', (e) => {
   e.preventDefault();
 
@@ -188,7 +191,6 @@ saveBtn.addEventListener('click', (e) => {
   addDataToTable(data);
 });
 
-// Add data to the table
 function addDataToTable(data) {
   const tr = document.createElement('tr');
 
@@ -203,7 +205,6 @@ function addDataToTable(data) {
   tableBody.appendChild(tr);
 };
 
-// Edit table cell
 function editTableCell() {
   const input = document.createElement('input');
   let editedCell;
@@ -235,7 +236,6 @@ function editTableCell() {
   });
 };
 
-// Save cell value
 function setCellValue(input, editedCell) {
   if (!currentCell) {
     return;
