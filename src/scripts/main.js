@@ -17,13 +17,14 @@ const sortTable = (sortBy, order) => {
 
     valueB = !order ? [valueA, valueA = valueB][0] : valueB;
 
-    if (+valueA) {
+    if (Number(valueA)) {
       return valueA - valueB;
     }
 
-    if (+valueA.slice(1).split(',').join('')) {
-      return +valueA.slice(1).split(',').join('')
-      - +valueB.slice(1).split(',').join('');
+    const isSalary = Number(valueA.slice(1).split(',').join(''));
+
+    if (isSalary) {
+      return isSalary - Number(valueB.slice(1).split(',').join(''));
     }
 
     return valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
@@ -86,25 +87,40 @@ document.body.append(newEmployeeForm);
 
 // validate function
 
+const MIN_NAME_LENGTH = 4;
+const MIN_AGE = 18;
+const MAX_AGE = 90;
+
 const validateForm = function(elements) {
   elements.pop();
 
-  switch (true) {
-    case (elements.some(item => !item.value.length)):
-      pushNotification('Error', 'All field are required', 'error');
+  const isEmpty = elements.some(item => !item.value.length);
 
-      return false;
-    case (elements[0].value.length < 4):
-      pushNotification('Error',
-        'Name should have more than 4 letters', 'error');
+  if (isEmpty) {
+    pushNotification('Error', 'All fields are required', 'error');
 
-      return false;
-    case (elements[3].value < 18 || elements[3].value > 90):
-      pushNotification('Error', 'Age should be between 18 end 90', 'error');
-
-      return false;
-    default: return true;
+    return false;
   }
+
+  const isNameValid = elements[0].value.length < MIN_NAME_LENGTH;
+
+  if (isNameValid) {
+    pushNotification('Error',
+      'Name should have more than 4 letters', 'error');
+
+    return false;
+  }
+
+  const isAgeValid = elements[3].value < MIN_AGE || elements[3].value > MAX_AGE;
+
+  if (isAgeValid) {
+    pushNotification('Error',
+      'Name should have more than 4 letters', 'error');
+
+    return false;
+  }
+
+  return true;
 };
 
 // add new row
