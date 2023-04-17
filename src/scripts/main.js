@@ -14,13 +14,8 @@ const sortTable = function(index, type) {
       case 'Name':
       case 'Position':
       case 'Office':
-        if (rowADate < rowBDate) {
-          return isAscending ? -1 : 1;
-        } else if (rowADate > rowBDate) {
-          return isAscending ? 1 : -1;
-        }
-
-        return 0;
+        return isAscending ? rowADate.localeCompare(rowBDate)
+        : rowBDate.localeCompare(rowADate);
       case 'Age':
         return isAscending ? rowADate - rowBDate : rowBDate - rowADate;
       case 'Salary':
@@ -165,7 +160,6 @@ const pushNotification = (title, description, type) => {
   const header = document.createElement('h2');
   const content = document.createElement('p');
 
-  body.append(notification);
   notification.append(header, content);
 
   header.textContent = title;
@@ -175,8 +169,21 @@ const pushNotification = (title, description, type) => {
   header.classList.add('title');
   notification.setAttribute('data-qa', 'notification');
 
+  body.append(notification);
+
+  const notifications = document.querySelectorAll('.notification');
+  const lastNotification = notifications[notifications.length - 1];
+
+  if (notifications.length > 1) {
+    const topNotification = notifications[notifications.length - 2];
+    const topPosition = topNotification.offsetTop;
+
+    lastNotification.style.top
+    = `${topPosition + topNotification.offsetHeight + 20}px`;
+  }
+
   setTimeout(() => {
-    notification.remove();
+    lastNotification.remove();
   }, 2000);
 };
 
@@ -247,6 +254,11 @@ tbody.addEventListener('dblclick', (e) => {
   item.firstChild.replaceWith(targetInput);
   targetInput.focus();
 
+  if (e.target) {
+    pushNotification('Warning',
+      'Start editing!', 'warning');
+  }
+
   targetInput.addEventListener('keypress', eventKey => {
     if (eventKey.key === 'Enter') {
       targetInput.blur();
@@ -272,9 +284,9 @@ tbody.addEventListener('dblclick', (e) => {
 
       return;
     } else if (targetInput.name === 'salary'
-    && targetInput.value >= 1) {
+    && Number(targetInput.value) > 0) {
       item.textContent
-      = `$${Number(targetInput.value).toLocaleString('en-US')}`;
+      = `$` + Number(targetInput.value).toLocaleString('en-US');
 
       pushNotification('Success message',
         'Success!', 'success');
