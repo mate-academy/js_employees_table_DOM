@@ -94,11 +94,9 @@ function showNotification(type, text) {
   notification.textContent = text;
   notification.prepend(notificationTitle);
   form.parentNode.insertBefore(notification, form.nextSibling);
-};
 
-function removeNotification() {
-  setTimeout(() => document.querySelector('.notification').remove(), 5000);
-}
+  setTimeout(() => notification.remove(), 5000);
+};
 
 form.addEventListener('submit', (ev) => {
   ev.preventDefault();
@@ -158,8 +156,6 @@ form.addEventListener('submit', (ev) => {
   rows.push(newRow);
   showNotification('Success', 'Row is added to the table');
 
-  removeNotification();
-
   form.reset();
 });
 
@@ -210,7 +206,6 @@ function saveChanges(cell, input, columnName) {
   if (newText === '') {
     newText = textValue;
     showNotification('Error', 'No blank value is allowed');
-    removeNotification();
   }
 
   const regex = {
@@ -226,13 +221,11 @@ function saveChanges(cell, input, columnName) {
 
     showNotification('Error',
       'Input editable values must match the data in the table');
-    removeNotification();
   }
 
   if (columnName === 'Age' && (newText < 18 || newText > 90)) {
     newText = textValue;
     showNotification('Error', 'Age must be between 18 and 90');
-    removeNotification();
   }
 
   cell.textContent = newText;
