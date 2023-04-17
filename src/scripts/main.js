@@ -4,7 +4,6 @@ const body = document.querySelector('body');
 const table = document.querySelector('table');
 const tbody = document.querySelector('tbody');
 
-// let clickCounter = 0;
 let isDescOrder;
 let LastClickedTarget;
 
@@ -115,7 +114,7 @@ form.innerHTML = `
 <label>Salary: 
   <input 
     name="salary" 
-    type="text" 
+    type="number" 
     data-qa="salary" 
     required
   >
@@ -133,9 +132,10 @@ document.querySelector('button').addEventListener('click', (e) => {
   let validity = true;
   let errorText = '';
 
-  for (const input of form) {
-    if (!input.checkValidity()) {
-      errorText += `Invalid value in '${input.name}' field. `;
+  for (let inputIndex = 0; inputIndex < form.length - 1; inputIndex++) {
+    if (!form[inputIndex].checkValidity()
+      || form[inputIndex].value.trim() === '') {
+      errorText += `Invalid value in '${form[inputIndex].name}' field. `;
       validity = false;
     }
   }
@@ -168,5 +168,5 @@ document.querySelector('button').addEventListener('click', (e) => {
     div.classList.add('error');
   }
   body.append(div);
-  setTimeout(() => div.remove(), 3000);
+  setTimeout(() => div.remove(), 5000);
 });
