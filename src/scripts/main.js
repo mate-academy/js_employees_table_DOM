@@ -8,6 +8,7 @@ const tableHeaders = thead.querySelectorAll('th');
 
 let sortOrder = 1;
 let activeHeader = null;
+let currentCell = false;
 const offices = [`Tokyo`, `Singapore`, `London`,
   `New York`, `Edinburgh`, `San Francisco`];
 
@@ -53,7 +54,7 @@ function normaliseNumber(num) {
 editTableCell(table);
 
 // Add table sorting
-table.addEventListener('click', (e) => {
+thead.addEventListener('click', (e) => {
   const header = e.target.closest('TH');
   const index = header.cellIndex;
   const tableRows = [...tableBody.querySelectorAll('tr')];
@@ -205,9 +206,7 @@ function addDataToTable(data) {
 // Edit table cell
 function editTableCell() {
   const input = document.createElement('input');
-  let currentCell = false;
   let editedCell;
-  let cellValue = '';
 
   input.classList.add('cell-input');
   input.style.width = '100%';
@@ -215,8 +214,7 @@ function editTableCell() {
   tableBody.addEventListener('dblclick', (e) => {
     if (e.target.tagName === 'TD' && !currentCell) {
       currentCell = true;
-      editedCell = e.target;
-      cellValue = editedCell.textContent;
+      editedCell = e.target.closest('TD');
       input.value = '';
       editedCell.textContent = '';
       editedCell.appendChild(input);
@@ -229,39 +227,74 @@ function editTableCell() {
       return;
     };
 
-    setCellValue();
+    setCellValue(input, editedCell);
   });
 
   input.addEventListener('blur', (e) => {
-    setCellValue();
+    setCellValue(input, editedCell);
   });
+};
 
-  function setCellValue() {
-    if (!currentCell) {
-      return;
-    };
-
-    const inputValue = input.value.trim();
-    const index = Array.from(editedCell.parentNode.children)
-      .indexOf(editedCell);
-
-    switch (true) {
-      case index === 4:
-        editedCell.textContent = inputValue.slice(0, 1) === '$'
-          ? `$${parseInt(inputValue
-            .split(',').join('').slice(1)).toLocaleString('en-US')}`
-          : `$${parseInt(inputValue
-            .split(',').join('')).toLocaleString('en-US')}`;
-        break;
-      case index !== 4:
-        editedCell.textContent = inputValue;
-        break;
-
-      case (!inputValue):
-        editedCell.textContent = cellValue;
-        break;
-    }
-
-    currentCell = false;
+// Save cell value
+function setCellValue(input, editedCell) {
+  if (!currentCell) {
+    return;
   };
+
+  const inputValue = input.value.trim();
+  const index = Array.from(editedCell.parentNode.children)
+    .indexOf(editedCell);
+
+  switch (true) {
+    case index === 4:
+      if (!checkInputValue(inputValue)) {
+        notification(
+          'Error',
+          'Please enter a number',
+          'error'
+        );
+
+        return;
+      };
+
+      editedCell.textContent = inputValue.slice(0, 1) === '$'
+        ? `$${parseInt(inputValue
+          .split(',').join('').slice(1)).toLocaleString('en-US')}`
+        : `$${parseInt(inputValue
+          .split(',').join('')).toLocaleString('en-US')}`;
+      break;
+
+    case index === 3:
+      if (!checkInputValue(inputValue)
+        || (inputValue > 90 || inputValue < 18)) {
+        notification(
+          'Error',
+          'Please enter a valid age',
+          'error'
+        );
+
+        return;
+      };
+      editedCell.textContent = inputValue;
+      break;
+
+    case index !== 4 || index !== 3:
+      if (inputValue.length < 4) {
+        notification(
+          'Error',
+          'Must be at least 4 characters',
+          'error'
+        );
+
+        return;
+      };
+      editedCell.textContent = inputValue;
+      break;
+  }
+
+  currentCell = false;
+};
+
+function checkInputValue(value) {
+  return /^[0-9]+$/.test(value);
 };
