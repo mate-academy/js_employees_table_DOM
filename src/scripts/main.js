@@ -15,7 +15,7 @@ const sortTable = function(index, type) {
       case 'Position':
       case 'Office':
         return isAscending ? rowADate.localeCompare(rowBDate)
-        : rowBDate.localeCompare(rowADate);
+          : rowBDate.localeCompare(rowADate);
       case 'Age':
         return isAscending ? rowADate - rowBDate : rowBDate - rowADate;
       case 'Salary':
@@ -23,6 +23,9 @@ const sortTable = function(index, type) {
         const dateB = rowBDate.replace(/[$,]/g, '');
 
         return isAscending ? dateA - dateB : dateB - dateA;
+
+      default:
+        alert(`Unexpected type: ${type}`);
     }
   };
 
@@ -75,6 +78,9 @@ table.addEventListener('click', (e) => {
     case 'Salary':
       salaryCount++;
       break;
+
+    default:
+      alert(`Unexpected type: ${type}`);
   }
 
   if (nameCount === 2) {
