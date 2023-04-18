@@ -84,7 +84,7 @@ document.body.insertAdjacentHTML('beforeend', `
   </form>
 `);
 
-const form = document.querySelector('form');
+const form = document.querySelector('.new-employee-form');
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -163,15 +163,15 @@ const cells = [...document.querySelectorAll('td')];
 cells.forEach(cell => {
   const index = cells.indexOf(cell);
 
-  cell.setAttribute('Editing', 'yes');
+  cell.setAttribute('data-editing', 'yes');
 
   cell.addEventListener('dblclick', (e) => {
     const copyCells = [...cells];
 
     copyCells.splice(index, 1);
-    copyCells.forEach(copyCell => copyCell.setAttribute('Editing', 'no'));
+    copyCells.forEach(copyCell => copyCell.setAttribute('data-editing', 'no'));
 
-    if (cell.getAttribute('Editing') === 'yes') {
+    if (cell.getAttribute('data-editing') === 'yes') {
       const removedText = cell.textContent;
 
       cell.textContent = '';
@@ -192,7 +192,7 @@ cells.forEach(cell => {
         cell.textContent = savedText;
 
         cells.forEach(currentCell => currentCell
-          .setAttribute('Editing', 'yes'));
+          .setAttribute('data-editing', 'yes'));
       });
 
       input.addEventListener('keypress', (ev) => {
@@ -204,7 +204,7 @@ cells.forEach(cell => {
           cell.textContent = savedText;
 
           cells.forEach(currentCell => currentCell
-            .setAttribute('Editing', 'yes'));
+            .setAttribute('data-editing', 'yes'));
         }
       });
     };
