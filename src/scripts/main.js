@@ -124,7 +124,7 @@ lastElem.addEventListener('click', e => {
 
   const data = Object.fromEntries(new FormData(form).entries());
 
-  if (!validationsOfInformation(data)) {
+  if (!checkIsValid(data)) {
     return;
   }
 
@@ -147,24 +147,25 @@ function saveDataToTable(data) {
   table.append(tr);
 }
 
-const minAge = 18;
-const maxAge = 90;
+const MIN_AGE = 18;
+const MAX_AGE = 90;
+const MIN_CHARACTERS = 4;
 
-function validationsOfInformation(data) {
-  if (data.name.length < 4) {
+function checkIsValid(data) {
+  if (data.name.length < MIN_CHARACTERS) {
     pushNotification(
       'Error',
-      'Name must contain more then 3 character',
+      `Name must contain ${MIN_CHARACTERS} and more characters`,
       'error'
     );
 
     return false;
   }
 
-  if (data.age < minAge || data.age > maxAge) {
+  if (data.age < MIN_AGE || data.age > MAX_AGE) {
     pushNotification(
       'Error',
-      'Age must be between 18 and 90',
+      `Age must be between ${MIN_AGE} and ${MAX_AGE}`,
       'error'
     );
 
@@ -229,7 +230,7 @@ function makeTdEditable(td, index) {
     case 0:
       input = document.createElement('input');
       input.type = 'text';
-      input.placeholder = 'at least 4 character';
+      input.placeholder = `at least ${MIN_CHARACTERS} character`;
       input.value = td.innerHTML;
       break;
 
@@ -291,12 +292,12 @@ function finishTdEdit(td, input, index) {
   if (input.value !== '') {
     switch (index) {
       case 0:
-        if (input.value.length < 4) {
+        if (input.value.length < MIN_CHARACTERS) {
           td.innerText = editingTd.data;
 
           pushNotification(
             'Error',
-            'Name must contain more then 3 character',
+            `Name must contain ${MIN_CHARACTERS} and more characters`,
             'error'
           );
           break;
@@ -306,12 +307,12 @@ function finishTdEdit(td, input, index) {
         break;
 
       case 3:
-        if (input.value < minAge || input.value > maxAge) {
+        if (input.value < MIN_AGE || input.value > MAX_AGE) {
           td.innerText = editingTd.data;
 
           pushNotification(
             'Error',
-            'Age must be between 18 and 90',
+            `Age must be between ${MIN_AGE} and ${MAX_AGE}`,
             'error'
           );
           break;
