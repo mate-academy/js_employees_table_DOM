@@ -9,21 +9,21 @@ const rows = [...tableBody.rows];
 let typeOfSort = 'DESC';
 let sortPrevTarget;
 
-function sortTable(index, array, type) {
-  const text = rows[0].cells[index].innerText;
+function sortTable(sortIndex, array, type) {
+  const text = rows[0].cells[sortIndex].innerText;
 
   const getSortedRow = (a, b) => {
     if (!isNaN(Number(text))) {
-      return a.cells[index].innerText - b.cells[index].innerText;
+      return a.cells[sortIndex].innerText - b.cells[sortIndex].innerText;
     };
 
     if (text[0] === '$') {
-      return convertToNumber(a.cells[index].innerText)
-        - convertToNumber(b.cells[index].innerText);
+      return convertToNumber(a.cells[sortIndex].innerText)
+        - convertToNumber(b.cells[sortIndex].innerText);
     };
 
-    return a.cells[index].innerText
-      .localeCompare(b.cells[index].innerText);
+    return a.cells[sortIndex].innerText
+      .localeCompare(b.cells[sortIndex].innerText);
   };
 
   const sortedRow = type === 'ASC'
@@ -34,13 +34,13 @@ function sortTable(index, array, type) {
 };
 
 tableHead.addEventListener('click', (e) => {
-  const index = [...tableHead.rows[0].cells].indexOf(e.target);
+  const indexForSorting = [...tableHead.rows[0].cells].indexOf(e.target);
 
   if (typeOfSort === 'DESC' || sortPrevTarget !== e.target) {
-    sortTable(index, [...tableBody.rows], 'ASC');
+    sortTable(indexForSorting, [...tableBody.rows], 'ASC');
     typeOfSort = 'ASC';
   } else {
-    sortTable(index, [...tableBody.rows], 'DESC');
+    sortTable(indexForSorting, [...tableBody.rows], 'DESC');
     typeOfSort = 'DESC';
   };
 
@@ -80,31 +80,31 @@ const cityesOfOffice = [
   'San Francisco',
 ];
 
-// eslint-disable-next-line no-shadow
-function createInput(name, type) {
+function createInput(nameOfInput, type) {
   const formInputTitle = document.createElement('label');
   const formInput = document.createElement('input');
 
-  formInputTitle.innerText = name[0].toUpperCase() + name.slice(1) + ':';
-  formInput.name = name;
+  formInputTitle.innerText = nameOfInput[0]
+    .toUpperCase() + nameOfInput.slice(1) + ':';
+  formInput.name = nameOfInput;
   formInput.type = type;
   formInput.required = true;
 
-  formInput.setAttribute('data-qa', name);
+  formInput.setAttribute('data-qa', nameOfInput);
 
   formInputTitle.append(formInput);
 
   return formInputTitle;
 }
 
-// eslint-disable-next-line no-shadow
-function createSelect(name, options) {
+function createSelect(nameOfSelect, options) {
   const formInputTitle = document.createElement('label');
   const formSelect = document.createElement('select');
 
-  formSelect.name = name;
+  formSelect.name = nameOfSelect;
 
-  formInputTitle.innerText = name[0].toUpperCase() + name.slice(1) + ':';
+  formInputTitle.innerText = nameOfSelect[0]
+    .toUpperCase() + nameOfSelect.slice(1) + ':';
 
   options.forEach(option => {
     const selectOption = document.createElement('option');
@@ -116,7 +116,7 @@ function createSelect(name, options) {
   });
 
   formSelect.required = true;
-  formSelect.setAttribute('data-qa', name);
+  formSelect.setAttribute('data-qa', nameOfSelect);
 
   formInputTitle.append(formSelect);
 
@@ -142,13 +142,12 @@ const formFields = [
   buttonSumbit,
 ];
 
-// eslint-disable-next-line no-shadow
-function constructForm(formFields, className) {
+function constructForm(fieldsOfForm, className) {
   const newForm = document.createElement('form');
 
   newForm.className = className;
 
-  formFields.forEach(formField => {
+  fieldsOfForm.forEach(formField => {
     newForm.append(formField);
   });
 
@@ -161,7 +160,13 @@ document.body.append(form);
 
 // Notifications
 
-const pushNotification = (posTop, posRight, title, description, type) => {
+const pushNotification = (
+  title,
+  description,
+  type,
+  posTop = 10,
+  posRight = 10,
+) => {
   const notification = document.createElement('div');
 
   notification.classList.add('notification', `${type}`);
@@ -201,36 +206,45 @@ buttonSumbit.addEventListener('click', e => {
   const salaryValue = inputSalary.firstElementChild.value;
 
   if (nameValue.length < 4) {
-    pushNotification(10, 10, 'Name input error',
-      'The Name field\n '
-    + 'contain more than three letters.', 'error');
+    pushNotification(
+      'Name input error',
+      'The Name field contain more than three letters.',
+      'error'
+    );
+
     e.valid = false;
 
     return;
   };
 
   if (ageValue < 18 || ageValue > 90) {
-    pushNotification(10, 10, 'Age input error',
-      'The age of the employee\n '
-    + 'must be between 18 and 90.', 'error');
+    pushNotification('Age input error',
+      'The age of the employee must be between 18 and 90.', 'error'
+    );
+
     e.valid = false;
 
     return;
   };
 
   if (positionValue.length < 4) {
-    pushNotification(10, 10, 'Position input error',
-      'The Position field\n '
-    + 'contain more than three letters.', 'error');
+    pushNotification('Position input error',
+      'The Position field contain more than three letters.',
+      'error'
+    );
+
     e.valid = false;
 
     return;
   };
 
   if (!salaryValue.length) {
-    pushNotification(10, 10, 'Salary input error',
-      'The Salary field\n '
-    + 'must contain the employee actual salary.', 'error');
+    pushNotification(
+      'Salary input error',
+      'The Salary field must contain the employee actual salary.',
+      'error'
+    );
+
     e.valid = false;
 
     return;
@@ -253,9 +267,11 @@ buttonSumbit.addEventListener('click', e => {
 
     tableBody.append(newEmployee);
 
-    pushNotification(10, 10, 'Data saved successfully',
-      'The entered data\n '
-      + 'has been successfully entered into the table.', 'success');
+    pushNotification(
+      'Data saved successfully',
+      'The entered data has been successfully entered into the table.',
+      'success'
+    );
 
     form.reset();
   };
@@ -273,88 +289,136 @@ function createRow(employee) {
   }
 
   return row;
-}
+};
 
 //  Editing of table cells by double-clicking on it
 
-let editableCell = false;
+let index = -1;
 let cellOldText;
 
 tableBody.addEventListener('dblclick', (e) => {
   const cell = e.target;
   const cellPadding = getComputedStyle(cell).padding;
 
-  if (!editableCell) {
-    editableCell = true;
+  const row = e.target.closest('tr');
 
-    const cellInput = document.createElement('input');
+  index = [...row.children].indexOf(e.target);
+  cellOldText = cell.innerText;
 
-    cellInput.className = 'cell-input';
+  let cellInput = document.createElement('input');
 
-    cellInput.style.width = `
+  if (index === 2) {
+    cellInput = document.createElement('select');
+
+    cityesOfOffice.forEach(option => {
+      const selectOption = document.createElement('option');
+
+      selectOption.value = option;
+      selectOption.innerText = option;
+
+      cellInput.append(selectOption);
+
+      cellInput.value = cellOldText;
+    });
+  } else {
+    cellInput.type = index === 3 || index === 4 ? 'number' : 'text';
+  }
+
+  cellInput.style.width = `
     ${cell.offsetWidth - (parseFloat(cellPadding) * 2)}px
-    `;
+  `;
+  cellInput.className = 'cell-input';
 
-    cellInput.type = 'text';
-    cellInput.name = 'cellEdit';
-    cellOldText = cell.innerText;
+  cellInput.name = 'cellEdit';
+  cellOldText = cell.innerText;
 
-    if (cell.innerText.includes('$')) {
-      cell.innerText = '$';
-      cellInput.type = 'number';
-    } else {
-      cell.innerText = '';
-    }
-
-    cell.append(cellInput);
-    cellInput.focus();
-  }
-});
-
-document.addEventListener('click', (e) => {
-  if (e.target === document.querySelector('.cell-input')) {
-    return;
+  if (cell.innerText.includes('$')) {
+    cell.innerText = '$';
+  } else {
+    cell.innerText = '';
   }
 
-  if (editableCell) {
-    const cellInput = document.querySelector('.cell-input');
-    const cell = cellInput.closest('td');
+  cell.append(cellInput);
+  cellInput.focus();
 
-    const newText = (cellInput.value.length) ? cellInput.value : cellOldText;
+  cellInput.addEventListener('blur', () => {
+    switch (index) {
+      case 0:
+        if (cellInput.value.length < 4) {
+          pushNotification(
+            'Name input error',
+            'The Name field contain more than three letters.',
+            'error'
+          );
 
-    if (cellInput.type === 'number' && cell.innerText.includes('$')) {
-      cell.innerText = (cellInput.value.length)
-        ? `$${Number(newText).toLocaleString('En-en')}`
-        : cellOldText;
-    } else {
-      cell.innerText = newText;
-    }
+          cell.innerText = cellOldText;
 
-    cellInput.remove();
-    editableCell = false;
-  }
-});
+          return;
+        };
 
-document.addEventListener('keypress', (e) => {
-  if (e.key !== 'Enter') {
-    return;
-  };
+        cell.innerText = cellInput.value;
+        break;
 
-  if (editableCell) {
-    const cellInput = document.querySelector('.cell-input');
-    const cell = cellInput.closest('td');
+      case 1:
+        if (cellInput.value.length < 4) {
+          pushNotification(
+            'Position input error',
+            'The Position field contain more than three letters.',
+            'error'
+          );
 
-    const newText = (cellInput.value.length) ? cellInput.value : cellOldText;
+          cell.innerText = cellOldText;
 
-    if (cellInput.type === 'number' && cell.innerText.includes('$')) {
-      cell.innerText = (cellInput.value.length)
-        ? `$${Number(newText).toLocaleString('En-en')}`
-        : cellOldText;
-    } else {
-      cell.innerText = newText;
+          return;
+        };
+
+        cell.innerText = cellInput.value;
+        break;
+
+      case 3:
+        if (cellInput.value < 18 || cellInput.value > 90) {
+          pushNotification(
+            'Age input error',
+            'The age of the employee must be between 18 and 90.',
+            'error'
+          );
+
+          cell.innerText = cellOldText;
+
+          return;
+        };
+
+        cell.innerText = cellInput.value;
+        break;
+
+      case 4:
+        if (!cellInput.value.length) {
+          pushNotification(
+            'Salary input error',
+            'The Salary field must contain the employee actual salary.',
+            'error'
+          );
+          cell.innerText = cellOldText;
+
+          return;
+        };
+
+        cell.innerText = `$${Number(cellInput.value).toLocaleString('En-en')}`;
+        break;
+
+      default:
+        cell.innerText = cellInput.value;
+        break;
     };
 
     cellInput.remove();
-    editableCell = false;
-  };
+  });
+
+  cellInput.addEventListener('keydown', (ek) => {
+    if (ek.key !== 'Enter') {
+      return;
+    }
+
+    cellInput.blur();
+  });
 });
