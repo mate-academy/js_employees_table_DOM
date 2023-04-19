@@ -122,15 +122,13 @@ const div = document.createElement('div');
 button.addEventListener('click', (e) => {
   e.preventDefault();
 
-  const person = document.querySelector('input[data-qa="name"]').value;
-  const position = document.querySelector('input[data-qa="position"]').value;
-  const office = document.querySelector('select[data-qa="office"]').value;
-  const age = document.querySelector('input[data-qa="age"]').value;
-  const salary = document.querySelector('input[data-qa="salary"]').value;
+  const person = document.querySelector('input[data-qa="name"]');
+  const position = document.querySelector('input[data-qa="position"]');
+  const office = document.querySelector('select[data-qa="office"]');
+  const age = document.querySelector('input[data-qa="age"]');
+  const salary = document.querySelector('input[data-qa="salary"]');
 
-  const salaryFormal = '$' + Intl.NumberFormat('en-US').format(salary);
-
-  if (person.length < 4 || position.length < 4) {
+  if (person.value.length < 4 || position.value.length < 4) {
     body.append(div);
     div.dataset.qa = `notification`;
     div.className = `notification error`;
@@ -141,7 +139,7 @@ button.addEventListener('click', (e) => {
     return;
   }
 
-  if (age < 18 || age > 90) {
+  if (age.value < 18 || age.value > 90) {
     body.append(div);
     div.dataset.qa = `notification`;
     div.className = `notification error`;
@@ -157,11 +155,11 @@ button.addEventListener('click', (e) => {
   tbody.append(newrow);
 
   tbody.lastElementChild.innerHTML = `
-    <td>${person}</td>
-    <td>${position}</td>
-    <td>${office}</td>
-    <td>${age}</td>
-    <td>${salaryFormal}</td>`;
+    <td>${person.value}</td>
+    <td>${position.value}</td>
+    <td>${office.value}</td>
+    <td>${age.value}</td>
+    <td>${'$' + Intl.NumberFormat('en-US').format(salary.value)}</td>`;
 
   body.append(div);
   div.dataset.qa = `notification`;
@@ -169,9 +167,15 @@ button.addEventListener('click', (e) => {
 
   div.innerHTML = `<h2 class='title'> success </h2>
     <p> A new employee is successfully added to the table</p>`;
+
+  person.value = '';
+  position.value = '';
+  office.value = '';
+  age.value = '';
+  salary.value = '';
 });
 
-let editedCell = null; // Хранит ссылку на редактируемую ячейку
+let editedCell = null;
 
 tbody.addEventListener('dblclick', (e) => {
   const cell = e.target.closest('td');
