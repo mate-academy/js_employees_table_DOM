@@ -3,10 +3,6 @@
 const body = document.querySelector('body');
 const head = document.querySelector('thead');
 const table = document.querySelector('tbody');
-//
-//
-//
-// First task (sorting)
 
 let sortDirection = 'asc';
 
@@ -24,6 +20,7 @@ head.addEventListener('click', (e) => {
     switch (type) {
       case 'Name':
       case 'Position':
+      case 'Office':
         compareResult = contentA.localeCompare(contentB);
         break;
 
@@ -48,19 +45,11 @@ head.addEventListener('click', (e) => {
     return compareResult;
   });
 
-  if (sortDirection === 'asc') {
-    sortDirection = 'desc';
-  } else {
-    sortDirection = 'asc';
-  }
+  sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
 
   table.append(...data);
 });
 
-//
-//
-//
-// Second task(select a row)
 const rows = document.querySelectorAll('tr');
 let selectedRow = null;
 
@@ -74,10 +63,6 @@ rows.forEach((row) => {
   });
 });
 
-//
-//
-//
-// Third task(create form)
 function removeSelect() {
   const selected = table.querySelectorAll('.active');
 
@@ -139,7 +124,7 @@ lastElem.addEventListener('click', e => {
 
   const data = Object.fromEntries(new FormData(form).entries());
 
-  if (!formValidation(data)) {
+  if (!validationsOfInformation(data)) {
     return;
   }
 
@@ -162,11 +147,10 @@ function saveDataToTable(data) {
   table.append(tr);
 }
 
-//
-//
-//
-// fourth task(notification)
-function formValidation(data) {
+const minAge = 18;
+const maxAge = 90;
+
+function validationsOfInformation(data) {
   if (data.name.length < 4) {
     pushNotification(
       'Error',
@@ -177,7 +161,7 @@ function formValidation(data) {
     return false;
   }
 
-  if (data.age < 18 || data.age > 90) {
+  if (data.age < minAge || data.age > maxAge) {
     pushNotification(
       'Error',
       'Age must be between 18 and 90',
@@ -218,10 +202,6 @@ function pushNotification(title, description, type) {
   }, 2000);
 };
 
-//
-//
-//
-// Fifth task(editing)
 let editingTd;
 
 table.addEventListener('dblclick', e => {
@@ -283,7 +263,10 @@ function makeTdEditable(td, index) {
       input = document.createElement('input');
       input.type = 'number';
       input.placeholder = 'just a number';
-      input.value = Number(td.innerHTML.slice(1).split(',').join(''));
+      input.value = +td.innerHTML.slice(1).split(',').join('');
+      break;
+
+    default:
       break;
   }
 
@@ -323,7 +306,7 @@ function finishTdEdit(td, input, index) {
         break;
 
       case 3:
-        if (input.value < 18 || input.value > 90) {
+        if (input.value < minAge || input.value > maxAge) {
           td.innerText = editingTd.data;
 
           pushNotification(
