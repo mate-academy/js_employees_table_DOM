@@ -130,24 +130,13 @@ button.addEventListener('click', (e) => {
 
   const salaryFormal = '$' + Intl.NumberFormat('en-US').format(salary);
 
-  if (person.length < 4) {
+  if (person.length < 4 || position.length < 4) {
     body.append(div);
     div.dataset.qa = `notification`;
     div.className = `notification error`;
 
     div.innerHTML = `<h2 class='title'>ERROR </h2>
-    <p> Name  has less than 4 letters</p>`;
-
-    return;
-  }
-
-  if (position.length < 4) {
-    body.append(div);
-    div.dataset.qa = `notification`;
-    div.className = `notification error`;
-
-    div.innerHTML = `<h2 class='title'>ERROR </h2>
-    <p> position  has less than 4 letters</p>`;
+    <p>  Text has less than 4 letters</p>`;
 
     return;
   }
