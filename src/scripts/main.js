@@ -167,6 +167,12 @@ const pushNotification = (
   posTop = 10,
   posRight = 10,
 ) => {
+  const oldNotification = document.querySelector('.notification');
+
+  if (oldNotification) {
+    oldNotification.style.display = 'none';
+  };
+
   const notification = document.createElement('div');
 
   notification.classList.add('notification', `${type}`);
@@ -296,7 +302,7 @@ function createRow(employee) {
 let index = -1;
 let cellOldText;
 
-tableBody.addEventListener('dblclick', (e) => {
+tableBody.addEventListener('dblclick', e => {
   const cell = e.target;
   const cellPadding = getComputedStyle(cell).padding;
 
@@ -334,8 +340,10 @@ tableBody.addEventListener('dblclick', (e) => {
 
   if (cell.innerText.includes('$')) {
     cell.innerText = '$';
+    cellInput.value = convertToNumber(cellOldText);
   } else {
     cell.innerText = '';
+    cellInput.value = cellOldText;
   }
 
   cell.append(cellInput);
@@ -344,7 +352,7 @@ tableBody.addEventListener('dblclick', (e) => {
   cellInput.addEventListener('blur', () => {
     switch (index) {
       case 0:
-        if (cellInput.value.length < 4) {
+        if (cellInput.value.trim().length < 4) {
           pushNotification(
             'Name input error',
             'The Name field contain more than three letters.',
@@ -360,7 +368,7 @@ tableBody.addEventListener('dblclick', (e) => {
         break;
 
       case 1:
-        if (cellInput.value.length < 4) {
+        if (cellInput.value.trim().length < 4) {
           pushNotification(
             'Position input error',
             'The Position field contain more than three letters.',
@@ -404,9 +412,15 @@ tableBody.addEventListener('dblclick', (e) => {
         };
 
         cell.innerText = `$${Number(cellInput.value).toLocaleString('En-en')}`;
+
         break;
 
       default:
+        if (cell.innerText.includes('$')) {
+          cell.innerText = `$${Number(cellInput.value)
+            .toLocaleString('En-en')}`;
+          break;
+        }
         cell.innerText = cellInput.value;
         break;
     };
