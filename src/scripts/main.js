@@ -93,6 +93,7 @@ form.append(formBtn);
 formBtn.addEventListener('click', (e) => {
   const newTr = document.createElement('tr');
   const [...labelForm] = form.querySelectorAll('label');
+  const allInput = document.querySelectorAll('input');
   let exValue = true;
 
   e.preventDefault();
@@ -110,10 +111,10 @@ formBtn.addEventListener('click', (e) => {
     }
 
     if (Math.sign(Number(item.children[0].value)) === -1) {
-      exValue = false
+      exValue = false;
     }
 
-    if (!item.children[0].value) {
+    if (!item.children[0].value.trim()) {
       exValue = false;
     }
 
@@ -122,5 +123,9 @@ formBtn.addEventListener('click', (e) => {
 
   if (exValue) {
     tbody.appendChild(newTr);
+  }
+
+  for (const input of allInput) {
+    input.value = '';
   }
 });
