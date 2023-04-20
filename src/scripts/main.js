@@ -119,6 +119,32 @@ const button = document.querySelector('button');
 const row = document.createElement('tr');
 const div = document.createElement('div');
 
+function notificationError() {
+  body.append(div);
+  div.dataset.qa = `notification`;
+  div.className = `notification error`;
+
+  div.innerHTML = `<h2 class='title'>ERROR </h2>
+  <p>  Incorrect data entry </p>`;
+
+  setTimeout(() => {
+    div.style.display = 'none';
+  }, 2000);
+}
+
+function notificationSuccess() {
+  body.append(div);
+  div.dataset.qa = `notification`;
+  div.className = `notification success`;
+
+  div.innerHTML = `<h2 class='title'> success </h2>
+    <p> Information saved </p>`;
+
+  setTimeout(() => {
+    div.style.display = 'none';
+  }, 2000);
+}
+
 button.addEventListener('click', (e) => {
   e.preventDefault();
 
@@ -128,24 +154,26 @@ button.addEventListener('click', (e) => {
   const age = document.querySelector('input[data-qa="age"]');
   const salary = document.querySelector('input[data-qa="salary"]');
 
-  if (person.value.length < 4 || position.value.length < 4) {
-    body.append(div);
-    div.dataset.qa = `notification`;
-    div.className = `notification error`;
+  function clearInput() {
+    setTimeout(() => {
+      person.value = '';
+      position.value = '';
+      office.value = '';
+      age.value = '';
+      salary.value = '';
+    }, 1000);
+  }
 
-    div.innerHTML = `<h2 class='title'>ERROR </h2>
-    <p>  Text has less than 4 letters</p>`;
+  if (person.value.trim().length < 4 || position.value.trim().length < 4) {
+    notificationError();
+    clearInput();
 
     return;
   }
 
   if (age.value < 18 || age.value > 90) {
-    body.append(div);
-    div.dataset.qa = `notification`;
-    div.className = `notification error`;
-
-    div.innerHTML = `<h2 class='title'>ERROR </h2>
-    <p> Age value is less than 18 or more than 90.</p>`;
+    notificationError();
+    clearInput();
 
     return;
   }
@@ -161,18 +189,8 @@ button.addEventListener('click', (e) => {
     <td>${age.value}</td>
     <td>${'$' + Intl.NumberFormat('en-US').format(salary.value)}</td>`;
 
-  body.append(div);
-  div.dataset.qa = `notification`;
-  div.className = `notification success`;
-
-  div.innerHTML = `<h2 class='title'> success </h2>
-    <p> A new employee is successfully added to the table</p>`;
-
-  person.value = '';
-  position.value = '';
-  office.value = '';
-  age.value = '';
-  salary.value = '';
+  notificationSuccess();
+  clearInput();
 });
 
 let editedCell = null;
@@ -195,17 +213,80 @@ tbody.addEventListener('dblclick', (e) => {
     editedCell = cell;
 
     input.addEventListener('blur', () => {
-      const newСellText = input.value || cellText;
+      if ((cell === cell.parentElement.children[0])
+       || (cell === cell.parentElement.children[1])) {
+        if (input.value.length > 4) {
+          cell.textContent = input.value;
+          notificationSuccess();
+        } else {
+          cell.textContent = cellText;
 
-      cell.textContent = newСellText;
+          notificationError();
+        }
+      }
+
+      if ((cell === cell.parentElement.children[3])) {
+        if ((+input.value > 18) && (+input.value < 90)) {
+          cell.textContent = input.value;
+          notificationSuccess();
+        } else {
+          notificationError();
+
+          cell.textContent = cellText;
+        }
+      }
+
+      if ((cell === cell.parentElement.children[4])) {
+        if (+input.value >= 0) {
+          cell.textContent
+          = '$' + Intl.NumberFormat('en-US').format(input.value);
+          notificationSuccess();
+        } else {
+          cell.textContent = cellText;
+
+          notificationError();
+        }
+      }
       editedCell = null;
     });
 
-    input.addEventListener('keydown', () => {
-      if (e.key === 'Enter') {
-        const newСellText = input.value || cellText;
+    input.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        if ((cell === cell.parentElement.children[0])
+       || (cell === cell.parentElement.children[1])) {
+          if (input.value.length > 4) {
+            cell.textContent = input.value;
+            notificationSuccess();
+          } else {
+            cell.textContent = cellText;
 
-        cell.textContent = newСellText;
+            notificationError();
+          }
+        }
+
+        if ((cell === cell.parentElement.children[3])) {
+          if ((+input.value > 18) && (+input.value < 90)) {
+            cell.textContent = input.value;
+            notificationSuccess();
+          } else {
+            notificationError();
+
+            cell.textContent = cellText;
+          }
+        }
+
+        if ((cell === cell.parentElement.children[4])) {
+          if (+input.value >= 0) {
+            cell.textContent
+            = '$' + Intl.NumberFormat('en-US').format(input.value);
+            notificationSuccess();
+          } else {
+            cell.textContent = cellText;
+
+            notificationError();
+          }
+        }
+
         editedCell = null;
       }
     });
