@@ -123,13 +123,12 @@ function notificationError() {
   body.append(div);
   div.dataset.qa = `notification`;
   div.className = `notification error`;
-  div.style.display = 'block';
 
   div.innerHTML = `<h2 class='title'>ERROR </h2>
   <p>  Incorrect data entry </p>`;
 
   setTimeout(() => {
-    div.style.display = 'none';
+    div.remove();
   }, 2000);
 }
 
@@ -137,16 +136,14 @@ function notificationSuccess() {
   body.append(div);
   div.dataset.qa = `notification`;
   div.className = `notification success`;
-  div.style.display = 'block';
 
   div.innerHTML = `<h2 class='title'> success </h2>
     <p> Information saved </p>`;
 
   setTimeout(() => {
-    div.style.display = 'none';
+    div.remove();
   }, 2000);
 }
-
 
 button.addEventListener('click', (e) => {
   e.preventDefault();
@@ -169,6 +166,7 @@ button.addEventListener('click', (e) => {
 
   if (person.value.trim().length < 4 || position.value.trim().length < 4) {
     notificationError();
+
     return;
   }
 
