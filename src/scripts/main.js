@@ -123,6 +123,7 @@ function notificationError() {
   body.append(div);
   div.dataset.qa = `notification`;
   div.className = `notification error`;
+  div.style.display = 'block';
 
   div.innerHTML = `<h2 class='title'>ERROR </h2>
   <p>  Incorrect data entry </p>`;
@@ -136,6 +137,7 @@ function notificationSuccess() {
   body.append(div);
   div.dataset.qa = `notification`;
   div.className = `notification success`;
+  div.style.display = 'block';
 
   div.innerHTML = `<h2 class='title'> success </h2>
     <p> Information saved </p>`;
@@ -144,6 +146,7 @@ function notificationSuccess() {
     div.style.display = 'none';
   }, 2000);
 }
+
 
 button.addEventListener('click', (e) => {
   e.preventDefault();
@@ -166,14 +169,11 @@ button.addEventListener('click', (e) => {
 
   if (person.value.trim().length < 4 || position.value.trim().length < 4) {
     notificationError();
-    clearInput();
-
     return;
   }
 
   if (age.value < 18 || age.value > 90) {
     notificationError();
-    clearInput();
 
     return;
   }
@@ -214,7 +214,8 @@ tbody.addEventListener('dblclick', (e) => {
 
     input.addEventListener('blur', () => {
       if ((cell === cell.parentElement.children[0])
-       || (cell === cell.parentElement.children[1])) {
+       || (cell === cell.parentElement.children[1])
+       || (cell === cell.parentElement.children[2])) {
         if (input.value.length > 4) {
           cell.textContent = input.value;
           notificationSuccess();
@@ -253,7 +254,8 @@ tbody.addEventListener('dblclick', (e) => {
     input.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') {
         if ((cell === cell.parentElement.children[0])
-       || (cell === cell.parentElement.children[1])) {
+       || (cell === cell.parentElement.children[1])
+       || (cell === cell.parentElement.children[2])) {
           if (input.value.length > 4) {
             cell.textContent = input.value;
             notificationSuccess();
