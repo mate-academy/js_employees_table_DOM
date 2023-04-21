@@ -4,7 +4,6 @@ const table = document.querySelector('table');
 const tableHead = table.querySelector('thead');
 const tableBody = table.querySelector('tbody');
 
-// #region Sort
 let counter = 1;
 let lastClickedIndex = null;
 
@@ -41,9 +40,7 @@ tableHead.addEventListener('click', e => {
 
   tableBody.append(...sortedRows);
 });
-// #endregion
 
-// #region Select
 let activeRow;
 
 tableBody.addEventListener('click', (e) => {
@@ -57,9 +54,7 @@ tableBody.addEventListener('click', (e) => {
 
   activeRow = clickedRow;
 });
-// #endregion
 
-// #region Form
 const form = document.createElement('form');
 
 form.className = 'new-employee-form';
@@ -86,9 +81,7 @@ form.innerHTML = `
 `;
 
 document.body.append(form);
-// #endregion
 
-// #region Notification
 const pushNotification = (title, description, type) => {
   const notification = document.createElement('div');
   const h2 = document.createElement('h2');
@@ -159,9 +152,7 @@ form.addEventListener('submit', e => {
 
   pushNotification('Success', 'New employee was added', 'success');
 });
-//  #endregion
 
-// #region Edit by double-clicking
 tableBody.addEventListener('dblclick', (evnt) => {
   const text = evnt.target.textContent;
   const index = evnt.target.cellIndex;
@@ -170,7 +161,7 @@ tableBody.addEventListener('dblclick', (evnt) => {
 
   let input = document.createElement('input');
 
-  input.classList.add('.cell-input');
+  input.classList.add('cell-input');
 
   if (index === 2) {
     const selectCity = document.createElement('select');
@@ -261,4 +252,3 @@ tableBody.addEventListener('dblclick', (evnt) => {
     }
   });
 });
-// #endregion
