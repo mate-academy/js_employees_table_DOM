@@ -2,7 +2,7 @@
 
 const tableHeader = document.querySelector('thead');
 
-const rowList = document.querySelectorAll('tbody >tr');
+let rowList = document.querySelectorAll('tbody >tr');
 const tbody = document.querySelector('tbody');
 
 const thead = document.querySelector('thead>tr');
@@ -25,11 +25,13 @@ tableHeader.addEventListener('click', (e) => {
 
   const listArr = [...rowList];
 
-  if (e.target.isClicked === false) {
+  function removeSumbolSalary(a) {
+    return +a.children[children].textContent.replace(/,/g, '').replace('$', '');
+  }
+
+  if (!e.target.isClicked) {
     if (item === 'Salary') {
-      listArr.sort((x, y) =>
-        (+y.children[children].textContent.replace(/,/g, '').replace('$', ''))
-      - (+x.children[children].textContent.replace(/,/g, '').replace('$', '')));
+      listArr.sort((x, y) => removeSumbolSalary(y) - removeSumbolSalary(x));
     } else {
       listArr.sort((x, y) =>
         y.children[children].textContent
@@ -44,11 +46,9 @@ tableHeader.addEventListener('click', (e) => {
     return;
   };
 
-  if (e.target.isClicked === true) {
+  if (e.target.isClicked) {
     if (item === 'Salary') {
-      listArr.sort((x, y) =>
-        (+x.children[children].textContent.replace(/,/g, '').replace('$', ''))
-      - (+y.children[children].textContent.replace(/,/g, '').replace('$', '')));
+      listArr.sort((x, y) => removeSumbolSalary(x) - removeSumbolSalary(y));
     } else {
       listArr.sort((x, y) =>
         x.children[children].textContent
@@ -187,6 +187,8 @@ button.addEventListener('click', (e) => {
     <td>${age.value}</td>
     <td>${'$' + Intl.NumberFormat('en-US').format(salary.value)}</td>`;
 
+  rowList = document.querySelectorAll('tbody >tr');
+
   notificationSuccess();
   clearInput();
 });
@@ -210,51 +212,29 @@ tbody.addEventListener('dblclick', (e) => {
 
     editedCell = cell;
 
-    input.addEventListener('blur', () => {
-      if ((cell === cell.parentElement.children[0])
-       || (cell === cell.parentElement.children[1])
-       || (cell === cell.parentElement.children[2])) {
-        if (input.value.length > 4) {
-          cell.textContent = input.value;
-          notificationSuccess();
-        } else {
-          cell.textContent = cellText;
+    if ((cell === cell.parentElement.children[2])) {
+      input.remove();
 
-          notificationError();
-        }
-      }
-
-      if ((cell === cell.parentElement.children[3])) {
-        if ((+input.value > 18) && (+input.value < 90)) {
-          cell.textContent = input.value;
-          notificationSuccess();
-        } else {
-          notificationError();
-
-          cell.textContent = cellText;
-        }
-      }
-
-      if ((cell === cell.parentElement.children[4])) {
-        if (+input.value >= 0) {
-          cell.textContent
-          = '$' + Intl.NumberFormat('en-US').format(input.value);
-          notificationSuccess();
-        } else {
-          cell.textContent = cellText;
-
-          notificationError();
-        }
-      }
+      cell.parentElement.children[2].insertAdjacentHTML('afterbegin', `
+        <label >
+          <select data-qa="cell-input"  required>
+          <option>Tokyo</option>
+          <option>Singapore</option>
+          <option>London</option>
+          <option>New York</option>
+          <option>Edinburgh</option>
+          <option>San Francisco</option>
+          </select>
+        </label> `);
       editedCell = null;
-    });
+    }
 
-    input.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Enter') {
-        if ((cell === cell.parentElement.children[0])
-       || (cell === cell.parentElement.children[1])
-       || (cell === cell.parentElement.children[2])) {
-          if (input.value.length > 4) {
+    input.addEventListener('blur', () => {
+      switch (cell) {
+        case cell.parentElement.children[0]:
+        case cell.parentElement.children[1]:
+
+          if (input.value.length >= 4) {
             cell.textContent = input.value;
             notificationSuccess();
           } else {
@@ -262,9 +242,10 @@ tbody.addEventListener('dblclick', (e) => {
 
             notificationError();
           }
-        }
+          break;
 
-        if ((cell === cell.parentElement.children[3])) {
+        case cell.parentElement.children[3]:
+
           if ((+input.value > 18) && (+input.value < 90)) {
             cell.textContent = input.value;
             notificationSuccess();
@@ -273,9 +254,10 @@ tbody.addEventListener('dblclick', (e) => {
 
             cell.textContent = cellText;
           }
-        }
+          break;
 
-        if ((cell === cell.parentElement.children[4])) {
+        case cell.parentElement.children[4]:
+
           if (+input.value >= 0) {
             cell.textContent
             = '$' + Intl.NumberFormat('en-US').format(input.value);
@@ -285,6 +267,52 @@ tbody.addEventListener('dblclick', (e) => {
 
             notificationError();
           }
+          break;
+      }
+
+      editedCell = null;
+    });
+
+    input.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        switch (cell) {
+          case cell.parentElement.children[0]:
+          case cell.parentElement.children[1]:
+
+            if (input.value.length >= 4) {
+              cell.textContent = input.value;
+              notificationSuccess();
+            } else {
+              cell.textContent = cellText;
+
+              notificationError();
+            }
+            break;
+
+          case cell.parentElement.children[3]:
+
+            if ((+input.value > 18) && (+input.value < 90)) {
+              cell.textContent = input.value;
+              notificationSuccess();
+            } else {
+              notificationError();
+
+              cell.textContent = cellText;
+            }
+            break;
+
+          case cell.parentElement.children[4]:
+
+            if (+input.value >= 0) {
+              cell.textContent
+              = '$' + Intl.NumberFormat('en-US').format(input.value);
+              notificationSuccess();
+            } else {
+              cell.textContent = cellText;
+
+              notificationError();
+            }
+            break;
         }
 
         editedCell = null;
