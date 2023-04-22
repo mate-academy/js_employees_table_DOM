@@ -227,16 +227,18 @@ tbody.addEventListener('dblclick', (e) => {
           </select>
         </label> `);
 
+      const select = document.querySelector('select[data-qa="cell-input"]');
+
+      select.addEventListener('change', () => {
+        cell.append(input);
+        cell.textContent = select.value;
+        notificationSuccess();
+      });
+    
+
       editedCell = null;
     }
 
-    const select = document.querySelector('select[data-qa="cell-input"]');
-
-    select.addEventListener('change', () => {
-      cell.append(input);
-      cell.textContent = select.value;
-      notificationSuccess();
-    });
 
     input.addEventListener('blur', () => {
       switch (cell) {
@@ -284,6 +286,7 @@ tbody.addEventListener('dblclick', (e) => {
 
     input.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') {
+
         switch (cell) {
           case cell.parentElement.children[0]:
           case cell.parentElement.children[1]:
