@@ -213,10 +213,10 @@ tbody.addEventListener('dblclick', (e) => {
     editedCell = cell;
 
     if ((cell === cell.parentElement.children[2])) {
-      input.remove();
+      // input.remove();
 
-      cell.parentElement.children[2].insertAdjacentHTML('afterbegin', `
-        <label >
+      cell.insertAdjacentHTML('afterbegin', `
+        <label data-qa="new-label">
           <select data-qa="cell-input"  required>
           <option>Tokyo</option>
           <option>Singapore</option>
@@ -226,8 +226,17 @@ tbody.addEventListener('dblclick', (e) => {
           <option>San Francisco</option>
           </select>
         </label> `);
+
       editedCell = null;
     }
+
+    const select = document.querySelector('select[data-qa="cell-input"]');
+
+    select.addEventListener('change', () => {
+      cell.append(input);
+      cell.textContent = select.value;
+      notificationSuccess();
+    });
 
     input.addEventListener('blur', () => {
       switch (cell) {
