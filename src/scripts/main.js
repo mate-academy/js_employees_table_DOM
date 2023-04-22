@@ -213,7 +213,7 @@ tbody.addEventListener('dblclick', (e) => {
     editedCell = cell;
 
     if ((cell === cell.parentElement.children[2])) {
-      // input.remove();
+      input.remove();
 
       cell.insertAdjacentHTML('afterbegin', `
         <label data-qa="new-label">
