@@ -9,8 +9,15 @@ const tableHeaders = thead.querySelectorAll('th');
 let sortOrder = 1;
 let activeHeader = null;
 let currentCell = false;
-const offices = [`Tokyo`, `Singapore`, `London`,
-  `New York`, `Edinburgh`, `San Francisco`];
+let initialValue;
+const offices = [
+  `Tokyo`,
+  `Singapore`,
+  `London`,
+  `New York`,
+  `Edinburgh`,
+  `San Francisco`,
+];
 
 const form = document.createElement('form');
 const saveBtn = document.createElement('button');
@@ -32,9 +39,11 @@ tableHeaders.forEach(tableHeader => {
     return;
   }
 
-  tableHeader.textContent === 'Age' || tableHeader.textContent === 'Salary'
-    ? input.type = 'number'
-    : input.type = 'text';
+  if (tableHeader.textContent === 'Age'
+    || tableHeader.textContent === 'Salary') {
+    input.type = 'number';
+  }
+  input.type = 'text';
 
   input.name = tableHeader.textContent.toLowerCase();
   input.required = true;
@@ -50,6 +59,7 @@ body.append(form);
 function normaliseNumber(num) {
   return parseFloat(num.replace('$', '').replace(',', ''));
 };
+
 editTableCell(table);
 
 thead.addEventListener('click', (e) => {
@@ -130,10 +140,10 @@ function notification(text, description, type) {
 };
 
 function generateNotificationMessage(data) {
-  if (data.name.length < 4 || data.position.length < 4) {
+  if (data.name.trim().length < 4 || data.position.trim().length < 4) {
     notification(
       'Error',
-      'Each field should have at least 4 characters',
+      'Name and position should have at least 4 characters!',
       'error'
     );
 
@@ -143,7 +153,7 @@ function generateNotificationMessage(data) {
   if (data.age < 18 || data.age > 90) {
     notification(
       'Error',
-      'Please enter valid age!',
+      'Age should be between 18 and 90 years!',
       'error'
     );
 
@@ -184,6 +194,8 @@ saveBtn.addEventListener('click', (e) => {
 
   const data = Object.fromEntries(new FormData(form).entries());
 
+  form.reset();
+
   if (!generateNotificationMessage(data)) {
     return;
   }
@@ -214,11 +226,12 @@ function editTableCell() {
 
   tableBody.addEventListener('dblclick', (e) => {
     if (e.target.tagName === 'TD' && !currentCell) {
+      initialValue = e.target.textContent;
       currentCell = true;
       editedCell = e.target.closest('TD');
-      input.value = '';
       editedCell.textContent = '';
-      editedCell.appendChild(input);
+      e.target.value = '';
+      editedCell.append(input);
       input.focus();
     };
   });
@@ -241,9 +254,13 @@ function setCellValue(input, editedCell) {
     return;
   };
 
-  const inputValue = input.value.trim();
+  let inputValue = input.value.trim();
   const index = Array.from(editedCell.parentNode.children)
     .indexOf(editedCell);
+
+  if (!inputValue) {
+    inputValue = initialValue;
+  }
 
   switch (true) {
     case index === 4:
