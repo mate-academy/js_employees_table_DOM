@@ -179,7 +179,13 @@ button.addEventListener('click', (e) => {
     return;
   }
 
-  if (salary.value < 0) {
+  if (salary.value <= 0) {
+    notificationError();
+
+    return;
+  }
+
+  if (!office.value) {
     notificationError();
 
     return;
@@ -221,38 +227,26 @@ tbody.addEventListener('dblclick', (e) => {
 
     editedCell = cell;
 
-    if ((cell === cell.parentElement.children[2])) {
-      input.remove();
-
-      cell.insertAdjacentHTML('afterbegin', `
-        <label data-qa="new-label">
-          <select data-qa="cell-input"  required>
-          <option>Tokyo</option>
-          <option>Singapore</option>
-          <option>London</option>
-          <option>New York</option>
-          <option>Edinburgh</option>
-          <option>San Francisco</option>
-          </select>
-        </label> `);
-
-      const select = document.querySelector('select[data-qa="cell-input"]');
-
-      select.addEventListener('change', () => {
-        cell.append(input);
-        cell.textContent = select.value;
-        notificationSuccess();
-      });
-
-      editedCell = null;
-    }
-
     input.addEventListener('blur', () => {
       switch (cell) {
         case cell.parentElement.children[0]:
         case cell.parentElement.children[1]:
 
           if (input.value.length >= 4) {
+            cell.textContent = input.value;
+            notificationSuccess();
+          } else {
+            cell.textContent = cellText;
+
+            notificationError();
+          }
+          break;
+
+        case cell.parentElement.children[2]:
+
+          if (input.value === 'Tokyo' || input.value === 'Singapore'
+          || input.value === 'New York' || input.value === 'Edinburgh'
+          || input.value === 'London' || input.value === 'San Francisco') {
             cell.textContent = input.value;
             notificationSuccess();
           } else {
@@ -298,6 +292,20 @@ tbody.addEventListener('dblclick', (e) => {
           case cell.parentElement.children[1]:
 
             if (input.value.length >= 4) {
+              cell.textContent = input.value;
+              notificationSuccess();
+            } else {
+              cell.textContent = cellText;
+
+              notificationError();
+            }
+            break;
+
+          case cell.parentElement.children[2]:
+
+            if (input.value === 'Tokyo' || input.value === 'Singapore'
+            || input.value === 'New York' || input.value === 'Edinburgh'
+            || input.value === 'London' || input.value === 'San Francisco') {
               cell.textContent = input.value;
               notificationSuccess();
             } else {
