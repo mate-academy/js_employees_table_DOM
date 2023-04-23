@@ -125,11 +125,14 @@ function notificationError() {
   div.className = `notification error`;
 
   div.innerHTML = `<h2 class='title'>ERROR </h2>
-  <p>  Incorrect data entry </p>`;
+  <p> Name and Position must be more then 3 letters.<br> 
+  Age must be between 18 and 90. <br> 
+  Salary must be positive
+  </p>`;
 
   setTimeout(() => {
     div.remove();
-  }, 2000);
+  }, 3000);
 }
 
 function notificationSuccess() {
@@ -171,6 +174,12 @@ button.addEventListener('click', (e) => {
   }
 
   if (age.value < 18 || age.value > 90) {
+    notificationError();
+
+    return;
+  }
+
+  if (salary.value < 0) {
     notificationError();
 
     return;
@@ -234,11 +243,9 @@ tbody.addEventListener('dblclick', (e) => {
         cell.textContent = select.value;
         notificationSuccess();
       });
-    
 
       editedCell = null;
     }
-
 
     input.addEventListener('blur', () => {
       switch (cell) {
@@ -286,7 +293,6 @@ tbody.addEventListener('dblclick', (e) => {
 
     input.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') {
-
         switch (cell) {
           case cell.parentElement.children[0]:
           case cell.parentElement.children[1]:
@@ -315,7 +321,7 @@ tbody.addEventListener('dblclick', (e) => {
 
           case cell.parentElement.children[4]:
 
-            if (+input.value >= 0) {
+            if (+input.value > 0) {
               cell.textContent
               = '$' + Intl.NumberFormat('en-US').format(input.value);
               notificationSuccess();
