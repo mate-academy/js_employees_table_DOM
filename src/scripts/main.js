@@ -210,7 +210,11 @@ tbody.addEventListener('dblclick', e => {
     }
 
     if (index === 4 && input.value) {
-      text = '$' + Number(text).toLocaleString('en-US');
+      if (input.value < 0) {
+        text = prevText;
+      } else {
+        text = '$' + Number(text).toLocaleString('en-US');
+      }
     }
 
     if (input.value.length < 4 && index === 0 && input.value) {
