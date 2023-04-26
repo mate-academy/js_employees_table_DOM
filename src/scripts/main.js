@@ -97,7 +97,7 @@ form.append(button);
 button.addEventListener('click', e => {
   e.preventDefault();
 
-  if (!form.name.value || !form.age.value || !form.position.value
+  if (!form.name.value.trim() || !form.age.value || !form.position.value.trim()
     || !form.office.value || !form.salary.value) {
     pushNotification(450, 20, 'Error',
       'Please fill all fields.', 'error');
@@ -115,6 +115,13 @@ button.addEventListener('click', e => {
   if (form.age.value < 18 || form.age.value > 90) {
     pushNotification(450, 20, 'Error',
       'Employee\'s age is less than 18 or more than 90.', 'error');
+
+    return;
+  }
+
+  if (form.salary.value < 0) {
+    pushNotification(450, 20, 'Error',
+      'Employee\'s salary is less than 0.', 'error');
 
     return;
   }
@@ -203,14 +210,18 @@ tbody.addEventListener('dblclick', e => {
   input.focus();
 
   input.addEventListener('blur', () => {
-    let text = input.value;
+    let text = input.value.trim();
 
     if (!text) {
       text = prevText;
     }
 
     if (index === 4 && input.value) {
-      text = '$' + Number(text).toLocaleString('en-US');
+      if (input.value < 0) {
+        text = prevText;
+      } else {
+        text = '$' + Number(text).toLocaleString('en-US');
+      }
     }
 
     if (input.value.length < 4 && index === 0 && input.value) {
