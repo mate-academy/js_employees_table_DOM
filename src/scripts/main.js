@@ -154,11 +154,11 @@ table.insertAdjacentHTML('afterend', `
 
 const form = document.querySelector('.new-employee-form');
 
-function createNotification(titleAndClass) {
+function createNotification(titleAndClass, description) {
   document.body.insertAdjacentHTML('afterbegin', `
     <div class="notification data-qa="notification" ${titleAndClass}">
       <span class="title">${titleAndClass}</span>
-      <p>You have provided incorrect information</p>
+      <p>${description}</p>
     </div>
   `);
 
@@ -175,21 +175,91 @@ form.elements.button.addEventListener('click', (e) => {
   const data = new FormData(form);
   const f = Object.fromEntries(data.entries());
 
-  if (f.name.length < 4 || +f.age < 18 || +f.age > 90) {
-    createNotification('error');
+  if (f.name.length < 4
+      || +f.age < 18
+      || +f.age > 90
+      || !isNaN(f.position)
+      || !isNaN(f.name)) {
+    createNotification('error', 'Please enter correct data');
+    form.reset();
 
     return;
   }
 
-  tbody.insertAdjacentHTML('beforebegin', `
-    <tr>
-      <td>${f.name}</td>
-      <td>${f.position}</td>
-      <td>${f.office}</td>
-      <td>${f.age}</td>
-      <td>$${f.salary.toLocaleString('en-US')}</td>
-    </tr>
-  `);
+  const NewtrForTable = document.createElement('tr');
+  const tdName = document.createElement('td');
+  const tdPosition = document.createElement('td');
+  const tdOffice = document.createElement('td');
+  const tdAge = document.createElement('td');
+  const tdSalary = document.createElement('td');
 
-  createNotification('success');
+  tdName.innerText = f.name;
+  tdPosition.innerText = f.position;
+  tdOffice.innerText = f.office;
+  tdAge.innerText = f.age;
+  tdSalary.innerText = `$${f.salary.toLocaleString('en-US')}`;
+  NewtrForTable.append(tdName, tdPosition, tdOffice, tdAge, tdSalary);
+  tbodyRows.push(NewtrForTable);
+  tbody.append(NewtrForTable);
+
+  form.reset();
+  createNotification('success', 'Correct data, You added new row');
+});
+
+let initialValue;
+
+tbody.addEventListener('dblclick', (event2) => {
+  const input = document.createElement('input');
+  const td = event2.target;
+
+  initialValue = td.innerHTML;
+  input.value = td.innerHTML;
+  input.className = 'cell-input';
+  td.innerHTML = '';
+  td.append(input);
+
+  if (td.cellIndex === 3) {
+    if (+input.value < 18 || +input.value < 90) {
+      input.value = initialValue;
+    }
+  }
+
+  if (td.cellIndex === 4) {
+    input.value = `$${td.textContent.toLocaleString('en-US')}`;
+  }
+
+  input.addEventListener('blur', () => {
+    if (input.value === '') {
+      td.textContent = initialValue;
+      input.remove();
+
+      return;
+    }
+
+    if (td.cellIndex === 3) {
+      if (+input.value < 18 || +input.value > 90 || isNaN(input.value)) {
+        td.textContent = initialValue;
+        input.remove();
+
+        return;
+      }
+    }
+
+    td.innerHTML = input.value.trim();
+    input.remove();
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (input.value === '' && e.key === 'Enter') {
+      td.textContent = initialValue;
+      input.remove();
+
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      td.textContent = input.value.trim();
+      input.remove();
+    }
+  });
 });
