@@ -6,26 +6,25 @@ const tableBody = table.querySelector('tbody');
 const rows = [...tableBody.querySelectorAll('tr')];
 let sortDirection = 1;
 
+const sortFunctions = {
+  'Name': (cell1, cell2) => sortDirection * cell1.localeCompare(cell2),
+  'Position': (cell1, cell2) => sortDirection * cell1.localeCompare(cell2),
+  'Office': (cell1, cell2) => sortDirection * cell1.localeCompare(cell2),
+  'Age': (cell1, cell2) => sortDirection * (cell1 - cell2),
+  'Salary': (cell1, cell2) => sortDirection * (Number(cell1.replace(/[^\d.-]/g, '')) - Number(cell2.replace(/[^\d.-]/g, ''))),
+};
+
 thead.addEventListener('click', e => {
   const eIndex = e.target.cellIndex;
 
   const sortRows = rows.sort((row1, row2) => {
     const cell1 = row1.querySelectorAll('td')[eIndex].textContent;
     const cell2 = row2.querySelectorAll('td')[eIndex].textContent;
-
-    switch (e.target.textContent) {
-      case 'Name':
-      case 'Position':
-      case 'Office':
-        return sortDirection * cell1.localeCompare(cell2);
-      case 'Age':
-        return sortDirection * cell1 - cell2;
-      case 'Salary':
-        return sortDirection * Number(cell1.replace(/[^\d.-]/g, ''))
-            - Number(cell2.replace(/[^\d.-]/g, ''));
-    }
+  
+    const sortFunction = sortFunctions[e.target.textContent];
+    return sortFunction(cell1, cell2);
   });
-
+  
   tableBody.append(...sortRows);
   sortDirection *= -1;
 });
@@ -56,29 +55,31 @@ body.appendChild(newForm);
 
 newForm.innerHTML = `
 <label>
-Name: <input name="name" type="text"  data-qa="name" required>
+  Name: <input name="name" type="text"  data-qa="name" required pattern="[A-Z][A-Za-z]*">
 </label>
 <label>
-Position: <input name="position" type="text" data-qa="position" required>
-</label>
-
-<label>
-Office: <select name="office" data-qa="office" required>
-<option>Tokyo</option>
-<option>Singapore</option>
-<option>London</option>
-<option>New York</option>
-<option>Edinburgh</option>
-<option>San Francisco</option>
-</select>
+  Position: <input name="position" type="text" data-qa="position" required>
 </label>
 
 <label>
-Age: <input name="age" data-qa="age" type="number" required>
+  Office: 
+    <select name="office" data-qa="office" required>
+      <option>Tokyo</option>
+      <option>Singapore</option>
+      <option>London</option>
+      <option>New York</option>
+      <option>Edinburgh</option>
+      <option>San Francisco</option>
+    </select>
 </label>
 
 <label>
-Salary: <input name="salary" type="number" data-qa="salary" required>
+  Age: 
+    <input name="age" data-qa="age" type="number" required>
+</label>
+
+<label>
+  Salary: <input name="salary" type="number" data-qa="salary" required min="1"> 
 </label>
 
 <button type="submit">Save to table</button>
