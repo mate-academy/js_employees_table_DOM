@@ -11,7 +11,9 @@ const sortFunctions = {
   'Position': (cell1, cell2) => sortDirection * cell1.localeCompare(cell2),
   'Office': (cell1, cell2) => sortDirection * cell1.localeCompare(cell2),
   'Age': (cell1, cell2) => sortDirection * (cell1 - cell2),
-  'Salary': (cell1, cell2) => sortDirection * (Number(cell1.replace(/[^\d.-]/g, '')) - Number(cell2.replace(/[^\d.-]/g, ''))),
+  'Salary': (cell1, cell2) => sortDirection
+    * (Number(cell1.replace(/[^\d.-]/g, ''))
+    - Number(cell2.replace(/[^\d.-]/g, ''))),
 };
 
 thead.addEventListener('click', e => {
@@ -20,11 +22,12 @@ thead.addEventListener('click', e => {
   const sortRows = rows.sort((row1, row2) => {
     const cell1 = row1.querySelectorAll('td')[eIndex].textContent;
     const cell2 = row2.querySelectorAll('td')[eIndex].textContent;
-  
+
     const sortFunction = sortFunctions[e.target.textContent];
+
     return sortFunction(cell1, cell2);
   });
-  
+
   tableBody.append(...sortRows);
   sortDirection *= -1;
 });
@@ -55,7 +58,9 @@ body.appendChild(newForm);
 
 newForm.innerHTML = `
 <label>
-  Name: <input name="name" type="text"  data-qa="name" required pattern="[A-Z][A-Za-z]*">
+  Name: <input name="name" type="text"  data-qa="name"
+               required pattern="[A-Z][A-Za-z]*"
+>
 </label>
 <label>
   Position: <input name="position" type="text" data-qa="position" required>
@@ -142,6 +147,8 @@ newForm.addEventListener('submit', (e) => {
 
       newCell.textContent = value;
     }
+
+    rows.push(newRow);
   }
 
   document.body.append(notification);
