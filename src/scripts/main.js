@@ -99,28 +99,28 @@ button.addEventListener('click', e => {
 
   if (!form.name.value.trim() || !form.age.value || !form.position.value.trim()
     || !form.office.value || !form.salary.value) {
-    pushNotification(450, 20, 'Error',
+    pushNotification(10, 10, 'Error',
       'Please fill all fields.', 'error');
 
     return;
   }
 
   if (form.name.value.length < 4 && form.name.value.length > 0) {
-    pushNotification(450, 20, 'Error',
+    pushNotification(10, 10, 'Error',
       'Employee\'s name has less then 4 letters.', 'error');
 
     return;
   }
 
   if (form.age.value < 18 || form.age.value > 90) {
-    pushNotification(450, 20, 'Error',
+    pushNotification(10, 10, 'Error',
       'Employee\'s age is less than 18 or more than 90.', 'error');
 
     return;
   }
 
   if (form.salary.value < 0) {
-    pushNotification(450, 20, 'Error',
+    pushNotification(10, 10, 'Error',
       'Employee\'s salary is less than 0.', 'error');
 
     return;
@@ -146,7 +146,7 @@ button.addEventListener('click', e => {
   tbody.append(newRow);
   form.reset();
 
-  pushNotification(450, 20, 'Success',
+  pushNotification(10, 10, 'Success',
     'New employee is successfully added to the table.', 'success');
 });
 
@@ -225,14 +225,14 @@ tbody.addEventListener('dblclick', e => {
     }
 
     if (input.value.length < 4 && index === 0 && input.value) {
-      pushNotification(450, 20, 'Error',
+      pushNotification(10, 10, 'Error',
         'Employee\'s name has less then 4 letters.', 'error');
 
       text = prevText;
     }
 
     if ((input.value < 18 || input.value > 90) && index === 3 && input.value) {
-      pushNotification(450, 20, 'Error',
+      pushNotification(10, 10, 'Error',
         'Employee\'s age is less than 18 or more than 90.', 'error');
 
       text = prevText;
