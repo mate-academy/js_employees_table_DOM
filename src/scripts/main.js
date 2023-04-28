@@ -181,7 +181,6 @@ form.elements.button.addEventListener('click', (e) => {
       || !isNaN(f.position)
       || !isNaN(f.name)) {
     createNotification('error', 'Please enter correct data');
-    form.reset();
 
     return;
   }
