@@ -7,6 +7,7 @@ const tbody = document.querySelector('tbody');
 let rows = [...tbody.rows];
 let body = document.querySelector('body');
 let startValue = '';
+let sortColumn = '';
 
 /* -----------------sorting table------------------ */
 const sortTable = (table, column) => {
@@ -21,9 +22,9 @@ const sortTable = (table, column) => {
     let aItem = a.children[column].innerHTML;
     let bItem = b.children[column].innerHTML;
 
-    if (column === 4) {
-      aItem = Number(a.children[4].innerHTML.slice(1, 10).split(',').join(''));
-      bItem = Number(b.children[4].innerHTML.slice(1, 10).split(',').join(''));
+    if (sortColumn === 'Salary') {
+      aItem = Number(a.children[4].innerHTML.replace(/\D/g, ''));
+      bItem = Number(b.children[4].innerHTML.replace(/\D/g, ''));
     }
 
     if (aItem > bItem) {
@@ -58,15 +59,19 @@ document.addEventListener('click', (e) => {
   }
 
   if (e.target.tagName === 'TH') {
+    sortColumn = e.target.innerHTML;
+
     const parentRow = e.target.parentNode;
     const arr = [...parentRow.children];
     const column = arr.indexOf(e.target);
+
+    rows = [...tbody.rows];
 
     sortTable(rows, column);
     tbody.append(...rows);
     body = document.querySelector('body');
 
-    rows = [...tbody.rows];
+    // rows = [...tbody.rows];
   }
 
   if (e.target.tagName === 'BUTTON') {
@@ -161,7 +166,8 @@ const appendRow = () => {
   newRow.append(newitem5);
 
   tbody.append(newRow);
-  showNotif('row appended', 'success');
+
+  showNotif('row has been added', 'success');
 };
 
 /* -----------------to create New Employee Form------------------ */
