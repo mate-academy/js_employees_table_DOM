@@ -218,45 +218,41 @@ function addDataToTable(data) {
 };
 
 function editTableCell() {
-  const input = document.createElement('input');
-  let editedCell;
-
-  input.classList.add('cell-input');
-  input.style.width = '100%';
-
   tableBody.addEventListener('dblclick', (e) => {
-    if (e.target.tagName === 'TD' && !currentCell) {
-      initialValue = e.target.textContent;
-      currentCell = true;
-      editedCell = e.target.closest('TD');
-      editedCell.textContent = '';
-      e.target.value = '';
-      editedCell.append(input);
-      input.focus();
-    };
-  });
+    const input = document.createElement('input');
+    const editedCell = e.target.closest('TD');
 
-  tableBody.addEventListener('keydown', (e) => {
-    if (e.code !== 'Enter' || !currentCell) {
-      return;
-    };
+    input.classList.add('cell-input');
+    input.style.width = '100%';
+    initialValue = e.target.textContent;
+    e.target.textContent = '';
+    currentCell = true;
+    editedCell.textContent = '';
+    editedCell.append(input);
+    input.focus();
 
-    setCellValue(input, editedCell);
-  });
+    tableBody.addEventListener('keydown', () => {
+      if (e.code !== 'Enter' || !currentCell) {
+        return;
+      };
 
-  input.addEventListener('blur', (e) => {
-    setCellValue(input, editedCell);
+      setCellValue(input, editedCell);
+    });
+
+    input.addEventListener('blur', () => {
+      setCellValue(input, editedCell);
+    });
   });
 };
 
-function setCellValue(input, editedCell) {
+function setCellValue(tableInput, cell) {
   if (!currentCell) {
     return;
   };
 
-  let inputValue = input.value.trim();
-  const index = Array.from(editedCell.parentNode.children)
-    .indexOf(editedCell);
+  let inputValue = tableInput.value.trim();
+  const index = Array.from(cell.parentNode.children)
+    .indexOf(cell);
 
   if (!inputValue) {
     inputValue = initialValue;
@@ -274,7 +270,7 @@ function setCellValue(input, editedCell) {
         return;
       };
 
-      editedCell.textContent = inputValue.slice(0, 1) === '$'
+      cell.textContent = inputValue.slice(0, 1) === '$'
         ? `$${parseInt(inputValue
           .split(',').join('').slice(1)).toLocaleString('en-US')}`
         : `$${parseInt(inputValue
@@ -292,7 +288,7 @@ function setCellValue(input, editedCell) {
 
         return;
       };
-      editedCell.textContent = inputValue;
+      cell.textContent = inputValue;
       break;
 
     case index !== 4 || index !== 3:
@@ -305,7 +301,7 @@ function setCellValue(input, editedCell) {
 
         return;
       };
-      editedCell.textContent = inputValue;
+      cell.textContent = inputValue;
       break;
   }
 
