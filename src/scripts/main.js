@@ -56,7 +56,7 @@ tbody.addEventListener('dblclick', (e) => {
   if (e.target.tagName === 'TD') {
     const cell = e.target;
     const columnNum = [...cell.closest('TR').children].indexOf(cell);
-    const defaultValue = cell.innerText;
+    const defaultValue = cell.innerText.trim();
     const selection = window.getSelection();
     const range = document.createRange();
 
@@ -72,43 +72,44 @@ tbody.addEventListener('dblclick', (e) => {
       });
     } else {
       cell.contentEditable = true;
-      cell.focus();
       range.selectNodeContents(cell);
       selection.removeAllRanges();
       selection.addRange(range);
 
       cell.addEventListener('blur', () => {
-        cell.innerText = cell.innerText.trim();
+        const content = cell.innerText.trim();
 
-        if (columnNum === 4 && cell.innerText.slice(0, 1) !== '$') {
-          cell.innerText = '$' + cell.innerText.trim();
+        if (columnNum === 4 && content.slice(0, 1) !== '$') {
+          if (!isNaN(parseFloat(content))) {
+            cell.innerText = '$' + (+content).toLocaleString('en');
+          } else {
+            cell.innerText = defaultValue;
+          }
         }
 
-        if (columnNum === 3 && (+cell.innerText > 90 || +cell.innerText < 18)) {
-          cell.innerText = cell.innerText.slice(0, 2);
+        if (columnNum === 3) {
+          if (+content > 90
+              || +content < 18
+              || isNaN(content)) {
+            cell.innerText = defaultValue;
+          }
+        }
+
+        if (columnNum === 0 || columnNum === 1) {
+          if (!isNaN(parseFloat(content))) {
+            cell.innerText = defaultValue;
+          }
+        }
+
+        if (!content) {
+          cell.innerText = defaultValue;
         }
       });
     }
 
-    cell.addEventListener('blur', () => {
-      cell.innerText = cell.innerText.trim();
-      cell.contentEditable = false;
-      cell.classList.remove('cell-input');
-
-      if (cell.innerText === '') {
-        cell.innerText = defaultValue;
-      }
-    });
-
     cell.addEventListener('keydown', eventCell => {
       if (eventCell.key === 'Enter') {
-        cell.innerText = cell.innerText.trim();
-        cell.contentEditable = false;
-        cell.classList.remove('cell-input');
-
-        if (cell.innerText === '') {
-          cell.innerText = defaultValue;
-        }
+        cell.blur();
       };
     });
   }
@@ -120,8 +121,9 @@ function createInput(labelText, inputName, data, inputtype = 'text') {
   label.innerHTML = `${labelText} <input name =${inputName} type=${inputtype} data-qa=${data} required></input>`;
   label.setAttribute('for', inputName);
 
-  if (inputName === 'name') {
-    label.children[0].minlength = '4';
+  if (inputName === 'name' || inputName === 'position') {
+    label.children[0].setAttribute('minlength', 4);
+    label.children[0].setAttribute('pattern', '[a-zA-Zа-яА-Яа-щА-ЩьюЯҐґІіЇїЄє]+(?:\\s[a-zA-Zа-яА-Яа-щА-ЩьюЯҐґІіЇїЄє]*)*');
   }
 
   if (inputName === 'age') {
@@ -191,7 +193,7 @@ addEmployForm.addEventListener('submit', (e) => {
     cell.innerText = e.target[i].value;
   }
 
-  newRow.lastElementChild.innerText = '$' + newRow.lastElementChild.innerText;
+  newRow.lastElementChild.innerText = '$' + (+newRow.lastElementChild.innerText).toLocaleString('en');
   tbody.append(newRow);
   tableSort(tbody.currentIndex);
   e.currentTarget.reset();
