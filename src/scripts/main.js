@@ -7,7 +7,7 @@ tbody.isSorted = false;
 tbody.currentIndex = 0;
 tbody.headName = 'name';
 
-function tableSort(indexCol = tbody.currentIndex) {
+function tableSort(indexCol = tbody.currentIndex, target = false) {
   const rowsForSort = [...tbody.querySelectorAll('tr')];
 
   rowsForSort.sort((a, b) => {
@@ -25,7 +25,7 @@ function tableSort(indexCol = tbody.currentIndex) {
     }
   });
 
-  if (tbody.isSorted) {
+  if (tbody.isSorted && target) {
     rowsForSort.reverse().forEach((el) => tbody.append(el));
     tbody.isSorted = false;
   } else {
@@ -41,7 +41,8 @@ table.addEventListener('click', (e) => {
     tbody.currentIndex = [...table.rows[place].children].indexOf(e.target);
     tbody.headName = table.rows[place].children[tbody.currentIndex].innerText;
 
-    tableSort(tbody.currentIndex);
+    tableSort(tbody.currentIndex, e.target.isSorted);
+    e.target.isSorted = !e.target.isSorted;
   }
 });
 
@@ -99,11 +100,11 @@ tbody.addEventListener('dblclick', (e) => {
     }
 
     cell.addEventListener('blur', () => {
-      const content = cell.innerText.trim();
+      const cellContent = cell.innerText.trim();
 
-      if (columnNum === 4 && content.slice(0, 1) !== '$') {
-        if (!isNaN(parseFloat(content))) {
-          cell.innerText = `$${(+content).toLocaleString('en')}`;
+      if (columnNum === 4 && cellContent.slice(0, 1) !== '$') {
+        if (!isNaN(parseFloat(cellContent))) {
+          cell.innerText = `$${(+cellContent).toLocaleString('en')}`;
 
           pushNotification(
             10,
@@ -126,9 +127,9 @@ tbody.addEventListener('dblclick', (e) => {
       }
 
       if (columnNum === 3) {
-        if (+content > 90
-            || +content < 18
-            || isNaN(content)) {
+        if (+cellContent > 90
+            || +cellContent < 18
+            || isNaN(cellContent)) {
           cell.innerText = defaultValue;
 
           pushNotification(
@@ -138,7 +139,7 @@ tbody.addEventListener('dblclick', (e) => {
             `New ${tbody.headName} is not correct.\n `,
             'error'
           );
-        } else if (defaultValue !== content) {
+        } else if (defaultValue !== cellContent) {
           pushNotification(
             10,
             10,
@@ -150,7 +151,7 @@ tbody.addEventListener('dblclick', (e) => {
       }
 
       if (columnNum === 0 || columnNum === 1) {
-        if (!isNaN(parseFloat(content))) {
+        if (!isNaN(parseFloat(cellContent))) {
           cell.innerText = defaultValue;
 
           pushNotification(
@@ -160,7 +161,7 @@ tbody.addEventListener('dblclick', (e) => {
             `New ${tbody.headName} string is not correct.\n `,
             'error'
           );
-        } else if (defaultValue !== content && content) {
+        } else if (defaultValue !== cellContent && cellContent) {
           pushNotification(
             10,
             10,
@@ -171,7 +172,7 @@ tbody.addEventListener('dblclick', (e) => {
         }
       }
 
-      if (!content) {
+      if (!cellContent) {
         cell.innerText = defaultValue;
       }
     });
@@ -200,6 +201,10 @@ function createInput(labelText, inputName, data, inputtype = 'text') {
   if (inputName === 'age') {
     label.children[0].min = '18';
     label.children[0].max = '90';
+  }
+
+  if (inputName === 'salary') {
+    label.children[0].min = '0';
   }
 
   return label;
