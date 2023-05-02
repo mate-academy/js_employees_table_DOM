@@ -5,6 +5,7 @@ const tbody = document.querySelector('tbody');
 
 tbody.isSorted = false;
 tbody.currentIndex = 0;
+tbody.headName = 'name';
 
 function tableSort(indexCol = tbody.currentIndex) {
   const rowsForSort = [...tbody.querySelectorAll('tr')];
@@ -38,6 +39,7 @@ table.addEventListener('click', (e) => {
     const place = e.target.closest('thead') ? 0 : table.rows.length - 1;
 
     tbody.currentIndex = [...table.rows[place].children].indexOf(e.target);
+    tbody.headName = table.rows[place].children[tbody.currentIndex].innerText;
 
     tableSort(tbody.currentIndex);
   }
@@ -49,6 +51,14 @@ tbody.addEventListener('click', (e) => {
 
   rowsForSort.forEach((item) => item.classList.remove('active'));
   row.classList.add('active');
+
+  if (!e.target.closest('select')) {
+    [...tbody.rows].forEach((el, i) => {
+      if (el.children[2].firstElementChild) {
+        el.children[2].innerText = el.children[2].firstElementChild.value;
+      }
+    });
+  };
 });
 
 tbody.addEventListener('dblclick', (e) => {
@@ -59,10 +69,34 @@ tbody.addEventListener('dblclick', (e) => {
     const selection = window.getSelection();
     const range = document.createRange();
 
+    tbody.headName = table.rows[0].children[columnNum].innerText;
     cell.contentEditable = true;
     range.selectNodeContents(cell);
     selection.removeAllRanges();
     selection.addRange(range);
+
+    if (columnNum === 2) {
+      const select = createSelect(cityList, 'office', true);
+      const cityIndex = cityList.indexOf(defaultValue);
+
+      select.options[cityIndex].selected = true;
+      cell.innerText = '';
+      select.classList.add('cell-input');
+      cell.append(select);
+      cell.contentEditable = false;
+
+      cell.addEventListener('change', () => {
+        cell.innerText = cell.firstElementChild.value;
+
+        pushNotification(
+          10,
+          10,
+          `${tbody.headName}`,
+          `New ${tbody.headName} is added to table.\n `,
+          'success'
+        );
+      });
+    }
 
     cell.addEventListener('blur', () => {
       const content = cell.innerText.trim();
@@ -70,8 +104,24 @@ tbody.addEventListener('dblclick', (e) => {
       if (columnNum === 4 && content.slice(0, 1) !== '$') {
         if (!isNaN(parseFloat(content))) {
           cell.innerText = `$${(+content).toLocaleString('en')}`;
+
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} is added to table.\n `,
+            'success'
+          );
         } else {
           cell.innerText = defaultValue;
+
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} is not correct.\n `,
+            'error'
+          );
         }
       }
 
@@ -80,14 +130,44 @@ tbody.addEventListener('dblclick', (e) => {
             || +content < 18
             || isNaN(content)) {
           cell.innerText = defaultValue;
+
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} is not correct.\n `,
+            'error'
+          );
+        } else if (defaultValue !== content) {
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} is added to table.\n `,
+            'success'
+          );
         }
       }
 
-      if (columnNum === 0
-          || columnNum === 1
-          || columnNum === 2) {
+      if (columnNum === 0 || columnNum === 1) {
         if (!isNaN(parseFloat(content))) {
           cell.innerText = defaultValue;
+
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} string is not correct.\n `,
+            'error'
+          );
+        } else if (defaultValue !== content && content) {
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} is added to table.\n `,
+            'success'
+          );
         }
       }
 
@@ -114,11 +194,7 @@ function createInput(labelText, inputName, data, inputtype = 'text') {
   label.setAttribute('for', inputName);
 
   if (inputName === 'name' || inputName === 'position') {
-    const pattern = `[a-zA-Zа-яА-Яа-щА-ЩьюЯҐґІіЇїЄє]+`
-                    + `(?:\\s[a-zA-Zа-яА-Яа-щА-ЩьюЯҐґІіЇїЄє]*)*`;
-
     label.children[0].setAttribute('minlength', 4);
-    label.children[0].setAttribute('pattern', pattern);
   }
 
   if (inputName === 'age') {
@@ -184,16 +260,70 @@ addEmployForm.addEventListener('submit', (e) => {
 
   for (let i = 0; i < rowLength; i++) {
     const cell = newRow.insertCell(i);
+    const inputValue = e.target[i].value.trim();
 
-    cell.innerText = e.target[i].value;
+    if (!inputValue || (!isNaN(inputValue) && i < 2)) {
+      pushNotification(
+        150,
+        10,
+        `Failed ${e.target[i].name}`,
+        `Please input correct ${e.target[i].name}.\n `,
+        'error'
+      );
+
+      return;
+    }
+
+    cell.innerText = inputValue;
   }
 
   const text = `$${(+newRow.lastElementChild.innerText).toLocaleString('en')}`;
 
   newRow.lastElementChild.innerText = text;
   tbody.append(newRow);
-  tableSort(tbody.currentIndex);
   e.currentTarget.reset();
+
+  pushNotification(
+    150,
+    10,
+    `New worker`,
+    `${newRow.children[0].innerText} is added to table.\n `,
+    'success'
+  );
 });
 
 document.body.append(addEmployForm);
+
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const notification = document.createElement('DIV');
+  const notificationTitle = document.createElement('H2');
+  const notificationText = document.createElement('P');
+
+  notificationTitle.innerText = title;
+  notificationText.innerText = description;
+  notification.append(notificationTitle);
+  notification.append(notificationText);
+  notification.classList.add('notification');
+
+  const notificationList = document.querySelectorAll('.notification');
+
+  function messageType(frame) {
+    notification.classList.add(frame);
+
+    if (notificationList.length) {
+      const existNoti = notificationList[notificationList.length - 1];
+      const existNotiRect = existNoti.getBoundingClientRect();
+      const existNotiPosition = existNotiRect.top + existNotiRect.height;
+
+      notification.style.top = `${existNotiPosition + 10}px`;
+      notification.style.right = `${posRight}px`;
+    }
+  }
+
+  messageType(type);
+  document.body.append(notification);
+
+  return setTimeout(() => {
+    document.body.removeChild(notification);
+  }, 2000);
+};
