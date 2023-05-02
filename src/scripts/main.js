@@ -120,8 +120,8 @@ function createInput(labelText, inputName, data, inputtype = 'text') {
   const label = document.createElement('LABEL');
 
   label.innerHTML = `${labelText}`
-                    + `<input name =${inputName}`
-                    + `type=${inputtype}`
+                    + `<input name =${inputName} `
+                    + `type=${inputtype} `
                     + `data-qa=${data} required></input>`;
   label.setAttribute('for', inputName);
 
