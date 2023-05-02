@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 'use strict';
 
 const table = document.querySelector('table');
@@ -83,7 +82,7 @@ tbody.addEventListener('dblclick', (e) => {
 
         if (columnNum === 4 && content.slice(0, 1) !== '$') {
           if (!isNaN(parseFloat(content))) {
-            cell.innerText = '$' + (+content).toLocaleString('en');
+            cell.innerText = `$${(+content).toLocaleString('en')}`;
           } else {
             cell.innerText = defaultValue;
           }
@@ -120,12 +119,18 @@ tbody.addEventListener('dblclick', (e) => {
 function createInput(labelText, inputName, data, inputtype = 'text') {
   const label = document.createElement('LABEL');
 
-  label.innerHTML = `${labelText} <input name =${inputName} type=${inputtype} data-qa=${data} required></input>`;
+  label.innerHTML = `${labelText}`
+                    + `<input name =${inputName}`
+                    + `type=${inputtype}`
+                    + `data-qa=${data} required></input>`;
   label.setAttribute('for', inputName);
 
   if (inputName === 'name' || inputName === 'position') {
+    const pattern = `[a-zA-Zа-яА-Яа-щА-ЩьюЯҐґІіЇїЄє]+`
+                    + `(?:\\s[a-zA-Zа-яА-Яа-щА-ЩьюЯҐґІіЇїЄє]*)*`;
+
     label.children[0].setAttribute('minlength', 4);
-    label.children[0].setAttribute('pattern', '[a-zA-Zа-яА-Яа-щА-ЩьюЯҐґІіЇїЄє]+(?:\\s[a-zA-Zа-яА-Яа-щА-ЩьюЯҐґІіЇїЄє]*)*');
+    label.children[0].setAttribute('pattern', pattern);
   }
 
   if (inputName === 'age') {
@@ -195,7 +200,9 @@ addEmployForm.addEventListener('submit', (e) => {
     cell.innerText = e.target[i].value;
   }
 
-  newRow.lastElementChild.innerText = '$' + (+newRow.lastElementChild.innerText).toLocaleString('en');
+  const text = `$${(+newRow.lastElementChild.innerText).toLocaleString('en')}`;
+
+  newRow.lastElementChild.innerText = text;
   tbody.append(newRow);
   tableSort(tbody.currentIndex);
   e.currentTarget.reset();
