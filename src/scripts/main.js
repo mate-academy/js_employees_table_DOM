@@ -60,42 +60,54 @@ tbody.addEventListener('dblclick', (e) => {
     const selection = window.getSelection();
     const range = document.createRange();
 
-    cell.contentEditable = true;
-    range.selectNodeContents(cell);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    if (columnNum === 2) {
+      const select = createSelect(cityList, 'office', true);
+      const cityIndex = cityList.indexOf(defaultValue);
 
-    cell.addEventListener('blur', () => {
-      const content = cell.innerText.trim();
+      select.options[cityIndex].selected = true;
+      cell.innerText = '';
+      cell.append(select);
+      cell.firstElementChild.classList.add('cell-input');
 
-      if (columnNum === 4 && content.slice(0, 1) !== '$') {
-        if (!isNaN(parseFloat(content))) {
-          cell.innerText = '$' + (+content).toLocaleString('en');
-        } else {
+      cell.addEventListener('change', () => {
+        cell.innerText = cell.firstElementChild.value;
+      });
+    } else {
+      cell.contentEditable = true;
+      range.selectNodeContents(cell);
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      cell.addEventListener('blur', () => {
+        const content = cell.innerText.trim();
+
+        if (columnNum === 4 && content.slice(0, 1) !== '$') {
+          if (!isNaN(parseFloat(content))) {
+            cell.innerText = '$' + (+content).toLocaleString('en');
+          } else {
+            cell.innerText = defaultValue;
+          }
+        }
+
+        if (columnNum === 3) {
+          if (+content > 90
+              || +content < 18
+              || isNaN(content)) {
+            cell.innerText = defaultValue;
+          }
+        }
+
+        if (columnNum === 0 || columnNum === 1) {
+          if (!isNaN(parseFloat(content))) {
+            cell.innerText = defaultValue;
+          }
+        }
+
+        if (!content) {
           cell.innerText = defaultValue;
         }
-      }
-
-      if (columnNum === 3) {
-        if (+content > 90
-            || +content < 18
-            || isNaN(content)) {
-          cell.innerText = defaultValue;
-        }
-      }
-
-      if (columnNum === 0
-          || columnNum === 1
-          || columnNum === 2) {
-        if (!isNaN(parseFloat(content))) {
-          cell.innerText = defaultValue;
-        }
-      }
-
-      if (!content) {
-        cell.innerText = defaultValue;
-      }
-    });
+      });
+    }
 
     cell.addEventListener('keydown', eventCell => {
       if (eventCell.key === 'Enter') {
