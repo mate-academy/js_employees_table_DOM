@@ -104,7 +104,7 @@ tbody.addEventListener('dblclick', (e) => {
 
       if (columnNum === 4 && cellContent.slice(0, 1) !== '$') {
         if (!isNaN(parseFloat(cellContent))) {
-          cell.innerText = `$${(+cellContent).toLocaleString('en')}`;
+          cell.innerText = `$${(parseFloat(cellContent)).toLocaleString('en')}`;
 
           pushNotification(
             10,
@@ -175,6 +175,7 @@ tbody.addEventListener('dblclick', (e) => {
       if (!cellContent) {
         cell.innerText = defaultValue;
       }
+      cell.contentEditable = false;
     });
 
     cell.addEventListener('keydown', eventCell => {
@@ -299,36 +300,44 @@ addEmployForm.addEventListener('submit', (e) => {
 
 document.body.append(addEmployForm);
 
-const pushNotification = (posTop, posRight, title, description, type) => {
+const pushNotification = (posTop, posRight, title, desc, type, eventObj) => {
   const notification = document.createElement('DIV');
   const notificationTitle = document.createElement('H2');
   const notificationText = document.createElement('P');
+  const x = document.documentElement.clientWidth - 50;
+  const y = 50;
+  const prevNot = document.elementFromPoint(x, y).closest('.notification');
+  let Ycoord = 10;
+
+  document.querySelectorAll(`.${title}-show`).forEach(el => {
+    el.classList.remove(`${title}-show`);
+    el.remove();
+  });
 
   notificationTitle.innerText = title;
-  notificationText.innerText = description;
+  notificationText.innerText = desc;
   notification.append(notificationTitle);
   notification.append(notificationText);
   notification.classList.add('notification');
+  notification.classList.add(`${title}-show`);
 
-  const notificationList = document.querySelectorAll('.notification');
+  function setPositionTop(elem) {
+    if (elem) {
+      Ycoord += elem.getBoundingClientRect().height + 20;
 
-  function messageType(frame) {
-    notification.classList.add(frame);
+      const a = document.elementFromPoint(x, Ycoord).closest('.notification');
 
-    if (notificationList.length) {
-      const existNoti = notificationList[notificationList.length - 1];
-      const existNotiRect = existNoti.getBoundingClientRect();
-      const existNotiPosition = existNotiRect.top + existNotiRect.height;
-
-      notification.style.top = `${existNotiPosition + 10}px`;
-      notification.style.right = `${posRight}px`;
+      setPositionTop(a);
+    } else {
+      notification.style.top = `${Ycoord + 10}px`;
     }
-  }
+  };
 
-  messageType(type);
+  setPositionTop(prevNot);
+
   document.body.append(notification);
 
-  return setTimeout(() => {
-    document.body.removeChild(notification);
+  setTimeout(() => {
+    notification.remove();
   }, 2000);
 };
