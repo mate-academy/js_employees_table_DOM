@@ -124,12 +124,14 @@ button.addEventListener('click', (e) => {
   if (nameInput.value.length < 4
       || ageInput.value > 90
       || ageInput.value < 18
+      || salaryInput.value < 0
   ) {
     pushNotification(10, 10, 'Error.',
       'New employee wasn\'t added.\n '
       + `Please, check if all of the inputs was filled correctly.
         Name should be not less than 4 letters.
-        Age should be not less than 18 y.o. and no more than 90 y.o.`,
+        Age should be not less than 18 y.o. and no more than 90 y.o.
+        Salary amount can't be a negative value.`,
       'error'
     );
 
