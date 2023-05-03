@@ -1,8 +1,5 @@
 'use strict';
 
-// write code here
-
-// task 1 - sort table //
 const table = document.querySelector('table');
 const listOfRows = document.querySelectorAll('tbody tr');
 const columnHeaders = table.querySelectorAll('thead th');
@@ -40,8 +37,6 @@ columnHeaders.forEach((header, i) => {
   });
 });
 
-// task 2 - selected row //
-
 for (let i = 0; i < listOfRows.length; i++) {
   const row = listOfRows[i];
 
@@ -58,8 +53,6 @@ for (let i = 0; i < listOfRows.length; i++) {
   });
 }
 
-// task 3 - add form //
-
 const form = document.createElement('form');
 
 form.className = 'new-employee-form';
@@ -74,19 +67,16 @@ function inputMaker(input, label, textContent, inputName, type) {
   form.appendChild(label);
 }
 
-// name input
 const nameInput = document.createElement('input');
 const nameLabel = document.createElement('label');
 
 inputMaker(nameInput, nameLabel, 'Name:', 'name', 'text');
 
-// position input
 const positionInput = document.createElement('input');
 const positionLabel = document.createElement('label');
 
 inputMaker(positionInput, positionLabel, 'Position:', 'position', 'text');
 
-// office select
 const officeSelect = document.createElement('select');
 const officeLabel = document.createElement('label');
 const options
@@ -107,19 +97,18 @@ officeSelect.name = 'office';
 officeSelect.required = true;
 form.appendChild(officeLabel);
 
-// age input
 const ageInput = document.createElement('input');
 const ageLabel = document.createElement('label');
 
+ageInput.min = 0;
 inputMaker(ageInput, ageLabel, 'Age:', 'age', 'number');
 
-// salary input
 const salaryInput = document.createElement('input');
 const salaryLabel = document.createElement('label');
 
+salaryInput.min = 0;
 inputMaker(salaryInput, salaryLabel, 'Salary:', 'salary', 'number');
 
-// button
 const button = document.createElement('button');
 
 button.type = 'submit';
@@ -192,8 +181,6 @@ button.addEventListener('click', (e) => {
   );
 });
 
-// task 4 - notifications //
-
 const pushNotification = (posTop, posRight, title, description, type) => {
   const div = document.createElement('div');
   const h2 = document.createElement('h2');
@@ -219,7 +206,6 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   }, 5000);
 };
 
-// task 5 - editing //
 const cells = document.querySelectorAll('td');
 const editInput = document.createElement('input');
 
