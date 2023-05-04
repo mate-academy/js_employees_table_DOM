@@ -143,15 +143,14 @@ button.addEventListener('click', (e) => {
     const cell = document.createElement('td');
 
     if (i === form.elements.length - 2) {
-      const salary = parseFloat(value).toString().replace(/0{3}$/, '');
-      const salaryNumber = parseFloat(salary);
+      const salaryNumber = parseFloat(value);
 
       if (!isNaN(salaryNumber)) {
         const formattedSalary
           = salaryNumber.toLocaleString('en-US', {
             style: 'currency',
             currency: 'USD',
-            minimumFractionDigits: 3,
+            minimumFractionDigits: 0,
           });
 
         cell.textContent = formattedSalary.replace('.', ',');
@@ -254,15 +253,14 @@ for (let i = 0; i < cells.length; i++) {
       }
 
       if (cellValue.includes('$')) {
-        const salary = parseFloat(value).toString().replace(/0{3}$/, '');
-        const salaryNumber = parseFloat(salary);
+        const salaryNumber = parseFloat(value);
 
         if (!isNaN(salaryNumber) && value > 0) {
           const formattedSalary
           = salaryNumber.toLocaleString('en-US', {
             style: 'currency',
             currency: 'USD',
-            minimumFractionDigits: 3,
+            minimumFractionDigits: 0,
           });
 
           currentEditCell.textContent = formattedSalary.replace('.', ',');
@@ -328,15 +326,14 @@ for (let i = 0; i < cells.length; i++) {
         }
 
         if (cellValue.includes('$')) {
-          const salary = parseFloat(value).toString().replace(/0{3}$/, '');
-          const salaryNumber = parseFloat(salary);
+          const salaryNumber = parseFloat(value);
 
           if (!isNaN(salaryNumber) && value > 0) {
             const formattedSalary
             = salaryNumber.toLocaleString('en-US', {
               style: 'currency',
               currency: 'USD',
-              minimumFractionDigits: 3,
+              minimumFractionDigits: 0,
             });
 
             currentEditCell.textContent = formattedSalary.replace('.', ',');
