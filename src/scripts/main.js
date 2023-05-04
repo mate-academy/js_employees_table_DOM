@@ -6,6 +6,7 @@ const tbody = document.querySelector('tbody');
 tbody.isSorted = false;
 tbody.currentIndex = 0;
 tbody.headName = 'name';
+tbody.defaultValue = null;
 
 function tableSort(indexCol = tbody.currentIndex, target = false) {
   const rowsForSort = [...tbody.querySelectorAll('tr')];
@@ -18,7 +19,10 @@ function tableSort(indexCol = tbody.currentIndex, target = false) {
       return first.localeCompare(second);
     } else {
       if (first.slice(0, 1) === '$') {
-        return parseFloat(first.slice(1)) - parseFloat(second.slice(1));
+        const z = parseFloat(first.slice(1).replaceAll(',', ''));
+        const x = parseFloat(second.slice(1).replaceAll(',', ''));
+
+        return z - x;
       }
 
       return parseFloat(first) - parseFloat(second);
@@ -66,10 +70,10 @@ tbody.addEventListener('dblclick', (e) => {
   if (e.target.tagName === 'TD') {
     const cell = e.target;
     const columnNum = [...cell.closest('TR').children].indexOf(cell);
-    const defaultValue = cell.innerText.trim();
     const selection = window.getSelection();
     const range = document.createRange();
 
+    tbody.defaultValue = cell.innerText.trim();
     tbody.headName = table.rows[0].children[columnNum].innerText;
     cell.contentEditable = true;
     range.selectNodeContents(cell);
@@ -78,7 +82,7 @@ tbody.addEventListener('dblclick', (e) => {
 
     if (columnNum === 2) {
       const select = createSelect(cityList, 'office', true);
-      const cityIndex = cityList.indexOf(defaultValue);
+      const cityIndex = cityList.indexOf(tbody.defaultValue);
 
       select.options[cityIndex].selected = true;
       cell.innerText = '';
@@ -114,7 +118,7 @@ tbody.addEventListener('dblclick', (e) => {
             'success'
           );
         } else {
-          cell.innerText = defaultValue;
+          cell.innerText = tbody.defaultValue;
 
           pushNotification(
             10,
@@ -130,7 +134,7 @@ tbody.addEventListener('dblclick', (e) => {
         if (+cellContent > 90
             || +cellContent < 18
             || isNaN(cellContent)) {
-          cell.innerText = defaultValue;
+          cell.innerText = tbody.defaultValue;
 
           pushNotification(
             10,
@@ -139,7 +143,7 @@ tbody.addEventListener('dblclick', (e) => {
             `New ${tbody.headName} is not correct.\n `,
             'error'
           );
-        } else if (defaultValue !== cellContent) {
+        } else if (tbody.defaultValue !== cellContent) {
           pushNotification(
             10,
             10,
@@ -152,7 +156,7 @@ tbody.addEventListener('dblclick', (e) => {
 
       if (columnNum === 0 || columnNum === 1) {
         if (!isNaN(parseFloat(cellContent))) {
-          cell.innerText = defaultValue;
+          cell.innerText = tbody.defaultValue;
 
           pushNotification(
             10,
@@ -161,7 +165,7 @@ tbody.addEventListener('dblclick', (e) => {
             `New ${tbody.headName} string is not correct.\n `,
             'error'
           );
-        } else if (defaultValue !== cellContent && cellContent) {
+        } else if (tbody.defaultValue !== cellContent && cellContent) {
           pushNotification(
             10,
             10,
@@ -173,7 +177,7 @@ tbody.addEventListener('dblclick', (e) => {
       }
 
       if (!cellContent) {
-        cell.innerText = defaultValue;
+        cell.innerText = tbody.defaultValue;
       }
       cell.contentEditable = false;
     });
@@ -270,7 +274,7 @@ addEmployForm.addEventListener('submit', (e) => {
 
     if (!inputValue || (!isNaN(inputValue) && i < 2)) {
       pushNotification(
-        150,
+        10,
         10,
         `Failed ${e.target[i].name}`,
         `Please input correct ${e.target[i].name}.\n `,
@@ -292,7 +296,7 @@ addEmployForm.addEventListener('submit', (e) => {
   pushNotification(
     150,
     10,
-    `New worker`,
+    `Worker`,
     `${newRow.children[0].innerText} is added to table.\n `,
     'success'
   );
@@ -300,7 +304,7 @@ addEmployForm.addEventListener('submit', (e) => {
 
 document.body.append(addEmployForm);
 
-const pushNotification = (posTop, posRight, title, desc, type, eventObj) => {
+const pushNotification = (posTop, posRight, title, desc, type) => {
   const notification = document.createElement('DIV');
   const notificationTitle = document.createElement('H2');
   const notificationText = document.createElement('P');
