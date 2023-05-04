@@ -1,3 +1,347 @@
 'use strict';
 
-// write code here
+const table = document.querySelector('table');
+const tbody = document.querySelector('tbody');
+
+tbody.isSorted = false;
+tbody.currentIndex = 0;
+tbody.headName = 'name';
+tbody.defaultValue = null;
+
+function tableSort(indexCol = tbody.currentIndex, target = false) {
+  const rowsForSort = [...tbody.querySelectorAll('tr')];
+
+  rowsForSort.sort((a, b) => {
+    const first = a.children[indexCol].innerText;
+    const second = b.children[indexCol].innerText;
+
+    if (isNaN(parseFloat(first.slice(1)))) {
+      return first.localeCompare(second);
+    } else {
+      if (first.slice(0, 1) === '$') {
+        const z = parseFloat(first.slice(1).replaceAll(',', ''));
+        const x = parseFloat(second.slice(1).replaceAll(',', ''));
+
+        return z - x;
+      }
+
+      return parseFloat(first) - parseFloat(second);
+    }
+  });
+
+  if (tbody.isSorted && target) {
+    rowsForSort.reverse().forEach((el) => tbody.append(el));
+    tbody.isSorted = false;
+  } else {
+    rowsForSort.forEach((el) => tbody.append(el));
+    tbody.isSorted = true;
+  }
+}
+
+table.addEventListener('click', (e) => {
+  if (e.target.tagName === 'TH') {
+    const place = e.target.closest('thead') ? 0 : table.rows.length - 1;
+
+    tbody.currentIndex = [...table.rows[place].children].indexOf(e.target);
+    tbody.headName = table.rows[place].children[tbody.currentIndex].innerText;
+
+    tableSort(tbody.currentIndex, e.target.isSorted);
+    e.target.isSorted = !e.target.isSorted;
+  }
+});
+
+tbody.addEventListener('click', (e) => {
+  const row = e.target.closest('TR');
+  const rowsForSort = [...tbody.querySelectorAll('tr')];
+
+  rowsForSort.forEach((item) => item.classList.remove('active'));
+  row.classList.add('active');
+
+  if (!e.target.closest('select')) {
+    [...tbody.rows].forEach((el, i) => {
+      if (el.children[2].firstElementChild) {
+        el.children[2].innerText = el.children[2].firstElementChild.value;
+      }
+    });
+  };
+});
+
+tbody.addEventListener('dblclick', (e) => {
+  if (e.target.tagName === 'TD') {
+    const cell = e.target;
+    const columnNum = [...cell.closest('TR').children].indexOf(cell);
+    const selection = window.getSelection();
+    const range = document.createRange();
+
+    tbody.defaultValue = cell.innerText.trim();
+    tbody.headName = table.rows[0].children[columnNum].innerText;
+    cell.contentEditable = true;
+    range.selectNodeContents(cell);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    if (columnNum === 2) {
+      const select = createSelect(cityList, 'office', true);
+      const cityIndex = cityList.indexOf(tbody.defaultValue);
+
+      select.options[cityIndex].selected = true;
+      cell.innerText = '';
+      select.classList.add('cell-input');
+      cell.append(select);
+      cell.contentEditable = false;
+
+      cell.addEventListener('change', () => {
+        cell.innerText = cell.firstElementChild.value;
+
+        pushNotification(
+          10,
+          10,
+          `${tbody.headName}`,
+          `New ${tbody.headName} is added to table.\n `,
+          'success'
+        );
+      });
+    }
+
+    cell.addEventListener('blur', () => {
+      const cellContent = cell.innerText.trim();
+
+      if (columnNum === 4 && cellContent.slice(0, 1) !== '$') {
+        if (!isNaN(parseFloat(cellContent))) {
+          cell.innerText = `$${(parseFloat(cellContent)).toLocaleString('en')}`;
+
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} is added to table.\n `,
+            'success'
+          );
+        } else {
+          cell.innerText = tbody.defaultValue;
+
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} is not correct.\n `,
+            'error'
+          );
+        }
+      }
+
+      if (columnNum === 3) {
+        if (+cellContent > 90
+            || +cellContent < 18
+            || isNaN(cellContent)) {
+          cell.innerText = tbody.defaultValue;
+
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} is not correct.\n `,
+            'error'
+          );
+        } else if (tbody.defaultValue !== cellContent) {
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} is added to table.\n `,
+            'success'
+          );
+        }
+      }
+
+      if (columnNum === 0 || columnNum === 1) {
+        if (!isNaN(parseFloat(cellContent))) {
+          cell.innerText = tbody.defaultValue;
+
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} string is not correct.\n `,
+            'error'
+          );
+        } else if (tbody.defaultValue !== cellContent && cellContent) {
+          pushNotification(
+            10,
+            10,
+            `${tbody.headName}`,
+            `New ${tbody.headName} is added to table.\n `,
+            'success'
+          );
+        }
+      }
+
+      if (!cellContent) {
+        cell.innerText = tbody.defaultValue;
+      }
+      cell.contentEditable = false;
+    });
+
+    cell.addEventListener('keydown', eventCell => {
+      if (eventCell.key === 'Enter') {
+        cell.blur();
+      };
+    });
+  }
+});
+
+function createInput(labelText, inputName, data, inputtype = 'text') {
+  const label = document.createElement('LABEL');
+
+  label.innerHTML = `${labelText}`
+                    + `<input name =${inputName} `
+                    + `type=${inputtype} `
+                    + `data-qa=${data} required></input>`;
+  label.setAttribute('for', inputName);
+
+  if (inputName === 'name' || inputName === 'position') {
+    label.children[0].setAttribute('minlength', 4);
+  }
+
+  if (inputName === 'age') {
+    label.children[0].min = '18';
+    label.children[0].max = '90';
+  }
+
+  if (inputName === 'salary') {
+    label.children[0].min = '0';
+  }
+
+  return label;
+}
+
+function createSelect(arr, data, isEdit = false) {
+  const label = document.createElement('LABEL');
+  const select = document.createElement('SELECT');
+
+  for (let i = 0; i < arr.length; i++) {
+    const option = document.createElement('OPTION');
+
+    option.innerText = arr[i];
+    select.add(option, select[i]);
+  }
+
+  select.setAttribute('data-qa', data);
+
+  if (!isEdit) {
+    label.innerText = data[0].toLocaleUpperCase() + data.slice(1) + ':';
+    label.append(select);
+
+    return label;
+  }
+
+  return select;
+}
+
+const addEmployForm = document.createElement('FORM');
+const formButton = document.createElement('BUTTON');
+
+const cityList = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
+
+addEmployForm.classList.add('new-employee-form');
+addEmployForm.action = '#';
+addEmployForm.method = 'GET';
+formButton.innerText = 'Save to table';
+
+addEmployForm.append(createInput('Name:', 'name', 'name'));
+addEmployForm.append(createInput('Position:', 'position', 'position'));
+addEmployForm.append(createSelect(cityList, 'office'));
+addEmployForm.append(createInput('Age:', 'age', 'age', 'number'));
+addEmployForm.append(createInput('Salary:', 'salary', 'salary', 'number'));
+addEmployForm.append(formButton);
+
+addEmployForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const newRow = tbody.rows[0].cloneNode();
+  const rowLength = tbody.rows[0].children.length;
+
+  for (let i = 0; i < rowLength; i++) {
+    const cell = newRow.insertCell(i);
+    const inputValue = e.target[i].value.trim();
+
+    if (!inputValue || (!isNaN(inputValue) && i < 2)) {
+      pushNotification(
+        10,
+        10,
+        `Failed ${e.target[i].name}`,
+        `Please input correct ${e.target[i].name}.\n `,
+        'error'
+      );
+
+      return;
+    }
+
+    cell.innerText = inputValue;
+  }
+
+  const text = `$${(+newRow.lastElementChild.innerText).toLocaleString('en')}`;
+
+  newRow.lastElementChild.innerText = text;
+  tbody.append(newRow);
+  e.currentTarget.reset();
+
+  pushNotification(
+    150,
+    10,
+    `Worker`,
+    `${newRow.children[0].innerText} is added to table.\n `,
+    'success'
+  );
+});
+
+document.body.append(addEmployForm);
+
+const pushNotification = (posTop, posRight, title, desc, type) => {
+  const notification = document.createElement('DIV');
+  const notificationTitle = document.createElement('H2');
+  const notificationText = document.createElement('P');
+  const x = document.documentElement.clientWidth - 50;
+  const y = 50;
+  const prevNot = document.elementFromPoint(x, y).closest('.notification');
+  let Ycoord = 10;
+
+  document.querySelectorAll(`.${title}-show`).forEach(el => {
+    el.classList.remove(`${title}-show`);
+    el.remove();
+  });
+
+  notificationTitle.innerText = title;
+  notificationText.innerText = desc;
+  notification.append(notificationTitle);
+  notification.append(notificationText);
+  notification.classList.add('notification');
+  notification.classList.add(`${title}-show`);
+
+  function setPositionTop(elem) {
+    if (elem) {
+      Ycoord += elem.getBoundingClientRect().height + 20;
+
+      const a = document.elementFromPoint(x, Ycoord).closest('.notification');
+
+      setPositionTop(a);
+    } else {
+      notification.style.top = `${Ycoord + 10}px`;
+    }
+  };
+
+  setPositionTop(prevNot);
+
+  document.body.append(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 2000);
+};
