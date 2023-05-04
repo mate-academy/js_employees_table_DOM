@@ -129,8 +129,8 @@ button.addEventListener('click', (e) => {
     pushNotification(10, 10, 'Error.',
       'New employee wasn\'t added.\n '
       + `Please, check if all of the inputs was filled correctly.
-        Name should be not less than 4 letters.
-        Age should be not less than 18 y.o. and no more than 90 y.o.
+        Name shouldn't be less than 4 letters.
+        Age shouldn't be less than 18 y.o. and no more than 90 y.o.
         Salary amount can't be a negative value.`,
       'error'
     );
@@ -162,7 +162,7 @@ button.addEventListener('click', (e) => {
     if (value.length === 0) {
       pushNotification(10, 10, 'Error.',
         'New employee wasn\'t added.\n '
-        + `Please, check if all of the inputs was filled correctly.
+        + `Please, check if all of the inputs were filled correctly.
           Name should be not less than 4 letters.
           Age should be not less than 18 y.o. and no more than 90 y.o.`,
         'error'
@@ -209,51 +209,185 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 };
 
 const cells = document.querySelectorAll('td');
-const editInput = document.createElement('input');
-
-editInput.className = 'cell-input';
 
 let currentEditCell = null;
 
-function editEvent(value, cell, cellValue) {
-  if (value.length === 0) {
-    cell.textContent = cellValue;
-  } else if (currentEditCell !== null) {
-    currentEditCell.textContent
-      = value.charAt(0).toUpperCase() + value.slice(1);
-  }
-  currentEditCell.removeChild(editInput);
-  currentEditCell = null;
-}
-
 for (let i = 0; i < cells.length; i++) {
   const cell = cells[i];
-  const cellValue = cell.textContent;
+  let cellValue;
 
   cell.addEventListener('dblclick', (e) => {
     e.preventDefault();
 
+    cellValue = cell.textContent.trim();
     cell.textContent = '';
+
+    const editInput = document.createElement('input');
+
+    editInput.className = 'cell-input';
+
+    if (cellValue.match(/[0-9]/)) {
+      editInput.type = 'number';
+      editInput.min = 0;
+    }
 
     cell.appendChild(editInput);
     editInput.focus();
+    editInput.value = '';
 
     currentEditCell = cell;
+
+    editInput.addEventListener('blur', () => {
+      let value = editInput.value.trim();
+      const isNumber = /^\d+$/.test(cellValue);
+      const nameCell = currentEditCell.parentElement.firstElementChild;
+
+      if (value === '') {
+        pushNotification(10, 10, 'Error.',
+          'Cell wasn\'t edited.\n '
+          + `Please, check if input was filled correctly.`,
+          'error'
+        );
+
+        value = cellValue;
+      }
+
+      if (cellValue.includes('$')) {
+        const salary = parseFloat(value);
+
+        if (!isNaN(salary) && value > 0) {
+          const formattedSalary
+          = salary.toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 3,
+          });
+
+          currentEditCell.textContent = formattedSalary.replace('.', ',');
+          currentEditCell = null;
+        } else {
+          pushNotification(10, 10, 'Error.',
+            'Cell wasn\'t edited.\n '
+            + `Please, check if input was filled correctly.
+              Salary amount can't be a negative value.`,
+            'error'
+          );
+
+          value = cellValue;
+        }
+      }
+
+      if (isNumber) {
+        const age = parseInt(value);
+
+        if (!isNaN(age) && age >= 18 && age <= 90) {
+          currentEditCell.textContent = age;
+          currentEditCell = null;
+        } else {
+          pushNotification(10, 10, 'Error.',
+            'Cell wasn\'t edited.\n '
+            + `Please, check if input was filled correctly.
+              Age shouldn't be less than 18 y.o. and no more than 90 y.o.`,
+            'error'
+          );
+
+          value = cellValue;
+        }
+      }
+
+      if (nameCell === currentEditCell && value.length < 4) {
+        pushNotification(10, 10, 'Error.',
+          'Cell wasn\'t edited.\n '
+          + `Please, check if input was filled correctly.
+            Name should contain more than 4 letters.`,
+          'error'
+        );
+
+        value = cellValue;
+      }
+
+      editEvent(value);
+    });
+
+    editInput.addEventListener('keypress', (ev) => {
+      if (ev.key === 'Enter') {
+        let value = editInput.value.trim();
+        const isNumber = /^\d+$/.test(cellValue);
+        const nameCell = currentEditCell.parentElement.firstElementChild;
+
+        if (value === '') {
+          pushNotification(10, 10, 'Error.',
+            'Cell wasn\'t edited.\n '
+            + `Please, check if input was filled correctly.`,
+            'error'
+          );
+
+          value = cellValue;
+        }
+
+        if (cellValue.includes('$')) {
+          const salary = parseFloat(value);
+
+          if (!isNaN(salary) && value > 0) {
+            const formattedSalary
+            = salary.toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD',
+              minimumFractionDigits: 3,
+            });
+
+            currentEditCell.textContent = formattedSalary.replace('.', ',');
+            currentEditCell = null;
+          } else {
+            pushNotification(10, 10, 'Error.',
+              'Cell wasn\'t edited.\n '
+              + `Please, check if input was filled correctly.
+                Salary amount can't be a negative value.`,
+              'error'
+            );
+
+            value = cellValue;
+          }
+        }
+
+        if (isNumber) {
+          const age = parseInt(value);
+
+          if (!isNaN(age) && age >= 18 && age <= 90) {
+            currentEditCell.textContent = age;
+            currentEditCell = null;
+          } else {
+            pushNotification(10, 10, 'Error.',
+              'Cell wasn\'t edited.\n '
+              + `Please, check if input was filled correctly.
+                Age shouldn't be less than 18 y.o. and no more than 90 y.o.`,
+              'error'
+            );
+
+            value = cellValue;
+          }
+        }
+
+        if (nameCell === currentEditCell && value.length < 4) {
+          pushNotification(10, 10, 'Error.',
+            'Cell wasn\'t edited.\n '
+            + `Please, check if input was filled correctly.
+              Name should contain more than 4 letters.`,
+            'error'
+          );
+
+          value = cellValue;
+        }
+
+        editEvent(value);
+      }
+    });
   });
+}
 
-  editInput.addEventListener('blur', () => {
-    const value = editInput.value;
-
-    editEvent(value, cell, cellValue);
-  });
-
-  editInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      const value = editInput.value;
-
-      editEvent(value, cell, cellValue);
-    }
-  });
+function editEvent(value) {
+  currentEditCell.textContent = value.charAt(0).toUpperCase() + value.slice(1);
+  currentEditCell = null;
 }
 
 document.body.appendChild(form);
