@@ -140,7 +140,7 @@ form.addEventListener('submit', e => {
       // e.preventDefault();
 
       pushNotification(10, 10, 'Fill in all fields',
-        'Necessary to fill all fields', 'warning');
+        'Necessary to fill all fields', 'error');
 
       return;
 
