@@ -91,15 +91,15 @@ tbody.addEventListener('click', e => {
 body.insertAdjacentHTML('beforeend', `
   <form action="" metod="get" class="new-employee-form">
     <label>Name:
-      <input name="name" data-qa="name" required>
+      <input name="name" data-qa="name">
     </label>
 
     <label>Position:
-      <input name="position" data-qa="position" required>
+      <input name="position" data-qa="position">
     </label>
 
     <label>Office:
-      <select name="office" data-qa="office" required>
+      <select name="office" data-qa="office">
         <option value="Tokyo">Tokyo</option>
         <option value="Singapore">Singapore</option>
         <option value="London">London</option>
@@ -110,21 +110,11 @@ body.insertAdjacentHTML('beforeend', `
     </label>
 
     <label>Age:
-      <input
-        name="age"
-        data-qa="age"
-        type="number"
-        required
-      >
+      <input name="age" data-qa="age" type="number">
     </label>
 
     <label>Salary:
-      <input
-      name="salary"
-      data-qa="salary"
-      type="number"
-      required
-    >
+      <input name="salary" data-qa="salary" type="number">
     </label>
 
     <button>Save to table</button>
@@ -142,6 +132,18 @@ form.addEventListener('submit', e => {
   const salary = +data.get('salary');
 
   switch (true) {
+    case (!data.get('name')
+      || !data.get('position')
+      || !data.get('office')
+      || !age
+      || !salary):
+      // e.preventDefault();
+
+      pushNotification(10, 10, 'Fill in all fields',
+        'Necessary to fill all fields', 'warning');
+
+      return;
+
     case (data.get('name').length < 4):
       // e.preventDefault();
 
@@ -229,7 +231,10 @@ function removeAndAdd(target, input, initialValue) {
   const value = (input.value) ? input.value : initialValue;
   const inputInside = input;
 
-  inputInside.remove();
+  if (inputInside) {
+    inputInside.remove();
+  }
+
   target.innerText = value;
 };
 
