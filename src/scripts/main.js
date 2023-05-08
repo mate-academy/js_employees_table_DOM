@@ -157,8 +157,29 @@ bodyTable.addEventListener('click', (e) => {
 
 bodyTable.addEventListener('dblclick', (e) => {
   const cell = e.target.closest('td');
-  const input = document.createElement('input');
+  const cellIndex = cell.cellIndex;
   const initialCellValue = cell.innerText;
+  let input = document.createElement('input');
+
+  if (cellIndex === 2) {
+    input = document.createElement('select');
+
+    const office = [
+      'Tokyo',
+      'Singapore',
+      'London',
+      'New York',
+      'Edinburgh',
+      'San Francisco',
+    ];
+
+    office.forEach(city => {
+      const option = document.createElement('option');
+
+      option.innerText = city;
+      input.append(option);
+    });
+  };
 
   input.classList.add('cell-input');
 
@@ -171,7 +192,7 @@ bodyTable.addEventListener('dblclick', (e) => {
   input.focus();
 
   input.addEventListener('blur', () => {
-    cellDataReplacement(cell, input, initialCellValue);
+    cellDataReplacement(cell, cellIndex, input, initialCellValue);
   });
 
   input.addEventListener('keydown', (eventKey) => {
@@ -179,7 +200,7 @@ bodyTable.addEventListener('dblclick', (e) => {
       return;
     }
 
-    cellDataReplacement(cell, input, initialCellValue);
+    cellDataReplacement(cell, cellIndex, input, initialCellValue);
   });
 });
 
@@ -199,18 +220,53 @@ function pushNotification(title, description, type) {
   `;
 
   body.append(message);
-  setTimeout(() => message.remove(), 2000);
+  setTimeout(() => message.remove(), 3000);
 };
 
-function cellDataReplacement(cell, input, initialCellValue) {
-  if (input.value === '' || input.value === '$') {
-    cell.innerText = initialCellValue;
-  } else if (input.value.slice(0, 1) === '$') {
-    const sum = input.value.slice(1).split(',').join('');
+function cellDataReplacement(cell, cellIndex, input, initialCellValue) {
+  cell.innerText = input.value;
 
-    cell.innerText = `$${(+sum).toLocaleString('en-US')}`;
-  } else {
-    cell.innerText = input.value;
+  switch (cellIndex) {
+    case 0:
+    case 1:
+      if (input.value.trim() === '' || input.value.length < 4) {
+        pushNotification(
+          'ERROR',
+          'Incorrectly entered data.The data must have at least 4 letters.',
+          'error');
+        cell.innerText = initialCellValue;
+      }
+      break;
+
+    case 3:
+      if (isNaN(input.value) || input.value < 18 || input.value > 90) {
+        pushNotification(
+          'ERROR',
+          'Incorrectly entered data.\n'
+          + 'The age must be at least 18 and not more than 90 years.',
+          'error'
+        );
+        cell.innerText = initialCellValue;
+      }
+      break;
+
+    case 4:
+      const sum = +(input.value.slice(1).split(',').join(''));
+
+      if (isNaN(sum) || sum <= 0) {
+        pushNotification(
+          'ERROR',
+          'Incorrectly entered data.\n'
+          + 'The sum must be greater than 0.',
+          'error');
+        cell.innerText = initialCellValue;
+      } else {
+        cell.innerText = `$${(sum).toLocaleString('en-US')}`;
+      }
+      break;
+
+    default:
+      break;
   }
 
   input.remove();
