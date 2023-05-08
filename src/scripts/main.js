@@ -72,7 +72,8 @@ employeeForm.addEventListener('submit', (e) => {
 
   const data = new FormData(employeeForm);
 
-  if (data.get('name').length < 4 || data.get('position').length < 4) {
+  if (data.get('name').trim().length < 4
+    || data.get('position').trim().length < 4) {
     pushNotification(
       'Wrong data',
       'The data must have at least 4 letters.',
