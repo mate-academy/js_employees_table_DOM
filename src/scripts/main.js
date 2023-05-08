@@ -1,7 +1,6 @@
 'use strict';
 
 const table = document.querySelector('table');
-const listOfRows = document.querySelectorAll('tbody tr');
 const columnHeaders = table.querySelectorAll('thead th');
 const rows = table.querySelector('tbody');
 let sortCounter = 0;
@@ -37,21 +36,23 @@ columnHeaders.forEach((header, i) => {
   });
 });
 
-for (let i = 0; i < listOfRows.length; i++) {
-  const row = listOfRows[i];
+table.addEventListener('click', (e) => {
+  const listOfRows = document.querySelectorAll('tbody tr');
+  const target = e.target;
+  const row = target.parentNode;
 
-  row.addEventListener('click', function handleClick() {
-    row.className = 'active';
+  if (target.tagName === 'TD') {
+    row.classList.add('active');
 
-    for (let j = 0; j < listOfRows.length; j++) {
-      const otherRow = listOfRows[j];
+    for (let i = 0; i < listOfRows.length; i++) {
+      const otherRow = listOfRows[i];
 
       if (otherRow !== row) {
         otherRow.classList.remove('active');
       }
     }
-  });
-}
+  }
+});
 
 const form = document.createElement('form');
 
@@ -208,34 +209,53 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   }, 5000);
 };
 
-const cells = document.querySelectorAll('td');
-
-let currentEditCell = null;
-
-for (let i = 0; i < cells.length; i++) {
-  const cell = cells[i];
+table.addEventListener('dblclick', (e) => {
+  const target = e.target;
+  const cell = target.closest('td');
   let cellValue;
+  let currentEditCell = null;
 
-  cell.addEventListener('dblclick', (e) => {
+  if (cell) {
     e.preventDefault();
 
     cellValue = cell.textContent.trim();
     cell.textContent = '';
 
     const editInput = document.createElement('input');
+    const officeSelectEdit = document.createElement('select');
+    const officeLabelEdit = document.createElement('label');
 
-    editInput.className = 'cell-input';
+    if (options.includes(cellValue)) {
+      for (let j = 0; j < options.length; j++) {
+        const officeOption = document.createElement('option');
 
-    if (cellValue.match(/[0-9]/)) {
-      editInput.type = 'number';
-      editInput.min = 0;
+        officeOption.textContent = options[j];
+        officeOption.value = options[j];
+        officeSelectEdit.appendChild(officeOption);
+      }
+
+      officeSelectEdit.dataset.qa = 'office';
+      officeSelectEdit.name = 'office';
+      officeSelectEdit.required = true;
+      officeLabelEdit.appendChild(officeSelectEdit);
+
+      cell.appendChild(officeLabelEdit);
+      officeLabelEdit.focus();
+      currentEditCell = cell;
+    } else {
+      editInput.className = 'cell-input';
+      editInput.type = 'text';
+
+      if (cellValue.match(/[0-9]/)) {
+        editInput.type = 'number';
+        editInput.min = 0;
+      }
+
+      cell.appendChild(editInput);
+      editInput.focus();
+      editInput.value = '';
+      currentEditCell = cell;
     }
-
-    cell.appendChild(editInput);
-    editInput.focus();
-    editInput.value = '';
-
-    currentEditCell = cell;
 
     editInput.addEventListener('blur', () => {
       let value = editInput.value.trim();
@@ -382,12 +402,29 @@ for (let i = 0; i < cells.length; i++) {
         editEvent(value);
       }
     });
-  });
-}
 
-function editEvent(value) {
-  currentEditCell.textContent = value.charAt(0).toUpperCase() + value.slice(1);
-  currentEditCell = null;
-}
+    officeSelectEdit.addEventListener('blur', () => {
+      const newOffice = officeSelectEdit.value;
+
+      currentEditCell.textContent = newOffice;
+      currentEditCell = null;
+    });
+
+    officeSelectEdit.addEventListener('keypress', (ev) => {
+      if (ev.key === 'Enter') {
+        const newOffice = officeSelectEdit.value;
+
+        currentEditCell.textContent = newOffice;
+        currentEditCell = null;
+      }
+    });
+  }
+
+  function editEvent(value) {
+    currentEditCell.textContent
+      = value.charAt(0).toUpperCase() + value.slice(1);
+    currentEditCell = null;
+  }
+});
 
 document.body.appendChild(form);
