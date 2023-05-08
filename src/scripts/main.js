@@ -2,7 +2,7 @@
 
 const tableHead = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
-const elements = tableBody.querySelectorAll('tr');
+const tableRows = tableBody.querySelectorAll('tr');
 const users = [];
 
 tableHead.addEventListener('click', e => {
@@ -18,18 +18,18 @@ tableHead.addEventListener('click', e => {
     }
 
     if (element.getAttribute('data-sort') === 'ASC') {
-      sortTableDESC(users, element.innerText);
+      sortTable(users, element.innerText, 'DESC');
       createTable(users);
       element.setAttribute('data-sort', 'DESC');
     } else {
-      sortTableASC(users, element.innerText);
+      sortTable(users, element.innerText, 'ASC');
       createTable(users);
       element.setAttribute('data-sort', 'ASC');
     }
   }
 });
 
-elements.forEach(tr => {
+tableRows.forEach(tr => {
   users.push(
     {
       Name: tr.children[0].innerText,
@@ -41,28 +41,39 @@ elements.forEach(tr => {
   );
 });
 
-const sortTableASC = (table, value) => {
-  table.sort((a, b) => {
-    if (typeof a[value] === 'number') {
-      return a[value] - b[value];
-    } else if (typeof a[value] === 'string') {
-      return a[value].localeCompare(b[value]);
+const sortTable = (table, value, order) => {
+  switch (order) {
+    case 'ASC': {
+      table.sort((a, b) => {
+        if (typeof a[value] === 'number') {
+          return a[value] - b[value];
+        } else if (typeof a[value] === 'string') {
+          return a[value].localeCompare(b[value]);
+        }
+
+        throw new Error('wrong typeof value');
+      });
+
+      break;
     }
 
-    throw new Error('wrong typeof value');
-  });
-};
+    case 'DESC': {
+      table.sort((a, b) => {
+        if (typeof a[value] === 'number') {
+          return b[value] - a[value];
+        } else if (typeof a[value] === 'string') {
+          return b[value].localeCompare(a[value]);
+        }
 
-const sortTableDESC = (table, value) => {
-  table.sort((a, b) => {
-    if (typeof a[value] === 'number') {
-      return b[value] - a[value];
-    } else if (typeof a[value] === 'string') {
-      return b[value].localeCompare(a[value]);
+        throw new Error('wrong typeof value');
+      });
+      break;
     }
 
-    throw new Error('wrong typeof value');
-  });
+    default: {
+      throw new Error('wrong order');
+    }
+  }
 };
 
 const createTable = (table) => {
@@ -89,7 +100,7 @@ const createTable = (table) => {
   });
 };
 
-elements.forEach(element => {
+tableRows.forEach(element => {
   element.addEventListener('click', () => {
     const actives = document.querySelectorAll('.active');
 
@@ -97,7 +108,7 @@ elements.forEach(element => {
       active.classList.remove('active');
     });
 
-    element.classList.add('active');
+    element.classList.toggle('active');
   });
 });
 
@@ -105,14 +116,35 @@ const createForm = () => {
   const newForm = document.createElement('form');
 
   newForm.classList.add('new-employee-form');
-  /* eslint-disable max-len */
 
   newForm.innerHTML = (
-    `<label>Name: <input name="name" type="text" data-qa="name" required></label>
-    <label>Position: <input name="position" type="text" data-qa="position" required></label>
-    <label>Office: <select name='office' data-qa="office" required><option value="Tokyo">Tokyo</option><option value="Singapore">Singapore</option><option value="London">London</option><option value="New York">New York</option><option value="Edinburgh">Edinburgh</option><option value="San Francisco">San Francisco</option></select></label>
-    <label>Age: <input name="age" type="number" data-qa="age" required></label>
-    <label>Salary: <input name="salary" type="number" data-qa="salary" required></label>
+    `<label>
+      Name:
+      <input name="name" type="text" data-qa="name" required>
+    </label>
+    <label>
+      Position:
+      <input name="position" type="text" data-qa="position" required>
+    </label>
+    <label>
+      Office:
+      <select name='office' data-qa="office" required>
+        <option value="Tokyo">Tokyo</option>
+        <option value="Singapore">Singapore</option>
+        <option value="London">London</option>
+        <option value="New York">New York</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="San Francisco">San Francisco</option>
+      </select>
+    </label>
+    <label>
+      Age:
+      <input name="age" type="number" data-qa="age" required>
+    </label>
+    <label>
+      Salary:
+      <input name="salary" type="number" data-qa="salary" required>
+    </label>
     <button type='button' class='add-to-table'>Save to table</button>`
   );
 
@@ -121,10 +153,10 @@ const createForm = () => {
 
 createForm();
 
-const addButton = document.querySelector('.add-to-table');
+const addTableButton = document.querySelector('.add-to-table');
 const addForm = document.querySelector('.new-employee-form');
 
-addButton.addEventListener('click', () => {
+addTableButton.addEventListener('click', () => {
   const formValues = {
     Name: addForm.querySelector('input[name="name"]').value,
     Position: addForm.querySelector('input[name="position"]').value,
@@ -134,13 +166,34 @@ addButton.addEventListener('click', () => {
   };
 
   if (formValues.Name.length < 4) {
-    pushNotification(10, 10, `Wrong name: ${formValues.Name}`, 'Your name is to short', 'error');
+    pushNotification(
+      10,
+      10,
+      `Wrong name: ${formValues.Name}`,
+      'Your name is to short',
+      'error'
+    );
   } else if (formValues.Age < 18 || formValues.Age > 90) {
-    pushNotification(10, 10, `Wrong Age: ${formValues.Age}`, 'Your age should be between 18 - 90', 'error');
-  } else if (Object.values(formValues).every(value => String(value).length > 0)) {
+    pushNotification(
+      10,
+      10,
+      `Wrong Age: ${formValues.Age}`,
+      'Your age should be between 18 - 90',
+      'error'
+    );
+  } else if (Object.values(formValues).every(value => (
+    String(value).length > 0
+  ))) {
     users.push(formValues);
     createTable(users);
-    pushNotification(10, 10, `Success`, 'New employee added to table', 'success');
+
+    pushNotification(
+      10,
+      10,
+      `Success`,
+      'New employee added to table',
+      'success'
+    );
   } else {
     pushNotification(10, 10, `Error`, 'all inputs must be filled', 'error');
   }
@@ -170,8 +223,21 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 
 let currentValue;
 
-tableBody.addEventListener('click', (clickEvent) => {
+tableBody.addEventListener('dblclick', (clickEvent) => {
   const target = clickEvent.target;
+  const tds = tableBody.querySelectorAll('td');
+
+  tds.forEach(td => {
+    if (td.innerHTML.includes('input')) {
+      const input = td.querySelector('input');
+
+      if (input.value) {
+        td.innerHTML = input.value;
+      } else {
+        td.innerHTML = currentValue;
+      }
+    }
+  });
 
   if (target.tagName === 'TD') {
     currentValue = target.innerText;
