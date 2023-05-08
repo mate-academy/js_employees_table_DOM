@@ -73,7 +73,9 @@ employeeForm.addEventListener('submit', (e) => {
   const data = new FormData(employeeForm);
 
   if (data.get('name').trim().length < 4
-    || data.get('position').trim().length < 4) {
+    || data.get('position').trim().length < 4
+    || data.get('name').match(/[0-9]/)
+    || data.get('position').match(/[0-9]/)) {
     pushNotification(
       'Wrong data',
       'The data must have at least 4 letters.',
@@ -230,7 +232,7 @@ function cellDataReplacement(cell, cellIndex, input, initialCellValue) {
   switch (cellIndex) {
     case 0:
     case 1:
-      if (input.value.trim().length < 4) {
+      if (input.value.trim().length < 4 || input.value.match(/[0-9]/)) {
         pushNotification(
           'ERROR',
           'Incorrectly entered data.The data must have at least 4 letters.',
