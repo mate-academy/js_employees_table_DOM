@@ -229,7 +229,7 @@ function cellDataReplacement(cell, cellIndex, input, initialCellValue) {
   switch (cellIndex) {
     case 0:
     case 1:
-      if (input.value.trim() === '' || input.value.length < 4) {
+      if (input.value.trim().length < 4) {
         pushNotification(
           'ERROR',
           'Incorrectly entered data.The data must have at least 4 letters.',
