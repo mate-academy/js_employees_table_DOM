@@ -52,7 +52,7 @@ createTable();
 function sortTable(toSort, colum) {
   const direction = sortedParam === colum;
 
-  sortedParam = sortedParam === colum ? sortedParam = '' : sortedParam = colum;
+  sortedParam = sortedParam === colum ? '' : colum;
 
   if (!direction) {
     if (typeof toSort[0][colum.toLowerCase()] === 'string') {
@@ -197,11 +197,18 @@ formButton.addEventListener('click', () => {
     return;
   }
 
+  if (newAge.value < 18 || newAge.value > 90) {
+    pushNotification('Error',
+      'Age must be beetwen 18 and 90 years', 'error');
+
+    return;
+  }
+
   rowObject.name = newName.value;
   rowObject.position = newPosition.value;
   rowObject.office = newOffice.value;
   rowObject.age = newAge.value;
-  rowObject.salary = newSallary.value;
+  rowObject.salary = +newSallary.value;
   dataArray.push(rowObject);
 
   createTable();
@@ -235,3 +242,53 @@ const pushNotification = (title, description, type) => {
 
   setTimeout(() => message.remove(), 2000);
 };
+
+// Edit Cell
+
+table.addEventListener('dblclick', (evnt) => {
+  if (!document.querySelector('.cell-input')) {
+    const row = evnt.target.closest('.row');
+    const rowObject = {};
+    const cell = evnt.target;
+    const editCell = document.createElement('input');
+
+    editCell.className = 'cell-input';
+
+    rowObject.name = row.children[0].innerText;
+    rowObject.position = row.children[1].innerText;
+    rowObject.office = row.children[2].innerText;
+    rowObject.age = row.children[3].innerText;
+    rowObject.salary = +salaryToNumber(row.children[4].innerText);
+
+    const index = dataArray.findIndex(x => x.name === rowObject.name);
+    const atribute = evnt.target.dataset.qa;
+
+    cell.innerHTML = '';
+    cell.append(editCell);
+
+    editCell.addEventListener('keydown', (evnt2) => {
+      if (evnt2.key === 'Enter') {
+        editCell.blur();
+      }
+    });
+
+    const initialValue = dataArray[index][atribute];
+
+    editCell.addEventListener('blur', () => {
+      let valueToSet = editCell.value;
+
+      if (!editCell.value) {
+        valueToSet = initialValue;
+        createTable();
+      }
+
+      if (atribute === 'salary') {
+        dataArray[index][atribute] = +valueToSet;
+      } else {
+        dataArray[index][atribute] = valueToSet;
+      }
+      editCell.remove();
+      createTable();
+    });
+  }
+});
