@@ -23,23 +23,29 @@ const formField = [
   },
 ];
 
-form.innerHTML = formField.map(field => `
-  <label>
-    ${field.name[0].toUpperCase() + field.name.slice(1)}:
-      <input name="${field.name}" type="${field.type}" data-qa="${field.name}">
-  </label>
-`).join('');
-
-document.querySelector('table').insertAdjacentElement('afterend', form);
-
-document.querySelector('[name="age"]').setAttribute('min', 14);
-
 const selectValues = ['Tokyo', 'Singapore', 'London', 'New York',
   'Edinburgh', 'San Francisco'];
 
+form.innerHTML = formField.map(field => `
+  <label>
+    ${field.name[0].toUpperCase() + field.name.slice(1)}:
+      <input
+        name="${field.name}"
+        type="${field.type}"
+        data-qa="${field.name}"
+        required
+      >
+  </label>
+`).join('');
+
+form.querySelector('[name="age"]').setAttribute('min', 18);
+form.querySelector('[name="age"]').setAttribute('max', 90);
+
+document.querySelector('table').insertAdjacentElement('afterend', form);
+
 form.children[1].insertAdjacentHTML('afterend', `
   <label>Office:
-    <select name="office" data-qa="office" >
+    <select name="office" data-qa="office" required>
       ${selectValues.map(value => `
       <option value="${value}">
         ${value}
@@ -59,25 +65,41 @@ const button = document.querySelector('button');
 button.addEventListener('click', (evt) => {
   evt.preventDefault();
 
-  const newEmployy = [...form.querySelectorAll('label')].map(person => {
-    return person.children[0].value;
-  });
-  const salary = (Math.round(newEmployy[4] * 1000) / 1000).toFixed(3);
+  const fName = form.querySelector('[name="name"]');
+  const fAge = form.querySelector('[name="age"]');
 
-  newEmployy[4] = '$' + salary.toString().replace('.', ',');
-  form.reset();
+  if (fName.value.length < 4) {
+    alert('Name minimum length is 4');
+    fName.focus();
 
-  const newPerson = document.createElement('tr');
+    return false;
+  } else if (fAge.value > 90 || fAge.value < 18) {
+    alert('Age value is less than 18 or more than 90');
+    fName.focus();
 
-  newPerson.innerHTML = newEmployy.map(el => `<td>${el}</td>`).join('');
+    return false;
+  } else {
+    alert('New employee is successfully added to the table');
 
-  document.querySelector('tbody').insertAdjacentElement('beforeend', newPerson);
+    const newEmployy = [...form.querySelectorAll('label')].map(person => {
+      return person.children[0].value;
+    });
+
+    const salary = (Math.round(newEmployy[4] * 1000) / 1000).toFixed(3);
+
+    newEmployy[4] = '$' + salary.toString().replace('.', ',');
+    form.reset();
+
+    const newPerson = document.createElement('tr');
+
+    newPerson.innerHTML = newEmployy.map(el => `<td>${el}</td>`).join('');
+
+    document.querySelector('tbody')
+      .insertAdjacentElement('beforeend', newPerson);
+  }
 });
 
-const header = document.querySelectorAll('thead tr th');
-const rows = document.querySelectorAll('tbody tr');
-
-[...header].forEach((element, index) => {
+[...document.querySelectorAll('thead tr th')].forEach((element, index) => {
   element.addEventListener('click', (e) => {
     if (!element.hasAttribute('direction')
       || element.getAttribute('direction') === 'DESC') {
@@ -85,6 +107,8 @@ const rows = document.querySelectorAll('tbody tr');
     } else {
       element.setAttribute('direction', 'DESC');
     }
+
+    const rows = document.querySelectorAll('tbody tr');
 
     const sortedRows = [...rows].sort((a, b) => {
       let compareA = a.querySelectorAll('td')[index].innerText;
@@ -111,7 +135,7 @@ const rows = document.querySelectorAll('tbody tr');
   });
 });
 
-[...rows].forEach(element => {
+[...document.querySelectorAll('tbody tr')].map(element => {
   element.addEventListener('click', (e) => {
     const activeElement = document.getElementsByClassName('active')[0];
 

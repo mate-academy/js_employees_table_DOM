@@ -1,5 +1,5 @@
-1. Replace `oksanatitanych` with your Github username in the link
-    - [DEMO LINK](https://oksanatitanych.github.io/js_employees_table_DOM/)
+1. Replace `oksanatytanych` with your Github username in the link
+    - [DEMO LINK](https://oksanatytanych.github.io/js_employees_table_DOM/)
 2. Follow [this instructions](https://mate-academy.github.io/layout_task-guideline/)
     - Run `npm run test` command to test your code;
     - Run `npm run test:only -- -n` to run fast test ignoring linter;
