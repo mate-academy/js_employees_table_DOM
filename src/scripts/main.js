@@ -5,6 +5,18 @@ const table = document.querySelector('table');
 const tbody = table.querySelector('tbody');
 const ths = table.querySelectorAll('thead > tr > th');
 
+const arrHead = ['name', 'position', 'office', 'age', 'salary'];
+
+function addDataTittle() {
+  const tableRow = tbody.children;
+
+  [...tableRow].map(tr => {
+    [...tr.children].forEach((td, index) => {
+      td.dataset.nameIs = arrHead[index];
+    });
+  });
+}
+
 let rows;
 // ---------------------------------------------------------
 // Створення форми
@@ -109,10 +121,20 @@ form.addEventListener('submit', (e) => {
 
   const data = new FormData(form);
 
-  if (data.get('name').length < 4 || data.get('position').length < 4) {
+  if (data.get('name').length < 4) {
     pushNotification(
       'Wrong data',
-      'The data must have at least 4 letters.',
+      'The name must have at least 4 letters.',
+      'error'
+    );
+
+    return;
+  };
+
+  if (data.get('position').length < 4) {
+    pushNotification(
+      'Wrong data',
+      'The position must have at least 4 letters.',
       'error'
     );
 
@@ -161,6 +183,7 @@ form.addEventListener('submit', (e) => {
   };
 
   tbody.append(newRow);
+  addDataTittle();
 
   form.reset();
 });
@@ -220,22 +243,21 @@ ths.forEach((th, index) => {
 // Перейменування
 // ---------------------------------------------------------
 tbody.addEventListener('dblclick', (e) => {
+  addDataTittle();
+
   const cell = e.target.closest('td');
+  const nameIs = cell.dataset.nameIs;
   const input = document.createElement('input');
   const initialCellValue = cell.innerText;
 
   input.classList.add('cell-input');
-
-  input.value = cell.innerText.slice(0, 1) === '$'
-    ? '$'
-    : cell.innerText;
 
   cell.firstChild.remove();
   cell.append(input);
   input.focus();
 
   input.addEventListener('blur', () => {
-    cellDataReplacement(cell, input, initialCellValue);
+    cellDataReplacement(cell, input, initialCellValue, nameIs);
   });
 
   input.addEventListener('keydown', (eventKey) => {
@@ -243,19 +265,67 @@ tbody.addEventListener('dblclick', (e) => {
       return;
     }
 
-    cellDataReplacement(cell, input, initialCellValue);
+    cellDataReplacement(cell, input, initialCellValue, cell.dataset.nameIs);
   });
 });
 
-function cellDataReplacement(cell, input, initialCellValue) {
-  if (input.value === '' || input.value === '$') {
-    cell.innerText = initialCellValue;
-  } else if (input.value.slice(0, 1) === '$') {
-    const sum = input.value.slice(1).split(',').join('');
+function cellDataReplacement(cell, input, initialCellValue, nameIs) {
+  switch (nameIs) {
+    case 'name':
+      if (input.value.trim().length < 4) {
+        pushNotification(
+          'Wrong data',
+          'The name must have at least 4 letters.',
+          'error'
+        );
+        cell.innerText = initialCellValue;
+      } else if (input.value.trim() === '') {
+        cell.innerText = initialCellValue;
+      } else {
+        cell.innerText = input.value;
+      }
+      break;
 
-    cell.innerText = `$${(+sum).toLocaleString('en-US')}`;
-  } else {
-    cell.innerText = input.value;
+    case 'position':
+      if (input.value.length < 4) {
+        pushNotification(
+          'Wrong data',
+          'The position must have at least 4 letters.',
+          'error'
+        );
+        cell.innerText = initialCellValue;
+      } else if (input.value.trim() === '') {
+        cell.innerText = initialCellValue;
+      } else {
+        cell.innerText = input.value;
+      }
+      break;
+
+    case 'age':
+      if (+input.value < 18 || +input.value > 90) {
+        pushNotification(
+          'Wrong age',
+          'The age must be at least 18 and not more than 90 years.',
+          'error'
+        );
+        cell.innerText = initialCellValue;
+      } else if (input.value.trim() === '') {
+        cell.innerText = initialCellValue;
+      } else {
+        cell.innerText = input.value;
+      }
+      break;
+
+    case 'salary':
+      if (input.value.trim() === '') {
+        cell.innerText = initialCellValue;
+      } else {
+        cell.innerText = `$${parseInt(input.value).toLocaleString('en-US')}`;
+      }
+      break;
+
+    default:
+      break;
   }
 
   input.remove();
