@@ -4,7 +4,6 @@
 const headers = document.querySelectorAll('th');
 const tableBody = document.querySelector('tbody');
 const allEmployees = tableBody.rows;
-const tableCells = document.querySelectorAll('td');
 let currSortedCol = null;
 
 // sort list
@@ -39,14 +38,18 @@ function convertToNumber(number) {
 
 // add selection on row click
 
-[...tableBody.rows].forEach(function(row) {
-  row.addEventListener('click', function() {
-    for (const person of [...tableBody.rows]) {
-      person.classList.remove('active');
-    };
-    row.classList.add('active');
+function initRowSelection() {
+  [...tableBody.rows].forEach(function(row) {
+    row.addEventListener('click', function() {
+      for (const person of [...tableBody.rows]) {
+        person.classList.remove('active');
+      };
+      row.classList.add('active');
+    });
   });
-});
+};
+
+initRowSelection();
 
 // add form
 
@@ -79,14 +82,25 @@ function addNewEmployee(e) {
   e.preventDefault();
 
   const row = document.createElement('tr');
+  const nameCell = document.createElement('td');
+  const positionCell = document.createElement('td');
+  const officeCell = document.createElement('td');
+  const ageCell = document.createElement('td');
+  const salaryCell = document.createElement('td');
 
-  row.innerHTML = `
-    <td>${form.elements.name.value}</td>
-    <td>${form.elements.position.value}</td>
-    <td>${form.elements.office.value}</td>
-    <td>${form.elements.age.value}</td>
-    <td>${'$' + Number(form.elements.salary.value).toLocaleString('en-US')}</td>
-  `;
+  nameCell.textContent = form.elements.name.value;
+  positionCell.textContent = form.elements.position.value;
+  officeCell.textContent = form.elements.office.value;
+  ageCell.textContent = form.elements.age.value;
+  salaryCell.textContent = '$' + Number(form.elements.salary.value).toLocaleString('en-US');
+  // row.innerHTML = `
+  //   <td>${form.elements.name.value}</td>
+  //   <td>${form.elements.position.value}</td>
+  //   <td>${form.elements.office.value}</td>
+  //   <td>${form.elements.age.value}</td>
+  //   <td>${'$' + Number(form.elements.salary.value).toLocaleString('en-US')}</td>
+  // `;
+  row.append(nameCell, positionCell, officeCell, ageCell, salaryCell);
 
   const isDataValid
     = form.elements.name.value.length >= 4
@@ -95,7 +109,10 @@ function addNewEmployee(e) {
 
   if (isDataValid) {
     tableBody.append(row);
+    handleDoubleClick();
+    initRowSelection();
     pushNotification(10, 10, 'Success', 'New employee added.', 'success');
+    form.reset();
   } else {
     pushNotification(
       10,
@@ -132,25 +149,31 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 
 // handle double click on cells
 
-tableCells.forEach(el => {
-  el.addEventListener('dblclick', (e) => {
-    const editInput = document.createElement('input');
-    const temporaryText = e.target.textContent;
+function handleDoubleClick() {
+  const tableCells = document.querySelectorAll('td');
 
-    e.target.firstChild.remove();
-    editInput.value = temporaryText;
+  tableCells.forEach(el => {
+    el.addEventListener('dblclick', (e) => {
+      const editInput = document.createElement('input');
+      const temporaryText = e.target.textContent;
 
-    editInput.addEventListener('blur', function() {
-      editInput.remove();
+      e.target.firstChild.remove();
+      editInput.value = temporaryText;
 
-      if (this.value) {
-        e.target.textContent = this.value;
-      } else {
-        e.target.textContent = temporaryText;
-      }
+      editInput.addEventListener('blur', function() {
+        editInput.remove();
+
+        if (this.value) {
+          e.target.textContent = this.value;
+        } else {
+          e.target.textContent = temporaryText;
+        }
+      });
+
+      e.target.append(editInput);
+      editInput.focus();
     });
-
-    e.target.append(editInput);
-    editInput.focus();
   });
-});
+};
+
+handleDoubleClick();
