@@ -171,7 +171,7 @@ container.append(form);
 
 form.addEventListener('submit', (evt) => {
   evt.preventDefault();
-  document.getElementById('form').reset();
+  document.querySelector('form').reset();
 });
 
 const newName = form.querySelector('.new-name');
@@ -215,11 +215,6 @@ formButton.addEventListener('click', () => {
 
   pushNotification('Success',
     'A new employee is successfully added to the table', 'success');
-
-  newName.value = '';
-  newPosition.value = '';
-  newAge.value = '';
-  newSallary.value = '';
 });
 
 // Notification's
