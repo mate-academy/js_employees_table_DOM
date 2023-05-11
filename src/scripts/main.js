@@ -231,12 +231,10 @@ function editTableCell() {
     editedCell.append(input);
     input.focus();
 
-    tableBody.addEventListener('keydown', () => {
-      if (e.code !== 'Enter' || !currentCell) {
-        return;
+    input.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        setCellValue(input, editedCell);
       };
-
-      setCellValue(input, editedCell);
     });
 
     input.addEventListener('blur', () => {
