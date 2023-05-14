@@ -83,7 +83,7 @@ saveButton.addEventListener('click', (e) => {
     if (nameField.value.length < 4) {
       showNotification('Error notification',
         'The length of the name must be greater than 4', 'error');
-    } else if (positionField.value < 4) {
+    } else if (positionField.value.length < 4) {
       showNotification('Error notification',
         'The length of the name must be greater than 4', 'error');
     } else if (ageField.value < 18 || ageField.value > 90) {
