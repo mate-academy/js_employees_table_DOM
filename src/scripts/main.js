@@ -21,7 +21,8 @@ form.insertAdjacentHTML('beforeend',
 
         <label>
         Position:
-        <input data-qa="position" name="position" type="text" required>
+        <input data-qa="position" name="position" type="text"
+        minLength="4" required>
      </label>
 
      <label>
@@ -38,7 +39,8 @@ form.insertAdjacentHTML('beforeend',
 
      <label>
      Age:
-        <input data-qa="age" name="age" type="number" required>
+        <input data-qa="age" name="age" type="number" min="18"
+        max="90" required>
      </label>
 
      <label>
@@ -81,6 +83,9 @@ saveButton.addEventListener('click', (e) => {
     if (nameField.value.length < 4) {
       showNotification('Error notification',
         'The length of the name must be greater than 4', 'error');
+    } else if (positionField.value < 4) {
+      showNotification('Error notification',
+        'The length of the name must be greater than 4', 'error');
     } else if (ageField.value < 18 || ageField.value > 90) {
       showNotification('Error notification',
         'The age is incorrect', 'error');
@@ -96,7 +101,11 @@ saveButton.addEventListener('click', (e) => {
 
 let activeRow = null;
 
-tBody.addEventListener('click', (e) => {
+document.addEventListener('click', (e) => {
+  if (!tBody.contains(e.target)) {
+    [...tBodyRows].forEach(row => row.classList.remove('active'));
+  }
+
   for (const row of tBodyRows) {
     if (row.contains(e.target)) {
       active(row);
@@ -131,23 +140,17 @@ thead.addEventListener('click', function(e) {
   currentTH = e.target;
 
   if (isFirstClick) {
-    bodyRowsArray.sort((rowA, rowB) => rowA.cells[targetIndex].innerHTML
-      .localeCompare(rowB.cells[targetIndex].innerHTML));
+    sort(bodyRowsArray, targetIndex, 'ASC', 'string');
 
     if (e.target.textContent === 'Salary') {
-      bodyRowsArray.sort((rowA, rowB) => normalizeNum(
-        rowA.cells[targetIndex].innerHTML) - normalizeNum(
-        rowB.cells[targetIndex].innerHTML));
+      sort(bodyRowsArray, targetIndex, 'ASC', 'number');
     }
     isFirstClick = false;
   } else {
-    bodyRowsArray.sort((rowA, rowB) => rowB.cells[targetIndex].innerHTML
-      .localeCompare(rowA.cells[targetIndex].innerHTML));
+    sort(bodyRowsArray, targetIndex, 'DESC', 'string');
 
     if (e.target.textContent === 'Salary') {
-      bodyRowsArray.sort((rowA, rowB) => normalizeNum(
-        rowB.cells[targetIndex].innerHTML) - normalizeNum(
-        rowA.cells[targetIndex].innerHTML));
+      sort(bodyRowsArray, targetIndex, 'ASC', 'number');
     }
     isFirstClick = true;
   }
@@ -155,8 +158,17 @@ thead.addEventListener('click', function(e) {
   tBody.append(...bodyRowsArray);
 });
 
+let editing = false;
+
 tBody.addEventListener('dblclick', (e) => {
   const td = e.target.closest('td');
+  const tdIndex = td.cellIndex;
+  const header = table.querySelector('tr');
+  const headerCell = header.cells[tdIndex].textContent;
+
+  if (editing) {
+    return;
+  }
 
   if (!td) {
     return;
@@ -166,34 +178,141 @@ tBody.addEventListener('dblclick', (e) => {
 
   td.textContent = '';
 
-  const input = document.createElement('input');
+  let input;
 
-  input.classList.add('cell-input');
-  input.value = initialValue;
-  input.type = 'text';
-  td.append(input);
+  if (headerCell === 'Office') {
+    if (editing) {
+      return;
+    }
+
+    const select = document.createElement('select');
+
+    select.insertAdjacentHTML('beforeend', `
+      <option value="Tokyo" selected>Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    `);
+    td.append(select);
+    editing = true;
+
+    select.addEventListener('blur', () => {
+      editing = false;
+
+      const savedValue = select.value;
+
+      select.remove();
+
+      td.textContent = savedValue;
+
+      if (!savedValue) {
+        td.textContent = initialValue;
+      }
+    });
+
+    select.addEventListener('keypress', (evnt) => {
+      if (evnt.key === 'Enter') {
+        select.blur();
+      }
+    });
+  } else {
+    input = document.createElement('input');
+
+    input.classList.add('cell-input');
+    input.value = initialValue;
+    input.type = 'text';
+    td.append(input);
+    editing = true;
+  }
+
+  if (!input) {
+    return;
+  }
 
   input.addEventListener('blur', () => {
-    const savedValue = input.value;
+    editing = false;
 
-    input.remove();
+    if (headerCell === 'Name' && input.value.length < 4) {
+      showNotification('Error notification',
+        'The length of the name must be greater than 4', 'error');
+      input.focus();
+    } else if (headerCell === 'Position' && input.value.length < 4) {
+      showNotification('Error notification',
+        'The length of the position must be greater than 5', 'error');
+      input.focus();
+    } else if (headerCell === 'Age' && (input.value < 18 || input.value > 90)) {
+      showNotification('Error notification',
+        'The age is incorrect', 'error');
+      input.focus();
+    } else if (headerCell === 'Salary'
+      && (input.value <= 0 || input.value > 999999)) {
+      showNotification('Error notification',
+        'Enter the correct salary value', 'error');
+      input.focus();
+    } else if (headerCell === 'Office' && input.value.length < 4) {
+      showNotification('Error notification',
+        'The length of the office must be greater than 4', 'error');
+      input.focus();
+    } else {
+      if (headerCell === 'Salary') {
+        const savedValue = `$${(+input.value).toLocaleString('en-US')}`;
 
-    td.textContent = savedValue;
+        input.remove();
+
+        td.textContent = savedValue;
+
+        if (!savedValue) {
+          td.textContent = initialValue;
+        }
+      } else {
+        const savedValue = input.value;
+
+        input.remove();
+
+        td.textContent = savedValue;
+
+        if (!savedValue) {
+          td.textContent = initialValue;
+        }
+      }
+    }
   });
 
   input.addEventListener('keypress', (evnt) => {
     if (evnt.key === 'Enter') {
-      const savedValue = input.value;
-
-      input.remove();
-
-      td.textContent = savedValue;
+      input.blur();
     }
   });
 });
 
 function normalizeNum(number) {
   return number.split(',').join('').slice(1);
+}
+
+function sort(array, index, order, type) {
+  if (order === 'ASC' && type === 'string') {
+    return array.sort((rowA, rowB) => rowA.cells[index].innerHTML
+      .localeCompare(rowB.cells[index].innerHTML));
+  }
+
+  if (order === 'ASC' && type === 'number') {
+    return array.sort((rowA, rowB) => normalizeNum(
+      rowA.cells[index].innerHTML) - normalizeNum(
+      rowB.cells[index].innerHTML));
+  }
+
+  if (order === 'DESC' && type === 'string') {
+    return array.sort((rowA, rowB) => rowB.cells[index].innerHTML
+      .localeCompare(rowA.cells[index].innerHTML));
+  }
+
+  if (order === 'DESC' && type === 'number') {
+    return array.sort((rowA, rowB) => normalizeNum(
+      rowB.cells[index].innerHTML) - normalizeNum(
+      rowA.cells[index].innerHTML));
+  }
 }
 
 const showNotification = (title, description, type) => {
