@@ -140,17 +140,23 @@ thead.addEventListener('click', function(e) {
   currentTH = e.target;
 
   if (isFirstClick) {
-    sort(bodyRowsArray, targetIndex, 'ASC', 'string');
+    bodyRowsArray.sort((rowA, rowB) => rowA.cells[targetIndex].innerHTML
+      .localeCompare(rowB.cells[targetIndex].innerHTML));
 
     if (e.target.textContent === 'Salary') {
-      sort(bodyRowsArray, targetIndex, 'ASC', 'number');
+      bodyRowsArray.sort((rowA, rowB) => normalizeNum(
+        rowA.cells[targetIndex].innerHTML) - normalizeNum(
+        rowB.cells[targetIndex].innerHTML));
     }
     isFirstClick = false;
   } else {
-    sort(bodyRowsArray, targetIndex, 'DESC', 'string');
+    bodyRowsArray.sort((rowA, rowB) => rowB.cells[targetIndex].innerHTML
+      .localeCompare(rowA.cells[targetIndex].innerHTML));
 
     if (e.target.textContent === 'Salary') {
-      sort(bodyRowsArray, targetIndex, 'ASC', 'number');
+      bodyRowsArray.sort((rowA, rowB) => normalizeNum(
+        rowB.cells[targetIndex].innerHTML) - normalizeNum(
+        rowA.cells[targetIndex].innerHTML));
     }
     isFirstClick = true;
   }
@@ -161,14 +167,14 @@ thead.addEventListener('click', function(e) {
 let editing = false;
 
 tBody.addEventListener('dblclick', (e) => {
+  if (editing) {
+    return;
+  }
+
   const td = e.target.closest('td');
   const tdIndex = td.cellIndex;
   const header = table.querySelector('tr');
   const headerCell = header.cells[tdIndex].textContent;
-
-  if (editing) {
-    return;
-  }
 
   if (!td) {
     return;
@@ -289,30 +295,6 @@ tBody.addEventListener('dblclick', (e) => {
 
 function normalizeNum(number) {
   return number.split(',').join('').slice(1);
-}
-
-function sort(array, index, order, type) {
-  if (order === 'ASC' && type === 'string') {
-    return array.sort((rowA, rowB) => rowA.cells[index].innerHTML
-      .localeCompare(rowB.cells[index].innerHTML));
-  }
-
-  if (order === 'ASC' && type === 'number') {
-    return array.sort((rowA, rowB) => normalizeNum(
-      rowA.cells[index].innerHTML) - normalizeNum(
-      rowB.cells[index].innerHTML));
-  }
-
-  if (order === 'DESC' && type === 'string') {
-    return array.sort((rowA, rowB) => rowB.cells[index].innerHTML
-      .localeCompare(rowA.cells[index].innerHTML));
-  }
-
-  if (order === 'DESC' && type === 'number') {
-    return array.sort((rowA, rowB) => normalizeNum(
-      rowB.cells[index].innerHTML) - normalizeNum(
-      rowA.cells[index].innerHTML));
-  }
 }
 
 const showNotification = (title, description, type) => {
