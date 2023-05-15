@@ -97,8 +97,8 @@ function addNewEmployee(e) {
   row.append(nameCell, positionCell, officeCell, ageCell, salaryCell);
 
   // add dblclick events to the new cells
-  row.querySelectorAll('td').forEach(cell => {
-    addDoubleClickEvent(cell);
+  row.querySelectorAll('td').forEach((cell, index) => {
+    addDoubleClickEvent(cell, index);
   });
 
   if (isLongerThan4(form.elements.name.value) && ageIsProper(form.elements.age.value)) {
