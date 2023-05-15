@@ -5,7 +5,7 @@ const tableBody = document.querySelector('tbody');
 const allEmployees = tableBody.rows;
 
 // helper fn
-const convertToNumber = number => number.replace('$', '').replace(',', '');
+const convertToNumber = number => number.replaceAll('$', '').replaceAll(',', '');
 const convertToCurrency = string => `$${Number(string).toLocaleString('en-US')}`;
 const isLongerThan4 = (value) => value.length >= 4;
 const isBetween18and90 = (value) => value >= 18 && value <= 90;
@@ -16,6 +16,7 @@ const headers = document.querySelectorAll('th');
 let currSortedCol = null;
 
 const sortList = (colIndex) => {
+
   [...allEmployees]
     .sort((prev, next) => {
       const prevContent = prev.children[colIndex].textContent;
