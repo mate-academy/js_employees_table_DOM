@@ -4,6 +4,13 @@
 const tableBody = document.querySelector('tbody');
 const allEmployees = tableBody.rows;
 
+// helper fn
+const convertToNumber = number => number.replace('$', '').replace(',', '');
+const convertToCurrency = string => `$${Number(string).toLocaleString('en-US')}`;
+const isLongerThan4 = (value) => value.length >= 4;
+const isBetween18and90 = (value) => value >= 18 && value <= 90;
+const hasOnlyLetters = (value) => /^[^\d]+$/.test(value);
+
 // sort list
 const headers = document.querySelectorAll('th');
 let currSortedCol = null;
@@ -32,13 +39,6 @@ headers.forEach((header, index) => {
     currSortedCol = (currSortedCol === index) ? null : index;
   });
 });
-
-// helper fn
-const convertToNumber = number => number.replace('$', '').replace(',', '');
-const convertToCurrency = string => `$${Number(string).toLocaleString('en-US')}`;
-const isLongerThan4 = (value) => value.length >= 4;
-const ageIsProper = (value) => value >= 18 && value <= 90;
-const hasOnlyLetters = (value) => /^[^\d]+$/.test(value);
 
 // add selection on row click
 function initRowSelection() {
@@ -102,7 +102,7 @@ function addNewEmployee(e) {
     addDoubleClickEvent(cell, index);
   });
 
-  if (isLongerThan4(form.elements.name.value) && ageIsProper(form.elements.age.value)) {
+  if (isLongerThan4(form.elements.name.value) && isBetween18and90(form.elements.age.value)) {
     tableBody.append(row);
     initRowSelection();
     pushNotification(10, 10, 'Success', 'New employee added.', 'success');
@@ -117,7 +117,7 @@ function addNewEmployee(e) {
   }
 };
 
-// add notifications
+// notifications
 
 const pushNotification = (posTop, posRight, title, description, type) => {
   const messageNotification = document.createElement('div');
@@ -191,6 +191,14 @@ function addDoubleClickEvent(el, colIndex) {
     function removeEditInput(thisContext) {
       editInput.remove();
 
+      // handle errors
+      if (thisContext.value === '') {
+        e.target.textContent = temporaryText;
+        pushNotification(10, 10, 'Error', 'Input cannot be empty', 'error');
+
+        return;
+      }
+
       if (colIndex === 0 && !isLongerThan4(thisContext.value)) {
         e.target.textContent = temporaryText;
         pushNotification(10, 10, 'Error', 'The name should be at least 4 characters long.', 'error');
@@ -205,26 +213,22 @@ function addDoubleClickEvent(el, colIndex) {
         return;
       }
 
-      if (colIndex === 3 && !ageIsProper(thisContext.value)) {
+      if (colIndex === 3 && !isBetween18and90(thisContext.value)) {
         e.target.textContent = temporaryText;
         pushNotification(10, 10, 'Error', 'Age should not be less than 18 and greater than 90.', 'error');
 
         return;
       }
 
-      if (thisContext.value) {
-        if (thisContext.value !== temporaryText) {
-          pushNotification(10, 10, 'Success', 'Data updated', 'success');
-        };
-        e.target.textContent = thisContext.value;
+      // handle success
+      if (thisContext.value !== temporaryText) {
+        pushNotification(10, 10, 'Success', 'Data updated', 'success');
+      };
+      e.target.textContent = thisContext.value;
 
-        if (colIndex === 4) {
-          e.target.textContent = convertToCurrency(thisContext.value);
-        };
-      } else {
-        e.target.textContent = temporaryText;
-        pushNotification(10, 10, 'Error', 'Input cannot be empty', 'error');
-      }
-    }
+      if (colIndex === 4) {
+        e.target.textContent = convertToCurrency(thisContext.value);
+      };
+    };
   });
 };
