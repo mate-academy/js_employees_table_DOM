@@ -59,7 +59,7 @@ const form = document.createElement('form');
 form.classList.add('new-employee-form');
 
 form.innerHTML = `
-    <label>Name: <input name="name" type="text" id="name" data-qa="name" required></label>
+    <label>Name: <input name="name" type="text" id="name" data-qa="name" pattern="[a-zA-Z]+" required></label>
     <label>Position: <input name="position" type="text" data-qa="position" required></label>
     <label>Age: <input name="age" type="number" data-qa="age" required></label>
     <label>Office:
@@ -154,7 +154,6 @@ function addDoubleClickEvent(el, colIndex) {
     const temporaryText = e.target.textContent;
 
     editInput.value = temporaryText;
-
     e.target.firstChild.remove();
 
     switch (colIndex) {
@@ -173,20 +172,20 @@ function addDoubleClickEvent(el, colIndex) {
       case 4:
         editInput.type = 'number';
         editInput.value = convertToNumber(temporaryText);
-
-        editInput.addEventListener('blur', function() {
-          editInput.remove();
-
-          if (this.value) {
-            e.target.textContent = convertToCurrency(this.value);
-          } else {
-            e.target.textContent = temporaryText;
-          }
-        });
         break;
     };
     e.target.append(editInput);
     editInput.focus();
+
+    editInput.addEventListener('blur', function() {
+      removeEditInput(this);
+    });
+
+    editInput.addEventListener('keypress', function(ev) {
+      if (ev.key === 'Enter') {
+        removeEditInput(this);
+      }
+    });
 
     function removeEditInput(thisContext) {
       editInput.remove();
@@ -194,6 +193,15 @@ function addDoubleClickEvent(el, colIndex) {
       if (colIndex === 0 && !isLongerThan4(thisContext.value)) {
         e.target.textContent = temporaryText;
         pushNotification(10, 10, 'Error', 'The name should be at least 4 characters long.', 'error');
+
+        return;
+      }
+
+      const regex = /^[^\d]+$/;
+
+      if ((colIndex === 0 || colIndex === 1) && !regex.test(thisContext.value)) {
+        e.target.textContent = temporaryText;
+        pushNotification(10, 10, 'Error', 'Input should contain only letters.', 'error');
 
         return;
       }
@@ -219,15 +227,5 @@ function addDoubleClickEvent(el, colIndex) {
         pushNotification(10, 10, 'Error', 'Input cannot be empty', 'error');
       }
     }
-
-    editInput.addEventListener('blur', function() {
-      removeEditInput(this);
-    });
-
-    editInput.addEventListener('keypress', function(ev) {
-      if (ev.key === 'Enter') {
-        removeEditInput(this);
-      }
-    });
   });
 };
