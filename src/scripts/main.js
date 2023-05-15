@@ -38,6 +38,7 @@ const convertToNumber = number => number.replace('$', '').replace(',', '');
 const convertToCurrency = string => `$${Number(string).toLocaleString('en-US')}`;
 const isLongerThan4 = (value) => value.length >= 4;
 const ageIsProper = (value) => value >= 18 && value <= 90;
+const hasOnlyLetters = (value) => /^[^\d]+$/.test(value);
 
 // add selection on row click
 function initRowSelection() {
@@ -60,7 +61,7 @@ form.classList.add('new-employee-form');
 
 form.innerHTML = `
     <label>Name: <input name="name" type="text" id="name" data-qa="name" pattern="[a-zA-Z]+" required></label>
-    <label>Position: <input name="position" type="text" data-qa="position" required></label>
+    <label>Position: <input name="position" type="text" data-qa="position" pattern="[a-zA-Z]+" required></label>
     <label>Age: <input name="age" type="number" data-qa="age" required></label>
     <label>Office:
       <select name = "office" data-qa="office" required>
@@ -197,9 +198,7 @@ function addDoubleClickEvent(el, colIndex) {
         return;
       }
 
-      const regex = /^[^\d]+$/;
-
-      if ((colIndex === 0 || colIndex === 1) && !regex.test(thisContext.value)) {
+      if ((colIndex === 0 || colIndex === 1) && !hasOnlyLetters(thisContext.value)) {
         e.target.textContent = temporaryText;
         pushNotification(10, 10, 'Error', 'Input should contain only letters.', 'error');
 
