@@ -194,35 +194,29 @@ button.addEventListener('click', (evt) => {
   }
 });
 
-let targetData;
-
 [...document.querySelectorAll('td')].forEach(element => {
   element.addEventListener('dblclick', (evt) => {
-    targetData = evt.target;
-
-    const newData = document.createElement('td');
+    const targetData = evt.target.textContent;
     const inputField = document.createElement('input');
 
     inputField.classList.add('cell-input');
-    newData.insertAdjacentElement('afterbegin', inputField);
-    targetData.parentNode.replaceChild(newData, targetData);
+    evt.target.replaceChildren(inputField);
+    inputField.focus();
 
-    newData.children[0].addEventListener('keypress', (e) => {
+    inputField.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-        if (e.target.value.length > 0) {
-          newData.innerHTML = newData.children[0].value;
-        } else {
-          newData.innerHTML = targetData.innerText;
-        }
+        const inputText = e.target.value;
+
+        inputText
+          ? inputField.replaceWith(inputText)
+          : inputField.replaceWith(targetData);
       }
     });
 
-    // newData.children[0].addEventListener('blur', (e) => {
-    //   if (newData.children[0].value > 0) {
-    //     newData.innerHTML = newData.children[0].value;
-    //   } else {
-    //     newData.innerHTML = targetData.innerText;
-    //   }
-    // });
+    inputField.addEventListener('blur', () => {
+      if (!inputField.value) {
+        inputField.replaceWith(targetData);
+      }
+    });
   });
 });
