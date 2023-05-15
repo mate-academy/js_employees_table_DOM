@@ -122,7 +122,8 @@ function pushNotification(title, type) {
     <h2 class="title">${title}</h2>
   `;
 
-  form.append(messageWindow);
+  document.querySelector('body')
+    .insertAdjacentElement('afterbegin', messageWindow);
 
   setTimeout(() => {
     messageWindow.remove();
@@ -132,6 +133,8 @@ function pushNotification(title, type) {
 function valideData() {
   if (newEmployy.includes('')) {
     pushNotification('All fields must be filled', 'warning');
+
+    return false;
   } else {
     const fName = form.querySelector('[name="name"]');
     const fAge = form.querySelector('[name="age"]');
@@ -168,9 +171,9 @@ button.addEventListener('click', (evt) => {
     return person.children[0].value;
   });
 
-  valideData();
+  const isDataValid = valideData();
 
-  if (valideData() === true) {
+  if (isDataValid) {
     const newPerson = document.createElement('tr');
 
     newEmployy[4] = '$' + (Math.round(newEmployy[4] * 1000) / 1000)
@@ -214,9 +217,9 @@ button.addEventListener('click', (evt) => {
     });
 
     inputField.addEventListener('blur', () => {
-      if (!inputField.value) {
-        inputField.replaceWith(targetData);
-      }
+      !inputField.value
+        ? inputField.replaceWith(targetData)
+        : inputField.replaceWith(inputField.value);
     });
   });
 });
