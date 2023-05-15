@@ -112,6 +112,18 @@ function sortBodyNumber(arr, childNumber, parsePattern) {
   );
 }
 
+function formatSalary(salary) {
+  let salaryCopy = salary;
+  salaryCopy = salaryCopy.replace(/\$|,/g, '');
+
+  salaryCopy = Number(salaryCopy).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  });
+
+  return salaryCopy.replace(/\.00$/, '');
+}
+
 tbody.addEventListener('click', (e) => {
   state.selectedPerson = e.target.closest('tr');
 
@@ -155,13 +167,7 @@ tbody.addEventListener('dblclick', (e) => {
         value = input.value !== '' ? input.value : value;
 
         if (salaryField) {
-          value = value.replace(/\$|,/g, '');
-
-          value = Number(value).toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-          });
-          value = value.replace(/\.00$/, '');
+          value = formatSalary(value);
         }
 
         inputParent.innerText = value;
@@ -256,7 +262,7 @@ newEmployeeForm.addEventListener('submit', (e) => {
   const data = new FormData(newEmployeeForm);
   const formData = Object.fromEntries(data.entries());
 
-  const { age, name: nameValue } = formData;
+  const { age, name: nameValue, salary } = formData;
 
   if (age < 18) {
     state.notifications.error.push(
@@ -275,6 +281,14 @@ newEmployeeForm.addEventListener('submit', (e) => {
       'The data is invalid: name should have at least 4 letters'
     );
   }
+
+  if (salary < 0) {
+    state.notifications.error.push(
+      'The data is invalid: salaty cannot be a negative number'
+    );
+  }
+
+  formData.salary = formatSalary(salary);
 
   if (state.notifications.error.length) {
     renderNotifications();
@@ -321,4 +335,4 @@ function renderNotifications() {
 
   state.notifications.error = [];
   state.notifications.success = [];
-}
+};
