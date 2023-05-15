@@ -36,6 +36,8 @@ headers.forEach((header, index) => {
 // helper fn
 const convertToNumber = number => number.replace('$', '').replace(',', '');
 const convertToCurrency = string => `$${Number(string).toLocaleString('en-US')}`;
+const isLongerThan4 = (value) => value.length >= 4;
+const ageIsProper = (value) => value >= 18 && value <= 90;
 
 // add selection on row click
 function initRowSelection() {
@@ -94,17 +96,12 @@ function addNewEmployee(e) {
   salaryCell.textContent = convertToCurrency(form.elements.salary.value);
   row.append(nameCell, positionCell, officeCell, ageCell, salaryCell);
 
-  // add dblclick events to the cells
+  // add dblclick events to the new cells
   row.querySelectorAll('td').forEach(cell => {
     addDoubleClickEvent(cell);
   });
 
-  const isDataValid
-    = form.elements.name.value.length >= 4
-    && form.elements.age.value >= 18
-    && form.elements.age.value <= 90;
-
-  if (isDataValid) {
+  if (isLongerThan4(form.elements.name.value) && ageIsProper(form.elements.age.value)) {
     tableBody.append(row);
     initRowSelection();
     pushNotification(10, 10, 'Success', 'New employee added.', 'success');
@@ -164,7 +161,7 @@ function addDoubleClickEvent(el, colIndex) {
       case 2:
         editInput = document.createElement('select');
 
-        const countries = ['Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh',  'San Francisco'];
+        const countries = ['Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco'];
 
         for (const country of countries) {
           editInput.innerHTML += (country === temporaryText) ? `<option selected>${country}</option>` : `<option>${country}</option>`;
@@ -188,18 +185,38 @@ function addDoubleClickEvent(el, colIndex) {
         });
         break;
     };
+    e.target.append(editInput);
+    editInput.focus();
 
     function removeEditInput(thisContext) {
       editInput.remove();
 
+      if (colIndex === 0 && !isLongerThan4(thisContext.value)) {
+        e.target.textContent = temporaryText;
+        pushNotification(10, 10, 'Error', 'The name should be at least 4 characters long.', 'error');
+
+        return;
+      }
+
+      if (colIndex === 3 && !ageIsProper(thisContext.value)) {
+        e.target.textContent = temporaryText;
+        pushNotification(10, 10, 'Error', 'Age should not be less than 18 and greater than 90.', 'error');
+
+        return;
+      }
+
       if (thisContext.value) {
+        if (thisContext.value !== temporaryText) {
+          pushNotification(10, 10, 'Success', 'Data updated', 'success');
+        };
         e.target.textContent = thisContext.value;
 
         if (colIndex === 4) {
           e.target.textContent = convertToCurrency(thisContext.value);
-        }
+        };
       } else {
         e.target.textContent = temporaryText;
+        pushNotification(10, 10, 'Error', 'Input cannot be empty', 'error');
       }
     }
 
@@ -212,7 +229,5 @@ function addDoubleClickEvent(el, colIndex) {
         removeEditInput(this);
       }
     });
-    e.target.append(editInput);
-    editInput.focus();
   });
 };
