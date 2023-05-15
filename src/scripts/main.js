@@ -5,11 +5,19 @@ const table = document.querySelector('table');
 const tbody = table.querySelector('tbody');
 const ths = table.querySelectorAll('thead > tr > th');
 
-let rows;
-// ---------------------------------------------------------
-// Створення форми
-// ---------------------------------------------------------
+const arrHead = ['name', 'position', 'office', 'age', 'salary'];
 
+function addDataTittle() {
+  const tableRow = tbody.children;
+
+  [...tableRow].map(tr => {
+    [...tr.children].forEach((td, index) => {
+      td.dataset.nameIs = arrHead[index];
+    });
+  });
+}
+
+let rows;
 const form = document.createElement('form');
 
 body.append(form);
@@ -73,12 +81,6 @@ button.textContent = 'Save to table';
 button.setAttribute('type', 'submit');
 form.append(button);
 
-// ---------------------------------------------------------
-// Створення форми
-// ---------------------------------------------------------
-// Створенння повідомлення
-// ---------------------------------------------------------
-
 function pushNotification(title, description, type) {
   const message = document.createElement('div');
 
@@ -98,21 +100,25 @@ function pushNotification(title, description, type) {
   setTimeout(() => message.remove(), 2000);
 };
 
-// ---------------------------------------------------------
-// Створенння повідомлення
-// ---------------------------------------------------------
-// Добавлення події submit
-// ---------------------------------------------------------
-
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const data = new FormData(form);
 
-  if (data.get('name').length < 4 || data.get('position').length < 4) {
+  if (data.get('name').length < 4) {
     pushNotification(
       'Wrong data',
-      'The data must have at least 4 letters.',
+      'The name must have at least 4 letters.',
+      'error'
+    );
+
+    return;
+  };
+
+  if (data.get('position').length < 4) {
+    pushNotification(
+      'Wrong data',
+      'The position must have at least 4 letters.',
       'error'
     );
 
@@ -161,15 +167,11 @@ form.addEventListener('submit', (e) => {
   };
 
   tbody.append(newRow);
+  addDataTittle();
 
   form.reset();
 });
 
-// ---------------------------------------------------------
-// Добавлення події submit
-// ---------------------------------------------------------
-// Реалізація сортування
-// ---------------------------------------------------------
 function sortTable(columnIndex, ascending) {
   const trs = tbody.querySelectorAll('tr');
 
@@ -214,28 +216,22 @@ ths.forEach((th, index) => {
   });
 });
 
-// ---------------------------------------------------------
-// Реалізація сортування
-// ---------------------------------------------------------
-// Перейменування
-// ---------------------------------------------------------
 tbody.addEventListener('dblclick', (e) => {
+  addDataTittle();
+
   const cell = e.target.closest('td');
+  const nameIs = cell.dataset.nameIs;
   const input = document.createElement('input');
   const initialCellValue = cell.innerText;
 
   input.classList.add('cell-input');
-
-  input.value = cell.innerText.slice(0, 1) === '$'
-    ? '$'
-    : cell.innerText;
 
   cell.firstChild.remove();
   cell.append(input);
   input.focus();
 
   input.addEventListener('blur', () => {
-    cellDataReplacement(cell, input, initialCellValue);
+    cellDataReplacement(cell, input, initialCellValue, nameIs);
   });
 
   input.addEventListener('keydown', (eventKey) => {
@@ -243,23 +239,78 @@ tbody.addEventListener('dblclick', (e) => {
       return;
     }
 
-    cellDataReplacement(cell, input, initialCellValue);
+    cellDataReplacement(cell, input, initialCellValue, cell.dataset.nameIs);
   });
 });
 
-function cellDataReplacement(cell, input, initialCellValue) {
-  if (input.value === '' || input.value === '$') {
-    cell.innerText = initialCellValue;
-  } else if (input.value.slice(0, 1) === '$') {
-    const sum = input.value.slice(1).split(',').join('');
+function cellDataReplacement(cell, input, initialCellValue, nameIs) {
+  switch (nameIs) {
+    case 'name':
+      if (input.value.trim().length < 4) {
+        pushNotification(
+          'Wrong data',
+          'The name must have at least 4 letters.',
+          'error'
+        );
+        cell.innerText = initialCellValue;
+      } else {
+        checkFill(cell, input, initialCellValue);
+      }
+      break;
 
-    cell.innerText = `$${(+sum).toLocaleString('en-US')}`;
-  } else {
-    cell.innerText = input.value;
+    case 'position':
+      if (input.value.length < 4) {
+        pushNotification(
+          'Wrong data',
+          'The position must have at least 4 letters.',
+          'error'
+        );
+        cell.innerText = initialCellValue;
+      } else {
+        checkFill(cell, input, initialCellValue);
+      }
+      break;
+
+    case 'age':
+      if (+input.value < 18 || +input.value > 90 || isNaN(+input.value)) {
+        pushNotification(
+          'Wrong age',
+          'The age must be at least 18 and not more than 90 years.',
+          'error'
+        );
+        cell.innerText = initialCellValue;
+      } else {
+        checkFill(cell, input, initialCellValue);
+      };
+      break;
+
+    case 'salary':
+      checkFill(cell, input, initialCellValue, true);
+      break;
+
+    default:
+      checkFill(cell, input, initialCellValue);
+      break;
   }
 
   input.remove();
 };
+
+function checkFill(cell, input, initialCellValue, nameIs = false) {
+  if (nameIs) {
+    if (input.value.trim() === '') {
+      cell.innerText = initialCellValue;
+    } else {
+      cell.innerText = `$${parseInt(input.value).toLocaleString('en-US')}`;
+    }
+  } else {
+    if (input.value.trim() === '') {
+      cell.innerText = initialCellValue;
+    } else {
+      cell.innerText = input.value;
+    }
+  }
+}
 
 tbody.addEventListener('click', (e) => {
   const trs = document.querySelectorAll('tr');
