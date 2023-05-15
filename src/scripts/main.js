@@ -1,30 +1,31 @@
 /* eslint-disable max-len */
 'use strict';
 
-const headers = document.querySelectorAll('th');
 const tableBody = document.querySelector('tbody');
 const allEmployees = tableBody.rows;
-let currSortedCol = null;
 
 // sort list
+const headers = document.querySelectorAll('th');
+let currSortedCol = null;
 
-const sortList = (index) => {
+const sortList = (colIndex) => {
   [...allEmployees]
     .sort((prev, next) => {
-      const prevContent = prev.children[index].textContent;
-      const nextContent = next.children[index].textContent;
+      const prevContent = prev.children[colIndex].textContent;
+      const nextContent = next.children[colIndex].textContent;
 
-      const returnResult = (prevContent.charAt(0) === '$')
+      const returnResult = (colIndex === 4)
         ? convertToNumber(prevContent) - convertToNumber(nextContent)
         : (prevContent).localeCompare(nextContent);
 
-      return (currSortedCol === index)
+      return (currSortedCol === colIndex)
         ? returnResult * -1
         : returnResult;
     })
     .forEach(item => tableBody.append(item));
 };
 
+// add click events to titles
 headers.forEach((header, index) => {
   header.addEventListener('click', function() {
     sortList(index);
@@ -32,18 +33,17 @@ headers.forEach((header, index) => {
   });
 });
 
-function convertToNumber(number) {
-  return +number.replace('$', '').replace(',', '.');
-}
+// helper fn
+const convertToNumber = number => number.replace('$', '').replace(',', '');
+const convertToCurrency = string => `$${Number(string).toLocaleString('en-US')}`;
 
 // add selection on row click
-
 function initRowSelection() {
-  [...tableBody.rows].forEach(function(row) {
+  [...tableBody.rows].forEach(row => {
     row.addEventListener('click', function() {
-      for (const person of [...tableBody.rows]) {
+      [...tableBody.rows].forEach(person => {
         person.classList.remove('active');
-      };
+      });
       row.classList.add('active');
     });
   });
@@ -52,7 +52,6 @@ function initRowSelection() {
 initRowSelection();
 
 // add form
-
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
@@ -92,15 +91,13 @@ function addNewEmployee(e) {
   positionCell.textContent = form.elements.position.value;
   officeCell.textContent = form.elements.office.value;
   ageCell.textContent = form.elements.age.value;
-  salaryCell.textContent = '$' + Number(form.elements.salary.value).toLocaleString('en-US');
-  // row.innerHTML = `
-  //   <td>${form.elements.name.value}</td>
-  //   <td>${form.elements.position.value}</td>
-  //   <td>${form.elements.office.value}</td>
-  //   <td>${form.elements.age.value}</td>
-  //   <td>${'$' + Number(form.elements.salary.value).toLocaleString('en-US')}</td>
-  // `;
+  salaryCell.textContent = convertToCurrency(form.elements.salary.value);
   row.append(nameCell, positionCell, officeCell, ageCell, salaryCell);
+
+  // add dblclick events to the cells
+  row.querySelectorAll('td').forEach(cell => {
+    addDoubleClickEvent(cell);
+  });
 
   const isDataValid
     = form.elements.name.value.length >= 4
@@ -109,7 +106,6 @@ function addNewEmployee(e) {
 
   if (isDataValid) {
     tableBody.append(row);
-    handleDoubleClick();
     initRowSelection();
     pushNotification(10, 10, 'Success', 'New employee added.', 'success');
     form.reset();
@@ -147,33 +143,76 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   }, 2000);
 };
 
-// handle double click on cells
+// add dblclick events on all cells
+[...tableBody.rows].forEach(row => {
+  row.querySelectorAll('td').forEach((cell, index) => {
+    addDoubleClickEvent(cell, index);
+  });
+});
 
-function handleDoubleClick() {
-  const tableCells = document.querySelectorAll('td');
+// add dblclick function
+function addDoubleClickEvent(el, colIndex) {
+  el.addEventListener('dblclick', (e) => {
+    let editInput = document.createElement('input');
+    const temporaryText = e.target.textContent;
 
-  tableCells.forEach(el => {
-    el.addEventListener('dblclick', (e) => {
-      const editInput = document.createElement('input');
-      const temporaryText = e.target.textContent;
+    editInput.value = temporaryText;
 
-      e.target.firstChild.remove();
-      editInput.value = temporaryText;
+    e.target.firstChild.remove();
 
-      editInput.addEventListener('blur', function() {
-        editInput.remove();
+    switch (colIndex) {
+      case 2:
+        editInput = document.createElement('select');
 
-        if (this.value) {
-          e.target.textContent = this.value;
-        } else {
-          e.target.textContent = temporaryText;
+        const countries = ['Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh',  'San Francisco'];
+
+        for (const country of countries) {
+          editInput.innerHTML += (country === temporaryText) ? `<option selected>${country}</option>` : `<option>${country}</option>`;
+        };
+        break;
+      case 3:
+        editInput.type = 'number';
+        break;
+      case 4:
+        editInput.type = 'number';
+        editInput.value = convertToNumber(temporaryText);
+
+        editInput.addEventListener('blur', function() {
+          editInput.remove();
+
+          if (this.value) {
+            e.target.textContent = convertToCurrency(this.value);
+          } else {
+            e.target.textContent = temporaryText;
+          }
+        });
+        break;
+    };
+
+    function removeEditInput(thisContext) {
+      editInput.remove();
+
+      if (thisContext.value) {
+        e.target.textContent = thisContext.value;
+
+        if (colIndex === 4) {
+          e.target.textContent = convertToCurrency(thisContext.value);
         }
-      });
+      } else {
+        e.target.textContent = temporaryText;
+      }
+    }
 
-      e.target.append(editInput);
-      editInput.focus();
+    editInput.addEventListener('blur', function() {
+      removeEditInput(this);
     });
+
+    editInput.addEventListener('keypress', function(ev) {
+      if (ev.key === 'Enter') {
+        removeEditInput(this);
+      }
+    });
+    e.target.append(editInput);
+    editInput.focus();
   });
 };
-
-handleDoubleClick();
