@@ -243,54 +243,15 @@ tbody.addEventListener('dblclick', (e) => {
   });
 });
 
-function cellDataReplacement(cell, input, initialCellValue, nameIs) {
-  switch (nameIs) {
-    case 'name':
-      if (input.value.trim().length < 4) {
-        pushNotification(
-          'Wrong data',
-          'The name must have at least 4 letters.',
-          'error'
-        );
-        cell.innerText = initialCellValue;
-      } else {
-        checkFill(cell, input, initialCellValue);
-      }
-      break;
+function cellDataReplacement(cell, input, initialCellValue) {
+  if (input.value === '' || input.value === '$') {
+    cell.innerText = initialCellValue;
+  } else if (input.value.slice(0, 1) === '$') {
+    const sum = input.value.slice(1).split(',').join('');
 
-    case 'position':
-      if (input.value.length < 4) {
-        pushNotification(
-          'Wrong data',
-          'The position must have at least 4 letters.',
-          'error'
-        );
-        cell.innerText = initialCellValue;
-      } else {
-        checkFill(cell, input, initialCellValue);
-      }
-      break;
-
-    case 'age':
-      if (+input.value < 18 || +input.value > 90 || isNaN(+input.value)) {
-        pushNotification(
-          'Wrong age',
-          'The age must be at least 18 and not more than 90 years.',
-          'error'
-        );
-        cell.innerText = initialCellValue;
-      } else {
-        checkFill(cell, input, initialCellValue);
-      };
-      break;
-
-    case 'salary':
-      checkFill(cell, input, initialCellValue, true);
-      break;
-
-    default:
-      checkFill(cell, input, initialCellValue);
-      break;
+    cell.innerText = `$${(+sum).toLocaleString('en-US')}`;
+  } else {
+    cell.innerText = input.value;
   }
 
   input.remove();
