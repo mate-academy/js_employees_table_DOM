@@ -200,7 +200,9 @@ button.addEventListener('click', (evt) => {
 [...document.querySelectorAll('td')].forEach(element => {
   element.addEventListener('dblclick', (evt) => {
     const targetData = evt.target.textContent;
-    const inputField = document.createElement('input');
+    const position = [...evt.target.closest('tr').children].indexOf(evt.target);
+    const inputField = [...form.querySelectorAll('label')]
+      .find((el, index) => index === position).children[0].cloneNode(true);
 
     inputField.classList.add('cell-input');
     evt.target.replaceChildren(inputField);
@@ -208,7 +210,12 @@ button.addEventListener('click', (evt) => {
 
     inputField.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-        const inputText = e.target.value;
+        let inputText = e.target.value;
+
+        if (position === 4) {
+          inputText = '$' + (Math.round(inputText * 1000) / 1000)
+            .toFixed(3).toString().replace('.', ',');
+        }
 
         inputText
           ? inputField.replaceWith(inputText)
@@ -217,9 +224,16 @@ button.addEventListener('click', (evt) => {
     });
 
     inputField.addEventListener('blur', () => {
-      !inputField.value
+      let inputText = inputField.value;
+
+      if (position === 4) {
+        inputText = '$' + (Math.round(inputText * 1000) / 1000)
+          .toFixed(3).toString().replace('.', ',');
+      }
+
+      !inputText
         ? inputField.replaceWith(targetData)
-        : inputField.replaceWith(inputField.value);
+        : inputField.replaceWith(inputText);
     });
   });
 });
