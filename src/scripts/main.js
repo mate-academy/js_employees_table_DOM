@@ -3,7 +3,6 @@
 const body = document.querySelector('body');
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
-const td = document.querySelectorAll('td');
 const rows = [...tbody.rows];
 const sortState = {};
 const indexCompare = [];
@@ -22,13 +21,13 @@ thead.addEventListener('click', e => {
   }
 
   const index = th.cellIndex;
-  const number = string => string.replace(/[$,]/g, '');
+  const formatNumber = string => string.replace(/[$,]/g, '');
   const currentSortState = sortState[index];
   const isAscending = currentSortState === 'asc';
 
   const sortData = rows.map(row => {
     const cell = row.children[index];
-    const value = number(cell.textContent);
+    const value = formatNumber(cell.textContent);
 
     return {
       row, value,
@@ -121,7 +120,7 @@ function pushNotification(title, description, type) {
   setTimeout(() => notification.remove(), 2000);
 }
 
-function validForm(data) {
+function validateForm(data) {
   valid = true;
 
   switch (true) {
@@ -167,7 +166,7 @@ form.addEventListener('submit', (e) => {
   const salaryResult = `$${Number(data.get('salary')).toLocaleString('de-DE')}`;
 
   e.preventDefault();
-  validForm(data);
+  validateForm(data);
 
   if (!valid) {
     return;
@@ -224,7 +223,7 @@ const changeCellOnInput = (e) => {
 };
 
 // valid cell
-const validCell = (e) => {
+const validateCell = (e) => {
   const input = document.querySelector('.cell-input');
   const isValid = () => {
     e.target.firstElementChild.focus();
@@ -298,7 +297,7 @@ const editCells = (el, prev) => {
 };
 
 const saveChanges = (e, prev) => {
-  validCell(e);
+  validateCell(e);
 
   if (!valid) {
     indexCompare.length = 0;
@@ -308,28 +307,26 @@ const saveChanges = (e, prev) => {
 };
 
 // dblclick
-td.forEach((cell, index) => {
-  cell.addEventListener('dblclick', (e) => {
-    indexCompare.push(index);
+tbody.addEventListener('dblclick', (e) => {
+  const tableCells = e.target.closest('td');
 
-    if (indexCompare[0] !== index) {
-      return;
+  if (!tableCells) {
+    return;
+  }
+
+  const prevText = e.target.innerText;
+
+  changeCellOnInput(e, prevText);
+
+  const field = e.target.firstElementChild;
+
+  field.addEventListener('blur', () => {
+    saveChanges(e, prevText);
+  });
+
+  field.addEventListener('keyup', (ev) => {
+    if (ev.key === 'Enter') {
+      field.blur();
     }
-
-    const prevText = e.target.innerText;
-
-    changeCellOnInput(e, prevText);
-
-    const field = e.target.firstElementChild;
-
-    field.addEventListener('blur', () => {
-      saveChanges(e, prevText);
-    });
-
-    field.addEventListener('keyup', (ev) => {
-      if (ev.key === 'Enter') {
-        field.blur();
-      }
-    });
   });
 });
