@@ -132,7 +132,7 @@ function showNotification(title, description, className) {
   const notification = document.createElement('div');
 
   notification.setAttribute('data-qa', 'notification');
-  notification.classList.add(className);
+  notification.classList.add('notification', className);
 
   const notificationTitle = document.createElement('h2');
 
@@ -191,7 +191,7 @@ form.addEventListener('submit', (e) => {
 
   const salaryCell = document.createElement('td');
 
-  salaryCell.textContent = '$' + salary.toLocaleString();
+  salaryCell.textContent = '$' + Math.abs(salary).toLocaleString();
   newRow.appendChild(salaryCell);
 
   tbody.appendChild(newRow);
