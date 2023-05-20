@@ -4,7 +4,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const tableHead = document.querySelector('thead');
   const tableBody = document.querySelector('tbody');
   let sortAscending = true; // true - low to high, false- high to low
-
+  const officeList = `
+  <select data-qa="office" name="office">
+    <option selected disabled></option>
+    <option value="Tokyo">
+      Tokyo
+    </option>
+    <option value="Singapore">
+      Singapore
+    </option>
+    <option value="London">
+      London
+    </option>
+    <option value="New York">
+      New York
+    </option>
+    <option value="Edinburgh">
+      Edinburgh
+    </option>
+    <option value="San Francisco">
+      San Francisco
+    </option>
+  </select>
+  `;
   const addNewEmployeeForm = createNewEmployeeForm();
 
   tableHead.addEventListener('click', (e) => {
@@ -30,29 +52,80 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tableBody.addEventListener('dblclick', (e) => {
     const editableCell = e.target.closest('td');
+    const editableRow = editableCell.closest('tr');
+    const editableCellNumber = [...editableRow.children].indexOf(editableCell);
 
-    editableCell.textContent = '';
+    const editableColumnName
+      = findTableColumnName(tableHead)[editableCellNumber].toLowerCase();
 
-    editableCell.innerHTML = `
-      <input class="cell-input">
-    `;
+    let editableCellInput;
+    const previousVal = editableCell.textContent;
+
+    switch (true) {
+      case editableColumnName === 'salary' || editableColumnName === 'age':
+        editableCellInput = '<input class="cell-input" type="number">';
+        break;
+
+      case editableColumnName === 'office':
+        editableCellInput = officeList;
+        break;
+
+      default:
+        editableCellInput = '<input class="cell-input" type="text">';
+    }
+
+    editableCell.innerHTML = editableCellInput;
+
+    editableCell.firstElementChild.focus();
+    addEditedCellInputEvents(editableCell, editableColumnName, previousVal);
   });
 
   addNewEmployeeForm.addEventListener('submit', e => {
     e.preventDefault();
 
-    if (!validateForm(e.target)) {
+    const addedEmployee = new FormData(e.target);
+    const newEmployee = Object.fromEntries(addedEmployee.entries());
+
+    if (!validateForm(newEmployee)) {
       showNotification('error', 'Message example');
 
       return;
     };
 
-    const newEmployee = new FormData(e.target);
-
     addNewEmployee(newEmployee);
     e.target.reset();
     showNotification('success', 'Message example');
   });
+
+  function addEditedCellInputEvents(cell, cellColumnName, previousValue) {
+    cell.firstElementChild.addEventListener('keyup', e => {
+      if (e.key === 'Enter') {
+        updateEditedCell(cell, cellColumnName, previousValue);
+      }
+    });
+
+    cell.firstElementChild.addEventListener('blur', e => {
+      updateEditedCell(cell, cellColumnName, previousValue);
+    });
+  }
+
+  function updateEditedCell(cell, cellColumnName, previousVal) {
+    const currentVal = cell.firstElementChild.value;
+    let input = '';
+
+    if (!validateInput(cellColumnName, currentVal)) {
+      showNotification('error', 'Please enter correct parameters');
+      input = previousVal;
+    }
+
+    if (cellColumnName === 'salary') {
+      input = `$${+currentVal.toLocaleString('en')}`;
+    }
+
+    input = input || currentVal;
+
+    cell.textContent = input;
+  }
 
   function showNotification(type, textMessage) {
     const notification = document.createElement('div');
@@ -102,27 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </label>
 
       <label>Office:
-        <select data-qa="office" name="office">
-          <option selected disabled></option>
-          <option value="Tokyo">
-            Tokyo
-          </option>
-          <option value="Singapore">
-            Singapore
-          </option>
-          <option value="London">
-            London
-          </option>
-          <option value="New York">
-            New York
-          </option>
-          <option value="Edinburgh">
-            Edinburgh
-          </option>
-          <option value="San Francisco">
-            San Francisco
-          </option>
-        </select>
+        ${officeList}
       </label>
 
       <label>Age:
@@ -141,8 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return employeeForm;
   }
 
-  function addNewEmployee(employeeData) {
-    const employee = Object.fromEntries(employeeData.entries());
+  function addNewEmployee(employee) {
     const tableColumnNames = findTableColumnName(tableHead);
     const row = document.createElement('tr');
 
@@ -169,26 +221,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function validateForm(form) {
-    const formInputs = form.querySelectorAll('input');
-    const nameField = form.name.value;
-    const ageField = +form.age.value;
-    const officeField = form.office.value;
-
-    for (let i = 0; i < formInputs.length; i++) {
-      if (formInputs[i].value.length === 0) {
+    for (const [inputName, inputValue] of Object.entries(form)) {
+      if (!validateInput(inputName, inputValue)) {
         return false;
       }
     }
 
-    if (nameField.length < 4) {
+    return true;
+  }
+
+  function validateInput(inName, inVal) {
+    if (inName === 'name' && inVal.length < 4) {
       return false;
     }
 
-    if (ageField < 18 || ageField > 90) {
+    if (inName === 'age' && (+inVal < 18 || +inVal > 90)) {
       return false;
     }
 
-    if (!officeField) {
+    if (inVal.length === 0) {
       return false;
     }
 
@@ -207,14 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableColumnNames = findTableColumnName(tableHead);
 
     return tableColumnNames.indexOf(selectedColName);
-  }
-
-  function convertStrToInt(str) {
-    const reg = /\D/g;
-
-    const out = parseInt(str.replace(reg, ''));
-
-    return out;
   }
 
   function sortTable(table, condition) {
@@ -257,5 +300,13 @@ document.addEventListener('DOMContentLoaded', () => {
     sortedData.forEach(row => {
       tableBody.append(row);
     });
+  }
+
+  function convertStrToInt(str) {
+    const reg = /\D/g;
+
+    const out = parseInt(str.replace(reg, ''));
+
+    return out;
   }
 });
