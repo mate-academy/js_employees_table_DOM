@@ -38,15 +38,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   tableBody.addEventListener('click', (e) => {
-    const selectedRow = e.target.closest('tr');
-    const isSelectedRow = tableBody.querySelector('tr.active');
+    const currentSelectedRow = e.target.closest('tr');
+    const previousSelectedRow = tableBody.querySelector('tr.active');
 
-    if (isSelectedRow && isSelectedRow !== selectedRow) {
-      isSelectedRow.classList.remove('active');
+    if (previousSelectedRow && previousSelectedRow !== currentSelectedRow) {
+      previousSelectedRow.classList.remove('active');
     }
 
-    if (selectedRow) {
-      selectedRow.classList.toggle('active');
+    if (currentSelectedRow) {
+      currentSelectedRow.classList.toggle('active');
     }
   });
 
@@ -62,7 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const previousVal = editableCell.textContent;
 
     switch (true) {
-      case editableColumnName === 'salary' || editableColumnName === 'age':
+      case editableColumnName === 'salary':
+        editableCellInput = '<input class="cell-input" type="number">';
+        break;
+
+      case editableColumnName === 'age':
         editableCellInput = '<input class="cell-input" type="number">';
         break;
 
@@ -258,8 +262,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return false;
     }
 
-    if (inName === 'age' && (+inVal < 18 || +inVal > 90)) {
-      return false;
+    if (inName === 'age') {
+      const age = +inVal;
+
+      return !(age < 18 || age > 90);
     }
 
     if (inVal.length === 0) {
