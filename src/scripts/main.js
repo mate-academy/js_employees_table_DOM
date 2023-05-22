@@ -11,12 +11,12 @@ const officeOptions
 
 employeeForm();
 
-for (let i = 0; i < tHeadCells.length; i++) {
-  tHeadCells[i].addEventListener('click', () => {
-    const receivedRows = sortByIdAndType(i);
+tHeadCells.forEach((cell, index) => {
+  cell.addEventListener('click', () => {
+    const receivedRows = sortByIdAndType(index);
     receivedRows.forEach(row => tbody.append(row));
-  });
-}
+  })
+})
 
 function sortByIdAndType(index) {
   const currentRows = [...tbody.querySelectorAll('tr')];
@@ -42,20 +42,20 @@ function sortByIdAndType(index) {
 }
 
 tbody.addEventListener('click', (event) => {
-  if (!event.target.parentElement.tagName === 'TR') {
+  if (event.target.parentElement.tagName !== 'TR') {
     return;
   }
 
   const activeClasses = tbody.querySelectorAll('.active');
-  for (const activeClass of activeClasses) {
+  activeClasses.forEach((activeClass) => {
     activeClass.classList.remove('active');
-  }
+  })
 
   event.target.parentElement.className = 'active';
 })
 
 tbody.addEventListener('dblclick', (event) => {
-  if (!event.target.tagName === 'TD') {
+  if (event.target.tagName !== 'TD') {
     return;
   }
 
@@ -122,9 +122,9 @@ function employeeForm() {
     let index = 0;
     const newRowData = {};
 
-    for (const element of newEmployeeData) {
+    newEmployeeData.forEach((element) => {
       if (element.tagName === 'BUTTON') {
-        continue;
+        return;
       }
       const cell = document.createElement('td');
 
@@ -141,7 +141,7 @@ function employeeForm() {
       newRowData[tHeadCells[index].innerText.toLowerCase()] = cell.textContent;
       index++;
       newRow.append(cell);
-    }
+    })
 
     if (formDataValidation(newRowData)) {
       tbody.append(newRow)
@@ -182,12 +182,12 @@ function createSelect(name, options) {
   select.name = name;
   select.setAttribute('data-qa', name);
 
-  for (const option of options) {
+  options.forEach((option) => {
     const optionHTML = document.createElement('option')
     optionHTML.value = option;
     optionHTML.textContent = option;
     select.append(optionHTML);
-  }
+  })
   return select;
 }
 
@@ -212,16 +212,21 @@ function formDataValidation(newRowData) {
   const newEmployeeName = newRowData.name;
   const newEmployeeAge = newRowData.age;
 
-  if (newEmployeeName.length < 4 || parseInt(newEmployeeAge) < 18 || parseInt(newEmployeeAge) > 90) {
-    notification.classList.add('error');
+  if (newEmployeeName.length < 4
+    || parseInt(newEmployeeAge, 10) < 18
+    || parseInt(newEmployeeAge, 10) > 90) {
 
     if (newEmployeeName.length < 4) {
+      notification.classList.add('error');
       notificationTitle.textContent = 'Name length error';
       notificationMessage.textContent = 'Your name length should be more than 4 symbols';
-    } else if (parseInt(newEmployeeAge) < 18 || parseInt(newEmployeeAge) > 90) {
+    } else if (parseInt(newEmployeeAge, 10) < 18
+      || parseInt(newEmployeeAge,  10) > 90) {
+      notification.classList.add('error');
       notificationTitle.textContent = 'Age error';
       notificationMessage.textContent = 'Your age can\'t be less than 18';
       if (parseInt(newEmployeeAge) > 90) {
+        notification.classList.add('error');
         notificationMessage.textContent = 'Your age can\'t be more than 90';
       }
     }
@@ -235,10 +240,6 @@ function formDataValidation(newRowData) {
 
   notification.append(notificationTitle);
   notification.append(notificationMessage);
-
-  console.log(notification.className);
-  console.log(notification);
-
 
   body.append(notification);
   setTimeout(() => notification.remove(), 2500);
