@@ -3,7 +3,9 @@
 const body = document.querySelector('body');
 const tHeadCells = document.querySelectorAll('table thead th');
 const tbody = document.querySelector('table tbody');
-const adult = 18;
+const ageCellIndex = 3;
+const salaryCellIndex = 4;
+const adultAge = 18;
 const maxAge = 90;
 
 const officeOptions
@@ -68,20 +70,41 @@ tbody.addEventListener('dblclick', (event) => {
     return;
   }
 
+  const row = [...document.querySelector('.active').children];
+
   const defaultValue = event.target.textContent.trim();
 
   const inputElement = document.createElement('input');
 
-  inputElement.type = 'text';
-  inputElement.classList.add('cell-input');
-  inputElement.style.width = defaultValue.length * 10 + 'px';
-  inputElement.value = defaultValue;
+  if (row[ageCellIndex].textContent === event.target.textContent) {
+    inputElement.type = 'number';
+    inputElement.min = '18';
+    inputElement.max = '90';
+    inputElement.style.width = ((defaultValue.length * 10) + 20) + 'px';
+  } else {
+    inputElement.type = 'text';
+  }
 
+  inputElement.classList.add('cell-input');
+  inputElement.value = defaultValue;
   event.target.textContent = '';
   event.target.append(inputElement);
   inputElement.focus();
 
   inputElement.addEventListener('blur', () => {
+    if (row[ageCellIndex].textContent === event.target.textContent) {
+      if (inputElement.value < adultAge || inputElement.value > maxAge) {
+        inputElement.value = '';
+      }
+    } else if (row[salaryCellIndex].textContent === event.target.textContent) {
+      if (!inputElement.value.includes('$')
+        || !inputElement.value.includes(',')
+        || inputElement.value.length < 6
+        || inputElement.value.length > 8) {
+        inputElement.value = '';
+      }
+    }
+
     inputElement.parentElement.textContent
       = inputElement.value === '' ? defaultValue : inputElement.value;
   });
@@ -90,6 +113,20 @@ tbody.addEventListener('dblclick', (event) => {
   inputElement.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
+
+      if (row[ageCellIndex].textContent === event.target.textContent) {
+        if (inputElement.value < adultAge || inputElement.value > maxAge) {
+          inputElement.value = '';
+        }
+      } else if (row[salaryCellIndex].textContent
+        === event.target.textContent) {
+        if (!inputElement.value.includes('$')
+          || !inputElement.value.includes(',')
+          || inputElement.value.length < 6
+          || inputElement.value.length > 8) {
+          inputElement.value = '';
+        }
+      }
 
       inputElement.parentElement.textContent
         = inputElement.value === '' ? defaultValue : inputElement.value;
@@ -234,7 +271,7 @@ function formDataValidation(newRowData) {
   const newEmployeeAge = newRowData.age;
 
   const minNameLength = newEmployeeName.length < 4;
-  const minEmployeeAge = parseInt(newEmployeeAge, 10) < adult;
+  const minEmployeeAge = parseInt(newEmployeeAge, 10) < adultAge;
   const maxEmployeeAge = parseInt(newEmployeeAge, 10) > maxAge;
 
   if (minNameLength || minEmployeeAge || maxEmployeeAge) {
