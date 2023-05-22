@@ -121,11 +121,9 @@ form.addEventListener('submit', e => {
     formValuesArr.forEach(([key, value]) => {
       const employeeField = newEmployee.insertCell();
 
-      if (key !== 'salary') {
-        employeeField.innerText = value;
-      } else {
-        employeeField.innerText = toCurrencyFormat(value);
-      }
+      employeeField.innerText = (key !== 'salary')
+        ? value
+        : toCurrencyFormat(value);
     });
 
     form.reset();
@@ -155,7 +153,7 @@ function validateForm({ name: validName, age: validAge }) {
   if (validAge < 18 || validAge > 90) {
     pushNotification(
       0, 0, 'Age restrictions',
-      'Sorry, your age does not meet our requirements', 'error'
+      'You must be at least 18 and no more than 90 years old', 'error'
     );
 
     return false;
@@ -236,7 +234,8 @@ tableBody.addEventListener('dblclick', e => {
         <input
           class="cell-input"
           type="text"
-          pattern="[a-zA-Z0-9]+[a-zA-Z0-9 ]+"{4}
+          minlength="4"
+          pattern="[a-zA-Z0-9]+[a-zA-Z0-9 ]+"
           value="${initValue}"
         >
       `;
@@ -280,7 +279,7 @@ function saveChanges(cell, input, index) {
       if (currentValue < 18 || currentValue > 90) {
         pushNotification(
           0, 0, 'Age restrictions',
-          'Sorry, your age does not meet our requirements', 'error'
+          'You must be at least 18 and no more than 90 years old', 'error'
         );
         cell.innerText = startValue;
       } else {
@@ -291,7 +290,8 @@ function saveChanges(cell, input, index) {
     default:
       if (currentValue.length > 0) {
         cell.innerText = (index !== 4)
-          ? currentValue : toCurrencyFormat(currentValue);
+          ? currentValue
+          : toCurrencyFormat(currentValue);
       } else {
         pushNotification(
           0, 0, 'Empty line',
@@ -299,7 +299,8 @@ function saveChanges(cell, input, index) {
         );
 
         cell.innerText = (index !== 4)
-          ? startValue : toCurrencyFormat(startValue);
+          ? startValue
+          : toCurrencyFormat(startValue);
       }
       break;
   };
