@@ -1,10 +1,10 @@
 'use strict';
 
-/* eslint-disable */
 const body = document.querySelector('body');
 const tHeadCells = document.querySelectorAll('table thead th');
 const tbody = document.querySelector('table tbody');
-const rows = [...tbody.querySelectorAll('tr')];
+const adult = 18;
+const maxAge = 90;
 
 const officeOptions
   = ['Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco'];
@@ -14,46 +14,55 @@ employeeForm();
 tHeadCells.forEach((cell, index) => {
   cell.addEventListener('click', () => {
     const receivedRows = sortByIdAndType(index);
+
     receivedRows.forEach(row => tbody.append(row));
-  })
-})
+  });
+});
 
 function sortByIdAndType(index) {
   const currentRows = [...tbody.querySelectorAll('tr')];
-  const rows = [...currentRows];
+  const sortedRows = [...currentRows];
 
-  rows.sort((rowA, rowB) => {
+  sortedRows.sort((rowA, rowB) => {
     const cellA = rowA.cells[index].innerText;
     const cellB = rowB.cells[index].innerText;
 
     return cellA.localeCompare(cellB, 'en', { numeric: true });
   });
 
-  if (JSON.stringify(rows.map(row => row.innerText))
-    === JSON.stringify(currentRows.map(row => row.innerText))) {
-    rows.sort((rowA, rowB) => {
+  const currentRowsAsString
+    = JSON.stringify(currentRows.map(row => row.innerText));
+  const sortedRowsAsString
+    = JSON.stringify(sortedRows.map(row => row.innerText));
+
+  if (currentRowsAsString === sortedRowsAsString) {
+    sortedRows.sort((rowA, rowB) => {
       const cellA = rowA.cells[index].innerText;
       const cellB = rowB.cells[index].innerText;
 
       return cellB.localeCompare(cellA, 'en', { numeric: true });
     });
   }
-  return rows;
+
+  return sortedRows;
 }
 
+// eslint-disable-next-line no-shadow
 tbody.addEventListener('click', (event) => {
   if (event.target.parentElement.tagName !== 'TR') {
     return;
   }
 
   const activeClasses = tbody.querySelectorAll('.active');
+
   activeClasses.forEach((activeClass) => {
     activeClass.classList.remove('active');
-  })
+  });
 
   event.target.parentElement.className = 'active';
-})
+});
 
+// eslint-disable-next-line no-shadow
 tbody.addEventListener('dblclick', (event) => {
   if (event.target.tagName !== 'TD') {
     return;
@@ -62,6 +71,7 @@ tbody.addEventListener('dblclick', (event) => {
   const defaultValue = event.target.textContent.trim();
 
   const inputElement = document.createElement('input');
+
   inputElement.type = 'text';
   inputElement.classList.add('cell-input');
   inputElement.style.width = defaultValue.length * 10 + 'px';
@@ -72,48 +82,52 @@ tbody.addEventListener('dblclick', (event) => {
   inputElement.focus();
 
   inputElement.addEventListener('blur', () => {
-    if (inputElement.value === '') {
-      inputElement.parentElement.textContent = defaultValue;
-    } else {
-      inputElement.parentElement.textContent = inputElement.value;
-    }
-  })
+    inputElement.parentElement.textContent
+      = inputElement.value === '' ? defaultValue : inputElement.value;
+  });
 
+  // eslint-disable-next-line no-shadow
   inputElement.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      if (inputElement.value === '') {
-        inputElement.parentElement.textContent = defaultValue;
-      } else {
-        inputElement.parentElement.textContent = inputElement.value;
-      }
+
+      inputElement.parentElement.textContent
+        = inputElement.value === '' ? defaultValue : inputElement.value;
     }
-  })
-})
+  });
+});
 
 function employeeForm() {
   const form = document.createElement('form');
+
   form.classList.add('new-employee-form');
 
   const nameInput = createInput('name');
+
   createLabel('Name:', nameInput, form);
 
   const positionInput = createInput('position');
+
   createLabel('Position:', positionInput, form);
 
   const officeSelect = createSelect('office', officeOptions);
+
   createLabel('Office:', officeSelect, form);
 
   const ageInput = createInput('age', 'number');
+
   createLabel('Age:', ageInput, form);
 
   const salaryInput = createInput('salary', 'number');
+
   createLabel('Salary:', salaryInput, form);
 
   const saveButton = document.createElement('button');
+
   saveButton.type = 'submit';
   saveButton.textContent = 'Save to table';
 
+  // eslint-disable-next-line no-shadow
   form.addEventListener('submit', (event) => {
     event.preventDefault();
 
@@ -126,25 +140,23 @@ function employeeForm() {
       if (element.tagName === 'BUTTON') {
         return;
       }
+
       const cell = document.createElement('td');
 
       if (element.tagName === 'SELECT') {
         cell.textContent = officeSelect.selectedOptions[0].innerText;
       }
 
-      if (element.name === 'salary') {
-        cell.textContent = getSalary(element.value);
-      } else {
-        cell.textContent = element.value;
-      }
+      cell.textContent = element.name === 'salary'
+        ? getSalary(element.value) : element.value;
 
       newRowData[tHeadCells[index].innerText.toLowerCase()] = cell.textContent;
       index++;
       newRow.append(cell);
-    })
+    });
 
     if (formDataValidation(newRowData)) {
-      tbody.append(newRow)
+      tbody.append(newRow);
       form.reset();
     }
   });
@@ -155,6 +167,7 @@ function employeeForm() {
 
 function createLabel(innerTextForLabel, inputElement, form) {
   const label = document.createElement('label');
+
   label.textContent = innerTextForLabel;
   label.append(inputElement);
 
@@ -163,8 +176,10 @@ function createLabel(innerTextForLabel, inputElement, form) {
   return label;
 }
 
+// eslint-disable-next-line no-shadow
 function createInput(name, type = 'text') {
   const input = document.createElement('input');
+
   input.required = true;
   input.setAttribute('data-qa', name);
   input.name = name;
@@ -177,17 +192,21 @@ function createInput(name, type = 'text') {
   return input;
 }
 
+// eslint-disable-next-line no-shadow
 function createSelect(name, options) {
   const select = document.createElement('select');
+
   select.name = name;
   select.setAttribute('data-qa', name);
 
   options.forEach((option) => {
-    const optionHTML = document.createElement('option')
+    const optionHTML = document.createElement('option');
+
     optionHTML.value = option;
     optionHTML.textContent = option;
     select.append(optionHTML);
-  })
+  });
+
   return select;
 }
 
@@ -200,11 +219,13 @@ function formDataValidation(newRowData) {
   let isCorrect = true;
 
   const notification = document.createElement('div');
+
   notification.classList.add('notification');
   notification.setAttribute('data-qa', 'notification');
   notification.style.textAlign = 'center';
 
   const notificationTitle = document.createElement('h2');
+
   notificationTitle.classList.add('title');
 
   const notificationMessage = document.createElement('p');
@@ -212,20 +233,23 @@ function formDataValidation(newRowData) {
   const newEmployeeName = newRowData.name;
   const newEmployeeAge = newRowData.age;
 
-  if (newEmployeeName.length < 4
-    || parseInt(newEmployeeAge, 10) < 18
-    || parseInt(newEmployeeAge, 10) > 90) {
+  const minNameLength = newEmployeeName.length < 4;
+  const minEmployeeAge = parseInt(newEmployeeAge, 10) < adult;
+  const maxEmployeeAge = parseInt(newEmployeeAge, 10) > maxAge;
 
-    if (newEmployeeName.length < 4) {
+  if (minNameLength || minEmployeeAge || maxEmployeeAge) {
+    if (minNameLength) {
       notification.classList.add('error');
       notificationTitle.textContent = 'Name length error';
-      notificationMessage.textContent = 'Your name length should be more than 4 symbols';
-    } else if (parseInt(newEmployeeAge, 10) < 18
-      || parseInt(newEmployeeAge,  10) > 90) {
+
+      notificationMessage.textContent
+        = 'Your name length should be more than 4 symbols';
+    } else if (minEmployeeAge || maxEmployeeAge) {
       notification.classList.add('error');
       notificationTitle.textContent = 'Age error';
       notificationMessage.textContent = 'Your age can\'t be less than 18';
-      if (parseInt(newEmployeeAge) > 90) {
+
+      if (maxEmployeeAge) {
         notification.classList.add('error');
         notificationMessage.textContent = 'Your age can\'t be more than 90';
       }
@@ -234,8 +258,8 @@ function formDataValidation(newRowData) {
     isCorrect = false;
   } else {
     notification.classList.add('success');
-    notificationTitle.textContent = 'Success'
-    notificationMessage.textContent = 'Data is correct'
+    notificationTitle.textContent = 'Success';
+    notificationMessage.textContent = 'Data is correct';
   }
 
   notification.append(notificationTitle);
