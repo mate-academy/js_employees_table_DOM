@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const tableHead = document.querySelector('thead');
   const tableBody = document.querySelector('tbody');
-  let sortAscending = true; // true - low to high, false- high to low
+  let sortAscending = true;
   const officeList = `
   <select data-qa="office" name="office">
     <option selected disabled></option>
@@ -86,15 +86,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const addedEmployee = new FormData(e.target);
     const newEmployee = Object.fromEntries(addedEmployee.entries());
 
-    if (!validateForm(newEmployee)) {
-      showNotification('error', 'Message example');
+    const { result, inputName } = validateForm(newEmployee);
+
+    if (!result) {
+      showNotification('error', inputName);
 
       return;
     };
 
     addNewEmployee(newEmployee);
     e.target.reset();
-    showNotification('success', 'Message example');
+    showNotification('success', '');
   });
 
   function addEditedCellInputEvents(cell, cellColumnName, previousValue) {
@@ -114,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let input = '';
 
     if (!validateInput(cellColumnName, currentVal)) {
-      showNotification('error', 'Please enter correct parameters');
+      showNotification('error', cellColumnName);
       input = previousVal;
     }
 
@@ -127,16 +129,34 @@ document.addEventListener('DOMContentLoaded', () => {
     cell.textContent = input;
   }
 
-  function showNotification(type, textMessage) {
+  function showNotification(type, title) {
     const notification = document.createElement('div');
+    const messages = {
+      name: 'Name should be equal or greater than 4 letters',
+      age: 'Age should be equal or greater than 18 and lower than 90',
+      length: 'Field should not be empty',
+      valid: 'Everything is ok',
+    };
+
+    let messagesText;
+
+    if (type === 'success') {
+      messagesText = messages.valid;
+    } else {
+      messagesText = messages[title]
+        ? messages[title]
+        : messages.length;
+    }
 
     notification.classList.add('notification');
     notification.classList.add(type);
     notification.setAttribute('data-qa', 'notification');
 
     notification.innerHTML = `
-      <h2 class="title">${type}</h2>
-      <p>${textMessage}</p>
+      <h2 class="title">
+        ${type === 'success' ? 'Success' : title + ' Error'}
+      </h2>
+      <p>${messagesText}</p>
     `;
 
     document.body.append(notification);
@@ -223,11 +243,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function validateForm(form) {
     for (const [inputName, inputValue] of Object.entries(form)) {
       if (!validateInput(inputName, inputValue)) {
-        return false;
+        return {
+          result: false,
+          inputName: inputName,
+        };
       }
     }
 
-    return true;
+    return { result: true };
   }
 
   function validateInput(inName, inVal) {
