@@ -74,9 +74,11 @@ tbody.addEventListener('dblclick', (event) => {
 
   const defaultValue = event.target.textContent.trim();
 
-  const inputElement = document.createElement('input');
+  let inputElement = document.createElement('input');
 
-  if (row[ageCellIndex].textContent === event.target.textContent) {
+  if (row[2].textContent === event.target.textContent) {
+    inputElement = createSelect('office', officeOptions);
+  } else if (row[ageCellIndex].textContent === event.target.textContent) {
     inputElement.type = 'number';
     inputElement.min = '18';
     inputElement.max = '90';
