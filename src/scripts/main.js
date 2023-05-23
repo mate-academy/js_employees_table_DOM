@@ -106,7 +106,7 @@ tbody.addEventListener('dblclick', (event) => {
     }
 
     inputElement.parentElement.textContent
-      = inputElement.value === '' ? defaultValue : inputElement.value;
+      = inputElement.value.trim() === '' ? defaultValue : inputElement.value;
   });
 
   // eslint-disable-next-line no-shadow
@@ -129,7 +129,7 @@ tbody.addEventListener('dblclick', (event) => {
       }
 
       inputElement.parentElement.textContent
-        = inputElement.value === '' ? defaultValue : inputElement.value;
+        = inputElement.value.trim() === '' ? defaultValue : inputElement.value;
     }
   });
 });
