@@ -8,33 +8,31 @@ let clickCounter = 0;
 
 document.body.children[0].style.alignSelf = 'flex-start';
 
-for (let i = 0; i <= 2; i++) {
-  const item = header.children[i];
-
+[...header.children].slice(0, 3).forEach(item => {
   item.addEventListener('click', (e) => {
     clickCounter++;
 
     sorted = [...rowsArray].sort((a, b) =>
-      a.children[i].innerText.localeCompare(b.children[i].innerText));
+      a.children.innerText.localeCompare(b.children.innerText));
 
     if (clickCounter % 2) {
       sorted = [...rowsArray].sort((a, b) =>
-        b.children[i].innerText.localeCompare(a.children[i].innerText));
+        b.children.innerText.localeCompare(a.children.innerText));
     }
 
     tbody.prepend(...sorted);
   });
-}
+});
 
 header.children[3].addEventListener('click', (e) => {
   clickCounter++;
 
   sorted = [...rowsArray].sort((a, b) =>
-    a.children[3].innerText - b.children[3].innerText);
+    b.children[3].innerText - a.children[3].innerText);
 
   if (clickCounter % 2) {
     sorted = [...rowsArray].sort((a, b) =>
-      b.children[3].innerText - a.children[3].innerText);
+      a.children[3].innerText - b.children[3].innerText);
   }
   tbody.prepend(...sorted);
 });
@@ -43,11 +41,11 @@ header.children[4].addEventListener('click', (e) => {
   clickCounter++;
 
   sorted = [...rowsArray].sort((a, b) =>
-    toNumber(a.children[4]) - toNumber(b.children[4]));
+    toNumber(b.children[4]) - toNumber(a.children[4]));
 
   if (clickCounter % 2) {
     sorted = [...rowsArray].sort((a, b) =>
-      toNumber(b.children[4]) - toNumber(a.children[4]));
+      toNumber(a.children[4]) - toNumber(b.children[4]));
   }
 
   tbody.prepend(...sorted);
@@ -57,9 +55,7 @@ function toNumber(element) {
   return +element.innerText.slice(1).replaceAll(',', '');
 };
 
-for (let r = 0; r < rowsArray.length; r++) {
-  const row = rowsArray[r];
-
+[...rowsArray].forEach(row => {
   row.addEventListener('click', (e) => {
     clickCounter++;
 
@@ -70,7 +66,7 @@ for (let r = 0; r < rowsArray.length; r++) {
     }
     row.classList.add('active');
   });
-}
+});
 
 const form = document.createElement('form');
 
@@ -125,7 +121,7 @@ form.addEventListener('submit', e => {
   const newPerson = document.createElement('tr');
   const data = new FormData(form);
 
-  if (data.get('name').length < 4) {
+  if (data.get('name').trim().length < 4) {
     pushNotification('Error', 'Write full name please', 'error');
 
     return;
@@ -139,9 +135,9 @@ form.addEventListener('submit', e => {
   };
 
   newPerson.innerHTML = `
-    <th>${data.get('name')}</th>
-    <th>${data.get('position')}</th>
-    <th>${data.get('office')}</th>
+    <th>${data.get('name').trim()}</th>
+    <th>${data.get('position').trim()}</th>
+    <th>${data.get('office').trim()}</th>
     <th>${data.get('age')}</th>
     <th>${formatNumber(data.get('salary'))}</th>
   `;
@@ -183,7 +179,7 @@ tbody.addEventListener('dblclick', d => {
   field.append(input);
 
   input.addEventListener('blur', () => {
-    const inputText = input.value;
+    const inputText = input.value.trim();
 
     if (field === cellSalary) {
       inputText
@@ -198,7 +194,7 @@ tbody.addEventListener('dblclick', d => {
 
   input.addEventListener('keypress', k => {
     if (k.key === 'Enter') {
-      const inputText = k.target.value;
+      const inputText = k.target.value.trim();
 
       if (field === cellSalary) {
         inputText
