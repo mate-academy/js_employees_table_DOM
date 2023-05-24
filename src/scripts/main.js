@@ -6,6 +6,8 @@ const rows = [...bodyTable.rows];
 let sortedList;
 
 headTable.addEventListener('click', e => {
+  const rowsAll = [...bodyTable.rows];
+
   const header = e.target.closest('th');
   const index = header.cellIndex;
 
@@ -17,14 +19,18 @@ headTable.addEventListener('click', e => {
     const rowOne = numberOptimizer(a.cells[index].textContent);
     const rowTwo = numberOptimizer(b.cells[index].textContent);
 
-    return rowOne.localeCompare(rowTwo);
+    if (Number.isNaN(+rowOne)) {
+      return rowOne.localeCompare(rowTwo);
+    }
+
+    return +rowOne - Number(rowTwo);
   });
 
   if (sortedList !== header) {
-    bodyTable.append(...rows);
+    bodyTable.append(...rowsAll);
     sortedList = header;
   } else {
-    bodyTable.append(...rows.reverse());
+    bodyTable.append(...rowsAll.reverse());
     sortedList = null;
   }
 });
@@ -146,27 +152,25 @@ form.addEventListener('submit', e => {
     <td>$${Number(dataObj.salary).toLocaleString('en-US')}</td>
   `;
 
-  bodyTable.append(newRow);
-  form.reset();
-
   if (dataObj.name.length < 4) {
-    return pushNotification(
+    pushNotification(
       'Error',
       'Name must include at least 4 letters',
       'error');
-  }
-
-  if (Number(dataObj.age) < 18 || Number(dataObj.age) > 90) {
-    return pushNotification(
+  } else if (Number(dataObj.age) < 18 || Number(dataObj.age) > 90) {
+    pushNotification(
       'Error',
       'Age must be no less than 18 and no more than 90',
       'error');
-  }
+  } else {
+    pushNotification(
+      'Success',
+      'Employee is successfully added to the table',
+      'success');
 
-  return pushNotification(
-    'Success',
-    'Employee is successfully added to the table',
-    'success');
+    bodyTable.append(newRow);
+    form.reset();
+  }
 });
 
 bodyTable.addEventListener('dblclick', (e) => {
