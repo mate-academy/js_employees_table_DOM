@@ -229,14 +229,21 @@ function pushNotification(posTop, posRight, title, description, type = '') {
 };
 
 function editableCell(cellElement) {
-  const text = cellElement.textContent.trim();
+  let text = cellElement.textContent.trim();
+
+  let isAmount = false;
+
+  if (text[0] === '$') {
+    isAmount = true;
+    text = parseInt(text.replace(/\D/g, ''));
+  }
 
   cellElement.textContent = null;
 
   cellElement.insertAdjacentHTML('beforeend', `
-  <input class = "cell-input" value = "${text}">
-  </input>
-`);
+    <input class = "cell-input" value = "${text}">
+    </input>
+  `);
 
   const input = document.querySelector('.cell-input');
 
@@ -248,7 +255,7 @@ function editableCell(cellElement) {
       input.value = text;
     }
 
-    input.parentElement.innerHTML = input.value.trim();
+    setCellValue(input, isAmount);
   });
 
   input.addEventListener('keypress', (ev) => {
@@ -257,7 +264,13 @@ function editableCell(cellElement) {
         input.value = text;
       }
 
-      input.parentElement.innerHTML = input.value;
+      setCellValue(input, isAmount);
     }
   });
+
+  function setCellValue(inputElement, isAmountValue = false) {
+    inputElement.parentElement.innerHTML = isAmount
+      ? `$${Number(input.value.trim()).toLocaleString('en-US')}`
+      : input.value.trim();
+  }
 }
