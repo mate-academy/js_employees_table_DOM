@@ -195,10 +195,6 @@ function validateForm(formData) {
     return false;
   }
 
-  if (formData.name.length < 4) {
-    return false;
-  }
-
   if (!formData.position) {
     return false;
   }
