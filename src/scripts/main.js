@@ -120,6 +120,9 @@ submitBtn.addEventListener('click', (e) => {
   } else if (dataObject.office === '' || dataObject.position === '') {
     showNotification('Empty fiels', 'error',
       'No empty fields allowed');
+  } else if (dataObject.salary < 0) {
+    showNotification('Incorrect salary', 'error',
+      'Please, enter correct number');
   } else {
     showNotification('Success!', 'success', 'New employee added');
 
