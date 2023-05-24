@@ -2,18 +2,39 @@
 
 const theadList = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
+const form = document.createElement('form');
+
+form.classList.add('new-employee-form');
+
+const formField = [
+  {
+    name: 'name',
+    type: 'text',
+  },
+  {
+    name: 'position',
+    type: 'text',
+  },
+  {
+    name: 'age',
+    type: 'number',
+  },
+  {
+    name: 'salary',
+    type: 'number',
+  },
+];
+const selectValues = ['Tokyo', 'Singapore',
+  'London', 'New York', 'Edinburgh', 'San Francisco'];
 
 theadList.addEventListener('click', (e) => {
   const index = e.target.cellIndex;
   const element = e.target.closest('th');
   const tbodyRows = [...tbody.querySelectorAll('tr')];
+  const isDesc = !element.hasAttribute('direction')
+    || element.getAttribute('direction') === 'DESC';
 
-  if (!element.hasAttribute('direction')
-    || element.getAttribute('direction') === 'DESC') {
-    element.setAttribute('direction', 'ASC');
-  } else {
-    element.setAttribute('direction', 'DESC');
-  }
+  element.setAttribute('direction', isDesc ? 'ASC' : 'DESC');
 
   tbodyRows.sort((a, b) => {
     let aContent = a.cells[index].textContent;
@@ -52,31 +73,6 @@ tbody.addEventListener('click', (e) => {
   selected.classList.add('active');
 });
 
-const form = document.createElement('form');
-
-form.classList.add('new-employee-form');
-
-const formField = [
-  {
-    name: 'name',
-    type: 'text',
-  },
-  {
-    name: 'position',
-    type: 'text',
-  },
-  {
-    name: 'age',
-    type: 'number',
-  },
-  {
-    name: 'salary',
-    type: 'number',
-  },
-];
-const selectValues = ['Tokyo', 'Singapore',
-  'London', 'New York', 'Edinburgh', 'San Francisco'];
-
 form.innerHTML = formField.map(field => `
   <label>
     ${field.name[0].toUpperCase() + field.name.slice(1)}:
@@ -88,8 +84,12 @@ form.innerHTML = formField.map(field => `
   </label>
 `).join('');
 
-form.querySelector('[name="age"]').setAttribute('min', 18);
-form.querySelector('[name="age"]').setAttribute('max', 90);
+const minAge = 18;
+const maxAge = 90;
+const age = form.querySelector('[name="age"]');
+
+age.setAttribute('min', minAge);
+age.setAttribute('max', maxAge);
 
 form.children[1].insertAdjacentHTML('afterend', `
   <label>Office:
@@ -103,15 +103,13 @@ form.children[1].insertAdjacentHTML('afterend', `
   </label>
 `);
 
-const submit = document.createElement('button');
+const submitButton = document.createElement('button');
 
-submit.type = 'submit';
-submit.textContent = 'Save to table';
+submitButton.type = 'submit';
+submitButton.textContent = 'Save to table';
 
-form.appendChild(submit);
+form.appendChild(submitButton);
 document.body.appendChild(form);
-
-const submitButton = document.querySelector('button');
 
 const pushNotification = (title, type) => {
   const notification = document.createElement('div');
@@ -131,11 +129,11 @@ const pushNotification = (title, type) => {
   }, 2000);
 };
 
-function dataValidation() {
+function validateData() {
   const newEmployee = [...form.querySelectorAll('label')].map(el =>
     el.children[0].value);
 
-  if (newEmployee.some(el => el === '') === true) {
+  if (newEmployee.some(el => el === '')) {
     pushNotification('Empty fields is not allowed', 'warning');
 
     return false;
@@ -164,7 +162,7 @@ function dataValidation() {
 submitButton.addEventListener('click', (e) => {
   e.preventDefault();
 
-  const checkValidation = dataValidation();
+  const checkValidation = validateData();
 
   if (checkValidation) {
     const newRow = document.createElement('tr');
@@ -177,4 +175,41 @@ submitButton.addEventListener('click', (e) => {
     form.reset();
     tbody.append(newRow);
   }
+});
+
+const cells = document.querySelectorAll('td');
+let activeInput = null;
+let previousValue = '';
+
+function saveChanges() {
+  const inputValue = activeInput.value;
+  const cell = activeInput.parentNode;
+
+  inputValue === '' ? cell.textContent = previousValue
+    : cell.textContent = inputValue;
+
+  activeInput = null;
+  previousValue = '';
+}
+
+cells.forEach((cell) => {
+  cell.addEventListener('dblclick', (e) => {
+    previousValue = cell.textContent;
+    cell.textContent = '';
+
+    activeInput = document.createElement('input');
+    activeInput.classList.add('cell-input');
+    activeInput.value = previousValue;
+
+    activeInput.addEventListener('blur', saveChanges);
+
+    activeInput.addEventListener('keypress', (evn) => {
+      if (evn.key === 'Enter') {
+        saveChanges();
+      }
+    });
+
+    cell.appendChild(activeInput);
+    activeInput.focus();
+  });
 });
