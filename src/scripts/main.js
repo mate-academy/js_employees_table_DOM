@@ -12,15 +12,18 @@ document.body.children[0].style.alignSelf = 'flex-start';
   item.addEventListener('click', (e) => {
     clickCounter++;
 
+    const i = [...header.children].indexOf(item);
+
     sorted = [...rowsArray].sort((a, b) =>
-      a.children.innerText.localeCompare(b.children.innerText));
+      a.children[i].innerText.localeCompare(b.children[i].innerText));
 
     if (clickCounter % 2) {
       sorted = [...rowsArray].sort((a, b) =>
-        b.children.innerText.localeCompare(a.children.innerText));
+        b.children[i].innerText.localeCompare(a.children[i].innerText));
     }
 
     tbody.prepend(...sorted);
+    clickCounter = 0;
   });
 });
 
@@ -35,6 +38,7 @@ header.children[3].addEventListener('click', (e) => {
       a.children[3].innerText - b.children[3].innerText);
   }
   tbody.prepend(...sorted);
+  clickCounter = 0;
 });
 
 header.children[4].addEventListener('click', (e) => {
@@ -49,6 +53,7 @@ header.children[4].addEventListener('click', (e) => {
   }
 
   tbody.prepend(...sorted);
+  clickCounter = 0;
 });
 
 function toNumber(element) {
