@@ -116,13 +116,13 @@ submitBtn.addEventListener('click', (e) => {
       'Name should have more than 4 letters');
   } else if (Number(dataObject.age) < 18 || Number(dataObject.age) > 90) {
     showNotification('Incorrect age', 'error',
-      'Please, enter correct age');
+      'Age must be between 18 to 90. Please, enter correct number.');
   } else if (dataObject.office === '' || dataObject.position === '') {
     showNotification('Empty fiels', 'error',
       'No empty fields allowed');
   } else if (dataObject.salary < 0) {
     showNotification('Incorrect salary', 'error',
-      'Please, enter correct number');
+      'No negative numbers allowed. Please, enter correct number');
   } else {
     showNotification('Success!', 'success', 'New employee added');
 
