@@ -113,7 +113,7 @@ function addForm() {
       </label>
       <label>Office: <select name="office" data-qa="office" required>
                       <option value="Tokyo">Tokyo</option>
-                      <option value="London">Singapore</option>
+                      <option value="Singapore">Singapore</option>
                       <option value="New York">New York</option>
                       <option value="Edinburgh">Edinburgh</option>
                       <option value="San Francisco">San Francisco</option>
@@ -145,6 +145,17 @@ function addForm() {
 
 addForm();
 
+const salaryFormEl = document.querySelector('form input[name="salary"]');
+const ageFormEl = document.querySelector('form input[name="age"]');
+
+[salaryFormEl, ageFormEl].map((el) => {
+  el.addEventListener('input', () => {
+    el.value = el.value.replace(/\D/g, '');
+  });
+
+  el.addEventListener('paste', (e) => e.preventDefault);
+});
+
 const form = document.querySelector('form');
 const submitBtn = document.querySelector('#submit-btn');
 
@@ -164,10 +175,6 @@ function addRow(formElement, tableElement, submitEvent) {
   const data = Object.fromEntries(new FormData(formElement).entries());
 
   if (!validateForm(data)) {
-    pushNotification(500, 10, 'Error!',
-      'Something went wrong\n '
-      + 'Check the form!', 'error');
-
     submitEvent.preventDefault();
 
     return false;
@@ -192,14 +199,26 @@ function addRow(formElement, tableElement, submitEvent) {
 
 function validateForm(formData) {
   if (formData.name.length < 4) {
+    pushNotification(500, 10, 'Error!',
+      `Something went wrong!<br> `
+      + `Name field cannot be empty! Or less then 4 letters!`, 'error');
+
     return false;
   }
 
-  if (!formData.position) {
+  if (!formData.position || formData.position.trim() === '') {
+    pushNotification(500, 10, 'Error!',
+      `Something went wrong!<br> `
+      + `Position field cannot be empty!`, 'error');
+
     return false;
   }
 
   if (+formData.age < 18 || +formData.age > 90) {
+    pushNotification(500, 10, 'Error!',
+      `Something went wrong!<br> `
+      + `Age must be more 18 & less 90`, 'error');
+
     return false;
   }
 
@@ -228,6 +247,8 @@ function editableCell(cellElement) {
   let text = cellElement.textContent.trim();
 
   let isAmount = false;
+  const isOfficeCell = isOffice(cellElement);
+  const isNumberCell = isNumber(cellElement);
 
   if (text[0] === '$') {
     isAmount = true;
@@ -236,37 +257,133 @@ function editableCell(cellElement) {
 
   cellElement.textContent = null;
 
-  cellElement.insertAdjacentHTML('beforeend', `
-    <input class = "cell-input" value = "${text}">
-    </input>
-  `);
+  if (isOfficeCell) {
+    cellElement.insertAdjacentHTML('beforeend', `
+      <select id = "cell-select">
+        <option value="Tokyo"
+          ${text === 'Tokyo' ? 'selected' : ''}
+        >Tokyo</option>
+        <option value="Singapore"
+          ${text === 'Singapore' ? 'selected' : ''}
+        >Singapore</option>
+        <option value="New York"
+          ${text === 'New York' ? 'selected' : ''}
+        >New York</option>
+        <option value="Edinburgh"
+          ${text === 'Edinburgh' ? 'selected' : ''}
+        >Edinburgh</option>
+        <option value="San Francisco"
+          ${text === 'San Francisco' ? 'selected' : ''}
+        >San Francisco</option>
+      </select>
+    `);
+  } else {
+    cellElement.insertAdjacentHTML('beforeend', `
+      <input class = "cell-input" value = "${text}">
+      </input>
+    `);
+  }
 
   const input = document.querySelector('.cell-input');
+  const select = document.querySelector('#cell-select');
 
-  input.focus();
-  input.setSelectionRange(input.value.length, input.value.length);
-
-  input.addEventListener('blur', () => {
-    if (!input.value) {
-      input.value = text;
-    }
-
-    setCellValue(input, isAmount);
-  });
-
-  input.addEventListener('keypress', (ev) => {
-    if (ev.key === 'Enter') {
-      if (!input.value) {
+  if (input) {
+    input.addEventListener('blur', () => {
+      if (!input.value || input.value.trim() === '') {
         input.value = text;
       }
 
-      setCellValue(input, isAmount);
-    }
-  });
+      if (validateCellInput(input, isAmount, isNumberCell)) {
+        setCellValue(input, isAmount);
+      } else {
+        input.value = text;
+        setCellValue(input, isAmount);
+      }
+    });
+
+    input.addEventListener('keypress', (ev) => {
+      if (ev.key === 'Enter') {
+        if (!input.value || input.value.trim() === '') {
+          input.value = text;
+        }
+
+        if (validateCellInput(input, isAmount, isNumberCell)) {
+          setCellValue(input, isAmount);
+        } else {
+          input.value = text;
+          setCellValue(input, isAmount);
+        }
+      }
+
+      if (isNumberCell) {
+        input.addEventListener('input', () => {
+          input.value = input.value.replace(/\D/g, '');
+        });
+      }
+    });
+
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+  }
+
+  if (select) {
+    select.focus();
+
+    select.addEventListener('blur', () => {
+      setCellValue(select, isAmount);
+    });
+  }
 
   function setCellValue(inputElement, isAmountValue = false) {
     inputElement.parentElement.innerHTML = isAmount
-      ? `$${Number(input.value.trim()).toLocaleString('en-US')}`
-      : input.value.trim();
+      ? `$${Number(inputElement.value.trim()).toLocaleString('en-US')}`
+      : inputElement.value.trim();
+  }
+
+  function isOffice(selectedCell) {
+    if (selectedCell === selectedCell.parentElement.children[2]) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function isNumber(selectedCell) {
+    if (selectedCell === selectedCell.parentElement.children[3]
+      || selectedCell === selectedCell.parentElement.children[4]) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function validateCellInput(inputEl, isAmountVal, isNumberVal) {
+    if (inputEl.value.length < 4 && !isNumberVal) {
+      pushNotification(500, 10, 'Error!',
+        'Bad!\n '
+        + 'Value must be longer than 3 char', 'error');
+
+      return false;
+    }
+
+    if (isNumberVal && !isAmountVal) {
+      if (+inputEl.value < 18 || +inputEl.value > 90 || isNaN(+inputEl.value)) {
+        pushNotification(500, 10, 'Error!',
+          'Bad!\n '
+          + 'Age must be more than 18 & less 90', 'error');
+
+        return false;
+      }
+    }
+
+    if ((isAmountVal && +inputEl.value === 0) || isNaN(+inputEl.value)) {
+      pushNotification(500, 10, 'Error!',
+        'Bad!\n '
+        + 'Salary must be more than 0!', 'error');
+
+      return false;
+    }
+
+    return true;
   }
 }
