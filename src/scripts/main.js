@@ -198,7 +198,7 @@ function addRow(formElement, tableElement, submitEvent) {
 }
 
 function validateForm(formData) {
-  if (formData.name.length < 4) {
+  if (formData.name.length < 4 || formData.name.trim() === '') {
     pushNotification(500, 10, 'Error!',
       `Something went wrong!<br> `
       + `Name field cannot be empty! Or less then 4 letters!`, 'error');
@@ -240,7 +240,7 @@ function pushNotification(posTop, posRight, title, description, type = '') {
 
   document.body.append(notificationEl);
 
-  setTimeout(() => notificationEl.remove(), 2000);
+  setTimeout(() => notificationEl.remove(), 4000);
 };
 
 function editableCell(cellElement) {
