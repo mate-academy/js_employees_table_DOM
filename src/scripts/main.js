@@ -3,7 +3,6 @@
 const tableEl = document.querySelector('table');
 const tHead = tableEl.querySelector('thead');
 
-// Sort table by order
 tHead.addEventListener('click', (e) => {
   if (e.target.tagName !== 'TH') {
     return false;
@@ -14,7 +13,6 @@ tHead.addEventListener('click', (e) => {
   sortTable(e.target, tableEl, order);
 });
 
-// Set active row by click
 tableEl.tBodies[0].addEventListener('click', (e) => {
   if (e.target.parentElement.tagName !== 'TR') {
     return false;
@@ -23,7 +21,6 @@ tableEl.tBodies[0].addEventListener('click', (e) => {
   setActiveRow(tableEl, e);
 });
 
-// Editing cells
 tableEl.tBodies[0].addEventListener('dblclick', (e) => {
   if (e.target.tagName !== 'TD') {
     return false;
@@ -33,13 +30,11 @@ tableEl.tBodies[0].addEventListener('dblclick', (e) => {
 });
 
 function sortTable(element, table, order) {
-  // Get index of sorting column
   const index = [...element.parentElement.children].indexOf(element);
 
   const rows = [...table.querySelectorAll('tbody > tr')];
 
   rows.sort((a, b) => {
-    // If sorting values are numbers
     if (getNumber(a.children[index].innerText)) {
       return order === 'ASC'
         ? getNumber(a.children[index].innerText)
@@ -48,7 +43,6 @@ function sortTable(element, table, order) {
           - getNumber(a.children[index].innerText);
     }
 
-    // If sorting values are strings
     if (a.children[index].innerText < b.children[index].innerText) {
       return order === 'ASC' ? -1 : 1;
     }
@@ -63,12 +57,10 @@ function sortTable(element, table, order) {
   table.querySelector('tbody').append(...rows);
 }
 
-// Parse number from string
 function getNumber(string) {
   return parseInt(string.replace(/\D/g, ''));
 }
 
-// Set sorting order flag
 function setOrder(element) {
   if (!element.dataset.order) {
     element.dataset.order = 'ASC';
@@ -81,7 +73,6 @@ function setOrder(element) {
   return element.dataset.order;
 }
 
-// Setting active row in table by click
 function setActiveRow(table, clickEvent) {
   const rows = [...table.querySelectorAll('tbody > tr')];
   const activeRow = rows.find((row) => row.classList.contains('active'));
@@ -97,41 +88,55 @@ function setActiveRow(table, clickEvent) {
 function addForm() {
   document.body.insertAdjacentHTML('beforeend', `
     <form class="new-employee-form">
-      <label>Name: <input
-                      name="name"
-                      data-qa="name"
-                      type="text"
-                      required
-                    >
+      <label>
+        Name:
+        <input
+          name="name"
+          data-qa="name"
+          type="text"
+          required
+        >
       </label>
-      <label>Position: <input
-                          name="position"
-                          data-qa="position"
-                          type="text"
-                          required
-                        >
+      <label>
+      Position:
+        <input
+          name="position"
+          data-qa="position"
+          type="text"
+          required
+        >
       </label>
-      <label>Office: <select name="office" data-qa="office" required>
-                      <option value="Tokyo">Tokyo</option>
-                      <option value="Singapore">Singapore</option>
-                      <option value="New York">New York</option>
-                      <option value="Edinburgh">Edinburgh</option>
-                      <option value="San Francisco">San Francisco</option>
-                    </select>
+      <label>
+        Office:
+        <select
+          name="office"
+          data-qa="office"
+          required
+        >
+          <option value="Tokyo">Tokyo</option>
+          <option value="Singapore">Singapore</option>
+          <option value="New York">New York</option>
+          <option value="Edinburgh">Edinburgh</option>
+          <option value="San Francisco">San Francisco</option>
+        </select>
       </label>
-      <label>Age: <input
-                    name="age"
-                    data-qa="age"
-                    type="number"
-                    required
-                  >
+      <label>
+        Age:
+        <input
+          name="age"
+          data-qa="age"
+          type="number"
+          required
+        >
       </label>
-      <label>Salary: <input
-                        name="salary"
-                        data-qa="salary"
-                        type="number"
-                        required
-                      >
+      <label>
+        Salary:
+        <input
+          name="salary"
+          data-qa="salary"
+          type="number"
+          required
+        >
       </label>
       <button
         id="submit-btn"
@@ -260,27 +265,44 @@ function editableCell(cellElement) {
   if (isOfficeCell) {
     cellElement.insertAdjacentHTML('beforeend', `
       <select id = "cell-select">
-        <option value="Tokyo"
+        <option
+          value="Tokyo"
           ${text === 'Tokyo' ? 'selected' : ''}
-        >Tokyo</option>
-        <option value="Singapore"
+        >
+          Tokyo
+        </option>
+        <option
+          value="Singapore"
           ${text === 'Singapore' ? 'selected' : ''}
-        >Singapore</option>
-        <option value="New York"
+        >
+          Singapore
+        </option>
+        <option
+          value="New York"
           ${text === 'New York' ? 'selected' : ''}
-        >New York</option>
-        <option value="Edinburgh"
+        >
+          New York
+        </option>
+        <option
+          value="Edinburgh"
           ${text === 'Edinburgh' ? 'selected' : ''}
-        >Edinburgh</option>
-        <option value="San Francisco"
+        >
+          Edinburgh
+        </option>
+        <option
+          value="San Francisco"
           ${text === 'San Francisco' ? 'selected' : ''}
-        >San Francisco</option>
+        >
+          San Francisco
+        </option>
       </select>
     `);
   } else {
     cellElement.insertAdjacentHTML('beforeend', `
-      <input class = "cell-input" value = "${text}">
-      </input>
+      <input
+        class = "cell-input"
+        value = "${text}"
+      >
     `);
   }
 
