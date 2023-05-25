@@ -184,9 +184,42 @@ let previousValue = '';
 function saveChanges() {
   const inputValue = activeInput.value;
   const cell = activeInput.parentNode;
+  const cellIndex = Array.from(cell.parentNode.children).indexOf(cell);
 
-  inputValue === '' ? cell.textContent = previousValue
-    : cell.textContent = inputValue;
+  switch (cellIndex) {
+    case 0:
+      if (inputValue.length < 4) {
+        pushNotification('Name minimum length is 4', 'error');
+        activeInput.focus();
+      } else {
+        cell.textContent = inputValue;
+
+        return cell.textContent;
+      }
+      break;
+
+    case 1:
+      inputValue === '' ? cell.textContent = previousValue
+        : cell.textContent = inputValue;
+      break;
+
+    case 3:
+      if (Number(inputValue) > 90 || Number(inputValue) < 18) {
+        pushNotification('Age should be between 18 and 90', 'error');
+        activeInput.focus();
+      } else {
+        cell.textContent = inputValue;
+
+        return cell.textContent;
+      }
+      break;
+
+    case 4:
+      cell.textContent = '$' + (Math.round(Number(inputValue) * 1000) / 1000)
+        .toFixed(3).toString().replace('.', ',');
+
+      return cell.textContent;
+  }
 
   activeInput = null;
   previousValue = '';
@@ -197,9 +230,26 @@ cells.forEach((cell) => {
     previousValue = cell.textContent;
     cell.textContent = '';
 
-    activeInput = document.createElement('input');
-    activeInput.classList.add('cell-input');
-    activeInput.value = previousValue;
+    const index = e.target.closest('tr').children.indexOf(3);
+
+    if (index === 3) {
+      activeInput = document.createElement('select');
+      activeInput.classList.add('cell-input');
+
+      selectValues.forEach((value) => {
+        const option = document.createElement('option');
+
+        option.value = value;
+        option.textContent = value;
+        activeInput.appendChild(option);
+      });
+
+      activeInput.value = previousValue;
+    } else {
+      activeInput = document.createElement('input');
+      activeInput.classList.add('cell-input');
+      activeInput.value = previousValue;
+    }
 
     activeInput.addEventListener('blur', saveChanges);
 
