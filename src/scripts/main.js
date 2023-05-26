@@ -4,56 +4,35 @@ const header = document.querySelector('tr');
 const tbody = document.querySelector('tbody');
 const rowsArray = tbody.children;
 let sorted;
-let clickCounter = 0;
 
 document.body.children[0].style.alignSelf = 'flex-start';
 
-[...header.children].slice(0, 3).forEach(item => {
+[...header.children].forEach((item, i) => {
+  let clickCounter = 0;
+
   item.addEventListener('click', (e) => {
     clickCounter++;
 
-    const i = [...header.children].indexOf(item);
-
     sorted = [...rowsArray].sort((a, b) =>
-      a.children[i].innerText.localeCompare(b.children[i].innerText));
+      b.children[i].innerText.localeCompare(a.children[i].innerText));
 
     if (clickCounter % 2) {
       sorted = [...rowsArray].sort((a, b) =>
-        b.children[i].innerText.localeCompare(a.children[i].innerText));
+        a.children[i].innerText.localeCompare(b.children[i].innerText));
+    }
+
+    if (item.innerText === 'Salary') {
+      sorted = [...rowsArray].sort((a, b) =>
+        toNumber(b.children[i]) - toNumber(a.children[i]));
+
+      if (clickCounter % 2) {
+        sorted = [...rowsArray].sort((a, b) =>
+          toNumber(a.children[i]) - toNumber(b.children[i]));
+      }
     }
 
     tbody.prepend(...sorted);
-    clickCounter = 0;
   });
-});
-
-header.children[3].addEventListener('click', (e) => {
-  clickCounter++;
-
-  sorted = [...rowsArray].sort((a, b) =>
-    b.children[3].innerText - a.children[3].innerText);
-
-  if (clickCounter % 2) {
-    sorted = [...rowsArray].sort((a, b) =>
-      a.children[3].innerText - b.children[3].innerText);
-  }
-  tbody.prepend(...sorted);
-  clickCounter = 0;
-});
-
-header.children[4].addEventListener('click', (e) => {
-  clickCounter++;
-
-  sorted = [...rowsArray].sort((a, b) =>
-    toNumber(b.children[4]) - toNumber(a.children[4]));
-
-  if (clickCounter % 2) {
-    sorted = [...rowsArray].sort((a, b) =>
-      toNumber(a.children[4]) - toNumber(b.children[4]));
-  }
-
-  tbody.prepend(...sorted);
-  clickCounter = 0;
 });
 
 function toNumber(element) {
@@ -62,8 +41,6 @@ function toNumber(element) {
 
 [...rowsArray].forEach(row => {
   row.addEventListener('click', (e) => {
-    clickCounter++;
-
     const activeElement = document.querySelector('.active');
 
     if (activeElement) {
