@@ -188,6 +188,7 @@ function saveChanges() {
 
   switch (cellIndex) {
     case 0:
+    case 1:
       if (inputValue.length < 4) {
         pushNotification('Name minimum length is 4', 'error');
         activeInput.focus();
@@ -198,10 +199,10 @@ function saveChanges() {
       }
       break;
 
-    case 1:
-      inputValue === '' ? cell.textContent = previousValue
-        : cell.textContent = inputValue;
-      break;
+    case 2:
+      cell.textContent = inputValue;
+
+      return cell.textContent;
 
     case 3:
       if (Number(inputValue) > 90 || Number(inputValue) < 18) {
@@ -215,10 +216,15 @@ function saveChanges() {
       break;
 
     case 4:
-      cell.textContent = '$' + (Math.round(Number(inputValue) * 1000) / 1000)
-        .toFixed(3).toString().replace('.', ',');
+      if (Number(inputValue) < 0) {
+        pushNotification('Number should be positive', 'error');
+        activeInput.focus();
+      } else {
+        cell.textContent = '$' + (Math.round(Number(inputValue) * 1000) / 1000)
+          .toFixed(3).toString().replace('.', ',');
 
-      return cell.textContent;
+        return cell.textContent;
+      }
   }
 
   activeInput = null;
@@ -230,9 +236,9 @@ cells.forEach((cell) => {
     previousValue = cell.textContent;
     cell.textContent = '';
 
-    const index = e.target.closest('tr').children.indexOf(3);
+    const index = e.target.cellIndex;
 
-    if (index === 3) {
+    if (index === 2) {
       activeInput = document.createElement('select');
       activeInput.classList.add('cell-input');
 
