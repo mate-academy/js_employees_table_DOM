@@ -37,6 +37,8 @@ const rows = tbody.rows;
 
 // Push notification FUNCTION;
 function pushNotification(message, type) {
+  const errorTitle = `Form was't added !!!`;
+  const successTitle = `Form was added`;
   const notifyErrors = {
     name: 'Name field should have not less then 4 character',
     position: 'Position field should have not less then 4 character',
@@ -44,9 +46,6 @@ function pushNotification(message, type) {
     age: 'Age field should be from 18 to 90',
     salary: 'Salary field should be from 90$',
   };
-
-  const errorTitle = `Form was't added !!!`;
-  const successTitle = `Form was added`;
   const successDescription = `Employee was added in the end of the table!\n `
     + `To edit the data double click on a cell!`;
 
@@ -82,7 +81,7 @@ function pushNotification(message, type) {
   div.style.top = '450px';
 
   setTimeout(() => {
-    document.body.removeChild(div);
+    document.querySelectorAll('.notification').forEach(x => x.remove());
   }, 6000);
 };
 
@@ -178,13 +177,16 @@ tbody.addEventListener('dblclick', e => {
   const target = e.target.parentElement;
   const input = document.createElement('input');
   const select = document.createElement('select');
-  let inputOrSelect = true;
   const theadTitle = thead.firstElementChild.children;
   const index = [...target.children].findIndex(x => x === e.target);
+  const styleTD = getComputedStyle(e.target);
+  let inputOrSelect = true;
 
   target.children[index].innerText = '';
   input.classList.add('cell-input');
   select.classList.add('cell-input');
+  input.style.width = styleTD.width;
+  select.style.width = styleTD.width;
 
   if (index < 2) {
     input.type = 'text';
