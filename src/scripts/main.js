@@ -217,7 +217,7 @@ function saveChanges() {
 
     case 4:
       if (Number(inputValue) < 0) {
-        pushNotification('Number should be positive', 'error');
+        pushNotification('Input should be a positive number', 'error');
         activeInput.focus();
       } else {
         cell.textContent = '$' + (Math.round(Number(inputValue) * 1000) / 1000)
@@ -238,23 +238,37 @@ cells.forEach((cell) => {
 
     const index = e.target.cellIndex;
 
-    if (index === 2) {
-      activeInput = document.createElement('select');
-      activeInput.classList.add('cell-input');
+    switch (index) {
+      case 0:
+      case 1:
+        activeInput = document.createElement('input');
+        activeInput.classList.add('cell-input');
+        activeInput.type = 'text';
+        activeInput.value = previousValue;
+        break;
 
-      selectValues.forEach((value) => {
-        const option = document.createElement('option');
+      case 2:
+        activeInput = document.createElement('select');
+        activeInput.classList.add('cell-input');
 
-        option.value = value;
-        option.textContent = value;
-        activeInput.appendChild(option);
-      });
+        selectValues.forEach((value) => {
+          const option = document.createElement('option');
 
-      activeInput.value = previousValue;
-    } else {
-      activeInput = document.createElement('input');
-      activeInput.classList.add('cell-input');
-      activeInput.value = previousValue;
+          option.value = value;
+          option.textContent = value;
+          activeInput.appendChild(option);
+        });
+
+        activeInput.value = previousValue;
+        break;
+
+      case 3:
+      case 4:
+        activeInput = document.createElement('input');
+        activeInput.classList.add('cell-input');
+        activeInput.type = 'number';
+        activeInput.value = previousValue;
+        break;
     }
 
     activeInput.addEventListener('blur', saveChanges);
