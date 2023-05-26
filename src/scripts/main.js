@@ -271,7 +271,13 @@ cells.forEach((cell) => {
         break;
     }
 
-    activeInput.addEventListener('blur', saveChanges);
+    activeInput.addEventListener('blur', () => {
+      if (!activeInput.value) {
+        activeInput.value = previousValue;
+      } else {
+        saveChanges();
+      }
+    });
 
     activeInput.addEventListener('keypress', (evn) => {
       if (evn.key === 'Enter') {
