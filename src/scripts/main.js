@@ -179,7 +179,7 @@ submitButton.addEventListener('click', (e) => {
 
 const cells = document.querySelectorAll('td');
 let activeInput = null;
-let previousValue = '';
+// let previousValue = '';
 
 function saveChanges() {
   const inputValue = activeInput.value;
@@ -205,7 +205,8 @@ function saveChanges() {
       return cell.textContent;
 
     case 3:
-      if (Number(inputValue) > 90 || Number(inputValue) < 18) {
+      if (isNaN(parseFloat(inputValue)) && Number(inputValue) > 90
+        && Number(inputValue) < 18) {
         pushNotification('Age should be between 18 and 90', 'error');
         activeInput.focus();
       } else {
@@ -216,7 +217,7 @@ function saveChanges() {
       break;
 
     case 4:
-      if (Number(inputValue) < 0) {
+      if (isNaN(parseFloat(inputValue)) && Number(inputValue) < 0) {
         pushNotification('Input should be a positive number', 'error');
         activeInput.focus();
       } else {
@@ -228,12 +229,12 @@ function saveChanges() {
   }
 
   activeInput = null;
-  previousValue = '';
 }
 
 cells.forEach((cell) => {
   cell.addEventListener('dblclick', (e) => {
-    previousValue = cell.textContent;
+    const previousValue = cell.textContent;
+
     cell.textContent = '';
 
     const index = e.target.cellIndex;
@@ -266,7 +267,6 @@ cells.forEach((cell) => {
       case 4:
         activeInput = document.createElement('input');
         activeInput.classList.add('cell-input');
-        activeInput.type = 'number';
         activeInput.value = previousValue;
         break;
     }
