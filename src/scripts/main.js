@@ -91,7 +91,7 @@ form.innerHTML = `
     name="salary"
     type="number"
     data-qa="salary"
-    required"
+    required
   ></label>
   <button type="submit">Save to table</button>
 `;
@@ -141,15 +141,15 @@ tbody.addEventListener('dblclick', d => {
   const input = document.createElement('input');
   const cellAge = field.closest('tr').children[3];
   const cellSalary = field.closest('tr').children[4];
-
   const text = field.innerText;
 
   input.value = text;
-
   input.className = 'cell-input';
 
   if (field === cellAge) {
     input.type = 'number';
+    input.min = '18';
+    input.max = '99';
   }
 
   if (field === cellSalary) {
@@ -158,10 +158,14 @@ tbody.addEventListener('dblclick', d => {
   }
 
   field.innerText = '';
+
   field.append(input);
 
-  input.addEventListener('blur', () => {
-    const inputText = input.value.trim();
+  input.addEventListener('blur', (b) => {
+    const currentInput = b.target;
+    const inputText = currentInput.value.trim();
+
+    inputValidation(inputText);
 
     if (field === cellSalary) {
       inputText
@@ -169,15 +173,21 @@ tbody.addEventListener('dblclick', d => {
         : input.replaceWith(text);
     }
 
-    inputText
+    if (field === cellAge) {
+      inputText > 18 && inputText < 90
+        ? input.replaceWith(formatNumber(inputText))
+        : input.replaceWith(text);
+    }
+
+    inputText.length > 4
       ? input.replaceWith(inputText)
       : input.replaceWith(text);
   });
 
   input.addEventListener('keypress', k => {
-    if (k.key === 'Enter') {
-      const inputText = k.target.value.trim();
+    const inputText = k.target.value.trim();
 
+    if (k.key === 'Enter') {
       if (field === cellSalary) {
         inputText
           ? input.replaceWith(text)
@@ -190,6 +200,17 @@ tbody.addEventListener('dblclick', d => {
     }
   });
 });
+
+function inputValidation(string) {
+  if (string < 18 || string > 90) {
+    pushNotification(
+      'Warning', 'Your age must be between 18 and 90 years old', 'warning');
+  };
+
+  if (isNaN(string) && string.length < 4) {
+    pushNotification('Error', 'Write full name please', 'error');
+  };
+}
 
 function pushNotification(title, description, type) {
   const block = document.createElement('div');
