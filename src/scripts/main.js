@@ -91,19 +91,25 @@ const officeInput = document.querySelector('[data-qa="office"]');
 const ageInput = document.querySelector('[data-qa="age"]');
 const salaryInput = document.querySelector('[data-qa="salary"]');
 
-nameInput.addEventListener('blur', (e) => {
-  if (nameInput.value.length < 4) {
-    Noti('Warning', 'Name has less than 4 letters', 'warning');
-    e.target.value = '';
-  }
-});
+function formValidation() {
+  const nameValue = nameInput.value;
+  const age = ageInput.value;
+  const letters = /^[A-Za-z]+$/;
 
-ageInput.addEventListener('blur', (e) => {
-  if (e.target.value < 18 || e.target.value > 90) {
-    Noti('Warning', 'Age should be from 18 to 90 years', 'warning');
-    e.target.value = '';
+  if (!nameValue.match(letters) || nameValue.length < 4) {
+    Noti('Warning', 'Name has less than 4 letters', 'warning', '389px');
+
+    return false;
   }
-});
+
+  if (age < 18 || age > 90) {
+    Noti('Warning', 'Age should be from 18 to 90 years', 'warning', '490px');
+
+    return false;
+  }
+
+  return true;
+};
 
 // Add employe
 
@@ -122,6 +128,15 @@ form.addEventListener('submit', e => {
   personOffice.innerText = officeInput.value;
   personAge.innerText = ageInput.value;
 
+  const validationRes = formValidation();
+
+  if (!validationRes) {
+    Noti('Error', 'New employee can not be added to the table',
+      'error', '280px');
+
+    return;
+  }
+
   if (salaryInput.value > 999) {
     const value = salaryInput.value.split('');
     const lastChar = value.splice(value.length - 3).join('');
@@ -130,6 +145,7 @@ form.addEventListener('submit', e => {
   } else {
     personSalary.innerText = `$${salaryInput.value}`;
   }
+
   tbody.prepend(newEmployee);
 
   nameInput.value = '';
@@ -137,19 +153,23 @@ form.addEventListener('submit', e => {
   ageInput.value = '';
   salaryInput.value = '';
 
-  Noti('Success', 'New employee is successfully added to the table', 'success');
+  Noti('Success', 'New employee is successfully added to the table', 'success', '280px');
 });
 
 // Notification
 
-function Noti(tittle, text, result) {
+function Noti(tittle, text, result, margin) {
   const noti = document.createElement('div');
+  const h = document.createElement('p');
 
   noti.setAttribute('data-qa', 'notification');
   noti.classList = `notification ${result}`;
-  noti.title = tittle;
+  h.textContent = tittle;
+  noti.append(h);
   noti.textContent = text;
-  body.prepend(noti);
+  noti.style.top = margin;
+  noti.style.left = '0px';
+  form.append(noti);
 
   setTimeout(() => noti.remove(), 2000);
 }
@@ -159,12 +179,26 @@ function Noti(tittle, text, result) {
 tbody.addEventListener('dblclick', e => {
   const el = e.target.closest('td');
   const input = document.createElement('input');
+  const prevValue = [...el.textContent];
 
   el.textContent = '';
   input.className = 'cell-input';
   el.append(input);
 
   input.addEventListener('blur', eve => {
-    el.innerText = eve.target.value;
+    if (el.cellIndex === 0) {
+      eve.target.value < 4 ? el.innerText = eve.target.value
+        : el.textContent = prevValue.join('');
+    }
+
+    if (el.cellIndex === 3) {
+      eve.target.value > 18 && eve.target.value < 90
+        ? el.innerText = eve.target.value
+        : el.textContent = prevValue.join('');
+    }
+
+    if (el.cellIndex === 4) {
+      el.innerText = `$${eve.target.value}`;
+    }
   });
 });
