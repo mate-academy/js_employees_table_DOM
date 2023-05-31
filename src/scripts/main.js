@@ -1,60 +1,87 @@
 'use strict';
 
+const table = document.querySelector('table');
 const tableHeader = document.querySelector('thead tr');
 const tableBody = document.querySelector('tbody');
-let temp = null;
+const offices = [
+  'Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco',
+];
+
+table.insertAdjacentHTML('afterend', `
+  <form method="/" action="GET" class="new-employee-form">
+    <label>Name:
+      <input name="name" type="text" data-qa="name">
+    </label>
+    <label>Position:
+      <input name="position" type="text" data-qa="position">
+    </label>
+    <label>Office:
+      <select name="office" type="text" data-qa="office">
+        <option selected disabled></option>
+        ${createSelectList()}
+      </select>
+    </label>
+    <label>Age:
+      <input name="age" type="number" data-qa="age">
+    </label>
+    <label>Salary:
+      <input name="salary" type="number" data-qa="salary">
+    </label>
+    <button type="submit">Save to table</button>
+  </form>
+`);
+
+const form = document.querySelector('.new-employee-form');
+
+let isSortedColumn = null;
+
+function sortColumns(a, b) {
+  if (a.includes('$')) {
+    return a.slice(1).replace(',', '') - b.slice(1).replace(',', '');
+  }
+
+  if (+a) {
+    return a - b;
+  }
+
+  return a.localeCompare(b);
+}
 
 tableHeader.addEventListener('click', e => {
   const indexColumn = [...tableHeader.children].findIndex(el =>
     el === e.target
   );
 
-  if (temp !== e.target) {
+  if (isSortedColumn !== e.target) {
     const ASC = [...tableBody.children].sort((a, b) => {
       const start = a.children[indexColumn].textContent;
       const end = b.children[indexColumn].textContent;
 
-      if (start.includes('$')) {
-        return start.slice(1).replace(',', '') - end.slice(1).replace(',', '');
-      }
-
-      if (+start) {
-        return start - end;
-      }
-
-      return start.localeCompare(end);
+      return sortColumns(start, end);
     });
 
-    document.querySelector('tbody').append(...ASC);
-    temp = e.target;
+    tableBody.append(...ASC);
+    isSortedColumn = e.target;
 
     return;
   }
 
-  if (temp === e.target) {
+  if (isSortedColumn === e.target) {
     const DESC = [...tableBody.children].sort((a, b) => {
       const start = a.children[indexColumn].textContent;
       const end = b.children[indexColumn].textContent;
 
-      if (start.includes('$')) {
-        return end.slice(1).replace(',', '') - start.slice(1).replace(',', '');
-      }
-
-      if (+start) {
-        return end - start;
-      }
-
-      return end.localeCompare(start);
+      return sortColumns(end, start);
     });
 
-    document.querySelector('tbody').append(...DESC);
-    temp = null;
+    tableBody.append(...DESC);
+    isSortedColumn = null;
   }
 });
 
 let previosTargetRow = null;
 
-document.querySelector('table tbody').addEventListener('click', e => {
+tableBody.addEventListener('click', e => {
   const selectedRow = e.target.closest('tr');
 
   if (previosTargetRow) {
@@ -73,37 +100,68 @@ document.querySelector('table tbody').addEventListener('click', e => {
   selectedRow.classList.add('active');
 });
 
-const form = document.createElement('form');
+function createSelectList() {
+  return `${offices.map(office => `<option>${office}</option>`).join('')}`;
+}
 
-form.className = 'new-employee-form';
+function convertSalary(salary) {
+  return `$${(+salary).toLocaleString('en-US')}`;
+}
 
-const offices = [
-  'Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco',
-];
+function validData(key, value, data) {
+  if (key === 'name') {
+    if (value.trim().length < 4) {
+      return pushNotification(450, 'error',
+        'The "Name" must contain more than 4 letters', 'error');
+    }
 
-form.innerHTML = `
-  <label>Name:
-    <input name="name" type="text" data-qa="name">
-  </label>
-  <label>Position:
-    <input name="position" type="text" data-qa="position">
-  </label>
-  <label>Office:
-    <select name="office" type="text" data-qa="office">
-      <option selected disabled></option>
-      ${offices.map(office => `<option>${office}</option>`).join('')}
-    </select>
-  </label>
-  <label>Age:
-    <input name="age" type="number" data-qa="age">
-  </label>
-  <label>Salary:
-    <input name="salary" type="number" data-qa="salary">
-  </label>
-  <button type="submit">Save to table</button>
-`;
+    if ([...value].find(
+      x => x.toUpperCase() === x.toLowerCase() && x !== ' '
+    )) {
+      return pushNotification(450, 'error',
+        'Invalid data, please use letters in "Name" field', 'error');
+    }
+  }
 
-document.querySelector('table').insertAdjacentElement('afterend', form);
+  if (key === 'position') {
+    if (value.trim().length === 0) {
+      return pushNotification(450, 'error',
+        'The "Position" is empty', 'error');
+    }
+
+    if ([...value].find(
+      x => x.toUpperCase() === x.toLowerCase() && x !== ' '
+    )) {
+      return pushNotification(450, 'error',
+        'Invalid data, please use letters in "Position" field', 'error');
+    }
+  }
+
+  if (data !== undefined) {
+    if (!('office' in data)) {
+      if (value.length === 0) {
+        return pushNotification(450, 'error',
+          'The "Office" is not selected', 'error');
+      }
+    }
+  }
+
+  if (key === 'age') {
+    if (value < 18 || value > 90) {
+      return pushNotification(450, 'error',
+        'The age must be more than 18 and less than 90', 'error');
+    }
+  }
+
+  if (key === 'salary') {
+    if (+value.slice(1) <= 0) {
+      return pushNotification(450, 'error',
+        'The "Salary" is empty', 'error');
+    }
+  }
+
+  return true;
+}
 
 form.addEventListener('submit', e => {
   e.preventDefault();
@@ -112,72 +170,28 @@ form.addEventListener('submit', e => {
   const data = new FormData(form);
   const formValues = Object.fromEntries(data.entries());
 
-  formValues.salary = `$${(+(formValues.salary)).toLocaleString('en-US')}`;
+  formValues.salary = convertSalary(formValues.salary);
 
   const values = [...Object.values(formValues)];
 
-  if (formValues.name.length < 4) {
-    return pushNotification(
-      450,
-      'error',
-      'The "Name" must contain more than 4 letters',
-      'error'
-    );
-  }
-
-  if (formValues.position === '') {
-    return pushNotification(
-      450,
-      'error',
-      'The "Position" is empty',
-      'error'
-    );
-  }
-
-  if (!formValues.office) {
-    return pushNotification(
-      450,
-      'error',
-      'The "Office" is not selected',
-      'error'
-    );
-  }
-
-  if (formValues.age < 18 || formValues.age > 90) {
-    return pushNotification(
-      450,
-      'error',
-      'The age must be more than 18 and less than 90',
-      'error');
-  }
-
-  if (+formValues.salary.slice(1) <= 0) {
-    return pushNotification(
-      450,
-      'error',
-      'The "Salary" is empty',
-      'error'
-    );
+  for (const key in formValues) {
+    if (validData(key, formValues[key], formValues) !== true) {
+      return;
+    }
   }
 
   newEmployee.innerHTML = `
-    ${values.map(value => `<td>${value}</td>`).join('')}
+    ${values.map(value => `<td>${value.trim()}</td>`).join('')}
   `;
 
-  document.querySelector('tbody').append(newEmployee);
+  tableBody.append(newEmployee);
 
-  pushNotification(
-    10, 'success', 'The data has been added successfully', 'success'
-  );
+  pushNotification(10, 'success',
+    'The data has been added successfully', 'success');
   form.reset();
 });
 
-const pushNotification = (
-  posTop,
-  title,
-  description,
-  type
-) => {
+function pushNotification(posTop, title, description, type) {
   if (document.body.contains(document.querySelector('.notification'))) {
     document.querySelector('.notification').remove();
   }
@@ -204,7 +218,15 @@ const pushNotification = (
   }, 5000);
 };
 
-document.querySelector('table tbody').addEventListener('dblclick', e => {
+const nameColumn = {
+  0: 'name',
+  1: 'position',
+  2: 'office',
+  3: 'age',
+  4: 'salary',
+};
+
+tableBody.addEventListener('dblclick', e => {
   if (document.querySelector('.cell-input')) {
     return;
   }
@@ -214,29 +236,18 @@ document.querySelector('table tbody').addEventListener('dblclick', e => {
 
   selectedCell.textContent = '';
 
-  const input = document.createElement('input');
-  const select = document.createElement('select');
-
-  input.classList.add('cell-input');
-  select.classList.add('cell-input');
-
-  selectedCell.append(input);
-  input.focus();
-
   const findIndex = [...e.target.closest('tr').children].findIndex(x =>
     x === e.target.closest('td')
   );
 
-  if (findIndex > 2) {
-    input.type = 'number';
-  }
-
   if (findIndex === 2) {
-    input.remove();
+    const select = document.createElement('select');
+
+    select.classList.add('cell-input');
     selectedCell.append(select);
 
     select.innerHTML = `
-      ${offices.map(office => `<option>${office}</option>`).join('')}
+      ${createSelectList()}
     `;
 
     select.addEventListener('blur', () => {
@@ -248,36 +259,41 @@ document.querySelector('table tbody').addEventListener('dblclick', e => {
         select.blur();
       }
     });
-  }
+  } else {
+    const input = document.createElement('input');
 
-  input.addEventListener('blur', () => {
-    let text = input.value.trim();
+    input.classList.add('cell-input');
+    selectedCell.append(input);
+    input.focus();
 
-    if (!text) {
-      selectedCell.textContent = textCell;
-
-      return;
+    if (findIndex > 2) {
+      input.type = 'number';
     }
 
-    if (findIndex === 4) {
-      text = `$${(+text).toLocaleString('en-US')}`;
-    }
+    input.addEventListener('blur', () => {
+      let text = input.value.trim();
 
-    selectedCell.textContent = text;
+      if (findIndex === 4) {
+        text = convertSalary(text);
+      }
 
-    pushNotification(
-      10, 'success', 'The data has been successfully changed', 'success'
-    );
-  });
+      if (validData(nameColumn[findIndex], text) !== true) {
+        selectedCell.textContent = textCell;
 
-  input.addEventListener('keydown', ev => {
-    if (ev.code === 'Enter') {
-      input.blur();
+        return;
+      }
+
+      selectedCell.textContent = text;
 
       pushNotification(
         10, 'success', 'The data has been successfully changed', 'success'
       );
-    }
-  });
+    });
+
+    input.addEventListener('keydown', ev => {
+      if (ev.code === 'Enter') {
+        input.blur();
+      }
+    });
+  }
 });
-// for test
