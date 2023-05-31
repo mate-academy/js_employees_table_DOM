@@ -94,6 +94,7 @@ const salaryInput = document.querySelector('[data-qa="salary"]');
 function formValidation() {
   const nameValue = nameInput.value;
   const age = ageInput.value;
+  const positionValue = positionInput.value;
   const letters = /^[A-Za-z]+$/;
 
   if (!nameValue.match(letters) || nameValue.length < 4) {
@@ -104,6 +105,12 @@ function formValidation() {
 
   if (age < 18 || age > 90) {
     Noti('Warning', 'Age should be from 18 to 90 years', 'warning', '490px');
+
+    return false;
+  }
+
+  if (!positionValue.match(letters) || positionValue.length < 4) {
+    Noti('Warning', 'Position has less than 4 letters', 'warning', '590px');
 
     return false;
   }
@@ -153,7 +160,8 @@ form.addEventListener('submit', e => {
   ageInput.value = '';
   salaryInput.value = '';
 
-  Noti('Success', 'New employee is successfully added to the table', 'success', '280px');
+  Noti('Success', 'New employee is successfully added to the table',
+    'success', '280px');
 });
 
 // Notification
@@ -187,7 +195,7 @@ tbody.addEventListener('dblclick', e => {
 
   input.addEventListener('blur', eve => {
     if (el.cellIndex === 0) {
-      eve.target.value < 4 ? el.innerText = eve.target.value
+      eve.target.value.length > 4 ? el.innerText = eve.target.value
         : el.textContent = prevValue.join('');
     }
 
@@ -198,7 +206,11 @@ tbody.addEventListener('dblclick', e => {
     }
 
     if (el.cellIndex === 4) {
-      el.innerText = `$${eve.target.value}`;
+      input.type = 'number';
+
+      el.textContent = eve.target.value
+        ? `$${eve.target.value.toLocaleString()}`
+        : prevValue.join('');
     }
   });
 });
