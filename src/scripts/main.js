@@ -13,36 +13,27 @@ const sortState = {
 };
 let selectedElement = null;
 
-// Масив, в якому зберігатимуться дані про працівників
 let employees = [];
 
-// редагування по подвійному кліці  //!не працює після першого редагування
 tbody.addEventListener('dblclick', (even) => {
   const selectedElementDblClick = even.target;
 
   if (selectedElementDblClick.tagName === 'TD') {
-    // Отримати поточне значення комірки
     const currentValue = selectedElementDblClick.textContent;
 
-    // Створити поле введення для редагування
     const input = document.createElement('input');
 
     input.type = 'text';
     input.value = currentValue;
 
-    // Замінити вміст комірки полем введення
     selectedElementDblClick.textContent = '';
     selectedElementDblClick.appendChild(input);
 
-    // Фокус на полі введення
     input.focus();
 
-    // Обробка події втрати фокусу (при завершенні редагування)
     input.addEventListener('blur', () => {
-      // Отримати нове значення з поля введення
       const newValue = input.value;
 
-      // Оновити значення комірки
       selectedElementDblClick.textContent = newValue;
 
       getEmployeeDataFromRow();
@@ -51,22 +42,17 @@ tbody.addEventListener('dblclick', (even) => {
   }
 });
 
-// Сортування
 thead.addEventListener('click', even => {
   const targetHeader = even.target;
 
   const headerIndex = Array.from(thead.children).indexOf(targetHeader);
 
-  // Перевіряємо, чи натиснуто на новий заголовок
   if (sortState.column !== headerIndex) {
-    // Якщо натиснуто на новий заголовок, скидаємо напрямок сортування до 'asc'
     sortState.order = 'asc';
   } else {
-    // Якщо натиснуто на поточний заголовок, змінюємо напрямок сортування
     sortState.order = sortState.order === 'asc' ? 'desc' : 'asc';
   }
 
-  // Оновлюємо поточний стовпець сортування
   sortState.column = headerIndex;
 
   const sortRows = Array.from(document.querySelectorAll('table tbody tr'));
@@ -91,7 +77,6 @@ thead.addEventListener('click', even => {
   });
 });
 
-// виділення рядка
 tbody.addEventListener('click', (even) => {
   const target = even.target;
 
@@ -103,7 +88,6 @@ tbody.addEventListener('click', (even) => {
   selectedElement.classList.add('active');
 });
 
-// Створюємо форму
 (function createForm() {
   form.classList.add('new-employee-form');
   form.setAttribute('action', '#');
@@ -161,11 +145,9 @@ tbody.addEventListener('click', (even) => {
   <button type="submit">Save to table</button>`);
 })();
 
-// Обробник події submit форми
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  // Отримуємо значення полів форми
   const nameInput = form.querySelector('input[name="name"]');
   const positionInput = form.querySelector('input[name="position"]');
   const officeSelect = form.querySelector('select[name="office"]');
@@ -178,7 +160,6 @@ form.addEventListener('submit', (e) => {
   const age = parseInt(ageInput.value.trim());
   const salary = salaryInput.value.trim();
 
-  // Перевіряємо валідність введених даних
   let isValid = true;
   let errorMessage = '';
 
@@ -197,14 +178,12 @@ form.addEventListener('submit', (e) => {
     errorMessage += '- Salary should be a valid number.\n';
   }
 
-  // Виводимо повідомлення про помилки, якщо дані не валідні
   if (!isValid) {
     pushNotification('Error', errorMessage, 'error');
 
     return;
   }
 
-  // Створюємо об'єкт працівника
   const employee = {
     nam,
     position,
@@ -213,18 +192,14 @@ form.addEventListener('submit', (e) => {
     salary,
   };
 
-  // Додаємо працівника до масиву і відображаємо його в таблиці
   employees.push(employee);
   updateTable();
 
-  // Очищаємо значення полів форми
   form.reset();
 
-  // Виводимо повідомлення про успішне додавання працівника
   pushNotification('Success', 'New employee has been added.', 'success');
 });
 
-// Проходимося по кожному рядку і отримуємо дані про працівника
 function getEmployeeDataFromRow() {
   if (employees.length > 0) {
     employees = [];
@@ -238,7 +213,6 @@ function getEmployeeDataFromRow() {
     const age = parseInt(cells[3].textContent);
     const salary = formatSalary(cells[4].textContent);
 
-    // Створюємо об'єкт працівника і додаємо його до масиву
     const employee = {
       nam,
       position,
@@ -252,9 +226,7 @@ function getEmployeeDataFromRow() {
 }
 
 getEmployeeDataFromRow();
-//!  додаткові функції
 
-// Функція для додавання повідомлення у контейнер
 function pushNotification(title, description, type) {
   const notification = document.createElement('div');
 
@@ -272,27 +244,23 @@ function pushNotification(title, description, type) {
   }, 4000);
 };
 
-// Функція для перевірки валідності поля "Name"
 function isValidName(nam) {
   return nam.length >= 4;
 };
 
-// Функція для перевірки валідності поля "Age"
 function isValidAge(age) {
   return age >= 18 && age <= 90;
 };
 
-// Функція для перевірки валідності поля "Salary"
 function isValidSalary(salary) {
   return !isNaN(salary);
 };
 
-// Функція для додавання працівника до таблиці
 function addEmployeeToTable(employee) {
   const newRow = document.createElement('tr');
 
   newRow.innerHTML = `
-    <td>${employee.name}</td>
+    <td>${employee.nam}</td>
     <td>${employee.position}</td>
     <td>${employee.office}</td>
     <td>${employee.age}</td>
@@ -301,32 +269,25 @@ function addEmployeeToTable(employee) {
   tbody.appendChild(newRow);
 };
 
-// Функція для оновлення відображення таблиці
 function updateTable() {
-  // Очищаємо поточне вміст таблиці
   tbody.innerHTML = '';
 
-  // Додаємо кожного працівника до таблиці
   employees.forEach((employee) => {
     addEmployeeToTable(employee);
   });
 };
 
-// Форматування Salary
 function formatSalary(string) {
   return string.replace(/[$,]/g, '');
 };
 
 function formatCurrency(numberString) {
-  // Перетворення рядка на число
   const number = Number(numberString);
 
-  // Перевірка, чи є число дійсним числом
   if (isNaN(number)) {
     return 'Invalid number';
   }
 
-  // Форматування числа у грошовий формат
   const formattedNumber = number.toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD',
