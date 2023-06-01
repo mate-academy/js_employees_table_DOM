@@ -161,6 +161,8 @@ const inputForm = `
       data-qa="age"
       name="age"
       type="number"
+      min="18"
+      max="90"
       required
     >
   </label>
@@ -171,6 +173,7 @@ const inputForm = `
       data-qa="salary"
       name="salary"
       type="number"
+      min="0"
       required
     >
   </label>
@@ -210,13 +213,15 @@ const pushNotification = (description, type) => {
 };
 
 formElement.addEventListener('submit', function(e) {
-  const isValidName = this.elements.name.value.length >= 4;
+  const isValidName = this.elements.name.value.replace(/\s/g, '').length >= 4;
+  const isValidPosition = this
+    .elements.position.value.replace(/\s/g, '').length >= 4;
   const isValidAge = this.elements.age.value >= 18
     && this.elements.age.value <= 90;
 
   e.preventDefault();
 
-  if (isValidName && isValidAge) {
+  if (isValidName && isValidAge && isValidPosition) {
     const row = `
       <tr>
         <td>${this.elements.name.value}</td>
@@ -231,10 +236,10 @@ formElement.addEventListener('submit', function(e) {
     pushNotification('Your changes has been saved', 'Success');
     form.reset();
   } else {
-    if (!isValidAge && !isValidName) {
+    if (!isValidAge && !isValidName && !isValidPosition) {
       pushNotification(
         `Age must be between 18 and 90.
-         Name must at least than 4 letters`,
+         Name and position must at least than 4 letters`,
         'Error');
     } else {
       if (!isValidAge) {
@@ -243,38 +248,61 @@ formElement.addEventListener('submit', function(e) {
           'Error');
       }
 
-      if (!isValidName) {
+      if (!isValidName || !isValidPosition) {
         pushNotification(
-          'Name must at least than 4 letters',
+          'Name and position must at least than 4 letters',
           'Error');
       }
     }
   }
 });
 
-const cells = document.querySelectorAll('td');
+document.addEventListener('dblclick', (ev) => {
+  const cell = ev.target;
 
-cells.forEach(cell => {
-  cell.addEventListener('dblclick', () => {
-    const cellValue = cell.innerText;
-    const input = document.createElement('input');
+  if (cell.tagName !== 'TD') {
+    return;
+  }
 
-    input.className = 'cell-input';
-    input.value = cellValue;
+  const cellIndex = cell.cellIndex;
+  const cellValue = cell.innerText;
+  let input = document.createElement('input');
 
-    cell.innerText = '';
-    cell.appendChild(input);
+  if (cellIndex === 2) {
+    const selectOffice = document.createElement('select');
+    const cityList = [
+      'Tokyo',
+      'Singapore',
+      'London',
+      'New York',
+      'Edinburgh',
+      'San Francisco',
+    ];
 
-    input.focus();
+    cityList.forEach((option) => {
+      const city = document.createElement('option');
 
-    input.addEventListener('keydown', (e) => {
-      if (e.code === 'Enter') {
-        cell.innerText = input.value || cellValue;
-      }
+      city.textContent = option;
+      selectOffice.append(city);
     });
+    input = selectOffice;
+  }
 
-    input.addEventListener('blur', () => {
+  input.className = 'cell-input';
+  input.value = cellValue;
+
+  cell.innerText = '';
+  cell.appendChild(input);
+
+  input.focus();
+
+  input.addEventListener('keydown', (e) => {
+    if (e.code === 'Enter') {
       cell.innerText = input.value || cellValue;
-    });
+    }
+  });
+
+  input.addEventListener('blur', () => {
+    cell.innerText = input.value || cellValue;
   });
 });
