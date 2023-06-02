@@ -120,7 +120,7 @@ form.addEventListener('submit', e => {
   } else if (isNaN(ageEmployee) || ageEmployee < 18 || ageEmployee > 90) {
     showNotification('error',
       'The age must be a valid number between 18 and 90.');
-  } else if (isNaN(salaryEmployee)) {
+  } else if (isNaN(salaryEmployee) || salaryEmployee < 0) {
     showNotification('error', 'The "Salary" is empty.');
   } else {
     const newRow = list.insertRow();
