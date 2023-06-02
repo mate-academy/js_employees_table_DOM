@@ -129,9 +129,11 @@ form.addEventListener('submit', e => {
 function formatNumber(string) {
   let newString = string;
 
-  newString = newString.split('').reverse();
-  newString.splice(3, 0, ',');
-  newString = newString.reverse().join('');
+  if (string.length > 3) {
+    newString = newString.split('').reverse();
+    newString.splice(3, 0, ',');
+    newString = newString.reverse().join('');
+  }
 
   return `$${newString}`;
 }
@@ -165,19 +167,21 @@ tbody.addEventListener('dblclick', d => {
     const currentInput = b.target;
     const inputText = currentInput.value.trim();
 
-    inputValidation(inputText);
-
     if (field === cellSalary) {
-      inputText
+      (parseInt(inputText) > 0)
         ? input.replaceWith(formatNumber(inputText))
         : input.replaceWith(text);
     }
 
     if (field === cellAge) {
+      ageValidation(inputText);
+
       inputText > 18 && inputText < 90
         ? input.replaceWith(formatNumber(inputText))
         : input.replaceWith(text);
     }
+
+    textValidation(inputText);
 
     inputText.length > 4
       ? input.replaceWith(inputText)
@@ -201,12 +205,14 @@ tbody.addEventListener('dblclick', d => {
   });
 });
 
-function inputValidation(string) {
+function ageValidation(string) {
   if (string < 18 || string > 90) {
     pushNotification(
       'Warning', 'Your age must be between 18 and 90 years old', 'warning');
   };
+}
 
+function textValidation(string) {
   if (isNaN(string) && string.length < 4) {
     pushNotification('Error', 'Write full name please', 'error');
   };
