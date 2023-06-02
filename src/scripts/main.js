@@ -3,7 +3,7 @@
 const table = document.querySelector('table');
 const headers = table.querySelectorAll('thead th');
 const list = table.querySelector('tbody');
-const rows = table.querySelectorAll('tbody tr');
+let rows = table.querySelectorAll('tbody tr');
 const orders = {};
 
 headers.forEach((element, index) => {
@@ -138,6 +138,8 @@ form.addEventListener('submit', e => {
         cell.textContent = values[columnName];
       }
     });
+
+    rows = table.querySelectorAll('tbody tr');
 
     showNotification('success',
       'The new employee is successfully added to the table.');
