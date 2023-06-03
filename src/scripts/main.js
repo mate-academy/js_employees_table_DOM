@@ -177,7 +177,7 @@ tbody.addEventListener('dblclick', d => {
       ageValidation(inputText);
 
       inputText > 18 && inputText < 90
-        ? input.replaceWith(formatNumber(inputText))
+        ? input.replaceWith(inputText)
         : input.replaceWith(text);
     }
 
