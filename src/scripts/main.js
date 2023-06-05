@@ -261,17 +261,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function validateInput(inName, inVal) {
-    if (inName === 'name' && inVal.length < 4) {
+    if (inName === 'name' && inVal.trim().length < 4) {
       return false;
     }
 
     if (inName === 'age') {
-      const age = +inVal;
+      const age = +inVal.trim();
 
       return !(age < 18 || age > 90);
     }
 
-    if (inVal.length === 0) {
+    if (inVal.trim().length === 0) {
       return false;
     }
 
