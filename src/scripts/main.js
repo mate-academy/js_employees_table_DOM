@@ -289,6 +289,7 @@ document.addEventListener('dblclick', (ev) => {
   }
 
   input.className = 'cell-input';
+  input.style.width = getComputedStyle(cell).width;
   input.value = cellValue;
 
   cell.innerText = '';
@@ -296,13 +297,107 @@ document.addEventListener('dblclick', (ev) => {
 
   input.focus();
 
-  input.addEventListener('keydown', (e) => {
-    if (e.code === 'Enter') {
-      cell.innerText = input.value || cellValue;
+  input.addEventListener('blur', () => {
+    switch (cellIndex) {
+      case 0:
+      case 1:
+        if (input.value.length < 4) {
+          cell.innerText = cellValue;
+
+          pushNotification(
+            'Name and position must at least than 4 letters',
+            'Error');
+        } else {
+          cell.innerText = input.value || cellValue;
+          pushNotification('Your changes has been saved', 'Success');
+        }
+        break;
+
+      case 2:
+        cell.innerText = input.value || cellValue;
+        pushNotification('Your changes has been saved', 'Success');
+        break;
+
+      case 3:
+        if (input.value < 18 || input.value > 90) {
+          cell.innerText = cellValue;
+
+          pushNotification(
+            'Age must be between 18 and 90',
+            'Error');
+        } else {
+          cell.innerText = input.value || cellValue;
+          pushNotification('Your changes has been saved', 'Success');
+        }
+        break;
+
+      case 4:
+        const amount = getNumber(input.value);
+
+        if (amount === 0) {
+          cell.innerText = cellValue;
+
+          pushNotification(
+            'Salary must be more than 0',
+            'Error');
+        } else {
+          cell.innerText = convertSalary(amount) || cellValue;
+          pushNotification('Your changes has been saved', 'Success');
+        }
+        break;
     }
   });
 
-  input.addEventListener('blur', () => {
-    cell.innerText = input.value || cellValue;
+  input.addEventListener('keydown', (e) => {
+    if (e.code === 'Enter') {
+      switch (cellIndex) {
+        case 0:
+        case 1:
+          if (input.value.length < 4) {
+            cell.innerText = cellValue;
+
+            pushNotification(
+              'Name and position must at least than 4 letters',
+              'Error');
+          } else {
+            cell.innerText = input.value || cellValue;
+            pushNotification('Your changes has been saved', 'Success');
+          }
+          break;
+
+        case 2:
+          cell.innerText = input.value || cellValue;
+          pushNotification('Your changes has been saved', 'Success');
+          break;
+
+        case 3:
+          if (input.value < 18 || input.value > 90) {
+            cell.innerText = cellValue;
+
+            pushNotification(
+              'Age must be between 18 and 90',
+              'Error');
+          } else {
+            cell.innerText = input.value || cellValue;
+            pushNotification('Your changes has been saved', 'Success');
+          }
+          break;
+
+        case 4:
+          const amount = getNumber(input.value);
+
+          if (amount === 0) {
+            cell.innerText = cellValue;
+
+            pushNotification(
+              'Salary must be more than 0',
+              'Error');
+          } else {
+            cell.innerText = convertSalary(amount) || cellValue;
+            pushNotification('Your changes has been saved', 'Success');
+          }
+          break;
+      }
+    }
   });
 });
