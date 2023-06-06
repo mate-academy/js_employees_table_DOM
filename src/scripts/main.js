@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return direction === 'ASC' ? (+cellA) - (+cellB) : (+cellB) - (+cellA);
       }
 
-      return direction
-      === 'ASC' ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+      return direction === 'ASC' ? cellA.localeCompare(
+        cellB) : cellB.localeCompare(cellA);
     });
 
     rows.forEach(row => tbody.appendChild(row));
@@ -60,9 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
   form.className = 'new-employee-form';
 
   form.innerHTML = `
-    <label>Name: <input name="name" type="text" data-qa="name"></label>
+    <label>Name: <input name="employeeName" type="text" data-qa="name"></label>
     <label>Position: <input name="position"
-    type="text" data-qa="position"></label>
+     type="text" data-qa="position"></label>
     <label>Office:
       <select name="office" data-qa="office">
         <option>Tokyo</option>
@@ -84,13 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', (evnt) => {
     evnt.preventDefault();
 
-    const userName = form.elements.userName.value.trim();
+    const employeeName = form.elements.employeeName.value.trim();
     const position = form.elements.position.value.trim();
     const office = form.elements.office.value;
     const age = +form.elements.age.value;
     const salary = +form.elements.salary.value;
 
-    if (userName.length < 4) {
+    if (employeeName.length < 4) {
       showErrorNotification('Name should be at least 4 characters');
 
       return;
@@ -105,12 +105,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const newRow = document.createElement('tr');
 
     newRow.innerHTML = `
-      <td>${name}</td>
+      <td>${employeeName}</td>
       <td>${position}</td>
       <td>${office}</td>
       <td>${age}</td>
       <td>$${salary.toLocaleString('en-US', {
-    minimumFractionDigits: 0, maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   })}</td>
     `;
     tbody.appendChild(newRow);
@@ -119,26 +120,30 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function showErrorNotification(message) {
-    const notification = document.createElement('div');
+    const notification = createNotification('error', message);
 
-    notification.className = 'error';
-    notification.dataset.qa = 'notification';
-    notification.textContent = message;
     document.body.appendChild(notification);
     setTimeout(() => document.body.removeChild(notification), 3000);
   }
 
   function showSuccessNotification(message) {
-    const notification = document.createElement('div');
+    const notification = createNotification('success', message);
 
-    notification.className = 'success';
-    notification.dataset.qa = 'notification';
-    notification.textContent = message;
     document.body.appendChild(notification);
     setTimeout(() => document.body.removeChild(notification), 3000);
   }
 
-  // Editing table cells (optional)
+  function createNotification(type, message) {
+    const notification = document.createElement('div');
+
+    notification.className = type;
+    notification.dataset.qa = 'notification';
+    notification.textContent = message;
+
+    return notification;
+  }
+
+  // Editing table cells
   tbody.addEventListener('dblclick', (evnt) => {
     if (evnt.target.tagName === 'TD') {
       const cell = evnt.target;
@@ -153,12 +158,17 @@ document.addEventListener('DOMContentLoaded', () => {
       input.focus();
 
       input.addEventListener('blur', () => {
-        cell.textContent = input.value;
+        const newValue = input.value.trim();
+
+        if (newValue !== '') {
+          cell.textContent = newValue;
+        }
+
         cell.removeChild(input);
       });
 
-      input.addEventListener('keydown', (avent) => {
-        if (avent.key === 'Enter') {
+      input.addEventListener('keydown', (evt) => {
+        if (evt.key === 'Enter') {
           input.blur();
         }
       });
