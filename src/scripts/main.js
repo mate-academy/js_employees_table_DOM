@@ -37,7 +37,7 @@ document.body.children[0].style.alignSelf = 'flex-start';
 
 function toNumber(element) {
   return +element.innerText.slice(1).replaceAll(',', '');
-};
+}
 
 [...rowsArray].forEach(row => {
   row.addEventListener('click', (e) => {
@@ -107,14 +107,14 @@ form.addEventListener('submit', e => {
     pushNotification('Error', 'Write full name please', 'error');
 
     return;
-  };
+  }
 
   if (data.get('age') < 18 || data.get('age') > 90) {
     pushNotification(
       'Warning', 'Your age must be between 18 and 90 years old', 'warning');
 
     return;
-  };
+  }
 
   newPerson.innerHTML = `
     <th>${data.get('name').trim()}</th>
@@ -151,7 +151,7 @@ tbody.addEventListener('dblclick', d => {
   if (field === cellAge) {
     input.type = 'number';
     input.min = '18';
-    input.max = '99';
+    input.max = '90';
   }
 
   if (field === cellSalary) {
@@ -176,14 +176,14 @@ tbody.addEventListener('dblclick', d => {
     if (field === cellAge) {
       ageValidation(inputText);
 
-      inputText > 18 && inputText < 90
+      (inputText > 18 && inputText < 90)
         ? input.replaceWith(inputText)
         : input.replaceWith(text);
     }
 
     textValidation(inputText);
 
-    inputText.length > 4
+    (inputText.length > 4)
       ? input.replaceWith(inputText)
       : input.replaceWith(text);
   });
@@ -209,14 +209,14 @@ function ageValidation(string) {
   if (string < 18 || string > 90) {
     pushNotification(
       'Warning', 'Your age must be between 18 and 90 years old', 'warning');
-  };
+  }
 }
 
 function textValidation(string) {
   if (isNaN(string) && string.length < 4) {
     pushNotification('Error',
       'Name should contain more than 3 letters', 'error');
-  };
+  }
 }
 
 function pushNotification(title, description, type) {
@@ -235,10 +235,10 @@ function pushNotification(title, description, type) {
 
   document.body.append(block);
 
-  setTimeout(function() {
+  setTimeout(() => {
     block.remove();
   }, 3000);
-};
+}
 
 tbody.addEventListener('dblclick', evnt => {
   const target = evnt.target;
