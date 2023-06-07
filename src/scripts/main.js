@@ -239,3 +239,39 @@ function pushNotification(title, description, type) {
     block.remove();
   }, 3000);
 };
+
+tbody.addEventListener('dblclick', evnt => {
+  const target = evnt.target;
+
+  if (target.tagName !== 'TH' || target.querySelector('input')) {
+    return;
+  }
+
+  const initialText = target.textContent;
+
+  target.textContent = '';
+
+  const input = document.createElement('input');
+
+  input.className = 'cell-input';
+  input.value = initialText;
+  target.appendChild(input);
+
+  input.addEventListener('blur', () => {
+    const newText = input.value || initialText;
+
+    target.textContent = newText;
+    input.remove();
+  });
+
+  input.addEventListener('keydown', evt => {
+    if (evt.key === 'Enter') {
+      const newText = input.value || initialText;
+
+      target.textContent = newText;
+      input.remove();
+    }
+  });
+
+  input.focus();
+});
