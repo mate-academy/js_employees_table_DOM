@@ -1,9 +1,9 @@
 'use strict';
 
 const table = document.querySelector('table');
-const tbody = table.querySelector('tbody');
 
-const addSortableTable = () => {
+const sortTable = () => {
+  const tbody = table.querySelector('tbody');
   const thead = table.querySelector('thead');
   let previousField = null;
   let isAscending = true;
@@ -51,16 +51,24 @@ const addSortableTable = () => {
 };
 
 document.querySelector('table');
-addSortableTable(table);
+sortTable(table);
 
 function getSalary(salary) {
   return +salary.replace('$', '').replace(',', '');
 }
 
-// const isActive
+table.addEventListener('click', e => {
+  const isTarget = e.target.closest('tr');
+  const findActive = table.querySelector('.active');
+  const isTargetCheck = document.querySelector('tbody').closest('tr');
 
-// tbody.addEventListener('clisk', e => {
-//   // const istarget = e.target.closest('th');
+  // if (!isTargetCheck) { // якщо додати цю перевірку то не працює підсвідчення 
+  //   return;
+  // }
 
-//   console.log(e);
-// });
+  if (findActive) {
+    findActive.classList.remove('active');
+  }
+
+  isTarget.setAttribute('class', 'active');
+});
