@@ -1,277 +1,336 @@
 'use strict';
 
-const header = document.querySelector('tr');
-const tbody = document.querySelector('tbody');
-const rowsArray = tbody.children;
-let sorted;
-
-document.body.children[0].style.alignSelf = 'flex-start';
-
-[...header.children].forEach((item, i) => {
-  let clickCounter = 0;
-
-  item.addEventListener('click', (e) => {
-    clickCounter++;
-
-    sorted = [...rowsArray].sort((a, b) =>
-      b.children[i].innerText.localeCompare(a.children[i].innerText));
-
-    if (clickCounter % 2) {
-      sorted = [...rowsArray].sort((a, b) =>
-        a.children[i].innerText.localeCompare(b.children[i].innerText));
-    }
-
-    if (item.innerText === 'Salary') {
-      sorted = [...rowsArray].sort((a, b) =>
-        toNumber(b.children[i]) - toNumber(a.children[i]));
-
-      if (clickCounter % 2) {
-        sorted = [...rowsArray].sort((a, b) =>
-          toNumber(a.children[i]) - toNumber(b.children[i]));
-      }
-    }
-
-    tbody.prepend(...sorted);
-  });
-});
-
-function toNumber(element) {
-  return +element.innerText.slice(1).replaceAll(',', '');
-}
-
-[...rowsArray].forEach(row => {
-  row.addEventListener('click', (e) => {
-    const activeElement = document.querySelector('.active');
-
-    if (activeElement) {
-      activeElement.classList.remove('active');
-    }
-    row.classList.add('active');
-  });
-});
-
-const form = document.createElement('form');
-
-form.classList.add('new-employee-form');
-
-form.innerHTML = `
-  <label> Name:
-      <input
-        name="name"
-        type="text"
-        data-qa="name"
-        required
-     ></label>
-  <label>Position:
-    <input
-      name="position"
-      type="text"
-      data-qa="position"
-      required
-  ></label>
-  <label>Office:
-    <select name="office" data-qa="office" required>
-      <option value="Tokyo">Tokyo</option>
-      <option value="Singapore">Singapore</option>
-      <option value="London">London</option>
-      <option value="New_York">New York</option>
-      <option value="Edinburgh">Edinburgh</option>
-      <option value="San_Francisco">San Francisco</option>
-    </select>
-  </label>
-  <label>Age:
-    <input
-      name="age"
-      type="number"
-      data-qa="age"
-      required
-  ></label>
-  <label>Salary:
-    <input
-    name="salary"
-    type="number"
-    data-qa="salary"
-    required
-  ></label>
-  <button type="submit">Save to table</button>
-`;
-document.body.append(form);
-
-form.addEventListener('submit', e => {
-  e.preventDefault();
-
-  const newPerson = document.createElement('tr');
-  const data = new FormData(form);
-
-  if (data.get('name').trim().length < 4) {
-    pushNotification('Error', 'Write full name please', 'error');
-
-    return;
-  }
-
-  if (data.get('age') < 18 || data.get('age') > 90) {
-    pushNotification(
-      'Warning', 'Your age must be between 18 and 90 years old', 'warning');
-
-    return;
-  }
-
-  newPerson.innerHTML = `
-    <th>${data.get('name').trim()}</th>
-    <th>${data.get('position').trim()}</th>
-    <th>${data.get('office').trim()}</th>
-    <th>${data.get('age')}</th>
-    <th>${formatNumber(data.get('salary'))}</th>
+document.addEventListener('DOMContentLoaded', () => {
+  const tableHead = document.querySelector('thead');
+  const tableBody = document.querySelector('tbody');
+  let sortAscending = true;
+  const officeList = `
+  <select data-qa="office" name="office">
+    <option selected disabled></option>
+    <option value="Tokyo">
+      Tokyo
+    </option>
+    <option value="Singapore">
+      Singapore
+    </option>
+    <option value="London">
+      London
+    </option>
+    <option value="New York">
+      New York
+    </option>
+    <option value="Edinburgh">
+      Edinburgh
+    </option>
+    <option value="San Francisco">
+      San Francisco
+    </option>
+  </select>
   `;
-  tbody.prepend(newPerson);
-});
+  const addNewEmployeeForm = createNewEmployeeForm();
 
-function formatNumber(string) {
-  let newString = string;
+  tableHead.addEventListener('click', (e) => {
+    const selectedName = e.target.closest('th').textContent;
 
-  if (string.length > 3) {
-    newString = newString.split('').reverse();
-    newString.splice(3, 0, ',');
-    newString = newString.reverse().join('');
-  }
-
-  return `$${newString}`;
-}
-
-tbody.addEventListener('dblclick', d => {
-  const field = d.target;
-  const input = document.createElement('input');
-  const cellAge = field.closest('tr').children[3];
-  const cellSalary = field.closest('tr').children[4];
-  const text = field.innerText;
-
-  input.value = text;
-  input.className = 'cell-input';
-
-  if (field === cellAge) {
-    input.type = 'number';
-    input.min = '18';
-    input.max = '90';
-  }
-
-  if (field === cellSalary) {
-    input.value = +text.slice(1).replace(',', '');
-    input.type = 'number';
-  }
-
-  field.innerText = '';
-
-  field.append(input);
-
-  input.addEventListener('blur', (b) => {
-    const currentInput = b.target;
-    const inputText = currentInput.value.trim();
-
-    if (field === cellSalary) {
-      (parseInt(inputText) > 0)
-        ? input.replaceWith(formatNumber(inputText))
-        : input.replaceWith(text);
+    if (selectedName) {
+      sortTable(tableBody, selectedName);
     }
-
-    if (field === cellAge) {
-      ageValidation(inputText);
-
-      (inputText > 18 && inputText < 90)
-        ? input.replaceWith(inputText)
-        : input.replaceWith(text);
-    }
-
-    textValidation(inputText);
-
-    (inputText.length > 4)
-      ? input.replaceWith(inputText)
-      : input.replaceWith(text);
   });
 
-  input.addEventListener('keypress', k => {
-    const inputText = k.target.value.trim();
+  tableBody.addEventListener('click', (e) => {
+    const currentSelectedRow = e.target.closest('tr');
+    const previousSelectedRow = tableBody.querySelector('tr.active');
 
-    if (k.key === 'Enter') {
-      if (field === cellSalary) {
-        inputText
-          ? input.replaceWith(text)
-          : input.replaceWith(formatNumber(inputText));
+    if (previousSelectedRow && previousSelectedRow !== currentSelectedRow) {
+      previousSelectedRow.classList.remove('active');
+    }
+
+    if (currentSelectedRow) {
+      currentSelectedRow.classList.toggle('active');
+    }
+  });
+
+  tableBody.addEventListener('dblclick', (e) => {
+    const editableCell = e.target.closest('td');
+    const editableRow = editableCell.closest('tr');
+    const editableCellNumber = [...editableRow.children].indexOf(editableCell);
+
+    const editableColumnName
+      = findTableColumnName(tableHead)[editableCellNumber].toLowerCase();
+
+    let editableCellInput;
+    const previousVal = editableCell.textContent;
+
+    switch (true) {
+      case editableColumnName === 'salary':
+        editableCellInput = '<input class="cell-input" type="number">';
+        break;
+
+      case editableColumnName === 'age':
+        editableCellInput = '<input class="cell-input" type="number">';
+        break;
+
+      case editableColumnName === 'office':
+        editableCellInput = officeList;
+        break;
+
+      default:
+        editableCellInput = '<input class="cell-input" type="text">';
+    }
+
+    editableCell.innerHTML = editableCellInput;
+
+    editableCell.firstElementChild.focus();
+    addEditedCellInputEvents(editableCell, editableColumnName, previousVal);
+  });
+
+  addNewEmployeeForm.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const addedEmployee = new FormData(e.target);
+    const newEmployee = Object.fromEntries(addedEmployee.entries());
+
+    const { result, inputName } = validateForm(newEmployee);
+
+    if (!result) {
+      showNotification('error', inputName);
+
+      return;
+    };
+
+    addNewEmployee(newEmployee);
+    e.target.reset();
+    showNotification('success', '');
+  });
+
+  function addEditedCellInputEvents(cell, cellColumnName, previousValue) {
+    cell.firstElementChild.addEventListener('keyup', e => {
+      if (e.key === 'Enter') {
+        updateEditedCell(cell, cellColumnName, previousValue);
+      }
+    });
+
+    cell.firstElementChild.addEventListener('blur', e => {
+      updateEditedCell(cell, cellColumnName, previousValue);
+    });
+  }
+
+  function updateEditedCell(cell, cellColumnName, previousVal) {
+    const currentVal = cell.firstElementChild.value;
+    let input = '';
+
+    if (!validateInput(cellColumnName, currentVal)) {
+      showNotification('error', cellColumnName);
+      input = previousVal;
+    }
+
+    if (cellColumnName === 'salary') {
+      input = `$${+currentVal.toLocaleString('en')}`;
+    }
+
+    input = input || currentVal;
+
+    cell.textContent = input;
+  }
+
+  function showNotification(type, title) {
+    const notification = document.createElement('div');
+    const messages = {
+      name: 'Name should be equal or greater than 4 letters',
+      age: 'Age should be equal or greater than 18 and lower than 90',
+      length: 'Field should not be empty',
+      valid: 'Everything is ok',
+    };
+
+    let messagesText;
+
+    if (type === 'success') {
+      messagesText = messages.valid;
+    } else {
+      messagesText = messages[title]
+        ? messages[title]
+        : messages.length;
+    }
+
+    notification.classList.add('notification');
+    notification.classList.add(type);
+    notification.setAttribute('data-qa', 'notification');
+
+    notification.innerHTML = `
+      <h2 class="title">
+        ${type === 'success' ? 'Success' : title + ' Error'}
+      </h2>
+      <p>${messagesText}</p>
+    `;
+
+    document.body.append(notification);
+
+    setTimeout(() => {
+      hideNotification(notification);
+    }, 5000);
+  }
+
+  function hideNotification(availableNotification) {
+    availableNotification.remove();
+  }
+
+  function createNewEmployeeForm() {
+    const employeeForm = document.createElement('form');
+
+    employeeForm.action = '#';
+    employeeForm.method = 'POST';
+    employeeForm.classList.add('new-employee-form');
+
+    employeeForm.innerHTML = `
+      <label>Name:
+        <input
+          data-qa="name"
+          name="name"
+          type="text"
+        >
+      </label>
+      <label>Position:
+        <input
+          data-qa="position"
+          name="position"
+          type="text"
+        >
+      </label>
+      <label>Office:
+        ${officeList}
+      </label>
+      <label>Age:
+        <input data-qa="age" name="age" type="number">
+      </label>
+      <label>Salary:
+        <input data-qa="salary" name="salary" type="number">
+      </label>
+      <button type="submit">Save to table</button>
+    `;
+
+    document.body.append(employeeForm);
+
+    return employeeForm;
+  }
+
+  function addNewEmployee(employee) {
+    const tableColumnNames = findTableColumnName(tableHead);
+    const row = document.createElement('tr');
+
+    tableColumnNames.forEach(item => {
+      const cell = document.createElement('td');
+
+      let cellData;
+
+      switch (true) {
+        case item.toLowerCase() === 'salary':
+          cellData = `
+            $${(+employee[item.toLowerCase()]).toLocaleString('en')}
+          `;
+          break;
+        default:
+          cellData = `${employee[item.toLowerCase()]}`;
       }
 
-      inputText
-        ? input.replaceWith(text)
-        : input.replaceWith(inputText);
+      cell.innerHTML = cellData;
+      row.append(cell);
+    });
+
+    tableBody.append(row);
+  }
+
+  function validateForm(form) {
+    for (const [inputName, inputValue] of Object.entries(form)) {
+      if (!validateInput(inputName, inputValue)) {
+        return {
+          result: false,
+          inputName: inputName,
+        };
+      }
     }
-  });
-});
 
-function ageValidation(string) {
-  if (string < 18 || string > 90) {
-    pushNotification(
-      'Warning', 'Your age must be between 18 and 90 years old', 'warning');
-  }
-}
-
-function textValidation(string) {
-  if (isNaN(string) && string.length < 4) {
-    pushNotification('Error',
-      'Name should contain more than 3 letters', 'error');
-  }
-}
-
-function pushNotification(title, description, type) {
-  const block = document.createElement('div');
-  const head = document.createElement('h2');
-  const massage = document.createElement('p');
-
-  block.setAttribute('data-qa', 'notification');
-  block.classList.add('notification', type);
-
-  head.textContent = title;
-  massage.textContent = description;
-
-  block.append(head);
-  block.append(massage);
-
-  document.body.append(block);
-
-  setTimeout(() => {
-    block.remove();
-  }, 3000);
-}
-
-tbody.addEventListener('dblclick', evnt => {
-  const target = evnt.target;
-
-  if (target.tagName !== 'TH' || target.querySelector('input')) {
-    return;
+    return { result: true };
   }
 
-  const initialText = target.textContent;
-
-  target.textContent = '';
-
-  const input = document.createElement('input');
-
-  input.className = 'cell-input';
-  input.value = initialText;
-  target.appendChild(input);
-
-  input.addEventListener('blur', () => {
-    const newText = input.value || initialText;
-
-    target.textContent = newText;
-    input.remove();
-  });
-
-  input.addEventListener('keydown', evt => {
-    if (evt.key === 'Enter') {
-      const newText = input.value || initialText;
-
-      target.textContent = newText;
-      input.remove();
+  function validateInput(inName, inVal) {
+    if (inName === 'name' && inVal.trim().length < 4) {
+      return false;
     }
-  });
 
-  input.focus();
+    if (inName === 'age') {
+      const age = +inVal.trim();
+
+      return !(age < 18 || age > 90);
+    }
+
+    if (inVal.trim().length === 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function findTableColumnName(tableHeader) {
+    const tableHeadElements = tableHeader.firstElementChild.children;
+
+    const tableHeadArray = [...tableHeadElements].map(item => item.textContent);
+
+    return tableHeadArray;
+  }
+
+  function findTableColumnNumberFromName(selectedColName) {
+    const tableColumnNames = findTableColumnName(tableHead);
+
+    return tableColumnNames.indexOf(selectedColName);
+  }
+
+  function sortTable(table, condition) {
+    const sortIndex = findTableColumnNumberFromName(condition);
+    const rowsData = table.children;
+
+    const sortedData = [...rowsData].sort((row1, row2) => {
+      const dataTypeOfSort
+        = convertStrToInt(row1.children[sortIndex].textContent)
+          ? 'number'
+          : 'string';
+
+      let row1DataToSort;
+      let row2DataToSort;
+      let sortResult;
+
+      if (dataTypeOfSort === 'number') {
+        row1DataToSort = convertStrToInt(row1.children[sortIndex].textContent);
+        row2DataToSort = convertStrToInt(row2.children[sortIndex].textContent);
+
+        sortResult = sortAscending
+          ? row1DataToSort - row2DataToSort
+          : row2DataToSort - row1DataToSort;
+      } else {
+        row1DataToSort = row1.children[sortIndex].textContent;
+        row2DataToSort = row2.children[sortIndex].textContent;
+
+        sortResult = sortAscending
+          ? row1DataToSort.localeCompare(row2DataToSort)
+          : row2DataToSort.localeCompare(row1DataToSort);
+      }
+
+      return sortResult;
+    });
+
+    sortAscending = !sortAscending;
+
+    tableBody.innerHTML = '';
+
+    sortedData.forEach(row => {
+      tableBody.append(row);
+    });
+  }
+
+  function convertStrToInt(str) {
+    const reg = /\D/g;
+
+    const out = parseInt(str.replace(reg, ''));
+
+    return out;
+  }
 });
