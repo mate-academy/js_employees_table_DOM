@@ -362,13 +362,13 @@ tbody.addEventListener('dblclick', e => {
             };
 
             item.textContent = `$${parseInt(input.value)
-            .toLocaleString('en-US')}`;
+              .toLocaleString('en-US')}`;
             input.remove();
           }
         });
 
         input.addEventListener('blur', ev => {
-          if (ev.target.value === '') {
+          if (!ev.target.value) {
             ev.target.value = currentItem;
           }
 
