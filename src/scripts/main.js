@@ -226,7 +226,7 @@ form.addEventListener('submit', (e) => {
 tbody.addEventListener('dblclick', e => {
   const item = e.target.closest('td');
   const targetCell = item.cellIndex;
-  const currentItem = item.text;
+  const currentItem = item.textContent;
 
   if (!item.querySelector('input') && targetCell < 2) {
     const input = document.createElement('input');
@@ -254,7 +254,7 @@ tbody.addEventListener('dblclick', e => {
     });
 
     input.addEventListener('blur', ev => {
-      if (ev.target.value === '') {
+      if (!ev.target.value) {
         ev.target.value = currentItem;
       }
 
@@ -361,7 +361,7 @@ tbody.addEventListener('dblclick', e => {
               return;
             };
 
-            item.textContent = `$${parseInt(input.value)}
+            item.textContent = `$${parseInt(input.value)
             .toLocaleString('en-US')}`;
             input.remove();
           }
