@@ -289,7 +289,7 @@ tbody.addEventListener('dblclick', e => {
     select.focus();
 
     select.addEventListener('change', ev => {
-      updateCellInitial(item, select);
+      updateCellCurrent(item, select);
     });
 
     select.addEventListener('blur', ev => {
