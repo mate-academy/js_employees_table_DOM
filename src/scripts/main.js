@@ -254,7 +254,7 @@ document.body.appendChild(form);
 // changing cell text
 
 tableBody.addEventListener('dblclick', (e) => {
-  const input = document.createElement('input');
+  let input = document.createElement('input');
   const td = e.target;
   const cellIndex = td.cellIndex;
 
@@ -268,6 +268,30 @@ tableBody.addEventListener('dblclick', (e) => {
   if (cellIndex > 2) {
     input.setAttribute('type', 'number');
   }
+
+  // cities
+
+  if (cellIndex === 2) {
+    const selectCity = document.createElement('select');
+    const cities = [
+      `Tokyo`,
+      `Singapore`,
+      `London`,
+      `New York`,
+      `Edinburgh`,
+      `San Francisco`,
+    ];
+
+    cities.forEach((option) => {
+      const city = document.createElement('option');
+
+      city.textContent = option;
+      selectCity.append(city);
+    });
+    input = selectCity;
+  }
+
+  // append input
   e.target.append(input);
 
   input.focus();
