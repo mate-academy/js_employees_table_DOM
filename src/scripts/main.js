@@ -2,7 +2,7 @@
 
 const tableHead = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
-const rows = document.querySelectorAll('tr');
+const rows = tableBody.querySelectorAll('tr');
 
 // sort table
 
@@ -193,14 +193,14 @@ form.addEventListener('submit', function(e) {
 
   if (person.length < 4) {
     pushNotification(450, 10, 'Error!',
-      'Name must have minimum 4 lettes', 'error');
+      'Name must have minimum 4 letters', 'error');
 
     return;
   }
 
   if (position.length === 0) {
     pushNotification(450, 10, 'Error!',
-      'Name must have minimum 4 lettes', 'error');
+      'Position must have minimum 1 letter', 'error');
 
     return;
   }
@@ -214,7 +214,7 @@ form.addEventListener('submit', function(e) {
 
   if (salary < 0) {
     pushNotification(450, 10, 'Error!',
-      'Age should be more than 18 and less than 90', 'error');
+      'Salary should be more than 0', 'error');
 
     return;
   }
