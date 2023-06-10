@@ -53,25 +53,6 @@ tableHead.addEventListener('click', e => {
   });
 });
 
-// changing text to cells
-
-tableBody.addEventListener('dblclick', e => {
-  const cell = e.target;
-  const originalText = cell.textContent;
-
-  cell.style.outline = 'none';
-  cell.textContent = '';
-
-  cell.contentEditable = true;
-  cell.focus();
-
-  cell.addEventListener('blur', () => {
-    if (cell.textContent === '') {
-      cell.textContent = originalText;
-    }
-  });
-});
-
 // notifications
 
 const pushNotification = (posTop, posRight, title, description, type) => {
@@ -202,14 +183,43 @@ form.addEventListener('submit', function(e) {
   e.preventDefault();
 
   // Get form data
-  const person = nameInput.value;
-  const position = positionInput.value;
+  const person = nameInput.value.trim();
+  const position = positionInput.value.trim();
   const office = officeSelect.value;
   const age = parseInt(ageInput.value);
   const salary = parseFloat(salaryInput.value);
 
+  // error - no new row
+
+  if (person.length < 4) {
+    pushNotification(450, 10, 'Error!',
+      'Name must have minimum 4 lettes', 'error');
+
+    return;
+  }
+
+  if (position.length === 0) {
+    pushNotification(450, 10, 'Error!',
+      'Name must have minimum 4 lettes', 'error');
+
+    return;
+  }
+
+  if (age < 18 || age > 90) {
+    pushNotification(450, 10, 'Error!',
+      'Age should be more than 18 and less than 90', 'error');
+
+    return;
+  }
+
+  if (salary < 0) {
+    pushNotification(450, 10, 'Error!',
+      'Age should be more than 18 and less than 90', 'error');
+
+    return;
+  }
+
   // new row
-  // const table = document.querySelector(tableBody);
   const newRow = tableBody.insertRow();
 
   const nameCell = newRow.insertCell();
@@ -234,23 +244,63 @@ form.addEventListener('submit', function(e) {
 
   // notifications if statements
 
-  if (person.length < 4) {
-    pushNotification(450, 10, 'Error!',
-      'Name must have minimum 4 lettes', 'error');
-
-    return;
-  }
-
-  if (age < 18 || ageInput > 90) {
-    pushNotification(450, 10, 'Error!',
-      'Age should be more than 18 and less than 90', 'error');
-
-    return;
-  }
-
   pushNotification(450, 10, 'Success!',
     'Employee successfully added', 'success');
 });
 
 // Append the form to the document body
 document.body.appendChild(form);
+
+// changing cell text
+
+tableBody.addEventListener('dblclick', (e) => {
+  const input = document.createElement('input');
+  const td = e.target;
+  const cellIndex = td.cellIndex;
+
+  input.style.width = getComputedStyle(td).width;
+  input.classList.add('cell-input');
+
+  const content = e.target.textContent;
+
+  e.target.textContent = '';
+
+  if (cellIndex > 2) {
+    input.setAttribute('type', 'number');
+  }
+  e.target.append(input);
+
+  input.focus();
+
+  input.addEventListener('blur', () => {
+    const valueInput = input.value;
+
+    if (valueInput.length > 3 && td.cellIndex <= 2) {
+      td.textContent = valueInput;
+    } else if (cellIndex === 3 && +valueInput > 17 && +valueInput < 91) {
+      td.textContent = valueInput;
+    } else if (cellIndex === 4 && +valueInput > 0) {
+      td.textContent = '$' + (+valueInput).toLocaleString('en-US');
+    } else {
+      td.textContent = content;
+    }
+
+    input.remove();
+  });
+
+  tableBody.addEventListener('keydown', (ev) => {
+    if (ev.code === 'Enter') {
+      const valueInput = input.value;
+
+      if (valueInput.length > 3 && td.cellIndex <= 2) {
+        td.textContent = valueInput;
+      } else if (cellIndex === 3 && +valueInput > 17 && +valueInput < 91) {
+        td.textContent = valueInput;
+      } else if (cellIndex === 4 && +valueInput > 0) {
+        td.textContent = '$' + (+valueInput).toLocaleString('en-US');
+      } else {
+        td.textContent = content;
+      }
+    }
+  });
+});
