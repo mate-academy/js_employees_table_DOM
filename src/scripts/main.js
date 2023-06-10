@@ -190,10 +190,7 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  const cellName = data.name;
-  const position = data.position;
-  const office = data.office;
-  const age = data.age;
+  const { name: cellName, position, office, age } = data;
   const salary = `$${parseInt(data.salary).toLocaleString('en-US')}`;
 
   if (cellName.length < 4) {
@@ -232,7 +229,7 @@ tbody.addEventListener('dblclick', e => {
     const input = document.createElement('input');
 
     item.textContent = '';
-    input.className = ('cell-input');
+    input.className = 'cell-input';
     input.value = item.textContent;
     input.type = 'text';
 
@@ -308,15 +305,18 @@ tbody.addEventListener('dblclick', e => {
 
     item.className = 'cell-input';
     item.textContent = '';
-    input.className = ('cell-input');
+    input.className = 'cell-input';
     input.value = item.textContent;
     input.type = 'number';
 
     item.appendChild(input);
     input.focus();
 
+    const TARGET_CELL_AGE = 3;
+    const TARGET_CELL_CURRENCY = 4;
+
     switch (targetCell) {
-      case 3: {
+      case TARGET_CELL_AGE: {
         input.className = 'age';
 
         input.addEventListener('keydown', ev => {
@@ -352,7 +352,7 @@ tbody.addEventListener('dblclick', e => {
         break;
       }
 
-      case 4: {
+      case TARGET_CELL_CURRENCY: {
         input.addEventListener('keydown', ev => {
           if (ev.key === 'Enter') {
             if (input.value.length === 0) {
@@ -361,8 +361,7 @@ tbody.addEventListener('dblclick', e => {
               return;
             };
 
-            item.textContent = `$${parseInt(input.value)
-              .toLocaleString('en-US')}`;
+            item.textContent = formatCurrency(input.value);
             input.remove();
           }
         });
@@ -378,8 +377,7 @@ tbody.addEventListener('dblclick', e => {
             return;
           };
 
-          item.textContent = `$${parseInt(input.value)
-            .toLocaleString('en-US')}`;
+          item.textContent = formatCurrency(input.value);
           input.remove();
         });
       }
@@ -397,3 +395,7 @@ function updateCellCurrent(item, input) {
   item.textContent = input.value;
   input.remove();
 }
+
+const formatCurrency = (value) => {
+  return `$${parseInt(value).toLocaleString('en-US')}`;
+};
