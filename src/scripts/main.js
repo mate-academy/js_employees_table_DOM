@@ -22,7 +22,7 @@ const sortTable = (cellIndex, isSorted) => {
   });
 
   if (isSorted) {
-    sortTable.reverse();
+    sortedTable.reverse();
   }
 
   tbody.append(...sortedTable);
