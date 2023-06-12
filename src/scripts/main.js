@@ -1,113 +1,26 @@
 'use strict';
 
-// Sort table
-const tHead = document.querySelector('thead');
-const tHeadItems = tHead.querySelectorAll('th');
-
-const tBody = document.querySelector('tbody');
-const trsBody = tBody.querySelectorAll('tr');
-
-let lastActiveTrBody;
-let sortedTrsBody;
-let isClickedFirst = false;
-
-tHeadItems.forEach((tHeadItem, index) => {
-  tHeadItem.addEventListener('click', () => {
-    isClickedFirst = !isClickedFirst;
-
-    if (isClickedFirst) {
-      if (index === 0 || index === 1 || index === 2) {
-        sortedTrsBody = [...trsBody].sort((trBody1, trBody2) => {
-          const trBody1String = trBody1.children[index].innerText;
-          const trBody2String = trBody2.children[index].innerText;
-
-          return trBody1String.localeCompare(trBody2String);
-        });
-      }
-
-      if (index === 3) {
-        sortedTrsBody = [...trsBody].sort((trBody1, trBody2) => {
-          const trBody1String = trBody1.children[index].innerText;
-          const trBody2String = trBody2.children[index].innerText;
-
-          const trBody1Number = getSimpleNumber(trBody1String);
-          const trBody2Number = getSimpleNumber(trBody2String);
-
-          return trBody2Number - trBody1Number;
-        });
-      }
-
-      if (index === 4) {
-        sortedTrsBody = [...trsBody].sort((trBody1, trBody2) => {
-          const trBody1String = trBody1.children[index].innerText;
-          const trBody2String = trBody2.children[index].innerText;
-
-          const trBody1Number = getAdvancedNumber(trBody1String);
-          const trBody2Number = getAdvancedNumber(trBody2String);
-
-          return trBody2Number - trBody1Number;
-        });
-      }
-    } else {
-      if (index === 0 || index === 1 || index === 2) {
-        sortedTrsBody = [...trsBody].sort((trBody1, trBody2) => {
-          const trBody1String = trBody1.children[index].innerText;
-          const trBody2String = trBody2.children[index].innerText;
-
-          return trBody2String.localeCompare(trBody1String);
-        });
-      }
-
-      if (index === 3) {
-        sortedTrsBody = [...trsBody].sort((trBody1, trBody2) => {
-          const trBody1String = trBody1.children[index].innerText;
-          const trBody2String = trBody2.children[index].innerText;
-
-          const trBody1Number = getSimpleNumber(trBody1String);
-          const trBody2Number = getSimpleNumber(trBody2String);
-
-          return trBody1Number - trBody2Number;
-        });
-      }
-
-      if (index === 4) {
-        sortedTrsBody = [...trsBody].sort((trBody1, trBody2) => {
-          const trBody1String = trBody1.children[index].innerText;
-          const trBody2String = trBody2.children[index].innerText;
-
-          const trBody1Number = getAdvancedNumber(trBody1String);
-          const trBody2Number = getAdvancedNumber(trBody2String);
-
-          return trBody1Number - trBody2Number;
-        });
-      }
-    }
-
-    sortedTrsBody.forEach(sortedTrBody => {
-      tBody.append(sortedTrBody);
-    });
-  });
-});
-
-function getAdvancedNumber(string) {
-  return +string.slice(1).split(',').join('');
-}
-
-function getSimpleNumber(string) {
-  return +string;
-}
+const tableBody = document.querySelector('tbody');
 
 // Add 'active' class
-trsBody.forEach(trBody => {
-  trBody.addEventListener('click', () => {
-    if (lastActiveTrBody !== undefined && lastActiveTrBody !== null) {
-      lastActiveTrBody.classList.remove('active');
-    }
+let lastActiveTr;
 
-    trBody.classList.add('active');
-    lastActiveTrBody = trBody;
-  });
+tableBody.addEventListener('click', (e) => {
+  const tr = e.target.closest('tr');
+
+  addActiveClass(tr);
 });
+
+function addActiveClass(tr) {
+  const activeClass = 'active';
+
+  if (lastActiveTr) {
+    lastActiveTr.classList.remove(activeClass);
+  }
+
+  lastActiveTr = tr;
+  lastActiveTr.classList.add(activeClass);
+}
 
 // Form
 const form = document.createElement('form');
@@ -118,103 +31,315 @@ form.setAttribute('method', 'post');
 
 document.body.append(form);
 
-// Labels, Inputs, Select and Button
-for (let index = 1; index <= 5; index++) {
+// Inputs, labels and select
+function createFormElement(
+  labelText,
+  element,
+  elementName,
+  elementQa,
+  elementType,
+  elementValues
+) {
+  // Label
   const label = document.createElement('label');
-  const input = document.createElement('input');
-  const select = document.createElement('select');
 
-  if (index === 3) {
-    label.append(select);
-  } else {
-    label.append(input);
+  label.innerText = labelText;
+  form.append(label);
+
+  // Input || Select
+  let unit = document.createElement('input');
+
+  unit.setAttribute('type', elementType);
+
+  if (element === 'select') {
+    unit = document.createElement('select');
+    unit.removeAttribute('type');
+
+    for (const value of elementValues) {
+      const option = document.createElement('option');
+
+      option.innerText = value;
+      unit.append(option);
+    }
   }
 
-  form.append(label);
+  unit.setAttribute('name', elementName);
+  unit.setAttribute('data-qa', elementQa);
+  label.append(unit);
 }
 
-// Labels
-const labels = document.querySelectorAll('label');
-const labelTexts = ['Name', 'Position', 'Office', 'Age', 'Salary'];
+// Name
+createFormElement(
+  'Name:',
+  'input',
+  'name',
+  'name',
+  'text'
+);
 
-labels.forEach((label, index) => {
-  label.insertAdjacentHTML('afterbegin', `
-    ${labelTexts[index]}:
-  `);
-});
+// Position
+createFormElement(
+  'Position',
+  'input',
+  'position',
+  'position',
+  'text'
+);
 
-// Inputs
-const inputs = document.querySelectorAll('input');
-const inputTypes = ['text', 'text', 'number', 'number'];
-const inputNames = ['name', 'position', 'age', 'salary'];
+// Office
+const selectValues = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinbrugh',
+  'San Francisco',
+];
 
-inputs.forEach((input, index) => {
-  input.setAttribute('type', inputTypes[index]);
-  input.setAttribute('name', inputNames[index]);
-  input.setAttribute('data-qa', inputNames[index]);
-});
+createFormElement(
+  'Office:',
+  'select',
+  'office',
+  'office',
+  null,
+  selectValues,
+);
 
-// Select
-const selectElement = document.querySelector('select');
-const selectElementValues
-  = ['Tokyo', 'Singapore', 'London', 'New York', 'Edinbrugh', 'San Francisco'];
+// Age
+createFormElement(
+  'Age:',
+  'input',
+  'age',
+  'age',
+  'number',
+);
 
-selectElement.setAttribute('name', 'office');
-selectElement.setAttribute('data-qa', 'office');
-
-selectElementValues.forEach(selectElementValue => {
-  const option = document.createElement('option');
-
-  option.innerText = selectElementValue;
-  selectElement.append(option);
-});
+// Salary
+createFormElement(
+  'Salary:',
+  'input',
+  'salary',
+  'salary',
+  'number',
+);
 
 // Button
 const button = document.createElement('button');
 
 button.classList.add('button');
-button.setAttribute('type', 'submit');
 button.innerText = 'Save to table';
+button.setAttribute('type', 'submit');
 
 form.append(button);
 
+// Validation
+const validateObject = {
+  name: false,
+  position: false,
+  age: false,
+  salary: false,
+};
+
+const inputs = document.querySelectorAll('input');
+const select = document.querySelector('select');
+
 button.addEventListener('click', (e) => {
-  const inputName = inputs[0];
-  const inputPosition = inputs[1];
-  const inputAge = inputs[2];
-  const inputSalary = inputs[3];
-
   e.preventDefault();
-  validateInputs(inputName, inputPosition, inputAge, inputSalary);
+  validateInputs(inputs);
 
-  const allValuesTrue
+  const isCorrectData
     = Object.values(validateObject).every(value => value === true);
 
-  if (allValuesTrue) {
-    addNewEmployee(inputs, selectElement);
-
-    pushNotification(
-      10,
-      10,
-      'Success!',
-      'Data has been added to table!',
-      'success'
-    );
-
+  if (isCorrectData) {
+    addNewEmployee(inputs, select);
     form.reset();
   }
 });
 
-function addNewEmployee(inputsElements, select) {
+function validateInputs(allInputs) {
+  let isValid = true;
+
+  allInputs.forEach(input => {
+    if (!isValid) {
+      return;
+    }
+
+    switch (input.name) {
+      case 'name': {
+        isValid = validateName(input);
+        break;
+      }
+
+      case 'position': {
+        isValid = validatePosition(input);
+        break;
+      }
+
+      case 'age': {
+        isValid = validateAge(input);
+        break;
+      }
+
+      case 'salary': {
+        isValid = validateSalary(input);
+        break;
+      }
+    }
+  });
+}
+
+function validateName(input) {
+  switch (true) {
+    case input.value.length < 4: {
+      pushNotification(
+        10,
+        10,
+        'Error!',
+        'Name mustn`t be less than 4 characters!',
+        'error'
+      );
+
+      return false;
+    }
+
+    case input.value.length === 0: {
+      pushNotification(
+        10,
+        10,
+        'Error!',
+        'Please, fill name!',
+        'error'
+      );
+
+      return false;
+    }
+
+    case !isNaN(+input.value): {
+      pushNotification(
+        10,
+        10,
+        'Error!',
+        'Name can`t a number!',
+        'error'
+      );
+
+      return false;
+    }
+
+    default: {
+      validateObject.name = true;
+
+      return true;
+    }
+  }
+}
+
+function validatePosition(input) {
+  switch (true) {
+    case input.value.length === 0: {
+      pushNotification(
+        10,
+        10,
+        'Error!',
+        'Please, fill position!',
+        'error'
+      );
+
+      return false;
+    }
+
+    case !isNaN(+input.value): {
+      pushNotification(
+        10,
+        10,
+        'Error!',
+        'Position can`t a number!',
+        'error'
+      );
+
+      return false;
+    }
+
+    default: {
+      validateObject.position = true;
+
+      return true;
+    }
+  }
+}
+
+function validateAge(input) {
+  const numberValue = getSimpleNumber(input.value);
+
+  switch (true) {
+    case numberValue < 18 || numberValue > 90: {
+      pushNotification(
+        10,
+        10,
+        'Error!',
+        'Age must be between 18 and 90!',
+        'error'
+      );
+
+      return false;
+    }
+
+    case input.value.length === 0: {
+      pushNotification(
+        10,
+        10,
+        'Error!',
+        'Please, fill the age!',
+        'error'
+      );
+
+      return false;
+    }
+
+    default: {
+      validateObject.age = true;
+
+      return true;
+    }
+  }
+}
+
+function validateSalary(input) {
+  switch (true) {
+    case input.value.length === 0: {
+      pushNotification(
+        10,
+        10,
+        'Error!',
+        'Please, fill salary!',
+        'error'
+      );
+
+      return false;
+    }
+
+    default: {
+      validateObject.salary = true;
+
+      return true;
+    }
+  }
+}
+
+// Add new Employee
+function addNewEmployee(allInputs, selectElement) {
   const tr = document.createElement('tr');
+  const index = [...allInputs].findIndex(input => {
+    return input.name === 'age';
+  });
   const selectTd = document.createElement('td');
 
-  selectTd.innerText = select.value;
+  selectTd.innerText = selectElement.value;
 
-  inputsElements.forEach((input, index) => {
+  allInputs.forEach(input => {
     const td = document.createElement('td');
 
-    if (index === 3) {
+    if (input.name === 'salary') {
       td.innerText = `$${(+input.value).toLocaleString('en-US')}`;
     } else {
       td.innerText = input.value;
@@ -223,11 +348,19 @@ function addNewEmployee(inputsElements, select) {
     tr.append(td);
   });
 
-  tr.insertBefore(selectTd, tr.children[2]);
-  tBody.append(tr);
+  tr.insertBefore(selectTd, tr.children[index]);
+  tableBody.append(tr);
 }
 
-// Notification
+// Help functions
+function getSimpleNumber(string) {
+  return +string;
+}
+
+function getAdvancedNumber(string) {
+  return +string.slice(1).split(',').join('');
+}
+
 function pushNotification(posTop, posRight, title, description, type) {
   const notificationBody = document.createElement('div');
   const notificationTitle = document.createElement('h2');
@@ -251,126 +384,45 @@ function pushNotification(posTop, posRight, title, description, type) {
   }, 2000);
 };
 
-// Validation
-const validateObject = {
-  name: false,
-  position: false,
-  age: false,
-  salary: false,
-};
+// Edit table data
+tableBody.addEventListener('dblclick', (e) => {
+  const td = e.target.closest('td');
 
-function validateInputs(nameInput, positionInput, ageInput, salaryInput) {
-  if (nameInput.value.length < 4) {
-    return pushNotification(
-      10,
-      10,
-      'Error!',
-      'Name must not be less than 4 characters',
-      'error'
-    );
-  } else {
-    validateObject.name = true;
-  }
+  setInput(td);
+});
 
-  if (positionInput.value.length === 0) {
-    return pushNotification(
-      10,
-      10,
-      'Error!',
-      'Please, fill the position',
-      'error'
-    );
-  } else {
-    validateObject.position = true;
-  }
+function setInput(td) {
+  const cellInput = document.createElement('input');
+  const tdData = td.innerText;
+
+  cellInput.classList.add('cell-input');
 
   if (
-    parseInt(ageInput.value) < 18
-    || parseInt(ageInput.value) > 90
+    isNaN(getSimpleNumber(tdData))
+    && isNaN(getAdvancedNumber(tdData))
   ) {
-    return pushNotification(
-      10,
-      10,
-      'Error!',
-      'Age must be between 18 and 90',
-      'error'
-    );
-  } else if (ageInput.value.length === 0) {
-    return pushNotification(
-      10,
-      10,
-      'Error!',
-      'Please, fill the age',
-      'error'
-    );
+    cellInput.setAttribute('type', 'text');
+    cellInput.value = tdData;
   } else {
-    validateObject.age = true;
-  }
+    cellInput.setAttribute('type', 'number');
 
-  if (salaryInput.value.length === 0) {
-    return pushNotification(
-      10,
-      10,
-      'Error!',
-      'Please, fill the salary',
-      'error'
-    );
-  } else {
-    validateObject.salary = true;
-  }
-}
-
-// Editing table
-const allTds = tBody.querySelectorAll('td');
-
-allTds.forEach(td => {
-  td.addEventListener('dblclick', () => {
-    const tdValue = td.innerText;
-
-    if (isNaN(getSimpleNumber(tdValue)) && isNaN(getAdvancedNumber(tdValue))) {
-      td.innerHTML = `
-        <input
-          class="cell-input"
-          type="text"
-          value="${tdValue}"
-        >
-      `;
-    } else if (!isNaN(getAdvancedNumber(tdValue))) {
-      td.innerHTML = `
-        <input
-          class="cell-input"
-          type="text"
-          value="${getAdvancedNumber(tdValue)}"
-        >
-      `;
+    if (!isNaN(getSimpleNumber(tdData))) {
+      cellInput.value = tdData;
     } else {
-      td.innerHTML = `
-        <input
-          class="cell-input"
-          type="number"
-          value="${tdValue}"
-        >
-      `;
+      cellInput.value = `${getAdvancedNumber(tdData)}`;
     }
+  }
 
-    const tdInput = td.querySelector('input');
+  td.innerText = '';
+  td.append(cellInput);
 
-    tdInput.addEventListener('blur', () => {
-      if (tdInput.value.length === 0) {
-        td.innerHTML = td.innerText;
-      } else {
-        td.innerHTML = tdInput.value;
-      }
-    });
-
-    tdInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        if (tdInput.value.length === 0) {
-          td.innerHTML = td.innerText;
-        } else {
-          td.innerHTML = tdInput.value;
-        }
-      }
-    });
+  cellInput.addEventListener('blur', () => {
+    if (cellInput.value.length === 0) {
+      td.innerText = tdData;
+    } else if (tdData.includes('$')) {
+      td.innerText = `$${(+cellInput.value).toLocaleString('en-US')}`;
+    } else {
+      td.innerText = cellInput.value;
+    }
   });
-});
+}
