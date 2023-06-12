@@ -354,10 +354,18 @@ function addNewEmployee(allInputs, selectElement) {
 
 // Help functions
 function getSimpleNumber(string) {
+  if (string === '' || string.trim() === '') {
+    return NaN;
+  }
+
   return +string;
 }
 
 function getAdvancedNumber(string) {
+  if (string === '' || string.trim() === '') {
+    return NaN;
+  }
+
   return +string.slice(1).split(',').join('');
 }
 
@@ -417,7 +425,7 @@ function setInput(td) {
   td.append(cellInput);
 
   cellInput.addEventListener('blur', () => {
-    if (cellInput.value.length === 0) {
+    if (cellInput.value.length === 0 || cellInput.value === '') {
       td.innerText = tdData;
     } else if (tdData.includes('$')) {
       td.innerText = `$${(+cellInput.value).toLocaleString('en-US')}`;
