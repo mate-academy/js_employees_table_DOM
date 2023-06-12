@@ -305,7 +305,6 @@ tbody.addEventListener('dblclick', e => {
 
     item.className = 'cell-input';
     item.textContent = '';
-    input.className = 'cell-input';
     input.value = item.textContent;
     input.type = 'number';
 
