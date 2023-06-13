@@ -85,37 +85,34 @@ selectOffice.dataset.qa = 'office';
 form.append(labelSelect);
 labelSelect.append(selectOffice);
 
-const option1 = document.createElement('option');
-const option2 = document.createElement('option');
-const option3 = document.createElement('option');
-const option4 = document.createElement('option');
-const option5 = document.createElement('option');
-const option6 = document.createElement('option');
+const options = [
+  {
+    value: 'Tokyo', text: 'Tokyo',
+  },
+  {
+    value: 'Singapore', text: 'Singapore',
+  },
+  {
+    value: 'London', text: 'London',
+  },
+  {
+    value: 'New York', text: 'New York',
+  },
+  {
+    value: 'Edinburgh', text: 'Edinburgh',
+  },
+  {
+    value: 'San Francisco', text: 'San Francisco',
+  },
+];
 
-option1.value = 'Tokyo';
-option1.textContent = 'Tokyo';
+for (let i = 0; i < options.length; i++) {
+  const option = document.createElement('option');
 
-option2.value = 'Singapore';
-option2.textContent = 'Singapore';
-
-option3.value = 'London';
-option3.textContent = 'London';
-
-option4.value = 'New York';
-option4.textContent = 'New York';
-
-option5.value = 'Edinburgh';
-option5.textContent = 'Edinburgh';
-
-option6.value = 'San Francisco';
-option6.textContent = 'San Francisco';
-
-selectOffice.append(option1);
-selectOffice.append(option2);
-selectOffice.append(option3);
-selectOffice.append(option4);
-selectOffice.append(option5);
-selectOffice.append(option6);
+  option.value = options[i].value;
+  option.textContent = options[i].text;
+  selectOffice.appendChild(option);
+}
 
 const labelAge = document.createElement('label');
 const inputAge = document.createElement('input');
