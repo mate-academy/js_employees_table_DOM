@@ -146,7 +146,7 @@ function showNotification(title, description, className) {
   }, 3000);
 }
 
-function validateData(nameInputValue, ageInputValue) {
+function validateData(nameInputValue, ageInputValue, positionInputValue) {
   if (nameInputValue.length < 4) {
     showNotification('Error', 'Name should have at least 4 letters', 'error');
 
@@ -159,6 +159,12 @@ function validateData(nameInputValue, ageInputValue) {
     return false;
   }
 
+  if (positionInputValue === '') {
+    showNotification('Error', 'Position should not be empty', 'error');
+
+    return false;
+  }
+
   return true;
 }
 
@@ -167,8 +173,9 @@ form.addEventListener('submit', (e) => {
 
   const nameInputValue = nameInput.querySelector('input').value;
   const ageInputValue = ageInput.querySelector('input').value;
+  const positionInputValue = positionInput.querySelector('input').value;
 
-  if (validateData(nameInputValue, ageInputValue)) {
+  if (validateData(nameInputValue, ageInputValue, positionInputValue)) {
     const newRow = tbody.insertRow();
     const convertedSalary = '$' + new Intl.NumberFormat('en-US')
       .format(salaryInput.querySelector('input').value);
