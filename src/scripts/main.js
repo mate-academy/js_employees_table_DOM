@@ -125,6 +125,7 @@ function showNotification(title, description, className) {
   const notification = document.createElement('div');
 
   notification.setAttribute('data-qa', 'notification');
+  notification.className = `notification`;
   notification.classList.add(className);
 
   const notificationTitle = document.createElement('h3');
@@ -168,7 +169,7 @@ form.addEventListener('submit', (e) => {
   const ageInputValue = ageInput.querySelector('input').value;
 
   if (validateData(nameInputValue, ageInputValue)) {
-    const newRow = table.insertRow();
+    const newRow = tbody.insertRow();
     const convertedSalary = '$' + new Intl.NumberFormat('en-US')
       .format(salaryInput.querySelector('input').value);
 
