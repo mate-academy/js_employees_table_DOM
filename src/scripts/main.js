@@ -9,13 +9,10 @@ const tableRows = [...tbody.rows];
 // Implement table sorting by clicking on the title (in two directions)
 
 function sortTable(columnIndex, sortOrder) {
-  const sortedRows = [...tableRows];
-
-  sortedRows.sort((rowA, rowB) => {
+  tableRows.sort((rowA, rowB) => {
     const cellA = rowA.querySelectorAll('td')[columnIndex].textContent;
     const cellB = rowB.querySelectorAll('td')[columnIndex].textContent;
 
-    // Сравниваем значения ячеек в зависимости от типа данных
     if (sortOrder === 'asc') {
       return cellA.localeCompare(cellB, undefined, { numeric: true });
     } else {
@@ -27,7 +24,7 @@ function sortTable(columnIndex, sortOrder) {
     tbody.removeChild(row);
   });
 
-  sortedRows.forEach((row) => {
+  tableRows.forEach((row) => {
     tbody.appendChild(row);
   });
 }
@@ -146,7 +143,8 @@ function showNotification(title, description, className) {
   }, 3000);
 }
 
-function validateData(nameInputValue, ageInputValue, positionInputValue) {
+function validateData(nameInputValue, ageInputValue,
+  positionInputValue, salaryInputValue) {
   if (nameInputValue.length < 4) {
     showNotification('Error', 'Name should have at least 4 letters', 'error');
 
@@ -165,6 +163,12 @@ function validateData(nameInputValue, ageInputValue, positionInputValue) {
     return false;
   }
 
+  if (salaryInputValue === '' || salaryInputValue === '0') {
+    showNotification('Error', 'Salary should not be empty', 'error');
+
+    return false;
+  }
+
   return true;
 }
 
@@ -174,11 +178,13 @@ form.addEventListener('submit', (e) => {
   const nameInputValue = nameInput.querySelector('input').value;
   const ageInputValue = ageInput.querySelector('input').value;
   const positionInputValue = positionInput.querySelector('input').value;
+  const salaryInputValue = salaryInput.querySelector('input').value;
 
-  if (validateData(nameInputValue, ageInputValue, positionInputValue)) {
+  if (validateData(nameInputValue, ageInputValue,
+    positionInputValue, salaryInputValue)) {
     const newRow = tbody.insertRow();
     const convertedSalary = '$' + new Intl.NumberFormat('en-US')
-      .format(salaryInput.querySelector('input').value);
+      .format(salaryInputValue);
 
     newRow.innerHTML = `
       <td>${nameInputValue}</td>
@@ -187,6 +193,8 @@ form.addEventListener('submit', (e) => {
       <td>${ageInputValue}</td>
       <td>${convertedSalary}</td>
     `;
+
+    tableRows.push(newRow);
 
     showNotification('Success', 'New employee added to the table', 'success');
 
