@@ -12,62 +12,65 @@ const sortingColumns = (e) => {
 
   for (let i = 1; i < updatedAllRows.length - 1; i++) {
     const cells = updatedAllRows[i].cells;
-    const person = {};
-
-    person.Name = cells[0].innerText;
-    person.Position = cells[1].innerText;
-    person.Office = cells[2].innerText;
-    person.Age = cells[3].innerText;
-    person.Salary = cells[4].innerText;
+    const person = {
+      Name: cells[0].innerText,
+      Position: cells[1].innerText,
+      Office: cells[2].innerText,
+      Age: cells[3].innerText,
+      Salary: cells[4].innerText,
+    };
 
     tableDataToSort.push(person);
   }
 
+  let sortCallback;
+  let sortAscending;
+
   if (e.target.dataset.clicked === 'true') {
-    if (sortByColumn === 'Salary') {
-      tableDataToSort.sort((a, b) => {
-        const toNumberA = a.Salary.match(/\d+/g).join('');
-        const toNumberB = b.Salary.match(/\d+/g).join('');
-
-        return toNumberB - toNumberA;
-      });
-    } else {
-      tableDataToSort.sort((a, b) =>
-        b[sortByColumn].localeCompare(a[sortByColumn]));
-    }
-    e.target.dataset.clicked = false;
+    sortAscending = false;
   } else {
-    const clicedTitile = document.querySelector('[data-clicked="true"]');
+    const clickedTitle = document.querySelector('[data-clicked="true"]');
 
-    if (clicedTitile) {
-      clicedTitile.dataset.clicked = false;
+    if (clickedTitle) {
+      clickedTitle.dataset.clicked = false;
     }
+    sortAscending = true;
+  }
 
-    if (sortByColumn === 'Salary') {
-      tableDataToSort.sort((a, b) => {
+  switch (sortByColumn) {
+    case 'Salary':
+      sortCallback = (a, b) => {
         const toNumberA = a.Salary.match(/\d+/g).join('');
         const toNumberB = b.Salary.match(/\d+/g).join('');
 
         return toNumberA - toNumberB;
-      });
-    } else {
-      tableDataToSort.sort((a, b) =>
-        a[sortByColumn].localeCompare(b[sortByColumn]));
-    }
-    e.target.dataset.clicked = true;
+      };
+      break;
+    default:
+      sortCallback = (a, b) => a[sortByColumn].localeCompare(b[sortByColumn]);
+      break;
   }
+
+  tableDataToSort.sort((a, b) => {
+    const result = sortCallback(a, b);
+
+    return sortAscending ? result : -result;
+  });
 
   for (let i = 1; i < updatedAllRows.length - 1; i++) {
     const tableRow = updatedAllRows[i];
+    const { Name, Position, Office, Age, Salary } = tableDataToSort[i - 1];
 
     tableRow.innerHTML = `
-      <td>${tableDataToSort[i - 1].Name}</td>
-      <td>${tableDataToSort[i - 1].Position}</td>
-      <td>${tableDataToSort[i - 1].Office}</td>
-      <td>${tableDataToSort[i - 1].Age}</td>
-      <td>${tableDataToSort[i - 1].Salary}</td>
+      <td>${Name}</td>
+      <td>${Position}</td>
+      <td>${Office}</td>
+      <td>${Age}</td>
+      <td>${Salary}</td>
     `;
   }
+
+  e.target.dataset.clicked = sortAscending ? 'true' : 'false';
 };
 
 tableHead.addEventListener('click', sortingColumns);
@@ -277,7 +280,7 @@ const editCells = (e) => {
     }
 
     if ((cellIndex === ageGolumn || cellIndex === salaryColumn)
-      && !+cellInput.value) {
+      && !+(cellInput.value.match(/\d+/g).join(''))) {
       e.target.innerText = originalText;
 
       pushNotification('error',
@@ -295,14 +298,20 @@ const editCells = (e) => {
     }
 
     if (cellIndex === salaryColumn) {
-      if (Number(cellInput.value) < 0) {
+      let cellInputValue = cellInput.value;
+
+      if (cellInput.value.includes('$')) {
+        cellInputValue = cellInput.value.match(/\d+/g).join('');
+      }
+
+      if (Number(cellInputValue) < 0) {
         target.innerText = originalText;
         pushNotification('error', 'Salary can\'t be less than $0');
 
         return;
       }
 
-      target.innerText = `$${Number(cellInput.value).toLocaleString()}`;
+      target.innerText = `$${Number(cellInputValue).toLocaleString()}`;
     } else {
       target.innerText = cellInput.value || originalText;
     }
