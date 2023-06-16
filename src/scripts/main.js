@@ -20,13 +20,9 @@ function sortTable(columnIndex, sortOrder) {
     }
   });
 
-  tableRows.forEach((row) => {
-    tbody.removeChild(row);
-  });
+  tbody.innerHTML = '';
 
-  tableRows.forEach((row) => {
-    tbody.appendChild(row);
-  });
+  tbody.append(...tableRows);
 }
 
 headers.forEach((header, index) => {
@@ -163,8 +159,9 @@ function validateData(nameInputValue, ageInputValue,
     return false;
   }
 
-  if (salaryInputValue === '' || salaryInputValue === '0') {
-    showNotification('Error', 'Salary should not be empty', 'error');
+  if (salaryInputValue === '' || salaryInputValue === '0'
+  || isNaN(salaryInputValue) || parseFloat(salaryInputValue) <= 0) {
+    showNotification('Error', 'Invalid salary value', 'error');
 
     return false;
   }
