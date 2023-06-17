@@ -197,7 +197,7 @@ function render(board, content) {
 }
 
 function validateData(data, text) {
-  if (data['name'].length < 4) {
+  if (data['name'].trim().length < 4) {
     text.textContent = 'Name should contain more than 4 letters. ';
 
     return true;
@@ -215,7 +215,7 @@ function validateData(data, text) {
     return true;
   }
 
-  if (data['salary'] === '0' || data['salary'].trim() === '') {
+  if (+data['salary'] <= 0 || data['salary'].trim() === '') {
     text.textContent = 'Salary is required';
 
     return true;
