@@ -126,37 +126,26 @@ document.body.append(form);
 table.addEventListener('dblclick', (e) => {
   editedCell = e.target.textContent;
 
-  e.target.innerHTML = `<input class="cell-input" value="${editedCell}">`;
+  const editedCellType = (!isNaN(parseInt(editedCell))
+    || editedCell.search(/[$]/) !== -1)
+    ? 'number'
+    : 'text';
+
+  e.target.innerHTML = `<input class="cell-input"
+    value="${(editedCell.search(/[$]/) === -1)
+    ? editedCell
+    : editedCell.replace(/[,$]/g, '')}"
+    type=${editedCellType}>`;
   e.target.firstChild.focus();
 });
 
 document.addEventListener('blur', (e) => {
-  const target = e.target;
-
-  if (target.classList.contains('cell-input')) {
-    const newText = target.value;
-
-    if (newText.trim() !== '') {
-      target.parentNode.textContent = newText;
-    } else {
-      target.parentNode.textContent = editedCell;
-    }
-  }
+  applyChanges(e);
 }, true);
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
-    const target = e.target;
-
-    if (target.classList.contains('cell-input')) {
-      const newText = target.value;
-
-      if (newText.trim() !== '') {
-        target.parentNode.textContent = newText;
-      } else {
-        target.parentNode.textContent = editedCell;
-      }
-    }
+    applyChanges(e);
   }
 });
 
@@ -219,5 +208,38 @@ function validateData(data, text) {
     text.textContent = 'Salary is required';
 
     return true;
+  }
+}
+
+function applyChanges(e) {
+  if (e.target.classList.contains('cell-input')) {
+    const newText = e.target.value.trim();
+    const cell = e.target.parentNode;
+    let shouldBeReplaced = true;
+    const columnName = (e.target.getAttribute('type') === 'number'
+      && cell.parentNode.lastElementChild === cell)
+      ? 'salary' : 'age';
+
+    if (columnName === 'age' && (+newText < 18 || +newText > 90)) {
+      shouldBeReplaced = false;
+    }
+
+    if (newText === '' || +newText <= 0) {
+      shouldBeReplaced = false;
+    }
+
+    if (shouldBeReplaced && columnName === 'salary') {
+      cell.textContent = '$' + (+newText).toLocaleString();
+
+      return;
+    }
+
+    if (!shouldBeReplaced) {
+      cell.textContent = editedCell;
+
+      return;
+    }
+
+    cell.textContent = newText;
   }
 }
