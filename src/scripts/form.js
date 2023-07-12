@@ -6,8 +6,8 @@ const buildForm = () => {
   <label
     >Position: <input name="position" data-qa="position" type="text"
   /></label>
-  <label
-    >Office:
+  <label>
+    Office:
     <select name="office" data-qa="office">
       <option disabled selected value="">Select an office</option>
       <option value="Tokyo">Tokyo</option>
@@ -18,8 +18,12 @@ const buildForm = () => {
       <option value="San Francisco">San Francisco</option>
     </select>
   </label>
-  <label>Age: <input name="age" data-qa="age"  type="number" /></label>
-  <label>Salary: <input name="salary" data-qa="salary" type="number" /></label>
+  <label>
+    Age: <input name="age" data-qa="age" min=1  type="number" />
+  </label>
+  <label>
+    Salary: <input name="salary" data-qa="salary" min=1000 type="number" />
+  </label>
   <button type="submit">Save to table</button>
 </form>`;
 

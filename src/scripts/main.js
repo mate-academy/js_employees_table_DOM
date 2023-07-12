@@ -7,7 +7,6 @@ const {
   validateFormInputs,
 } = require('./form.js');
 
-// write code here
 buildForm();
 
 let lastTarget;
@@ -17,7 +16,10 @@ const form = document.querySelector('form');
 
 const selectActiveRow = (rows, index) => {
   rows.forEach((row) => row.classList.remove('active'));
-  rows[index].classList.add('active');
+
+  if (rows[index]) {
+    rows[index].classList.add('active');
+  }
 };
 
 const sortTable = (index, order) => {
@@ -48,10 +50,12 @@ const insertIntoTable = (formData) => {
 };
 
 const saveCellInput = (targetedCell, value, initialValue) => {
+  targetedCell.textContent = '';
+
   if (!value) {
-    targetedCell.innerHTML = initialValue;
+    targetedCell.textContent = initialValue;
   } else {
-    targetedCell.innerHTML = value;
+    targetedCell.textContent = value;
   }
 };
 
@@ -64,24 +68,27 @@ tableThead.addEventListener('click', ({ target }) => {
 
   if (lastTarget === target) {
     sortTable(columnIndex, 'desc');
+    lastTarget = null;
   } else {
     sortTable(columnIndex, 'asc');
+    lastTarget = target;
   }
-
-  lastTarget = target;
 });
 
 tableTbody.addEventListener('click', ({ target }) => {
   const tableBodyRows = tableTbody.querySelectorAll('tr');
-  const tableRowIndex = [...tableBodyRows].findIndex(
+  const rowIndex = [...tableBodyRows].findIndex(
     (row) => target.closest('tr') === row
   );
 
-  if (tableBodyRows[tableRowIndex].classList.contains('active')) {
+  if (
+    tableBodyRows[rowIndex]
+    && tableBodyRows[rowIndex].classList.contains('active')
+  ) {
     return;
   }
 
-  selectActiveRow(tableBodyRows, tableRowIndex);
+  selectActiveRow(tableBodyRows, rowIndex);
 });
 
 form.addEventListener('submit', (e) => {
@@ -109,15 +116,18 @@ form.addEventListener('submit', (e) => {
 });
 
 tableTbody.addEventListener('dblclick', ({ target: targetedCell }) => {
-  const initialValue = targetedCell.innerText;
+  const initialValue = targetedCell.textContent;
 
-  targetedCell.innerHTML = `<input class="cell-input" value=${initialValue} />`;
+  targetedCell.innerHTML = `<input class="cell-input"/>`;
 
-  document
-    .querySelector('.cell-input')
-    .addEventListener('blur', ({ target }) => {
-      saveCellInput(targetedCell, target.value, initialValue);
-    });
+  const targetedCellChild = targetedCell.children[0];
+
+  targetedCellChild.focus();
+  targetedCellChild.value = initialValue;
+
+  targetedCellChild.addEventListener('blur', ({ target }) => {
+    saveCellInput(targetedCell, target.value, initialValue);
+  });
 
   targetedCell.addEventListener('keypress', ({ key, target }) => {
     if (key === 'Enter') {
