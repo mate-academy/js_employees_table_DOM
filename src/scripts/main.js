@@ -60,35 +60,29 @@ const saveCellInput = (targetedCell, value, initialValue) => {
 };
 
 tableThead.addEventListener('click', ({ target }) => {
-  const theadChildren = target.closest('tr').children;
-
-  const columnIndex = [...theadChildren].findIndex(
-    (th) => th.innerText === target.innerText
-  );
+  const theadCellIndex = target.cellIndex;
 
   if (lastTarget === target) {
-    sortTable(columnIndex, 'desc');
+    sortTable(theadCellIndex, 'desc');
     lastTarget = null;
   } else {
-    sortTable(columnIndex, 'asc');
+    sortTable(theadCellIndex, 'asc');
     lastTarget = target;
   }
 });
 
 tableTbody.addEventListener('click', ({ target }) => {
   const tableBodyRows = tableTbody.querySelectorAll('tr');
-  const rowIndex = [...tableBodyRows].findIndex(
-    (row) => target.closest('tr') === row
-  );
+  const tableRowIndex = target.closest('tr').rowIndex - 1;
 
   if (
-    tableBodyRows[rowIndex]
-    && tableBodyRows[rowIndex].classList.contains('active')
+    tableBodyRows[tableRowIndex]
+    && tableBodyRows[tableRowIndex].classList.contains('active')
   ) {
     return;
   }
 
-  selectActiveRow(tableBodyRows, rowIndex);
+  selectActiveRow(tableBodyRows, tableRowIndex);
 });
 
 form.addEventListener('submit', (e) => {
