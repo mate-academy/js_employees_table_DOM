@@ -50,30 +50,30 @@ const validateFormInputs = (inputName, inputValue) => {
   if (!inputValue) {
     createNotification('error', 'Fill all the inputs');
 
-    return true;
+    return false;
   }
 
   if (inputName === 'name' && inputValue.length < 4) {
     createNotification('error', 'Name is too short');
 
-    return true;
+    return false;
   }
 
   if (inputName === 'age') {
     if (+inputValue < 18) {
       createNotification('error', 'You are too young');
 
-      return true;
+      return false;
     }
 
     if (+inputValue > 90) {
       createNotification('error', 'You are too old');
 
-      return true;
+      return false;
     }
   }
 
-  return false;
+  return true;
 };
 
 module.exports = {

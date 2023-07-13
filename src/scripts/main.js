@@ -1,6 +1,6 @@
 'use strict';
 
-const { sortAscending, sortDescending } = require('./sortHelpers.js');
+const { sort } = require('./sortHelpers.js');
 const {
   buildForm,
   createNotification,
@@ -12,28 +12,33 @@ buildForm();
 let lastTarget;
 const tableThead = document.querySelector('thead');
 const tableTbody = document.querySelector('tbody');
+const rows = tableTbody.getElementsByTagName('tr');
 const form = document.querySelector('form');
 
-const selectActiveRow = (rows, index) => {
-  rows.forEach((row) => row.classList.remove('active'));
-
-  if (rows[index]) {
-    rows[index].classList.add('active');
+const selectActiveRow = (target) => {
+  if (target.classList.contains('active')) {
+    return;
   }
+
+  const currentlyActive = tableTbody.querySelector('.active');
+
+  if (currentlyActive) {
+    currentlyActive.classList.remove('active');
+  }
+
+  target.classList.add('active');
 };
 
 const sortTable = (index, order) => {
-  const rows = tableTbody.getElementsByTagName('tr');
-
   const sortedRows = [...rows].sort((a, b) => {
-    const columnAText = a.children[index].innerText;
-    const columnBText = b.children[index].innerText;
+    let columnAText = a.children[index].innerText;
+    let columnBText = b.children[index].innerText;
 
-    if (order === 'asc') {
-      return sortAscending(columnAText, columnBText);
-    } else {
-      return sortDescending(columnAText, columnBText);
+    if (order === 'desc') {
+      [columnAText, columnBText] = [columnBText, columnAText];
     }
+
+    return sort(columnAText, columnBText);
   });
 
   sortedRows.forEach((row) => tableTbody.appendChild(row));
@@ -62,27 +67,17 @@ const saveCellInput = (targetedCell, value, initialValue) => {
 tableThead.addEventListener('click', ({ target }) => {
   const theadCellIndex = target.cellIndex;
 
-  if (lastTarget === target) {
+  if (lastTarget === target.textContent) {
     sortTable(theadCellIndex, 'desc');
     lastTarget = null;
   } else {
     sortTable(theadCellIndex, 'asc');
-    lastTarget = target;
+    lastTarget = target.textContent;
   }
 });
 
 tableTbody.addEventListener('click', ({ target }) => {
-  const tableBodyRows = tableTbody.querySelectorAll('tr');
-  const tableRowIndex = target.closest('tr').rowIndex - 1;
-
-  if (
-    tableBodyRows[tableRowIndex]
-    && tableBodyRows[tableRowIndex].classList.contains('active')
-  ) {
-    return;
-  }
-
-  selectActiveRow(tableBodyRows, tableRowIndex);
+  selectActiveRow(target.closest('tr'));
 });
 
 form.addEventListener('submit', (e) => {
@@ -92,7 +87,7 @@ form.addEventListener('submit', (e) => {
   const data = [];
 
   for (const [key, value] of formData.entries()) {
-    if (validateFormInputs(key, value)) {
+    if (!validateFormInputs(key, value)) {
       return;
     }
 

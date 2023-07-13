@@ -6,7 +6,7 @@ const tesIfIncludesNumbers = (string) => {
   return numberRegEx.test(string);
 };
 
-const sortAscending = (a, b) => {
+const sort = (a, b) => {
   if (tesIfIncludesNumbers(a)) {
     return +a.replace(/[$,]/g, '') - +b.replace(/[$,]/g, '');
   } else {
@@ -14,15 +14,6 @@ const sortAscending = (a, b) => {
   }
 };
 
-const sortDescending = (a, b) => {
-  if (tesIfIncludesNumbers(a)) {
-    return +b.replace(/[$,]/g, '') - +a.replace(/[$,]/g, '');
-  } else {
-    return b.localeCompare(a);
-  }
-};
-
 module.exports = {
-  sortAscending,
-  sortDescending,
+  sort,
 };
