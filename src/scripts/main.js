@@ -3,11 +3,11 @@
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 const rows = [...tbody.querySelectorAll('tr')];
-let ascName = true;
-let ascPosition = true;
-let ascOffice = true;
-let ascAge = true;
-let ascSalary = true;
+let ascName = 1;
+let ascPosition = 1;
+let ascOffice = 1;
+let ascAge = 1;
+let ascSalary = 1;
 const body = document.querySelector('body');
 const form = document.createElement('form');
 const notification = document.createElement('div');
@@ -44,115 +44,43 @@ const button = document.querySelector('button');
 thead.addEventListener('click', e => {
   const columnIndex = e.target.cellIndex;
 
-  if (e.target.cellIndex === 0) {
-    if (ascName) {
+  switch (e.target.cellIndex) {
+    case 0:
+      sortStrings(ascName, columnIndex);
+      ascName *= -1;
+
+      break;
+    case 1:
+      sortStrings(ascPosition, columnIndex);
+      ascPosition *= -1;
+      break;
+
+    case 2:
+      sortStrings(ascOffice, columnIndex);
+      ascOffice *= -1;
+      break;
+
+    case 3:
       rows.sort((a, b) => {
         const current = a.cells[columnIndex].innerHTML;
         const next = b.cells[columnIndex].innerHTML;
 
-        ascName = false;
-
-        return current.localeCompare(next);
+        return ascAge * (Number(current) - Number(next));
       });
-    } else {
-      rows.sort((a, b) => {
-        const current = b.cells[columnIndex].innerHTML;
-        const next = a.cells[columnIndex].innerHTML;
+      ascAge *= -1;
+      break;
 
-        ascName = true;
-
-        return current.localeCompare(next);
-      });
-    }
-  }
-
-  if (e.target.cellIndex === 1) {
-    if (ascPosition) {
+    case 4:
       rows.sort((a, b) => {
         const current = a.cells[columnIndex].innerHTML;
         const next = b.cells[columnIndex].innerHTML;
 
-        ascPosition = false;
-
-        return current.localeCompare(next);
+        return ascSalary * (salaryToNumber(current) - salaryToNumber(next));
       });
-    } else {
-      rows.sort((a, b) => {
-        const current = b.cells[columnIndex].innerHTML;
-        const next = a.cells[columnIndex].innerHTML;
-
-        ascPosition = true;
-
-        return current.localeCompare(next);
-      });
-    }
+      ascSalary *= -1;
+      break;
   }
 
-  if (e.target.cellIndex === 2) {
-    if (ascOffice) {
-      rows.sort((a, b) => {
-        const current = a.cells[columnIndex].innerHTML;
-        const next = b.cells[columnIndex].innerHTML;
-
-        ascOffice = false;
-
-        return current.localeCompare(next);
-      });
-    } else {
-      rows.sort((a, b) => {
-        const current = b.cells[columnIndex].innerHTML;
-        const next = a.cells[columnIndex].innerHTML;
-
-        ascOffice = true;
-
-        return current.localeCompare(next);
-      });
-    }
-  }
-
-  if (e.target.cellIndex === 3) {
-    if (ascAge) {
-      rows.sort((a, b) => {
-        const current = a.cells[columnIndex].innerHTML;
-        const next = b.cells[columnIndex].innerHTML;
-
-        ascAge = false;
-
-        return Number(current) - Number(next);
-      });
-    } else {
-      rows.sort((a, b) => {
-        const current = b.cells[columnIndex].innerHTML;
-        const next = a.cells[columnIndex].innerHTML;
-
-        ascAge = true;
-
-        return Number(current) - Number(next);
-      });
-    }
-  }
-
-  if (e.target.cellIndex === 4) {
-    if (ascSalary) {
-      rows.sort((a, b) => {
-        const current = a.cells[columnIndex].innerHTML;
-        const next = b.cells[columnIndex].innerHTML;
-
-        ascSalary = false;
-
-        return salaryToNumber(current) - salaryToNumber(next);
-      });
-    } else {
-      rows.sort((a, b) => {
-        const current = b.cells[columnIndex].innerHTML;
-        const next = a.cells[columnIndex].innerHTML;
-
-        ascSalary = true;
-
-        return salaryToNumber(current) - salaryToNumber(next);
-      });
-    }
-  }
   rows.forEach(x => tbody.appendChild(x));
 });
 
@@ -196,4 +124,13 @@ button.addEventListener('click', (e) => {
 
 function salaryToNumber(string) {
   return Number(string.slice(1).replaceAll(',', ''));
+}
+
+function sortStrings(asc, columnIndex) {
+  rows.sort((a, b) => {
+    const current = a.cells[columnIndex].innerHTML;
+    const next = b.cells[columnIndex].innerHTML;
+
+    return asc * current.localeCompare(next);
+  });
 }
