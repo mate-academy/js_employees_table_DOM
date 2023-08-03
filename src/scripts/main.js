@@ -96,14 +96,11 @@ button.addEventListener('click', (e) => {
 
   if (!nameInput.value || !ageInput.value || !officeInput.value
     || !positionInput.value || !salaryInput.value) {
-    notification.classList.add('error');
-    notification.textContent = 'at least one of the fields is empty';
+    notificationError('at least one of the fields is empty');
   } else if (nameInput.value.length < 4) {
-    notification.classList.add('error');
-    notification.textContent = 'Name must have at least 4 letters';
+    notificationError('Name must have at least 4 letters');
   } else if (ageInput.value < 18 || ageInput.value > 90) {
-    notification.classList.add('error');
-    notification.textContent = 'Age must be between 18 and 90';
+    notificationError('Age must be between 18 and 90');
   } else {
     newRow.outerHTML = `<tr>
     <td>${nameInput.value}</td>
@@ -113,12 +110,7 @@ button.addEventListener('click', (e) => {
     <td>$${Number(salaryInput.value).toLocaleString('en-US')}</td>
     </tr>`;
     notification.classList.add('success');
-    notification.textContent = 'You have added a new employee';
-    nameInput.value = '';
-    positionInput.value = '';
-    officeInput.value = 'Tokyo';
-    ageInput.value = '';
-    salaryInput.value = '';
+    notificationSuccess();
   }
 });
 
@@ -133,4 +125,18 @@ function sortStrings(asc, columnIndex) {
 
     return asc * current.localeCompare(next);
   });
+}
+
+function notificationError(text) {
+  notification.classList.add('error');
+  notification.textContent = text;
+}
+
+function notificationSuccess() {
+  notification.textContent = 'You have added a new employee';
+  nameInput.value = '';
+  positionInput.value = '';
+  officeInput.value = 'Tokyo';
+  ageInput.value = '';
+  salaryInput.value = '';
 }
