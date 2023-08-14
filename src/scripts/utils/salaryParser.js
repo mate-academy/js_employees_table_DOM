@@ -1,18 +1,29 @@
 'use strict';
 
-const salaryParser = (salary) => {
-  if (typeof salary === 'number') {
-    const formattedSalary = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    })
-      .format(salary)
-      .replace('.00', '');
+const formatNumberToSalary = (number) => {
+  if (typeof number !== 'number') {
+    return;
+  }
 
-    return formattedSalary;
+  const formattedSalary = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  })
+    .format(number)
+    .replace('.00', '');
+
+  return formattedSalary;
+};
+
+const parseSalaryToNumber = (salary) => {
+  if (typeof salary === 'number') {
+    return;
   }
 
   return parseFloat(salary.replace(/[^\d.-]/g, ''));
 };
 
-module.exports = { salaryParser };
+module.exports = {
+  formatNumberToSalary,
+  parseSalaryToNumber,
+};

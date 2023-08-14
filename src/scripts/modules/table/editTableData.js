@@ -1,19 +1,35 @@
 'use strict';
 
 /* eslint-disable no-shadow */
-const { salaryParser } = require('../../utils');
+const { parseSalaryToNumber, formatNumberToSalary } = require('../../utils');
+
+const getNewValue = (prevValue, valueToChange) => {
+  const parsedPrevValue = +prevValue;
+  const parsedValueToChange = +valueToChange;
+
+  const isNumber = !isNaN(parsedPrevValue) && !isNaN(parsedValueToChange);
+  const isCorrectAge = parsedValueToChange >= 18 && parsedValueToChange <= 90;
+
+  if (isNumber) {
+    return isCorrectAge
+      ? parsedValueToChange
+      : parsedPrevValue;
+  }
+
+  return valueToChange.trim() || prevValue.trim();
+};
 
 const getInputType = (data) => {
-  const isNumber = !Number.isNaN(salaryParser(data)) || !Number.isNaN(+data);
+  const isNumber = !isNaN(parseSalaryToNumber(data)) || !isNaN(+data);
 
   return isNumber ? 'number' : 'text';
 };
 
 const saveChanges = (tableData, prevValue, valueToChange) => {
-  const newValue = valueToChange || prevValue;
+  const newValue = getNewValue(prevValue, valueToChange);
 
   if (prevValue.startsWith('$')) {
-    const newSalary = salaryParser(+newValue);
+    const newSalary = formatNumberToSalary(+newValue);
 
     if (newSalary.slice(1) === 'NaN') {
       tableData.textContent = prevValue;
@@ -21,7 +37,7 @@ const saveChanges = (tableData, prevValue, valueToChange) => {
       return;
     }
 
-    tableData.textContent = salaryParser(+newValue);
+    tableData.textContent = newSalary;
 
     return;
   }
@@ -56,7 +72,7 @@ const replaceDataToInput = (tableData) => {
 
   input.className = 'cell-input';
   input.type = inputType;
-  input.value = salaryParser(value) || value;
+  input.value = parseSalaryToNumber(value) || value;
 
   tableData.innerHTML = '';
 

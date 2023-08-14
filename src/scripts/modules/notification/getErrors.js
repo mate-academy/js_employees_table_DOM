@@ -3,7 +3,7 @@
 const getErrors = (data) => {
   const errors = [];
 
-  const isSomeEmptyField = Object.values(data).some(value => !value);
+  const isSomeEmptyField = Object.values(data).some(value => !value.trim());
 
   if (isSomeEmptyField) {
     errors.push({

@@ -1,6 +1,6 @@
 'use strict';
 
-const { salaryParser } = require('../../utils');
+const { formatNumberToSalary } = require('../../utils');
 const { pushNotification, getErrors } = require('../notification');
 
 const createNewEmployee = (formData) => {
@@ -12,7 +12,7 @@ const createNewEmployee = (formData) => {
     let data = value;
 
     if (key === 'salary') {
-      data = salaryParser(+data);
+      data = formatNumberToSalary(+data);
     }
 
     tableData.textContent = data;

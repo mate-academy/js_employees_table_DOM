@@ -1,9 +1,10 @@
 'use strict';
 
 const { capitalizeWord } = require('./capitalizeWord');
-const { salaryParser } = require('./salaryParser');
+const { formatNumberToSalary, parseSalaryToNumber } = require('./salaryParser');
 
 module.exports = {
   capitalizeWord,
-  salaryParser,
+  formatNumberToSalary,
+  parseSalaryToNumber,
 };
