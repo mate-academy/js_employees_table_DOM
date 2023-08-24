@@ -99,17 +99,17 @@ function createInputField(text, tag, type) {
 
   element.dataset.qa = textModified;
   element.name = textModified;
-  // element.required = true;
+  element.required = true;
 
   if (`${tag}` === 'select') {
-    for (const option of options) {
+    options.forEach(option => {
       const office = document.createElement('option');
 
-      office.value = option.toLowerCase();
+      office.value = option;
       office.textContent = option;
 
       element.appendChild(office);
-    }
+    });
   }
   label.appendChild(element);
 
@@ -132,23 +132,69 @@ form.appendChild(submitBtn);
 
 document.body.appendChild(form);
 
-submitBtn.addEventListener('click', () => {
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const message = document.createElement('div');
+
+  message.classList.add('notification', `${type}`);
+  message.dataset.qa = 'notification';
+
+  const messageTitle = document.createElement('h2');
+
+  messageTitle.classList.add('title');
+  messageTitle.textContent = `${title}`;
+  message.appendChild(messageTitle);
+
+  const messageDescription = document.createElement('p');
+
+  messageDescription.textContent = `${description}`;
+  message.appendChild(messageDescription);
+
+  document.body.appendChild(message);
+  message.style.top = posTop + 'px';
+  message.style.right = posRight + 'px';
+
+  setTimeout(() => {
+    message.remove();
+  }, 2000);
+};
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+
   const fullName = form.elements.name.value;
   const position = form.elements.position.value;
   const office = form.elements.office.value;
-  const age = parseInt(form.elements.age.value);
-  const salary = parseFloat(form.elements.salary.value);
+  const age = form.elements.age.value;
+  const salary = parseInt(form.elements.salary.value);
 
-  const row = document.createElement('tr');
+  const formattedSalary = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(salary);
 
-  row.innerHTML = `
+  if (fullName.length > 4 && parseInt(age) >= 18) {
+    const newEmployee = document.createElement('tr');
+
+    newEmployee.innerHTML = `
 
   <td>${fullName}</td>
   <td>${position}</td>
   <td>${office}</td>
   <td>${age}</td>
-  <td>${salary}</td>
+  <td>${formattedSalary}</td>
 `;
 
-  tableBody.appendChild(row);
+    tableBody.appendChild(newEmployee);
+
+    pushNotification(10, 10, 'Title of Success message',
+      'Message example.\n '
+  + 'Notification should contain title and description.', 'success');
+  }
+
+  if (fullName.length < 4 || parseInt(age) < 18) {
+    pushNotification(150, 10, 'Title of Error message',
+      'Message example.\n '
+  + 'Notification should contain title and description.', 'error');
+  }
 });
