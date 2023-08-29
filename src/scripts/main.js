@@ -13,16 +13,18 @@ function toNumbers(string) {
 
 function toSalary(string) {
   const split = string.split('');
-  let salary = '$';
+  const salary = [];
+  let x = 0;
 
-  for (let i = 0; i < split.length; i++) {
-    if (i % 3 === 0 && i !== 0) {
-      salary += ',';
+  for (let i = split.length - 1; i >= 0; i--) {
+    if (x % 3 === 0 && x !== 0) {
+      salary.push(',');
     }
-    salary += split[i];
+    salary.push(split[i]);
+    x++;
   }
 
-  return salary;
+  return `$${salary.reverse().join('')}`;
 }
 
 function sortBy(filter, index) {
@@ -159,10 +161,8 @@ const createForm = () => {
     newForm.append(label);
   }
 
-  newButton.setAttribute('type', 'submit');
   newButton.innerHTML = 'Save to table';
   newForm.append(newButton);
-  newForm.setAttribute('onsubmit', 'return false');
   newForm.classList.add('new-employee-form');
   table.after(newForm);
 };
@@ -183,31 +183,32 @@ function addEmploye() {
   tableBody.append(tr);
 }
 
-function addNotification(isAdded) {
+function typeOfNotification(div, h2, paragraph, notificationStatus, message) {
+  h2.innerHTML = notificationStatus;
+  paragraph.innerHTML = message;
+  div.classList.add(notificationStatus.toLowerCase());
+}
+
+function addNotification(nStatus, message) {
   const divNotification = document.createElement('div');
   const h2Notification = document.createElement('h2');
   const pNotification = document.createElement('p');
 
   divNotification.classList.add('notification');
-  h2Notification.classList.add('notification', 'title');
+  h2Notification.classList.add('notification.title');
 
-  if (isAdded) {
-    h2Notification.innerHTML = 'Success!';
-    pNotification.innerHTML = 'Employee added';
-    divNotification.classList.add('success');
-  } else if (!isAdded) {
-    h2Notification.innerHTML = 'Warning!';
-    pNotification.innerHTML = 'Someting wrong, check tooltips';
-    divNotification.classList.add('warning');
-  } else {
-    h2Notification.innerHTML = 'Error';
-    pNotification.innerHTML = 'There was an error';
-    divNotification.classList.add('error');
-  }
+  typeOfNotification(
+    divNotification,
+    h2Notification,
+    pNotification,
+    nStatus,
+    message,
+  );
+
   divNotification.setAttribute('data-qa', 'notification');
   divNotification.append(h2Notification);
   divNotification.append(pNotification);
-  table.after(divNotification);
+  form.after(divNotification);
 
   setTimeout(() => {
     divNotification.remove();
@@ -224,35 +225,39 @@ button.addEventListener('click', e => {
   const inputAge = form.querySelector('[name="age"]');
   const inputSalary = form.querySelector('[name="salary"]');
 
-  if (
-    inputName.value
-    && inputPosition.value
-    && inputAge.value
-    && inputSalary.value
-    && inputName.validity.valid
-    && inputAge.validity.valid
-    && inputSalary.validity.valid
-  ) {
-    const salary = toSalary(inputSalary.value);
+  try {
+    if (
+      inputName.value
+      && inputPosition.value
+      && inputAge.value
+      && inputSalary.value
+      && inputName.validity.valid
+      && inputAge.validity.valid
+      && inputSalary.validity.valid
+    ) {
+      const salary = toSalary(inputSalary.value);
 
-    addEmploye(
-      inputName.value,
-      inputPosition.value,
-      inputOffice.value,
-      inputAge.value,
-      salary,
-    );
+      addEmploye(
+        inputName.value,
+        inputPosition.value,
+        inputOffice.value,
+        inputAge.value,
+        salary,
+      );
 
-    inputName.value = '';
-    inputPosition.value = '';
-    inputOffice.value = 'Tokyo';
-    inputAge.value = '';
-    inputSalary.value = '';
+      inputName.value = '';
+      inputPosition.value = '';
+      inputOffice.value = 'Tokyo';
+      inputAge.value = '';
+      inputSalary.value = '';
 
-    return addNotification(true);
+      return addNotification('Success', 'Employee added');
+    }
+  } catch (err) {
+    return addNotification('Error', err.message);
   }
 
-  return addNotification(false);
+  return addNotification('Warning', 'Someting wrong, check tooltips');
 });
 
 document.addEventListener('dblclick', eMain => {
