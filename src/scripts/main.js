@@ -4,7 +4,7 @@
 const table = document.querySelector('table');
 const tableHead = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
-const rows = [...tableBody.rows];
+let rows = [...tableBody.rows];
 const orders = ['default', 'default', 'default', 'default', 'default'];
 
 function toNumbers(string) {
@@ -25,7 +25,7 @@ function toSalary(string) {
   return salary;
 }
 
-function sortBy(filter, index, order) {
+function sortBy(filter, index) {
   switch (filter) {
     case 'Name':
     case 'Position':
@@ -56,6 +56,8 @@ function sortBy(filter, index, order) {
 }
 
 tableHead.addEventListener('click', e => {
+  rows = [...tableBody.rows];
+
   const thIndex = e.target.cellIndex;
 
   if (e.target.tagName !== 'TH') {
@@ -134,13 +136,17 @@ const createForm = () => {
 
       if (fieldName === 'name') {
         input.setAttribute('minlength', '4');
-        input.setAttribute('onkeydown', 'return /[a-z]/i.test(event.key)');
+        input.setAttribute('onkeydown', 'return /[a-z ]/i.test(event.key)');
       };
 
       if (fieldName === 'age') {
         input.setAttribute('min', '18');
         input.setAttribute('max', '90');
       };
+
+      if (fieldName === 'salary') {
+        input.setAttribute('min', '0');
+      }
 
       label.innerHTML = naming[i];
       input.setAttribute('name', fieldName);
@@ -223,6 +229,9 @@ button.addEventListener('click', e => {
     && inputPosition.value
     && inputAge.value
     && inputSalary.value
+    && inputName.validity.valid
+    && inputAge.validity.valid
+    && inputSalary.validity.valid
   ) {
     const salary = toSalary(inputSalary.value);
 
@@ -263,8 +272,10 @@ document.addEventListener('dblclick', eMain => {
     eMain.target.innerHTML = input.value ? input.value : text;
   });
 
-  input.addEventListener('keypress', () => {
-    input.remove();
-    eMain.target.innerHTML = input.value ? input.value : text;
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      input.remove();
+      eMain.target.innerHTML = input.value ? input.value : text;
+    }
   });
 });
