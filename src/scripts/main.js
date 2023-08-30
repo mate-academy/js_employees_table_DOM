@@ -202,6 +202,11 @@ function addNotification(nStatus, message) {
 }
 
 const form = document.querySelector('form');
+const inputName = form.querySelector('[name="name"]');
+const inputPosition = form.querySelector('[name="position"]');
+const inputOffice = form.querySelector('[name="office"]');
+const inputAge = form.querySelector('[name="age"]');
+const inputSalary = form.querySelector('[name="salary"]');
 
 function checkIfValid(formName, formPosition, formAge, formSalary) {
   errorMessage = 'something wrong';
@@ -225,7 +230,7 @@ function checkIfValid(formName, formPosition, formAge, formSalary) {
     return errorMessage;
   };
 
-  if (formPosition.length === 0) {
+  if (formPosition.trim().length === 0) {
     errorMessage = 'Position can\'t be empty';
     isValid = false;
 
@@ -239,8 +244,8 @@ function checkIfValid(formName, formPosition, formAge, formSalary) {
     return errorMessage;
   };
 
-  if (!formSalary) {
-    errorMessage = 'Salary can\'t be empty';
+  if (formSalary < 0 || !formSalary) {
+    errorMessage = 'Salary can\'t be empty or negative';
     isValid = false;
 
     return errorMessage;
@@ -249,12 +254,6 @@ function checkIfValid(formName, formPosition, formAge, formSalary) {
 
 form.addEventListener('submit', e => {
   e.preventDefault();
-
-  const inputName = form.querySelector('[name="name"]');
-  const inputPosition = form.querySelector('[name="position"]');
-  const inputOffice = form.querySelector('[name="office"]');
-  const inputAge = form.querySelector('[name="age"]');
-  const inputSalary = form.querySelector('[name="salary"]');
 
   checkIfValid(
     inputName.value,
@@ -291,34 +290,71 @@ form.addEventListener('submit', e => {
   return addNotification('Warning', errorMessage);
 });
 
-document.addEventListener('dblclick', eMain => {
-  const input = document.createElement('input');
-  const text = eMain.target.innerHTML;
-  let isUpdated = true;
-
+tableBody.addEventListener('dblclick', eMain => {
   if (eMain.target.tagName === 'TD') {
+    const inputs = form.querySelectorAll('label');
+    const inputsArr = [...inputs];
+    const input = inputsArr[eMain.target.cellIndex].lastChild.cloneNode(true);
+    const backupValue = eMain.target.innerHTML;
+
     input.value = eMain.target.innerHTML;
     eMain.target.innerHTML = '';
 
     eMain.target.append(input);
     input.focus();
-  }
 
-  const removeAndUpdate = () => {
-    if (isUpdated) {
+    const removeAndUpdate = () => {
+      switch (input.name) {
+        case 'name':
+          if (
+            !input.value
+              .split('')
+              .every(a => a.toLowerCase() !== a.toUpperCase()
+                || a === ' ')
+                || input.value.trim().length < 4
+          ) {
+            eMain.target.innerHTML = backupValue;
+            addNotification('Warning', 'Name length > 4 and only letters');
+
+            return;
+          };
+          break;
+
+        case 'age':
+          if (input.value < 18 || input.value > 90) {
+            eMain.target.innerHTML = backupValue;
+            addNotification('Warning', 'Age can\'t be < 18 and > 90');
+
+            return;
+          };
+          break;
+
+        case 'salary':
+          if (input.value <= 0) {
+            eMain.target.innerHTML = backupValue;
+            addNotification('Warning', 'Salary can\'t be negative');
+
+            return;
+          } else {
+            eMain.target.innerHTML = input.value.trim()
+              ? toSalary(input.value)
+              : backupValue;
+
+            return;
+          };
+      }
+
       input.remove();
-      eMain.target.innerHTML = input.value ? input.value : text;
-      isUpdated = false;
-    }
-  };
+      eMain.target.innerHTML = input.value.trim() ? input.value : backupValue;
+    };
 
-  input.addEventListener('blur', removeAndUpdate);
+    input.addEventListener('blur', removeAndUpdate);
 
-  input.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      input.removeEventListener('blur', removeAndUpdate);
-      removeAndUpdate();
-      isUpdated = false;
-    }
-  });
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        input.removeEventListener('blur', removeAndUpdate);
+        removeAndUpdate();
+      }
+    });
+  }
 });
