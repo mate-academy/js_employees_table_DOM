@@ -244,7 +244,7 @@ function checkIfValid(formName, formPosition, formAge, formSalary) {
     return errorMessage;
   };
 
-  if (formSalary < 0 || !formSalary) {
+  if (formSalary <= 0 || !formSalary) {
     errorMessage = 'Salary can\'t be empty or negative';
     isValid = false;
 
