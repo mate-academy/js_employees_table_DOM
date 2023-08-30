@@ -6,6 +6,8 @@ const tableHead = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
 let rows = [...tableBody.rows];
 const orders = ['default', 'default', 'default', 'default', 'default'];
+let errorMessage = '';
+let isValid = true;
 
 function toNumbers(string) {
   return +string.replace(/[$,]/g, '');
@@ -129,30 +131,14 @@ const createForm = () => {
       });
 
       select.setAttribute('name', fieldName);
-      select.required = true;
       label.innerHTML = naming[i];
 
       label.append(select);
     } else {
       const input = document.createElement('input');
 
-      if (fieldName === 'name') {
-        input.setAttribute('minlength', '4');
-        input.setAttribute('onkeydown', 'return /[a-z ]/i.test(event.key)');
-      };
-
-      if (fieldName === 'age') {
-        input.setAttribute('min', '18');
-        input.setAttribute('max', '90');
-      };
-
-      if (fieldName === 'salary') {
-        input.setAttribute('min', '0');
-      }
-
       label.innerHTML = naming[i];
       input.setAttribute('name', fieldName);
-      input.required = true;
       input.setAttribute('type', type);
       input.setAttribute('data-qa', fieldName);
 
@@ -215,31 +201,76 @@ function addNotification(nStatus, message) {
   }, 2000);
 }
 
-const button = document.querySelector('button');
 const form = document.querySelector('form');
 
-button.addEventListener('click', e => {
+function checkIfValid(formName, formPosition, formAge, formSalary) {
+  errorMessage = 'something wrong';
+  isValid = true;
+
+  if (
+    !formName
+      .split('')
+      .every(a => a.toLowerCase() !== a.toUpperCase() || a === ' ')
+  ) {
+    errorMessage = 'Only alphabetic characters allowed';
+    isValid = false;
+
+    return errorMessage;
+  };
+
+  if (formName.trim().length < 4) {
+    errorMessage = 'Name minimum length 4';
+    isValid = false;
+
+    return errorMessage;
+  };
+
+  if (formPosition.length === 0) {
+    errorMessage = 'Position can\'t be empty';
+    isValid = false;
+
+    return errorMessage;
+  };
+
+  if (formAge < 18 || formAge > 90) {
+    errorMessage = 'Age can\'t be more than 90 or less than 18';
+    isValid = false;
+
+    return errorMessage;
+  };
+
+  if (!formSalary) {
+    errorMessage = 'Salary can\'t be empty';
+    isValid = false;
+
+    return errorMessage;
+  }
+}
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+
   const inputName = form.querySelector('[name="name"]');
   const inputPosition = form.querySelector('[name="position"]');
   const inputOffice = form.querySelector('[name="office"]');
   const inputAge = form.querySelector('[name="age"]');
   const inputSalary = form.querySelector('[name="salary"]');
 
-  try {
-    if (
-      inputName.value
-      && inputPosition.value
-      && inputAge.value
-      && inputSalary.value
-      && inputName.validity.valid
-      && inputAge.validity.valid
-      && inputSalary.validity.valid
-    ) {
-      const salary = toSalary(inputSalary.value);
+  checkIfValid(
+    inputName.value,
+    inputPosition.value,
+    inputAge.value,
+    inputSalary.value,
+  );
 
+  try {
+    const salary = toSalary(inputSalary.value);
+    const employeeName = inputName.value;
+
+    if (isValid) {
       addEmploye(
-        inputName.value,
-        inputPosition.value,
+        inputName.value.trim(),
+        inputPosition.value.trim(),
         inputOffice.value,
         inputAge.value,
         salary,
@@ -251,18 +282,19 @@ button.addEventListener('click', e => {
       inputAge.value = '';
       inputSalary.value = '';
 
-      return addNotification('Success', 'Employee added');
+      return addNotification('Success', `${employeeName} added`);
     }
   } catch (err) {
     return addNotification('Error', err.message);
   }
 
-  return addNotification('Warning', 'Someting wrong, check tooltips');
+  return addNotification('Warning', errorMessage);
 });
 
 document.addEventListener('dblclick', eMain => {
   const input = document.createElement('input');
   const text = eMain.target.innerHTML;
+  let isUpdated = true;
 
   if (eMain.target.tagName === 'TD') {
     input.value = eMain.target.innerHTML;
@@ -272,15 +304,21 @@ document.addEventListener('dblclick', eMain => {
     input.focus();
   }
 
-  input.addEventListener('blur', () => {
-    input.remove();
-    eMain.target.innerHTML = input.value ? input.value : text;
-  });
+  const removeAndUpdate = () => {
+    if (isUpdated) {
+      input.remove();
+      eMain.target.innerHTML = input.value ? input.value : text;
+      isUpdated = false;
+    }
+  };
+
+  input.addEventListener('blur', removeAndUpdate);
 
   input.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
-      input.remove();
-      eMain.target.innerHTML = input.value ? input.value : text;
+      input.removeEventListener('blur', removeAndUpdate);
+      removeAndUpdate();
+      isUpdated = false;
     }
   });
 });
