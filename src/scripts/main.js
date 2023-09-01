@@ -185,6 +185,7 @@ form.addEventListener('submit', e => {
   <td>${formattedSalary}</td>
 `;
 
+    rowsArray.push(newEmployee);
     tableBody.appendChild(newEmployee);
 
     pushNotification(10, 10, 'Title of Success message',
