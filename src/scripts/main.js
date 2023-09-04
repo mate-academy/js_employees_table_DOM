@@ -56,6 +56,8 @@ headings.forEach(heading => {
 
 rowsArray.forEach(row => {
   row.addEventListener('click', () => {
+    // console.log(rowsArray);
+
     rowsArray.forEach(tr => {
       tr.classList.remove('active');
     });
@@ -115,6 +117,8 @@ function createInputField(text, tag, type) {
 
   return label;
 }
+
+// console.log(form);
 
 const nameField = createInputField('Name:', 'input', 'text');
 const positionField = createInputField('Position:', 'input', 'text');
@@ -187,6 +191,7 @@ form.addEventListener('submit', e => {
 
     rowsArray.push(newEmployee);
     tableBody.appendChild(newEmployee);
+    // console.log(newEmployee);
 
     pushNotification(10, 10, 'Title of Success message',
       'Message example.\n '
