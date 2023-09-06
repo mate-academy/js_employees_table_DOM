@@ -268,6 +268,8 @@ function changeContentInCell(e) {
   const cell = e.target;
   const input = document.createElement('input');
 
+  input.classList.add('cell-input');
+
   if ([...cell.parentElement.children].indexOf(cell) === 4) {
     input.setAttribute('value', getNumFromString(cell.textContent));
   } else {
@@ -346,7 +348,6 @@ function changeContentInCell(e) {
   input.addEventListener('blur', handleChangeEvent);
   input.addEventListener('keypress', handleChangeEvent);
 
-  cell.classList.add('cell-input');
   cell.innerHTML = '';
   cell.append(input);
   input.focus();
