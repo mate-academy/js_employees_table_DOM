@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     notification.classList.add('notification');
     notification.setAttribute('data-qa', 'notification');
+    notification.style.transition = 'opacity 0.5s';
 
     return notification;
   }
@@ -120,10 +121,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const age = formData.get('age');
     const salary = formData.get('salary');
 
-    if (employeeName.length < 4 || age < 18 || age > 90) {
-      displayErrorNotification(notification,
-        'Invalid data! Please check the fields.');
+    let error = '';
 
+    if (employeeName.length < 4) {
+      error = 'Name should contain more than 4 letters.';
+    } else if (position.trim() === '') {
+      error = 'Position is required.';
+    } else if (age < 18 || age > 90) {
+      error = 'Age must be between 18 and 90.';
+    } else if (+salary <= 0 || salary.trim() === '') {
+      error = 'Salary is required.';
+    }
+
+    if (error) {
+      displayErrorNotification(notification, error);
       return;
     }
 
@@ -148,13 +159,21 @@ document.addEventListener('DOMContentLoaded', () => {
       Salary: parseFloat(salary),
     });
 
+    setTimeout(() => {
+      hideNotification(notification);
+    }, 2000);
+
     sortTable(headerCells.findIndex(
       cell => cell.classList.contains('sort-asc')));
   }
 
+  let originalCellValue = '';
+
   function editCell(cell) {
     const cellValue = cell.textContent;
     const input = document.createElement('input');
+
+    originalCellValue = cellValue;
 
     input.type = 'text';
     input.value = cellValue;
@@ -179,20 +198,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (editedValue === '') {
       cell.textContent = 'N/A';
-    } else {
+    } else if (validateInput(editedValue)) {
       cell.textContent = editedValue;
+    } else {
+      cell.textContent = originalCellValue;
+
+      displayErrorNotification(
+        notificationElement, 'Invalid data! Please check the fields.');
     }
+  }
+
+  function validateInput(value) {
+    return value.length >= 4;
   }
 
   function displayErrorNotification(notification, message) {
     notification.classList.remove('success');
     notification.classList.add('error');
     notification.textContent = message;
+    notification.style.display = 'block';
   }
 
   function displaySuccessNotification(notification, message) {
+    notification.textContent = message;
     notification.classList.remove('error');
     notification.classList.add('success');
-    notification.textContent = message;
+    notification.style.opacity = '1';
+    notification.style.display = 'block';
   }
+
+  function hideNotification(notification) {
+    notification.style.opacity = '0';
+
+    setTimeout(() => {
+      notification.textContent = '';
+      removeNotificationIfEmpty(notification);
+    }, 500);
+  }
+
+  function removeNotificationIfEmpty(notification) {
+    if (notification.textContent.trim() === '') {
+      notification.style.display = 'none';
+    }
+  }
+  removeNotificationIfEmpty(notificationElement);
 });
