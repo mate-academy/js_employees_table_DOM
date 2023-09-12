@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedRow = row;
   }
 
-  function addNewEmployee(form, notification, employes) {
+  function addNewEmployee(form, notification, employeeList) {
     const formData = new FormData(form);
     const employeeName = formData.get('employeeName');
     const position = formData.get('position');
@@ -135,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (error) {
       displayErrorNotification(notification, error);
+
       return;
     }
 
@@ -164,16 +165,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2000);
 
     sortTable(headerCells.findIndex(
-      cell => cell.classList.contains('sort-asc')));
+      (cell) => cell.classList.contains('sort-asc')
+    ));
   }
-
-  let originalCellValue = '';
 
   function editCell(cell) {
     const cellValue = cell.textContent;
     const input = document.createElement('input');
-
-    originalCellValue = cellValue;
 
     input.type = 'text';
     input.value = cellValue;
@@ -198,18 +196,77 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (editedValue === '') {
       cell.textContent = 'N/A';
-    } else if (validateInput(editedValue)) {
-      cell.textContent = editedValue;
-    } else {
-      cell.textContent = originalCellValue;
-
+    } else if (cell.cellIndex === 0 && editedValue.length < 4) {
       displayErrorNotification(
-        notificationElement, 'Invalid data! Please check the fields.');
-    }
-  }
+        notificationElement, 'Name can\'t be less than 4 symbols'
+      );
 
-  function validateInput(value) {
-    return value.length >= 4;
+      return;
+    } else if (cell.cellIndex === 1 && editedValue.length <= 1) {
+      displayErrorNotification(
+        notificationElement, 'Position should be more than 1 symbol'
+      );
+
+      return;
+    } else if (cell.cellIndex === 2) {
+      const availableOffices = [
+        'Tokyo',
+        'Singapore',
+        'London',
+        'New York',
+        'Edinburgh',
+        'San Francisco',
+      ];
+
+      if (availableOffices.includes(editedValue)) {
+        cell.textContent = editedValue;
+
+        displaySuccessNotification(
+          notificationElement, 'Your data was changed'
+        );
+      } else {
+        const errorMessage = `Office must be one of the followed values:
+        ${availableOffices.join(', ')}`;
+
+        displayErrorNotification(notificationElement, errorMessage);
+
+        return;
+      }
+    } else if (cell.cellIndex === 3) {
+      const ageValue = parseInt(editedValue);
+
+      if (ageValue < 18 || ageValue > 90) {
+        displayErrorNotification(
+          notificationElement, 'Age should be less than 18 and more than 90'
+        );
+
+        return;
+      }
+    } else if (cell.cellIndex === 4) {
+      const salaryValue = parseFloat(editedValue.replace(/[$,]/g, ''));
+
+      if (salaryValue >= 10000) {
+        const formattedSalary = '$'
+        + salaryValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+
+        cell.textContent = formattedSalary;
+
+        displaySuccessNotification(notificationElement,
+          'Your data was changed');
+      } else {
+        displayErrorNotification(
+          notificationElement, 'Salary should be more than 10000'
+        );
+
+        return;
+      }
+    }
+
+    cell.textContent = editedValue;
+
+    if (cell.cellIndex === 0 || cell.cellIndex === 1 || cell.cellIndex === 3) {
+      displaySuccessNotification(notificationElement, 'Your data was changed');
+    }
   }
 
   function displayErrorNotification(notification, message) {
@@ -241,5 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
       notification.style.display = 'none';
     }
   }
+
   removeNotificationIfEmpty(notificationElement);
 });
