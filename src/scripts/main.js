@@ -2,6 +2,13 @@
 
 const body = document.querySelector('body');
 const form = document.createElement('form');
+const tbody = document.querySelector('tbody');
+const tBodyRows = [...tbody.rows];
+const thead = document.querySelector('thead');
+const tH = thead.querySelectorAll('th');
+const magicValue = 4;
+let activeCell = null;
+let sortDirection = 1;
 
 form.className = 'new-employee-form';
 form.method = 'post';
@@ -27,17 +34,90 @@ form.innerHTML = `
 
 body.append(form);
 
-const thead = document.querySelector('thead');
-const tH = thead.querySelectorAll('th');
-
-const tbody = document.querySelector('tbody');
-const tBodyRows = [...tbody.rows];
-
 function usdNum(str) {
   return Number(str.replace(/\D/g, ''));
 }
 
-let sortDirection = 1;
+function addRowToTable(name, position, office, age, salary) {
+  const newRow = tbody.insertRow();
+
+  const nameCell = newRow.insertCell();
+
+  nameCell.textContent = name;
+
+  const positionCell = newRow.insertCell();
+
+  positionCell.textContent = position;
+
+  const officeCell = newRow.insertCell();
+
+  officeCell.textContent = office;
+
+  const ageCell = newRow.insertCell();
+
+  ageCell.textContent = age;
+
+  const salaryCell = newRow.insertCell();
+
+  salaryCell.textContent = salary;
+}
+
+function clearInputFields() {
+  const nameInput = document.querySelector('input[name="name"]');
+  const positionInput = document.querySelector('input[name="position"]');
+  const officeInput = document.querySelector('select[name="office"]');
+  const ageInput = document.querySelector('input[name="age"]');
+  const salaryInput = document.querySelector('input[name="salary"]');
+
+  nameInput.value = '';
+  positionInput.value = '';
+  officeInput.value = 'Tokyo';
+  ageInput.value = '';
+  salaryInput.value = '';
+}
+
+function showNotification(type, message) {
+  const notification = document.createElement('div');
+
+  notification.textContent = message;
+  notification.classList.add(type);
+  notification.setAttribute('data-qa', 'notification');
+  body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const nameInput = document.querySelector('input[name="name"]');
+  const positionInput = document.querySelector('input[name="position"]');
+  const officeInput = document.querySelector('select[name="office"]');
+  const ageInput = document.querySelector('input[name="age"]');
+  const salaryInput = document.querySelector('input[name="salary"]');
+
+  if (
+    nameInput.value.length < magicValue
+    || isNaN(Number(ageInput.value))
+    || isNaN(Number(salaryInput.value))
+  ) {
+    showNotification('error', 'Invalid data entered');
+  } else {
+    addRowToTable(
+      nameInput.value,
+      positionInput.value,
+      officeInput.value,
+      ageInput.value,
+      salaryInput.value
+    );
+
+    clearInputFields();
+
+    showNotification('success', 'Employee added to the table');
+  }
+});
 
 thead.addEventListener('click', (ev) => {
   const sortByIndex = [...tH].indexOf(ev.target);
@@ -70,8 +150,6 @@ tbody.addEventListener('click', (ev) => {
     row.classList.add('active');
   }
 });
-
-let activeCell = null;
 
 tbody.addEventListener('dblclick', (ev) => {
   const cell = ev.target.closest('td');
@@ -107,64 +185,3 @@ tbody.addEventListener('dblclick', (ev) => {
     });
   }
 });
-
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  const nameInput = document.querySelector('input[name="name"]');
-  const positionInput = document.querySelector('input[name="position"]');
-  const officeInput = document.querySelector('select[name="office"]');
-  const ageInput = document.querySelector('input[name="age"]');
-  const salaryInput = document.querySelector('input[name="salary"]');
-
-  if (
-    nameInput.value.length < 4
-    || isNaN(Number(ageInput.value))
-    || isNaN(Number(salaryInput.value))
-  ) {
-    showNotification('error', 'Invalid data entered');
-  } else {
-    const newRow = tbody.insertRow();
-
-    const nameCell = newRow.insertCell();
-
-    nameCell.textContent = nameInput.value;
-
-    const positionCell = newRow.insertCell();
-
-    positionCell.textContent = positionInput.value;
-
-    const officeCell = newRow.insertCell();
-
-    officeCell.textContent = officeInput.value;
-
-    const ageCell = newRow.insertCell();
-
-    ageCell.textContent = ageInput.value;
-
-    const salaryCell = newRow.insertCell();
-
-    salaryCell.textContent = salaryInput.value;
-
-    nameInput.value = '';
-    positionInput.value = '';
-    officeInput.value = 'Tokyo';
-    ageInput.value = '';
-    salaryInput.value = '';
-
-    showNotification('success', 'Employee added to the table');
-  }
-});
-
-function showNotification(type, message) {
-  const notification = document.createElement('div');
-
-  notification.textContent = message;
-  notification.classList.add(type);
-  notification.setAttribute('data-qa', 'notification');
-  body.appendChild(notification);
-
-  setTimeout(() => {
-    notification.remove();
-  }, 3000);
-}
