@@ -89,7 +89,9 @@ tableBody.addEventListener('click', (e) => {
     oldActiveRow.classList.remove('active');
   }
 
-  targetRow.classList.add('active');
+  if (targetRow) {
+    targetRow.classList.add('active');
+  }
 });
 
 const form = document.createElement('form');
@@ -240,4 +242,36 @@ notification.addEventListener('success', (e) => {
     document.body.removeChild(notification);
     notification.classList.remove('success');
   }, 2000);
+});
+
+tableBody.addEventListener('dblclick', (e) => {
+  const targetCell = e.target.closest('td');
+
+  const prevValue = targetCell.innerText;
+
+  targetCell.innerHTML = `<input
+    type="text"
+    class="cell-input"
+  >`;
+
+  const input = targetCell.children[0];
+
+  input.focus();
+  input.value = prevValue;
+
+  const saveValue = () => {
+    const newValue = input.value;
+
+    targetCell.innerText = newValue ? `${newValue}` : prevValue;
+  };
+
+  input.addEventListener('blur', () => {
+    saveValue();
+  });
+
+  input.addEventListener('keypress', (keyEvent) => {
+    if (keyEvent.key === 'Enter') {
+      saveValue();
+    }
+  });
 });
