@@ -101,13 +101,16 @@ form.addEventListener('submit', (e) => {
 
   if (nameInput.value.length < magicValue) {
     pushNotification(
-      450, 10, 'Error', 'Name must be at least 4 characters long.', 'error'
+      10, 10, 'Error', 'Name must be at least 4 characters long.', 'error'
     );
-  } else if (isNaN(Number(ageInput.value))) {
-    pushNotification(450, 10, 'Error', 'Age must be a valid number.', 'error');
-  } else if (isNaN(Number(salaryInput.value))) {
+  } else if (isNaN(Number(ageInput.value)) || Number(ageInput.value) < 1) {
     pushNotification(
-      450, 10, 'Error', 'Salary must be a valid number.', 'error'
+      10, 10, 'Error', 'Age must be a positive number.', 'error'
+    );
+  } else if (isNaN(Number(salaryInput.value))
+    || Number(salaryInput.value) < 1) {
+    pushNotification(
+      10, 10, 'Error', 'Salary must be a positive number.', 'error'
     );
   } else {
     addRowToTable(
@@ -123,6 +126,8 @@ form.addEventListener('submit', (e) => {
     pushNotification(
       10, 10, 'Success', 'Employee added to the table successfully.', 'success'
     );
+
+    tBodyRows.push(tbody.lastElementChild);
   }
 });
 
@@ -143,8 +148,11 @@ thead.addEventListener('click', (ev) => {
   });
 
   tbody.innerHTML = '';
-
   tbody.append(...tBodyRows);
+
+  if (activeCell) {
+    activeCell = tbody.querySelector('.editing');
+  }
 
   sortDirection *= -1;
 });
