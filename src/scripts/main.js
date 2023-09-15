@@ -15,11 +15,13 @@ form.method = 'post';
 form.action = '';
 
 form.innerHTML = `
-  <label>Name: <input data-qa="name" name="name" type="text"></label>
-<label>Position: <input data-qa="position" name="position" type="text"></label>
+  <label>Name: <input data-qa="name" name="name" type="text" required></label>
+  <label>Position: 
+    <input data-qa="position" name="position" type="text" required>
+  </label>
   <label>Office:
     <select data-qa="office" name="office">
-      <option>Tokyo</option>
+      <option selected>Tokyo</option>
       <option>Singapore</option>
       <option>London</option>
       <option>New York</option>
@@ -27,8 +29,10 @@ form.innerHTML = `
       <option>San Francisco</option>
     </select>
   </label>
-  <label>Age: <input data-qa="age" name="age" type="text"></label>
-  <label>Salary: <input data-qa="salary" name="salary" type="text"></label>
+  <label>Age: <input data-qa="age" name="age" type="number" required></label>
+  <label>Salary: 
+    <input data-qa="salary" name="salary" type="number" required>
+  </label>
   <button type="submit">Save to table</button>
 `;
 
@@ -63,30 +67,27 @@ function addRowToTable(name, position, office, age, salary) {
 }
 
 function clearInputFields() {
-  const nameInput = document.querySelector('input[name="name"]');
-  const positionInput = document.querySelector('input[name="position"]');
-  const officeInput = document.querySelector('select[name="office"]');
-  const ageInput = document.querySelector('input[name="age"]');
-  const salaryInput = document.querySelector('input[name="salary"]');
+  const inputs = form.querySelectorAll('input, select');
 
-  nameInput.value = '';
-  positionInput.value = '';
-  officeInput.value = 'Tokyo';
-  ageInput.value = '';
-  salaryInput.value = '';
+  inputs.forEach((input) => (input.value = ''));
 }
 
-function showNotification(type, message) {
-  const notification = document.createElement('div');
+function pushNotification(posTop, posRight, title, description, type) {
+  const div = document.createElement('div');
+  const h2 = document.createElement('h2');
+  const p = document.createElement('p');
 
-  notification.textContent = message;
-  notification.classList.add(type);
-  notification.setAttribute('data-qa', 'notification');
-  body.appendChild(notification);
-
-  setTimeout(() => {
-    notification.remove();
-  }, 3000);
+  h2.className = 'title';
+  h2.textContent = title;
+  p.textContent = description;
+  div.className = 'notification';
+  div.classList.add(`${type}`);
+  div.style.top = `${posTop}px`;
+  div.style.right = `${posRight}px`;
+  div.append(h2);
+  div.append(p);
+  body.append(div);
+  setTimeout(() => div.remove(), 2000);
 }
 
 form.addEventListener('submit', (e) => {
@@ -98,12 +99,16 @@ form.addEventListener('submit', (e) => {
   const ageInput = document.querySelector('input[name="age"]');
   const salaryInput = document.querySelector('input[name="salary"]');
 
-  if (
-    nameInput.value.length < magicValue
-    || isNaN(Number(ageInput.value))
-    || isNaN(Number(salaryInput.value))
-  ) {
-    showNotification('error', 'Invalid data entered');
+  if (nameInput.value.length < magicValue) {
+    pushNotification(
+      450, 10, 'Error', 'Name must be at least 4 characters long.', 'error'
+    );
+  } else if (isNaN(Number(ageInput.value))) {
+    pushNotification(450, 10, 'Error', 'Age must be a valid number.', 'error');
+  } else if (isNaN(Number(salaryInput.value))) {
+    pushNotification(
+      450, 10, 'Error', 'Salary must be a valid number.', 'error'
+    );
   } else {
     addRowToTable(
       nameInput.value,
@@ -115,7 +120,9 @@ form.addEventListener('submit', (e) => {
 
     clearInputFields();
 
-    showNotification('success', 'Employee added to the table');
+    pushNotification(
+      10, 10, 'Success', 'Employee added to the table successfully.', 'success'
+    );
   }
 });
 
