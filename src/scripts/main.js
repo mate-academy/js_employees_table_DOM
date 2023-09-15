@@ -259,8 +259,16 @@ tableBody.addEventListener('dblclick', (e) => {
   input.focus();
   input.value = prevValue;
 
+  if (prevValue[0] === '$') {
+    input.value = prevValue.slice(1).replace(',', '');
+  }
+
   const saveValue = () => {
-    const newValue = input.value;
+    let newValue = input.value;
+
+    if (prevValue[0] === '$') {
+      newValue = `$${(+newValue).toLocaleString('en-US')}`;
+    }
 
     targetCell.innerText = newValue ? `${newValue}` : prevValue;
   };
