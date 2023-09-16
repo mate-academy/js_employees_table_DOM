@@ -189,8 +189,8 @@ sendButton.addEventListener('click', (e) => {
 
     errorEvent.detail.description = 'Your age is not valid. '
       + ((+data.get('age') < 18)
-        ? 'Your age should be more than 18'
-        : 'Your age should be less than 90');
+        ? 'It should be more than 18'
+        : 'It should be less than 90');
 
     notification.dispatchEvent(errorEvent);
 
