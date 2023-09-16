@@ -175,7 +175,9 @@ sendButton.addEventListener('click', (e) => {
 
   if (data.get('name').length < 4) {
     errorEvent.detail.title = 'Error';
-    errorEvent.detail.description = 'Your entered name is so small';
+
+    errorEvent.detail.description = 'Your entered name is so small. '
+      + 'It must contain at least 4 characters';
 
     notification.dispatchEvent(errorEvent);
 
@@ -184,7 +186,12 @@ sendButton.addEventListener('click', (e) => {
 
   if (+data.get('age') < 18 || +data.get('age') > 90) {
     errorEvent.detail.title = 'Error';
-    errorEvent.detail.description = 'Your age is not valid';
+
+    errorEvent.detail.description = 'Your age is not valid. '
+      + (+data.get('age') < 18)
+      ? 'Your age should be more than 18'
+      : 'Your age should be less than 90';
+
     notification.dispatchEvent(errorEvent);
 
     return;
