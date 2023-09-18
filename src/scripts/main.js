@@ -20,7 +20,7 @@ form.innerHTML = `
     <input data-qa="position" name="position" type="text" required>
   </label>
   <label>Office:
-    <select data-qa="office" name="office">
+    <select data-qa="office" name="office" required>
       <option selected>Tokyo</option>
       <option>Singapore</option>
       <option>London</option>
@@ -190,9 +190,11 @@ tbody.addEventListener('dblclick', (ev) => {
     input.addEventListener('blur', () => {
       const newValue = input.value;
 
-      if (isSalaryCell) {
+      if (newValue.trim() === '') {
+        cell.innerHTML = cellValue;
+      } else if (isSalaryCell) {
         if (!isNaN(newValue) && Number(newValue) >= 0) {
-          cell.innerHTML = newValue;
+          cell.innerHTML = '$' + newValue;
         } else {
           pushNotification(
             10,
@@ -228,9 +230,11 @@ tbody.addEventListener('dblclick', (ev) => {
       if (e.key === 'Enter') {
         const newValue = input.value;
 
-        if (isSalaryCell) {
+        if (newValue.trim() === '') {
+          cell.innerHTML = cellValue;
+        } else if (isSalaryCell) {
           if (!isNaN(newValue) && Number(newValue) >= 0) {
-            cell.innerHTML = newValue;
+            cell.innerHTML = '$' + newValue;
           } else {
             pushNotification(
               10,
