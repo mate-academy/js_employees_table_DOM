@@ -63,7 +63,7 @@ function addRowToTable(name, position, office, age, salary) {
 
   const salaryCell = newRow.insertCell();
 
-  salaryCell.textContent = salary;
+  salaryCell.textContent = '$' + salary;
 }
 
 function clearInputFields() {
@@ -177,6 +177,8 @@ tbody.addEventListener('dblclick', (ev) => {
     activeCell = cell;
 
     const cellValue = cell.textContent;
+    const isSalaryCell = cell.cellIndex === 4;
+    const isAgeCell = cell.cellIndex === 3;
 
     cell.innerHTML = `<input type="text" value="${cellValue}">`;
     cell.classList.add('editing');
@@ -186,14 +188,76 @@ tbody.addEventListener('dblclick', (ev) => {
     input.focus();
 
     input.addEventListener('blur', () => {
-      cell.innerHTML = input.value;
+      const newValue = input.value;
+
+      if (isSalaryCell) {
+        if (!isNaN(newValue) && Number(newValue) >= 0) {
+          cell.innerHTML = newValue;
+        } else {
+          pushNotification(
+            10,
+            10,
+            'Error',
+            'Salary must be a positive number.',
+            'error'
+          );
+          cell.innerHTML = cellValue;
+        }
+      } else if (isAgeCell) {
+        if (!isNaN(newValue) && Number(newValue) >= 0) {
+          cell.innerHTML = newValue;
+        } else {
+          pushNotification(
+            10,
+            10,
+            'Error',
+            'Age must be a positive number.',
+            'error'
+          );
+          cell.innerHTML = cellValue;
+        }
+      } else {
+        cell.innerHTML = newValue;
+      }
+
       cell.classList.remove('editing');
       activeCell = null;
     });
 
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        cell.innerHTML = input.value;
+        const newValue = input.value;
+
+        if (isSalaryCell) {
+          if (!isNaN(newValue) && Number(newValue) >= 0) {
+            cell.innerHTML = newValue;
+          } else {
+            pushNotification(
+              10,
+              10,
+              'Error',
+              'Salary must be a positive number.',
+              'error'
+            );
+            cell.innerHTML = cellValue;
+          }
+        } else if (isAgeCell) {
+          if (!isNaN(newValue) && Number(newValue) >= 0) {
+            cell.innerHTML = newValue;
+          } else {
+            pushNotification(
+              10,
+              10,
+              'Error',
+              'Age must be a positive number.',
+              'error'
+            );
+            cell.innerHTML = cellValue;
+          }
+        } else {
+          cell.innerHTML = newValue;
+        }
+
         cell.classList.remove('editing');
         activeCell = null;
       }
