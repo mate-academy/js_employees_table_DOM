@@ -20,7 +20,7 @@ form.innerHTML = `
     <input data-qa="position" name="position" type="text" required>
   </label>
   <label>Office:
-    <select data-qa="office" name="office" required>
+    <select data-qa="office" name="office" required readonly>
       <option selected>Tokyo</option>
       <option>Singapore</option>
       <option>London</option>
@@ -29,9 +29,11 @@ form.innerHTML = `
       <option>San Francisco</option>
     </select>
   </label>
-  <label>Age: <input data-qa="age" name="age" type="number" required></label>
+  <label>Age: 
+    <input data-qa="age" name="age" type="number" required min="1">
+  </label>
   <label>Salary: 
-    <input data-qa="salary" name="salary" type="number" required>
+    <input data-qa="salary" name="salary" type="number" required min="1">
   </label>
   <button type="submit">Save to table</button>
 `;
@@ -44,26 +46,17 @@ function usdNum(str) {
 
 function addRowToTable(name, position, office, age, salary) {
   const newRow = tbody.insertRow();
+  const cells = [];
 
-  const nameCell = newRow.insertCell();
+  for (let i = 0; i < 5; i++) {
+    cells.push(newRow.insertCell());
+  }
 
-  nameCell.textContent = name;
-
-  const positionCell = newRow.insertCell();
-
-  positionCell.textContent = position;
-
-  const officeCell = newRow.insertCell();
-
-  officeCell.textContent = office;
-
-  const ageCell = newRow.insertCell();
-
-  ageCell.textContent = age;
-
-  const salaryCell = newRow.insertCell();
-
-  salaryCell.textContent = '$' + salary;
+  cells[0].textContent = name;
+  cells[1].textContent = position;
+  cells[2].textContent = office;
+  cells[3].textContent = age;
+  cells[4].textContent = '$' + salary;
 }
 
 function clearInputFields() {
@@ -73,52 +66,64 @@ function clearInputFields() {
 }
 
 function pushNotification(posTop, posRight, title, description, type) {
-  const div = document.createElement('div');
-  const h2 = document.createElement('h2');
-  const p = document.createElement('p');
+  const notification = document.createElement('div');
+  const titleElement = document.createElement('h2');
+  const descriptionElement = document.createElement('p');
 
-  h2.className = 'title';
-  h2.textContent = title;
-  p.textContent = description;
-  div.className = 'notification';
-  div.classList.add(`${type}`);
-  div.style.top = `${posTop}px`;
-  div.style.right = `${posRight}px`;
-  div.append(h2);
-  div.append(p);
-  body.append(div);
-  setTimeout(() => div.remove(), 2000);
+  titleElement.className = 'title';
+  titleElement.textContent = title;
+  descriptionElement.textContent = description;
+  notification.className = 'notification';
+  notification.classList.add(type);
+  notification.style.top = `${posTop}px`;
+  notification.style.right = `${posRight}px`;
+  notification.appendChild(titleElement);
+  notification.appendChild(descriptionElement);
+  body.appendChild(notification);
+  setTimeout(() => notification.remove(), 2000);
 }
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  const nameInput = document.querySelector('input[name="name"]');
-  const positionInput = document.querySelector('input[name="position"]');
-  const officeInput = document.querySelector('select[name="office"]');
-  const ageInput = document.querySelector('input[name="age"]');
-  const salaryInput = document.querySelector('input[name="salary"]');
+  const nameInput = form.querySelector('input[name="name"]');
+  const positionInput = form.querySelector('input[name="position"]');
+  const officeInput = form.querySelector('select[name="office"]');
+  const ageInput = form.querySelector('input[name="age"]');
+  const salaryInput = form.querySelector('input[name="salary"]');
 
-  if (nameInput.value.length < magicValue) {
+  const nameValue = nameInput.value.trim();
+  const positionValue = positionInput.value.trim();
+  const ageValue = Number(ageInput.value);
+  const salaryValue = Number(salaryInput.value);
+
+  if (nameValue.length < magicValue) {
     pushNotification(
       10, 10, 'Error', 'Name must be at least 4 characters long.', 'error'
     );
-  } else if (isNaN(Number(ageInput.value)) || Number(ageInput.value) < 1) {
+  } else if (!/^\S+$/.test(nameValue)) {
     pushNotification(
-      10, 10, 'Error', 'Age must be a positive number.', 'error'
+      10, 10, 'Error', 'Name cannot consist of white spaces only.', 'error'
     );
-  } else if (isNaN(Number(salaryInput.value))
-    || Number(salaryInput.value) < 1) {
+  } else if (positionValue.length === 0) {
+    pushNotification(
+      10, 10, 'Error', 'Position cannot be empty.', 'error'
+    );
+  } else if (isNaN(ageValue) || ageValue < 18 || ageValue > 90) {
+    pushNotification(
+      10, 10, 'Error', 'Age must be between 18 and 90.', 'error'
+    );
+  } else if (isNaN(salaryValue) || salaryValue < 1) {
     pushNotification(
       10, 10, 'Error', 'Salary must be a positive number.', 'error'
     );
   } else {
     addRowToTable(
-      nameInput.value,
-      positionInput.value,
+      nameValue,
+      positionValue,
       officeInput.value,
-      ageInput.value,
-      salaryInput.value
+      ageValue,
+      salaryValue
     );
 
     clearInputFields();
@@ -135,8 +140,8 @@ thead.addEventListener('click', (ev) => {
   const sortByIndex = [...tH].indexOf(ev.target);
 
   tBodyRows.sort((a, b) => {
-    const aIn = a.cells[sortByIndex].innerText;
-    const bIn = b.cells[sortByIndex].innerText;
+    const aIn = a.cells[sortByIndex].textContent;
+    const bIn = b.cells[sortByIndex].textContent;
     const numA = usdNum(aIn);
     const numB = usdNum(bIn);
 
@@ -171,7 +176,7 @@ tbody.addEventListener('dblclick', (ev) => {
 
   if (cell) {
     if (activeCell) {
-      activeCell.innerHTML = cell.querySelector('input').value;
+      activeCell.textContent = cell.querySelector('input').value;
       activeCell.classList.remove('editing');
     }
     activeCell = cell;
@@ -191,10 +196,10 @@ tbody.addEventListener('dblclick', (ev) => {
       const newValue = input.value;
 
       if (newValue.trim() === '') {
-        cell.innerHTML = cellValue;
+        cell.textContent = cellValue;
       } else if (isSalaryCell) {
         if (!isNaN(newValue) && Number(newValue) >= 0) {
-          cell.innerHTML = '$' + newValue;
+          cell.textContent = '$' + newValue;
         } else {
           pushNotification(
             10,
@@ -203,23 +208,19 @@ tbody.addEventListener('dblclick', (ev) => {
             'Salary must be a positive number.',
             'error'
           );
-          cell.innerHTML = cellValue;
+          cell.textContent = cellValue;
         }
       } else if (isAgeCell) {
-        if (!isNaN(newValue) && Number(newValue) >= 0) {
-          cell.innerHTML = newValue;
+        if (!isNaN(newValue) && Number(newValue) >= 18 && Number(newValue) <= 90) {
+          cell.textContent = newValue;
         } else {
           pushNotification(
-            10,
-            10,
-            'Error',
-            'Age must be a positive number.',
-            'error'
+            10, 10, 'Error', 'Age must be between 18 and 90.', 'error'
           );
-          cell.innerHTML = cellValue;
+          cell.textContent = cellValue;
         }
       } else {
-        cell.innerHTML = newValue;
+        cell.textContent = newValue;
       }
 
       cell.classList.remove('editing');
@@ -231,10 +232,10 @@ tbody.addEventListener('dblclick', (ev) => {
         const newValue = input.value;
 
         if (newValue.trim() === '') {
-          cell.innerHTML = cellValue;
+          cell.textContent = cellValue;
         } else if (isSalaryCell) {
-          if (!isNaN(newValue) && Number(newValue) >= 0) {
-            cell.innerHTML = '$' + newValue;
+          if (!isNaN(newValue) && Number(newValue) >= 1) {
+            cell.textContent = '$' + newValue;
           } else {
             pushNotification(
               10,
@@ -243,11 +244,11 @@ tbody.addEventListener('dblclick', (ev) => {
               'Salary must be a positive number.',
               'error'
             );
-            cell.innerHTML = cellValue;
+            cell.textContent = cellValue;
           }
         } else if (isAgeCell) {
-          if (!isNaN(newValue) && Number(newValue) >= 0) {
-            cell.innerHTML = newValue;
+          if (!isNaN(newValue) && Number(newValue) >= 1) {
+            cell.textContent = newValue;
           } else {
             pushNotification(
               10,
@@ -256,10 +257,10 @@ tbody.addEventListener('dblclick', (ev) => {
               'Age must be a positive number.',
               'error'
             );
-            cell.innerHTML = cellValue;
+            cell.textContent = cellValue;
           }
         } else {
-          cell.innerHTML = newValue;
+          cell.textContent = newValue;
         }
 
         cell.classList.remove('editing');
