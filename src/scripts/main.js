@@ -107,20 +107,18 @@ form.addEventListener('submit', (e) => {
     pushNotification(
       10, 10, 'Error', 'Age must be a positive number.', 'error'
     );
-  } else if (
-    isNaN(Number(salaryInput.value)) || Number(salaryInput.value) < 1) {
+  } else if (isNaN(Number(salaryInput.value))
+    || Number(salaryInput.value) < 1) {
     pushNotification(
       10, 10, 'Error', 'Salary must be a positive number.', 'error'
     );
   } else {
-    const formattedSalary = `$${salaryInput.value}`;
-
     addRowToTable(
       nameInput.value,
       positionInput.value,
       officeInput.value,
       ageInput.value,
-      formattedSalary
+      salaryInput.value
     );
 
     clearInputFields();
@@ -173,42 +171,14 @@ tbody.addEventListener('dblclick', (ev) => {
 
   if (cell) {
     if (activeCell) {
-      const inputValue = cell.querySelector('input').value.trim();
-      const isValidNumber = /^[0-9]+(\.\d{1,2})?$/.test(inputValue);
-
-      if (!isValidNumber) {
-        pushNotification(
-          10, 10, 'Error', 'Please enter a valid number.', 'error'
-        );
-
-        return;
-      }
-
-      if (activeCell.classList.contains('salary')) {
-        const inputValue = input.value.trim();
-        const formattedSalary = `$${inputValue}`;
-
-        cell.innerHTML = formattedSalary; 
-      } else {
-        const inputValue = input.value.trim();
-
-        cell.innerHTML = inputValue;
-      }
-
+      activeCell.innerHTML = cell.querySelector('input').value;
       activeCell.classList.remove('editing');
     }
     activeCell = cell;
 
     const cellValue = cell.textContent;
 
-    if (cell.classList.contains('salary')) {
-      const cellInputValue = cellValue.replace('$', '');
-
-      cell.innerHTML = `<input type="text" value="$${cellInputValue}">`;
-    } else {
-      cell.innerHTML = `<input type="text" value="${cellValue}">`;
-    }
-
+    cell.innerHTML = `<input type="text" value="${cellValue}">`;
     cell.classList.add('editing');
 
     const input = cell.querySelector('input');
@@ -216,50 +186,14 @@ tbody.addEventListener('dblclick', (ev) => {
     input.focus();
 
     input.addEventListener('blur', () => {
-      const inputValue = input.value.trim();
-      const isValidNumber = /^[0-9]+(\.\d{1,2})?$/.test(inputValue);
-
-      if (!isValidNumber) {
-        pushNotification(
-          10, 10, 'Error', 'Please enter a valid number.', 'error'
-        );
-
-        return;
-      }
-
-      if (cell.classList.contains('salary')) {
-        const formattedSalary = `$${inputValue}`;
-
-        cell.innerHTML = formattedSalary;
-      } else {
-        cell.innerHTML = inputValue;
-      }
-
+      cell.innerHTML = input.value;
       cell.classList.remove('editing');
       activeCell = null;
     });
 
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        const inputValue = input.value.trim();
-        const isValidNumber = /^[0-9]+(\.\d{1,2})?$/.test(inputValue);
-
-        if (!isValidNumber) {
-          pushNotification(
-            10, 10, 'Error', 'Please enter a valid number.', 'error'
-          );
-
-          return;
-        }
-
-        if (cell.classList.contains('salary')) {
-          const formattedSalary = `$${inputValue}`;
-
-          cell.innerHTML = formattedSalary;
-        } else {
-          cell.innerHTML = inputValue;
-        }
-
+        cell.innerHTML = input.value;
         cell.classList.remove('editing');
         activeCell = null;
       }
