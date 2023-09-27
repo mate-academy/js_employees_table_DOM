@@ -119,16 +119,25 @@ form.addEventListener('submit', e => {
   const salaryEmployee = parseInt(values['salary']);
 
   if (nameEmployee.length < 4) {
-    showNotification('error', 'The name must contain at least 4 letters.');
-  } else if (positionEmployee.length === 0) {
-    showNotification('error', 'The "Position" is empty.');
-  } else if (!officeEmployee) {
-    showNotification('error', 'The Office field is not selected.');
-  } else if (isNaN(ageEmployee) || ageEmployee < 18 || ageEmployee > 90) {
-    showNotification('error',
+    return showNotification('error',
+      'The name must contain at least 4 letters.');
+  }
+
+  if (positionEmployee.length === 0) {
+    return showNotification('error', 'The "Position" is empty.');
+  }
+
+  if (!officeEmployee) {
+    return showNotification('error', 'The Office field is not selected.');
+  }
+
+  if (isNaN(ageEmployee) || ageEmployee < 18 || ageEmployee > 90) {
+    return showNotification('error',
       'The age must be a valid number between 18 and 90.');
-  } else if (isNaN(salaryEmployee) || salaryEmployee < 0) {
-    showNotification('error', 'The "Salary" is empty.');
+  }
+
+  if (isNaN(salaryEmployee) || salaryEmployee < 0) {
+    return showNotification('error', 'The "Salary" is empty.');
   } else {
     const newRow = list.insertRow();
 
