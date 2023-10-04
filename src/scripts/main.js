@@ -116,6 +116,7 @@ formFilled.addEventListener('submit', function(evt) {
   const enteredName = formData.get('name');
   const enteredAge = formData.get('age');
   const enteredPosition = formData.get('position');
+  const enteredSalary = formData.get('salary');
 
   rowToInsert.setAttribute('data-qa', 'success');
 
@@ -129,7 +130,7 @@ formFilled.addEventListener('submit', function(evt) {
   let message = 'All field are correct and the table will be updated';
   let messageClass = 'success';
 
-  if (enteredName.length < 4) {
+  if (enteredName.trim.length < 4) {
     message = 'Text entries must be longer than four characters in length';
     messageClass = 'error';
   }
@@ -141,6 +142,11 @@ formFilled.addEventListener('submit', function(evt) {
 
   if (enteredAge < 18 || enteredAge > 90) {
     message = 'Age entry must be between 18 years and 90 years';
+    messageClass = 'error';
+  }
+
+  if (enteredSalary <= 0) {
+    message = 'Salary must be zero or above.';
     messageClass = 'error';
   }
 
