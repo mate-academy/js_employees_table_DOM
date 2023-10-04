@@ -57,8 +57,6 @@ table.addEventListener('click', function(evt) {
   }
 });
 
-// form
-
 const form = document.createElement('form');
 
 form.classList.add(`new-employee-form`);
@@ -149,7 +147,7 @@ formFilled.addEventListener('submit', function(evt) {
   notificationTitle.textContent = message;
   notification.classList.add(messageClass);
   notification.append(notificationTitle);
-  form.append(notification);
+  form.after(notification);
 
   setTimeout(() => {
     notification.remove();
