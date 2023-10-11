@@ -130,7 +130,7 @@ formFilled.addEventListener('submit', function(evt) {
   let message = 'All field are correct and the table will be updated';
   let messageClass = 'success';
 
-  if (enteredName.trim.length < 4) {
+  if (enteredName.trim().length < 4) {
     message = 'Text entries must be longer than four characters in length';
     messageClass = 'error';
   }
