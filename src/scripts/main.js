@@ -42,10 +42,10 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   }, 2000);
 };
 
-const showError = function() {
+const showError = function(message = 'Houston we have trubles!\n '
+  + 'Check inputs values again. All of them must be filled.') {
   pushNotification(10, 10, 'Error',
-    'Houston we have trubles!\n '
-  + 'Check inputs values again.', 'error');
+    message, 'error');
 
   addSwitcher = false;
 };
@@ -57,20 +57,24 @@ const showSuccess = function() {
 };
 
 const nameRequire = function(personName) {
-  if (personName.length < 4) {
-    showError();
+  const nameErrorText = 'Name block is not correct!\n'
+    + 'It length should be more than 3 symbol and includes only letters.';
+
+  if (personName.length < 4 && personName !== '') {
+    showError(nameErrorText);
   }
 
   for (const letter of personName) {
-    if (letter.toLowerCase() === letter.toUpperCase()) {
-      showError();
+    if (letter.toLowerCase() === letter.toUpperCase() && personName !== '') {
+      showError(nameErrorText);
     }
   }
 };
 
 const ageRequire = function(personAge) {
-  if (+personAge < 18 || +personAge > 90) {
-    showError();
+  if ((+personAge < 18 || +personAge > 90) && personAge !== '') {
+    showError('Age block is not correct!\n'
+    + 'It value must be more than 18 and less 90.');
   }
 };
 
@@ -164,6 +168,83 @@ const newFunction = function() {
         const actionItem = action.target;
 
         item.innerHTML = actionItem.value;
+
+        if (index === 4 || (index % 5) === 4) {
+          let onlyNumberString = '';
+          let dollarCount = 0;
+          let commaCount = 0;
+          let salarySwitcher = false;
+
+          for (let symbol = 0; symbol < actionItem.value.length; symbol++) {
+            if (actionItem.value[symbol] === '$') {
+              dollarCount++;
+            }
+
+            if (actionItem.value[symbol] === ',') {
+              commaCount++;
+            }
+
+            if (actionItem.value[symbol] !== '$'
+              && actionItem.value[symbol] !== ',') {
+              onlyNumberString += actionItem.value[symbol];
+            }
+          }
+
+          const salaryRequierBeforeThouthand = function(count) {
+            if (commaCount === count) {
+              salarySwitcher = true;
+            }
+          };
+
+          const salaryRequierBeforeMillion = function(count, commaIndex) {
+            if (commaCount === count && actionItem.value[commaIndex] === ',') {
+              salarySwitcher = true;
+            }
+          };
+
+          const salaryRequierAfterMillion
+            = function(count, firstCommaIndex, secondCommaIndex) {
+              if (commaCount === count
+                && actionItem.value[firstCommaIndex] === ','
+              && actionItem.value[secondCommaIndex] === ',') {
+                salarySwitcher = true;
+              }
+            };
+
+          switch (actionItem.value.length) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+              salaryRequierBeforeThouthand(0);
+              break;
+            case 6:
+              salaryRequierBeforeMillion(1, 2);
+              break;
+            case 7:
+              salaryRequierBeforeMillion(1, 3);
+              break;
+            case 8:
+              salaryRequierBeforeMillion(1, 4);
+              break;
+            case 10:
+              salaryRequierAfterMillion(2, 2, 6);
+              break;
+            case 11:
+              salaryRequierAfterMillion(2, 3, 7);
+              break;
+            case 12:
+              salaryRequierAfterMillion(2, 4, 8);
+              break;
+          }
+
+          if (actionItem.value[0] === '$' && dollarCount === 1
+            && (/^[0-9]+$/.test(onlyNumberString)) && salarySwitcher === true) {
+            item.innerHTML = actionItem.value;
+          } else {
+            item.innerHTML = itemText;
+          }
+        }
 
         if (actionItem.value === '') {
           item.innerHTML = itemText;
