@@ -8,6 +8,11 @@ const COLUMNS = {
   SALARY: 4,
 };
 
+// #region utils
+function formatNumber(number) {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
 const formatSalary = (salary) => {
   return parseInt(salary.slice(1).replace(/,/g, ''));
 };
@@ -15,28 +20,31 @@ const formatSalary = (salary) => {
 function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
+// #endregion
 
+// DOM elements selection
 const body = document.body;
 const tableElement = document.querySelector('table');
 const tbody = tableElement.querySelector('tbody');
-const rows = Array.from(tbody.rows);
-const headers = document.querySelectorAll('thead th');
+const headers = tableElement.querySelectorAll('thead th');
 
 // #region Sort table
 let isDescOrder = false;
 let currentSortField = null;
 
-const setSortOrder = (newSortField) => {
+function setSortOrder(newSortField) {
   if (currentSortField !== null && currentSortField === newSortField) {
     isDescOrder = !isDescOrder;
   } else {
     isDescOrder = false;
     currentSortField = newSortField;
   }
-};
+}
 
 function sortTable(column) {
   setSortOrder(column);
+
+  const rows = Array.from(tbody.rows);
 
   rows.sort((a, b) => {
     const aValue = a.cells[column].textContent;
@@ -62,31 +70,25 @@ function sortTable(column) {
     tbody.appendChild(row);
   });
 }
-
-headers.forEach((header, columnIndex) => {
-  header.addEventListener('click', () => {
-    sortTable(columnIndex);
-  });
-});
 // #endregion
 
 // #region Select table row
-let currentSelectedRow = null;
+let selectedRow = null;
 
-rows.forEach(row => {
-  row.addEventListener('click', () => {
-    if (currentSelectedRow !== null) {
-      currentSelectedRow.classList.remove('active');
-    }
+function selectTableRow(e) {
+  const tableRow = e.target.closest('tr');
 
-    if (currentSelectedRow !== row) {
-      row.classList.add('active');
-      currentSelectedRow = row;
-    } else {
-      currentSelectedRow = null;
-    }
-  });
-});
+  if (!tableRow || !tbody.contains(tableRow)) {
+    return;
+  }
+
+  if (selectedRow) {
+    selectedRow.classList.remove('active');
+  }
+
+  tableRow.classList.add('active');
+  selectedRow = tableRow;
+}
 // #endregion
 
 // #region Create form
@@ -126,19 +128,20 @@ const formFields = [
 ];
 
 function createFormField(field) {
+  const { name: fieldName, type, tagName, options } = field;
   const formField = document.createElement('label');
 
-  formField.textContent = capitalize(field.name) + ':';
+  formField.textContent = capitalize(fieldName) + ':';
 
-  const formFieldContent = document.createElement(field.tagName);
+  const formFieldContent = document.createElement(tagName);
 
-  formFieldContent.setAttribute('data-qa', field.name);
-  formFieldContent.setAttribute('name', field.name);
+  formFieldContent.setAttribute('data-qa', fieldName);
+  formFieldContent.setAttribute('name', fieldName);
 
   if (field.tagName === 'input') {
-    formFieldContent.type = field.type;
+    formFieldContent.type = type;
   } else {
-    for (const option of field.options) {
+    for (const option of options) {
       const newOptionElement = document.createElement('option');
 
       newOptionElement.value = option;
@@ -172,3 +175,219 @@ formElement.appendChild(submitButton);
 
 body.appendChild(formElement);
 // #endregion
+
+// #region Handle form submit
+function createNewEmployee(formData) {
+  const tableRow = document.createElement('tr');
+
+  for (const [key, value] of Object.entries(formData)) {
+    const tableData = document.createElement('td');
+
+    let data = value;
+
+    if (key === 'salary') {
+      data = '$' + formatNumber(data);
+    }
+
+    tableData.textContent = data;
+
+    tableRow.appendChild(tableData);
+  }
+
+  return tableRow;
+}
+
+function addNewEmployee(e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const formData = Object.fromEntries(new FormData(form));
+
+  const errors = getErrors(formData);
+
+  if (!errors.length) {
+    const newEmployee = createNewEmployee(formData);
+
+    tbody.appendChild(newEmployee);
+    form.reset();
+
+    pushNotification(10, 10, 'Success', 'New employee was created', 'success');
+
+    return;
+  }
+
+  for (const [index, { title, description }] of errors.entries()) {
+    pushNotification(10 + (index * 130), 10, title, description, 'error');
+  }
+}
+
+formElement.addEventListener('submit', (e) => addNewEmployee(e));
+// #endregion
+
+// #region Validate form
+function getErrors(formData) {
+  const { name: fieldName, position, office, age, salary } = formData;
+  const errors = [];
+
+  if (!fieldName || !position || !office || !age || !salary) {
+    errors.push({
+      title: 'All fields are required',
+      description: 'Please fill all fields',
+    });
+
+    return errors;
+  }
+
+  if (fieldName.length < 4) {
+    errors.push({
+      title: 'Name is too short',
+      description: 'Name has to be at least 4 characters',
+    });
+  }
+
+  if (age < 18 || age > 90) {
+    errors.push({
+      title: 'Wrong age',
+      description: 'Age has to be between 18 and 90 years old',
+    });
+  }
+
+  return errors;
+}
+// #endregion
+
+// #region Create notifications
+function pushNotification(posTop, posRight, title, description, type) {
+  const messageElement = document.createElement('div');
+
+  messageElement.className = `notification ${type}`;
+  messageElement.style.cssText = `top: ${posTop}px; right: ${posRight}px`;
+  messageElement.setAttribute('data-qa', 'notification');
+
+  const titleElement = document.createElement('h2');
+
+  titleElement.classList.add('title');
+  titleElement.textContent = title;
+
+  const descriptionElement = document.createElement('p');
+
+  descriptionElement.textContent = description;
+
+  messageElement.appendChild(titleElement);
+  messageElement.appendChild(descriptionElement);
+
+  document.body.appendChild(messageElement);
+
+  setTimeout(() => {
+    document.body.removeChild(messageElement);
+  }, 2000);
+}
+// #endregion
+
+// #region Edit table
+const getInputType = (data) => {
+  const isNumber = !Number.isNaN(formatSalary(data)) || !Number.isNaN(+data);
+
+  return isNumber ? 'number' : 'text';
+};
+
+const saveChanges = (tableData, prevValue, valueToChange) => {
+  const newValue = valueToChange || prevValue;
+
+  if (prevValue.startsWith('$')) {
+    const newSalary = formatNumber(+newValue);
+
+    if (isNaN(newSalary.slice(1))) {
+      tableData.textContent = prevValue;
+
+      return;
+    }
+
+    tableData.textContent = '$' + formatNumber(+newValue);
+
+    return;
+  }
+
+  tableData.textContent = newValue;
+};
+
+const onBlur = (e, tableData, prevValue) => {
+  saveChanges(tableData, prevValue, e.target.value);
+};
+
+const onKeyPress = (tableData, prevValue) => {
+  tableData.addEventListener(
+    'keydown',
+    (e) => {
+      if (e.key === 'Enter') {
+        saveChanges(tableData, prevValue, e.target.value);
+      }
+
+      if (e.key === 'Escape') {
+        tableData.textContent = prevValue;
+      }
+    },
+  );
+};
+
+const changeToInput = (tableData) => {
+  const value = tableData.textContent;
+
+  const input = document.createElement('input');
+  const inputType = getInputType(value);
+
+  input.classList.add('cell-input');
+  input.type = inputType;
+
+  if (value.startsWith('$')) {
+    input.value = formatSalary(value);
+  } else {
+    input.value = value;
+  }
+
+  tableData.innerHTML = '';
+
+  tableData.appendChild(input);
+  input.focus();
+
+  input.addEventListener(
+    'blur',
+    (e) => onBlur(e, tableData, value),
+    { once: true }
+  );
+};
+
+function editTableData(e) {
+  e.preventDefault();
+
+  const targetItem = e.target;
+  const table = e.currentTarget;
+  const tableBody = table.querySelector('tbody');
+
+  const tableData = targetItem.closest('td');
+
+  if (!tableData || !tableBody.contains(tableData)) {
+    return;
+  }
+
+  const prevValue = tableData.textContent;
+
+  const dataInput = tableData.querySelector('.cell-input');
+
+  if (!dataInput) {
+    changeToInput(tableData);
+  }
+
+  onKeyPress(tableData, prevValue);
+}
+// #endregion
+
+// Event listeners
+headers.forEach((header, columnIndex) => {
+  header.addEventListener('click', () => {
+    sortTable(columnIndex);
+  });
+});
+
+tableElement.addEventListener('click', selectTableRow);
+tableElement.addEventListener('dblclick', editTableData);
