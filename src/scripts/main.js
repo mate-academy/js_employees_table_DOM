@@ -285,6 +285,44 @@ function pushNotification(posTop, posRight, title, description, type) {
 // #endregion
 
 // #region Edit table
+function getInputErrors(value, columnIndex) {
+  const errors = [];
+
+  switch (columnIndex) {
+    case COLUMNS.NAME:
+      if (value.length < 4) {
+        errors.push({
+          title: 'Name is too short',
+          description: 'Name has to be at least 4 characters',
+        });
+      }
+      break;
+
+    case COLUMNS.AGE:
+      if (value < 18 || value > 90) {
+        errors.push({
+          title: 'Wrong age',
+          description: 'Age has to be between 18 and 90 years old',
+        });
+      }
+      break;
+
+    case COLUMNS.OFFICE:
+      if (!formFields[COLUMNS.OFFICE].options.includes(value)) {
+        errors.push({
+          title: 'Wrong city',
+          description: 'Office should be in one of the cities from the list',
+        });
+      }
+      break;
+
+    default:
+      break;
+  }
+
+  return errors;
+}
+
 const getInputType = (data) => {
   const isNumber = !Number.isNaN(formatSalary(data)) || !Number.isNaN(+data);
 
@@ -312,7 +350,22 @@ const saveChanges = (tableData, prevValue, valueToChange) => {
 };
 
 const onBlur = (e, tableData, prevValue) => {
-  saveChanges(tableData, prevValue, e.target.value);
+  const newValue = e.target.value;
+  const columnIndex = tableData.cellIndex;
+
+  const errors = getInputErrors(newValue, columnIndex);
+
+  if (!errors.length || newValue === '') {
+    saveChanges(tableData, prevValue, newValue);
+
+    return;
+  }
+
+  for (const [index, { title, description }] of errors.entries()) {
+    pushNotification(10 + (index * 130), 10, title, description, 'error');
+  }
+
+  tableData.textContent = prevValue;
 };
 
 const onKeyPress = (tableData, prevValue) => {
@@ -320,7 +373,7 @@ const onKeyPress = (tableData, prevValue) => {
     'keydown',
     (e) => {
       if (e.key === 'Enter') {
-        saveChanges(tableData, prevValue, e.target.value);
+        onBlur(e, tableData, prevValue);
       }
 
       if (e.key === 'Escape') {
