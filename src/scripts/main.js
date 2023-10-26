@@ -1,20 +1,62 @@
 'use strict';
 
-const NAME = 'Name';
-const POSITION = 'Position';
-const OFFICE = 'Office';
-const AGE = 'Age';
-const SALARY = 'Salary';
-const messageName = 'Поле "Name:" повинно мати не менше 4 символів';
-const messagePosition = 'Необхідно вказати посаду';
-const messageFullData = 'Недостатньо даних';
-const messageAge = 'Вік від 18 до 90';
-const messageSuccess = 'Співробітника успішно додано';
+const TITLE = {
+  NAME: 'Name',
+  POSITION: 'Position',
+  OFFICE: 'Office',
+  AGE: 'Age',
+  SALARY: 'Salary',
+};
+
+const MESSAGE = {
+  NAME: 'Поле "Name:" повинно мати не менше 4 символів',
+  POSITION: 'Необхідно вказати посаду',
+  FULL_DATA: 'Недостатньо даних',
+  AGE: 'Вік від 18 до 90',
+  SUCCESS: 'Співробітника успішно додано',
+};
 
 const thead = document.querySelector('thead');
 let currentCol = null;
 
 document.querySelector('table').addEventListener('click', e => {
+  document.querySelector('tbody').addEventListener('mousedown', even => {
+    even.preventDefault();
+  });
+
+  document.querySelector('tbody').addEventListener('dblclick', v => {
+    const cell = v.target;
+    const start = cell.innerText;
+
+    cell.parentElement.className = '';
+
+    const input = document.createElement('input');
+
+    input.className = 'cell-input';
+    input.value = cell.innerText;
+    input.size = input.value.length;
+
+    cell.textContent = '';
+    cell.append(input);
+    input.focus();
+
+    input.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter') {
+        input.blur();
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      if (!input.value) {
+        input.remove();
+        cell.innerText = start;
+      } else {
+        input.remove();
+        cell.innerText = input.value;
+      }
+    });
+  });
+
   const tbody = document.querySelector('tbody');
 
   if (thead.contains(e.target)) {
@@ -60,11 +102,12 @@ for (const item of [...thead.firstElementChild.children]) {
 
   label.textContent = `${item.textContent}:`;
 
-  if (item.textContent !== OFFICE) {
+  if (item.textContent !== TITLE.OFFICE) {
     const input = document.createElement('input');
 
     input.name = item.textContent.toLowerCase();
     input.dataset.qa = item.textContent.toLowerCase();
+    input.required = true;
     label.append(input);
   } else {
     const select = document.createElement('select');
@@ -97,15 +140,16 @@ for (const label of labels) {
   const field = label.firstElementChild;
 
   switch (field.dataset.qa) {
-    case NAME.toLowerCase():
+    case TITLE.NAME.toLowerCase():
       field.type = 'text';
       break;
 
-    case POSITION.toLowerCase():
+    case TITLE.POSITION.toLowerCase():
       field.type = 'text';
+      field.required = false;
       break;
 
-    case OFFICE.toLowerCase():
+    case TITLE.OFFICE.toLowerCase():
       const options = field.children;
 
       options[0].value = '';
@@ -114,11 +158,11 @@ for (const label of labels) {
       options[0].setAttribute('selected', true);
       break;
 
-    case AGE.toLowerCase():
+    case TITLE.AGE.toLowerCase():
       field.type = 'number';
       break;
 
-    case SALARY.toLowerCase():
+    case TITLE.SALARY.toLowerCase():
       field.type = 'number';
       break;
   }
@@ -137,43 +181,43 @@ form.addEventListener('submit', e => {
     const td = document.createElement('td');
 
     switch (field.dataset.qa) {
-      case NAME.toLowerCase():
-        if (data.get(NAME.toLowerCase()).length < 4) {
-          informMessage('error', messageName);
+      case TITLE.NAME.toLowerCase():
+        if (data.get(TITLE.NAME.toLowerCase()).length < 4) {
+          informMessage('error', MESSAGE.NAME);
 
           return;
         } else {
-          td.innerText = data.get(NAME.toLowerCase());
+          td.innerText = data.get(TITLE.NAME.toLowerCase());
         }
         break;
 
-      case POSITION.toLowerCase():
-        if (!data.get(POSITION.toLowerCase())) {
-          informMessage('error', messagePosition);
+      case TITLE.POSITION.toLowerCase():
+        if (!data.get(TITLE.POSITION.toLowerCase())) {
+          informMessage('error', MESSAGE.POSITION);
 
           return;
         } else {
-          td.innerText = data.get(POSITION.toLowerCase());
+          td.innerText = data.get(TITLE.POSITION.toLowerCase());
         }
         break;
 
-      case OFFICE.toLowerCase():
-        td.innerText = data.get(OFFICE.toLowerCase());
+      case TITLE.OFFICE.toLowerCase():
+        td.innerText = data.get(TITLE.OFFICE.toLowerCase());
         break;
 
-      case AGE.toLowerCase():
-        if (+data.get(AGE.toLowerCase()) < 18
-          || +data.get(AGE.toLowerCase()) >= 90) {
-          informMessage('error', messageAge);
+      case TITLE.AGE.toLowerCase():
+        if (+data.get(TITLE.AGE.toLowerCase()) < 18
+          || +data.get(TITLE.AGE.toLowerCase()) >= 90) {
+          informMessage('error', MESSAGE.AGE);
 
           return;
         } else {
-          td.innerText = data.get(AGE.toLowerCase());
+          td.innerText = data.get(TITLE.AGE.toLowerCase());
         }
         break;
 
-      case SALARY.toLowerCase():
-        td.innerText = salaryToString(data.get(SALARY.toLowerCase()));
+      case TITLE.SALARY.toLowerCase():
+        td.innerText = salaryToString(data.get(TITLE.SALARY.toLowerCase()));
         break;
     }
     newRow.append(td);
@@ -188,40 +232,12 @@ form.addEventListener('submit', e => {
   }
 
   if (counterFree !== newRow.children.length) {
-    informMessage('warning', messageFullData);
+    informMessage('warning', MESSAGE.FULL_DATA);
   } else {
     document.querySelector('tbody').append(newRow);
     form.reset();
-    informMessage('success', messageSuccess);
+    informMessage('success', MESSAGE.SUCCESS);
   }
-});
-
-document.querySelector('tbody').addEventListener('dblclick', e => {
-  const cell = e.target;
-
-  cell.parentElement.className = '';
-
-  const input = document.createElement('input');
-
-  input.className = 'cell-input';
-  input.value = cell.innerText;
-  cell.replaceWith(input);
-  input.focus();
-
-  input.addEventListener('keydown', ev => {
-    if (ev.key === 'Enter') {
-      input.blur();
-    }
-  });
-
-  input.addEventListener('blur', ev => {
-    if (!input.value) {
-      input.replaceWith(cell);
-    } else {
-      cell.innerText = input.value;
-      input.replaceWith(cell);
-    }
-  });
 });
 
 function listOfOffices(table) {
@@ -231,7 +247,7 @@ function listOfOffices(table) {
   const rows = [...table.rows].slice(0, -1);
 
   for (let i = 0; i < header.length; i++) {
-    if (header[i].textContent !== OFFICE) {
+    if (header[i].textContent !== TITLE.OFFICE) {
       continue;
     }
 
@@ -255,16 +271,16 @@ function sortBy(tbEl, thEl, value) {
 
     tbEl.sort((a, b) => {
       switch (value) {
-        case NAME:
-        case POSITION:
-        case OFFICE:
+        case TITLE.NAME:
+        case TITLE.POSITION:
+        case TITLE.OFFICE:
           return a.children[i].textContent
             .localeCompare(b.children[i].textContent);
 
-        case AGE:
+        case TITLE.AGE:
           return +a.children[i].textContent - +b.children[i].textContent;
 
-        case SALARY:
+        case TITLE.SALARY:
           return salaryToNumber(a.children[i].textContent)
             - salaryToNumber(b.children[i].textContent);
       }
@@ -302,7 +318,7 @@ function informMessage(type, text) {
   div.dataset.qa = 'notification';
   div.innerText = text;
   div.style.color = 'black';
-  form.prepend(div);
+  document.body.append(div);
 
   setTimeout(() => {
     div.remove();
