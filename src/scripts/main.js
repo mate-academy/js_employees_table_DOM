@@ -65,6 +65,8 @@ thead.addEventListener('click', e => {
 
       sortRow(sortedRows);
     }
+
+    rowsArray.forEach((element) => element.classList.remove('active'));
   }
 }
 );
@@ -213,8 +215,11 @@ tBody.addEventListener('dblclick', e => {
   const target = e.target;
 
   if (target.tagName === 'TD') {
+    const parentRow = target.parentElement;
+
     const originalText = target.innerText;
     const newInput = document.createElement('INPUT');
+
     const handleInput = function() {
       if (newInput.value.trim() === '') {
         target.innerText = originalText;
@@ -222,13 +227,29 @@ tBody.addEventListener('dblclick', e => {
         target.innerText = newInput.value;
       }
 
-      target.removeChild(newInput);
+      if (newInput.classList.contains('salary')) {
+        target.innerText
+          = '$' + newInput.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
     };
 
     target.innerText = '';
     newInput.classList.add('cell-input');
+
     newInput.value = originalText;
+
+    if (target === parentRow.children[3]) {
+      newInput.setAttribute('type', 'number');
+    }
+
+    if (target === parentRow.children[4]) {
+      newInput.value = Number(originalText.replace(/\D/g, ''));
+      newInput.setAttribute('type', 'number');
+      newInput.classList.add('salary');
+    }
+
     target.appendChild(newInput);
+    newInput.focus();
 
     newInput.addEventListener('blur', () => {
       handleInput();
