@@ -101,7 +101,7 @@ for (const header of tableHeaders) {
 
     const optionDefault = document.createElement('option');
 
-    optionDefault.innerText = 'Choose your office';
+    optionDefault.innerText = 'Select location';
     optionDefault.setAttribute('disabled', '');
     optionDefault.setAttribute('selected', '');
     optionDefault.value = '';
@@ -135,20 +135,20 @@ form.addEventListener('submit', e => {
 
   if (fields.some(field => field.validity.valueMissing)) {
     pushNotification(
-      'error',
-      'All fields must be filled',
+      'Hey!',
+      'All fields must be filled in.',
       'error',
     );
   } else if (fields[0].value.length < 4) {
     pushNotification(
-      'error',
-      'Name must be at least 4 characters long.',
+      'Hold your horses!',
+      'The name must have at least 4 characters.',
       'error',
     );
   } else if (fields[3].validity.rangeUnderflow
       || fields[3].validity.rangeOverflow) {
     pushNotification(
-      'error',
+      'Wait a moment!',
       'Age must be between 18 and 90.',
       'error',
     );
@@ -167,8 +167,8 @@ form.addEventListener('submit', e => {
     };
 
     pushNotification(
-      'success',
-      'User added to table',
+      'Phew!',
+      'Employee has been added to the table',
       'success',
     );
   }
