@@ -236,8 +236,9 @@ tableBody.addEventListener('dblclick', function(e) {
 
   originalValue = clickedCell.textContent;
 
-  clickedCell.innerHTML = clickedCell.textContent;
+  clickedCell.innerHTML = '';
   clickedCell.appendChild(input);
+  input.value = originalValue;
 
   currentlyEditingCell = clickedCell;
 
