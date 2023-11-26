@@ -92,6 +92,9 @@ document.body.insertAdjacentHTML('beforeend', `
 `);
 
 const form = document.querySelector('.new-employee-form');
+const MIN_NAME_LENGTH = 4;
+const MIN_AGE = 18;
+const MAX_AGE = 90;
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -107,11 +110,11 @@ form.addEventListener('submit', (e) => {
 
   let message = '';
 
-  if (fields.name.length < 4) {
+  if (fields.name.length < MIN_NAME_LENGTH) {
     message += '\n Name must not be less than 4 symbols';
   };
 
-  if (parseInt(fields.age) < 18 || parseInt(fields.age) > 90) {
+  if (parseInt(fields.age) < MIN_AGE || parseInt(fields.age) > MAX_AGE) {
     message += '\n The age must be between 18 and 90';
   };
 
@@ -163,28 +166,30 @@ tableBody.addEventListener('dblclick', (e) => {
 
   const oldtext = e.target.innerText;
   const input = document.createElement('input');
+  const [,,, age, salary] = e.target.parentElement.children;
 
   input.className = 'cell-input';
   input.value = oldtext;
 
-  if (e.target === e.target.parentElement.children[3]) {
-    input.setAttribute('type', 'number');
-  };
-
-  if (e.target === e.target.parentElement.children[4]) {
-    input.setAttribute('type', 'number');
-    input.value = Number(oldtext.replace(/\D/g, ''));
-  };
+  switch (e.target) {
+    case age:
+      input.setAttribute('type', 'number');
+      break;
+    case salary:
+      input.setAttribute('type', 'number');
+      input.value = Number(oldtext.replace(/\D/g, ''));
+      break;
+    default:
+      break;
+  }
 
   e.target.firstChild.replaceWith(input);
   input.focus();
 
   const handleCellInput = () => {
-    if (input.value.trim() === '') {
-      e.target.innerText = oldtext;
-    } else {
-      e.target.innerText = input.value;
-    }
+    e.target.innerText = input.value.trim() === ''
+      ? e.target.innerText = oldtext
+      : e.target.innerText = input.value;
 
     if (e.target === e.target.parentElement.children[4]) {
       e.target.innerText = `$${Number(input.value)
