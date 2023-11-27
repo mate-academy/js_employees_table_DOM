@@ -150,7 +150,12 @@ form.addEventListener('submit', (e) => {
   const newAge = age.value;
   const newSalary = salary.value;
 
-  if (newName.length < 4) {
+  if (newName.trim().length < 1 && newPosition.trim().length < 1) {
+    pushNotification(10, 10, 'Error',
+      'Name or Position can not be only spaces', 'error');
+
+    return null;
+  } else if (newName.length < 4) {
     pushNotification(10, 10, 'Error',
       'Name can not have less than 4 letters', 'error');
 
