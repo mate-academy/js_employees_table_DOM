@@ -150,7 +150,7 @@ form.addEventListener('submit', (e) => {
   const newAge = age.value;
   const newSalary = salary.value;
 
-  if (newName.trim().length < 1 && newPosition.trim().length < 1) {
+  if (newName.trim().length > 1 && newPosition.trim().length > 1) {
     pushNotification(10, 10, 'Error',
       'Name or Position can not be only spaces', 'error');
 
