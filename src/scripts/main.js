@@ -220,6 +220,7 @@ tbody.addEventListener('dblclick', e => {
     };
 
     target.innerText = '';
+
     newInput.classList.add('cell-input');
 
     newInput.value = originalText;
