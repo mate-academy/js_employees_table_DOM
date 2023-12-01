@@ -120,7 +120,7 @@ form.addEventListener('click', e => {
   const formAge = form.children[3].children[0].value;
   const formSalary = form.children[4].children[0].value;
 
-  if (!formPosition || !formOffice || !formSalary) {
+  if (!formPosition.trim() || !formOffice || !formSalary) {
     showErrorMessage('Error',
       'All inputs must be filled',
       'error');
@@ -128,7 +128,7 @@ form.addEventListener('click', e => {
     return;
   }
 
-  if (formName.length < 4) {
+  if (formName.trim().length < 4) {
     showErrorMessage('Wrong name',
       'Name must contains at least 4 characters',
       'error');
