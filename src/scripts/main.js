@@ -31,6 +31,11 @@ const handleHeaderClick = () => {
 
   sortTable(columnIndex, newOrder);
 
+  document.querySelectorAll('th')
+    .forEach(header => header.classList.remove('asc', 'desc'));
+
+  th.classList.add(newOrder);
+
   th.dataset.sortOrder = newOrder;
 };
 
@@ -68,7 +73,6 @@ const validateFormData = (formData) => {
   return true;
 };
 
-// Function to show notifications
 const showNotification = (message, type) => {
   const notification = document.createElement('div');
 
@@ -108,7 +112,10 @@ const handleFormSubmit = () => {
 };
 
 document.querySelectorAll('th')
-  .forEach((th) => th.addEventListener('click', handleHeaderClick));
+  .forEach((th) => th.addEventListener('click', (event) => {
+    currentEvent = event;
+    handleHeaderClick();
+  }));
 
 document.querySelectorAll('tbody tr')
   .forEach((row) => row.addEventListener('click', handleRowClick));
