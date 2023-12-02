@@ -1,150 +1,208 @@
 'use strict';
 
-let currentEvent;
+const thead = document.querySelector('thead');
+const mainColumn = thead.querySelector('tr');
+const tBody = document.querySelector('tbody');
+const form = createForm();
 
-const toggleSortOrder = (currentOrder) =>
-  (currentOrder === 'asc' ? 'desc' : 'asc');
+let sortingOrder = null;
+let currentColumn = null;
 
-const sortTable = (columnIndex, sortOrder) => {
-  const rows = Array.from(document.querySelectorAll('tbody tr'));
+const toNumber = stringWithSymbols => parseFloat(stringWithSymbols.replace(/[$,]/g, ''));
 
-  rows.sort((rowA, rowB) => {
-    const valueA = rowA.children[columnIndex].textContent;
-    const valueB = rowB.children[columnIndex].textContent;
+const sortRow = rowToSort => {
+  while (tBody.firstChild) {
+    tBody.removeChild(tBody.firstChild);
+  }
 
-    return sortOrder === 'asc'
-      ? valueA.localeCompare(valueB)
-      : valueB.localeCompare(valueA);
+  rowToSort.forEach(row => {
+    tBody.appendChild(row);
   });
-
-  const tbody = document.querySelector('tbody');
-
-  tbody.innerHTML = '';
-  rows.forEach((row) => tbody.appendChild(row));
 };
 
-const handleHeaderClick = () => {
-  const th = currentEvent.target;
-  const columnIndex = th.cellIndex;
-  const currentOrder = th.dataset.sortOrder || 'asc';
-  const newOrder = toggleSortOrder(currentOrder);
-
-  sortTable(columnIndex, newOrder);
-
-  document.querySelectorAll('th')
-    .forEach(header => header.classList.remove('asc', 'desc'));
-
-  th.classList.add(newOrder);
-
-  th.dataset.sortOrder = newOrder;
+const sortAscDesc = index => {
+  sortingOrder = currentColumn !== index ? 'asc' : sortingOrder === 'asc' ? 'desc' : 'asc';
+  currentColumn = index;
 };
 
-const handleRowClick = () => {
-  const selectedRow = currentEvent.target.closest('tr');
-  const rows = document.querySelectorAll('tbody tr');
-
-  rows.forEach((row) => row.classList.remove('active'));
-  selectedRow.classList.add('active');
+const createForm = () => {
+  const form = document.createElement('form');
+  form.classList.add('new-employee-form');
+  form.innerHTML =
+    '<label>Name: <input name="name" type="text" data-qa="name"></label>' +
+    '<label>Position: <input name="position" type="text" data-qa="position"></label>' +
+    '<label>Office:' +
+    '<select name="office" data-qa="office">' +
+    '<option></option>' +
+    '<option value="Tokyo">Tokyo</option>' +
+    '<option value="Singapore">Singapore</option>' +
+    '<option value="London">London</option>' +
+    '<option value="New York">New York</option>' +
+    '<option value="Edinburgh">Edinburgh</option>' +
+    '<option value="San Francisco">San Francisco</option>' +
+    '</select>' +
+    '</label>' +
+    '<label>Age: <input name="age" type="number" data-qa="age"></label>' +
+    '<label>Salary: <input name="salary" type="number" data-qa="salary"></label>' +
+    '<button>Save to table</button>';
+  document.body.appendChild(form);
+  return form;
 };
 
-const validateFormData = (formData) => {
-  const name = formData.get('name');
-  const age = parseInt(formData.get('age'), 10);
-  const salary = parseInt(formData.get('salary').replace(/[^\d]/g, ''), 10);
+const fieldValues = form.querySelectorAll('[data-qa]');
+const fieldsArray = [...fieldValues];
 
-  if (name.length < 4) {
-    showNotification('Name should have at least 4 characters', 'error');
-
-    return false;
-  }
-
-  if (age < 18 || age > 90) {
-    showNotification('Age should be between 18 and 90', 'error');
-
-    return false;
-  }
-
-  if (isNaN(salary) || salary <= 0) {
-    showNotification('Invalid salary value', 'error');
-
-    return false;
-  }
-
-  return true;
-};
-
-const showNotification = (message, type) => {
+const pushNotification = (title, description, type) => {
   const notification = document.createElement('div');
-
-  notification.className = `notification ${type}`;
-  notification.dataset.qa = 'notification';
-  notification.textContent = message;
-
+  notification.classList.add('notification', type);
+  notification.setAttribute('data-qa', 'notification');
+  notification.style.top = '15px';
+  notification.style.right = '15px';
+  const titleContext = document.createElement('h2');
+  titleContext.classList.add('title');
+  titleContext.innerText = title;
+  const descriptionContext = document.createElement('p');
+  descriptionContext.innerText = description;
+  notification.appendChild(titleContext);
+  notification.appendChild(descriptionContext);
   document.body.appendChild(notification);
-
   setTimeout(() => {
     document.body.removeChild(notification);
-  }, 3000);
+  }, 2000);
 };
 
-const handleFormSubmit = () => {
-  currentEvent.preventDefault();
+thead.addEventListener('click', e => {
+  const target = e.target;
 
-  const form = currentEvent.target;
-  const formData = new FormData(form);
+  for (let i = 0; i < mainColumn.children.length; i++) {
+    if (target === mainColumn.children[i] && i > 2) {
+      sortAscDesc(i);
+      const sortedRows = rowsArray.sort((a, b) => {
+        const numA = toNumber(a.cells[i].innerText);
+        const numB = toNumber(b.cells[i].innerText);
+        return sortingOrder === 'asc' ? numA - numB : numB - numA;
+      });
+      sortRow(sortedRows);
+    }
 
-  if (validateFormData(formData)) {
-    const newRow = document.createElement('tr');
+    if (target === mainColumn.children[i] && i <= 2) {
+      sortAscDesc(i);
+      const sortedRows = rowsArray.sort((a, b) => {
+        const nameA = a.cells[i].innerText.toLowerCase();
+        const nameB = b.cells[i].innerText.toLowerCase();
+        return sortingOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+      });
+      sortRow(sortedRows);
+    }
 
-    newRow.innerHTML = `
-      <td>${formData.get('name')}</td>
-      <td>${formData.get('position')}</td>
-      <td>${formData.get('office')}</td>
-      <td>${formData.get('age')}</td>
-      <td>${formData.get('salary')}</td>
-    `;
-
-    document.querySelector('tbody').appendChild(newRow);
-
-    form.reset();
-    showNotification('Employee added successfully', 'success');
+    rowsArray.forEach(element => element.classList.remove('active'));
   }
-};
+});
 
-document.querySelectorAll('th')
-  .forEach((th) => th.addEventListener('click', (event) => {
-    currentEvent = event;
-    handleHeaderClick();
-  }));
+tBody.addEventListener('click', e => {
+  const target = e.target;
+  if (target.tagName === 'TD') {
+    rowsArray.forEach(element => element.classList.remove('active'));
+    target.parentElement.classList.add('active');
+  }
+  rowsArray = Array.from(tBody.rows);
+});
 
-document.querySelectorAll('tbody tr')
-  .forEach((row) => row.addEventListener('click', handleRowClick));
+form.addEventListener('click', e => {
+  const target = e.target;
+  const button = form.querySelector('button');
 
-const form = document.createElement('form');
+  if (target === button) {
+    e.preventDefault();
 
-form.className = 'new-employee-form';
+    const newRow = tBody.insertRow(tBody.rows.length);
+    const fields = {
+      name: fieldsArray[0].value,
+      position: fieldsArray[1].value,
+      office: fieldsArray[2].value,
+      age: fieldsArray[3].value,
+      salary: fieldsArray[4].value,
+    };
 
-form.innerHTML = `
-  <label>Name: <input name="name" type="text" data-qa="name" required></label>
-  <label>Position:
-    <input name="position" type="text" data-qa="position" required>
-  </label>
-  <label>Office:
-    <select name="office" data-qa="office" required>
-      <option value="Tokyo">Tokyo</option>
-      <option value="Singapore">Singapore</option>
-      <option value="London">London</option>
-      <option value="New York">New York</option>
-      <option value="Edinburgh">Edinburgh</option>
-      <option value="San Francisco">San Francisco</option>
-    </select>
-  </label>
-  <label>Age: <input name="age" type="number" data-qa="age" required></label>
-  <label>Salary:
-    <input name="salary" type="number" data-qa="salary" required>
-  </label>
-  <button type="submit">Save to table</button>
-`;
+    for (const [key, value] of Object.entries(fields)) {
+      if (!value.length) {
+        pushNotification('Error', 'Fill all lines', 'error');
+        return;
+      }
 
-form.addEventListener('submit', handleFormSubmit);
-document.body.appendChild(form);
+      if (key === 'name' && value.length < 4) {
+        pushNotification('Name is too short', 'Name has to be at least 4 characters', 'error');
+        return;
+      }
+
+      if (key === 'age' && (value < 18 || value > 90)) {
+        pushNotification('Wrong age', 'Age has to be between 18 and 60 years', 'error');
+        return;
+      }
+    }
+
+    fieldsArray.forEach(field => {
+      const cell = newRow.insertCell();
+      if (field.name === 'salary') {
+        const formattedSalary = '$' + field.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        cell.innerText = formattedSalary;
+      } else {
+        cell.innerText = field.value;
+      }
+    });
+
+    pushNotification('Hooray!', 'New employee is successfully added to the table', 'success');
+
+    rowsArray = Array.from(tBody.rows);
+    form.reset();
+  }
+});
+
+tBody.addEventListener('dblclick', e => {
+  const target = e.target;
+
+  if (target.tagName === 'TD') {
+    const parentRow = target.parentElement;
+    const originalText = target.innerText;
+    const newInput = document.createElement('INPUT');
+
+    const handleInput = () => {
+      if (newInput.value.trim() === '') {
+        target.innerText = originalText;
+      } else {
+        target.innerText = newInput.value;
+      }
+
+      if (newInput.classList.contains('salary')) {
+        target.innerText = '$' + newInput.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
+    };
+
+    target.innerText = '';
+    newInput.classList.add('cell-input');
+    newInput.value = originalText;
+
+    if (target === parentRow.children[3]) {
+      newInput.setAttribute('type', 'number');
+    }
+
+    if (target === parentRow.children[4]) {
+      newInput.value = Number(originalText.replace(/\D/g, ''));
+      newInput.setAttribute('type', 'number');
+      newInput.classList.add('salary');
+    }
+
+    target.appendChild(newInput);
+    newInput.focus();
+
+    newInput.addEventListener('blur', () => {
+      handleInput();
+    });
+
+    newInput.addEventListener('keypress', press => {
+      if (press.key === 'Enter') {
+        handleInput();
+      }
+    });
+  }
+});
