@@ -9,6 +9,15 @@ const QUERY = {
   'Salary': 4,
 };
 
+const queryName = 0;
+const queryPosition = 1;
+const queryOffice = 2;
+const queryAge = 3;
+const querySalary = 4;
+
+const notificationSuccess = 'success';
+const notificationError = 'error';
+
 const body = document.querySelector('body');
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
@@ -18,36 +27,39 @@ let desc = false;
 let query = '';
 
 function sortEmployees(sortedQuery) {
-  if (sortedQuery < 3) {
-    return desc
-      ? [...employees].sort((em1, em2) =>
-        em2.children[sortedQuery].innerText
-          .localeCompare(em1.children[sortedQuery].innerText),
-      )
-      : [...employees].sort((em1, em2) =>
-        em1.children[sortedQuery].innerText
-          .localeCompare(em2.children[sortedQuery].innerText),
-      );
-  } else if (sortedQuery === 3) {
-    return desc
-      ? [...employees].sort((em1, em2) =>
-        +em2.children[sortedQuery].innerText
-        - +em1.children[sortedQuery].innerText,
-      )
-      : [...employees].sort((em1, em2) =>
-        +em1.children[sortedQuery].innerText
-        - +em2.children[sortedQuery].innerText,
-      );
-  } else {
-    return desc
-      ? [...employees].sort((em1, em2) =>
-        getNumberSalary(em2.children[sortedQuery].innerText)
-        - getNumberSalary(em1.children[sortedQuery].innerText),
-      )
-      : [...employees].sort((em1, em2) =>
-        getNumberSalary(em1.children[sortedQuery].innerText)
-        - getNumberSalary(em2.children[sortedQuery].innerText),
-      );
+  switch (sortedQuery) {
+    case queryName:
+    case queryPosition:
+    case queryOffice:
+      return desc
+        ? [...employees].sort((em1, em2) =>
+          em2.children[sortedQuery].innerText
+            .localeCompare(em1.children[sortedQuery].innerText),
+        )
+        : [...employees].sort((em1, em2) =>
+          em1.children[sortedQuery].innerText
+            .localeCompare(em2.children[sortedQuery].innerText),
+        );
+    case queryAge:
+      return desc
+        ? [...employees].sort((em1, em2) =>
+          +em2.children[sortedQuery].innerText
+          - +em1.children[sortedQuery].innerText,
+        )
+        : [...employees].sort((em1, em2) =>
+          +em1.children[sortedQuery].innerText
+          - +em2.children[sortedQuery].innerText,
+        );
+    case querySalary:
+      return desc
+        ? [...employees].sort((em1, em2) =>
+          getNumberSalary(em2.children[sortedQuery].innerText)
+          - getNumberSalary(em1.children[sortedQuery].innerText),
+        )
+        : [...employees].sort((em1, em2) =>
+          getNumberSalary(em1.children[sortedQuery].innerText)
+          - getNumberSalary(em2.children[sortedQuery].innerText),
+        );
   }
 }
 
@@ -88,7 +100,6 @@ form.innerHTML = `
 <label>Position: <input name="position" type="text" data-qa="position"></label>
 <label>Office:
 <select name="office" data-qa="office">
-<option></option>
 <option value="Tokyo">Tokyo</option>
 <option value="Singapore">Singapore</option>
 <option value="London">London</option>
@@ -123,7 +134,7 @@ form.addEventListener('click', e => {
   if (!formPosition.trim() || !formOffice || !formSalary) {
     showErrorMessage('Error',
       'All inputs must be filled',
-      'error');
+      notificationError);
 
     return;
   }
@@ -131,7 +142,7 @@ form.addEventListener('click', e => {
   if (formName.trim().length < 4) {
     showErrorMessage('Wrong name',
       'Name must contains at least 4 characters',
-      'error');
+      notificationError);
 
     return;
   }
@@ -139,14 +150,14 @@ form.addEventListener('click', e => {
   if (+formAge < 18 || +formAge > 90) {
     showErrorMessage('Wrong age',
       'Age must be more than 18 and less than 90',
-      'error');
+      notificationError);
 
     return;
   }
 
   showErrorMessage('Success',
     'Employee was created',
-    'success');
+    notificationSuccess);
 
   tbody.insertAdjacentHTML('afterbegin', `
   <tr>
@@ -168,11 +179,11 @@ function showErrorMessage(title, description, type) {
   notification.setAttribute('data-qa', 'notification');
 
   switch (type) {
-    case 'success':
-      notification.classList.add('success');
+    case notificationSuccess:
+      notification.classList.add(notificationSuccess);
       break;
-    case 'error':
-      notification.classList.add('error');
+    case notificationError:
+      notification.classList.add(notificationError);
       break;
   }
 
@@ -207,11 +218,9 @@ tbody.addEventListener('dblclick', e => {
     const newInput = document.createElement('INPUT');
 
     const handleInput = () => {
-      if (newInput.value.trim() === '') {
-        target.innerText = originalText;
-      } else {
-        target.innerText = newInput.value;
-      }
+      newInput.value.trim() === ''
+        ? target.innerText = originalText
+        : target.innerText = newInput.value;
 
       if (newInput.classList.contains('salary')) {
         target.innerText
