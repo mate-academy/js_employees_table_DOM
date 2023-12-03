@@ -1,208 +1,205 @@
 'use strict';
 
-const thead = document.querySelector('thead');
-const mainColumn = thead.querySelector('tr');
-const tBody = document.querySelector('tbody');
-const form = createForm();
-
-let sortingOrder = null;
-let currentColumn = null;
-
-const toNumber = stringWithSymbols => parseFloat(stringWithSymbols.replace(/[$,]/g, ''));
-
-const sortRow = rowToSort => {
-  while (tBody.firstChild) {
-    tBody.removeChild(tBody.firstChild);
-  }
-
-  rowToSort.forEach(row => {
-    tBody.appendChild(row);
-  });
-};
-
-const sortAscDesc = index => {
-  sortingOrder = currentColumn !== index ? 'asc' : sortingOrder === 'asc' ? 'desc' : 'asc';
-  currentColumn = index;
-};
-
-const createForm = () => {
+document.addEventListener('DOMContentLoaded', function() {
+  const table = document.querySelector('table tbody');
+  const tableHeaders = document.querySelectorAll('table th');
   const form = document.createElement('form');
-  form.classList.add('new-employee-form');
-  form.innerHTML =
-    '<label>Name: <input name="name" type="text" data-qa="name"></label>' +
-    '<label>Position: <input name="position" type="text" data-qa="position"></label>' +
-    '<label>Office:' +
-    '<select name="office" data-qa="office">' +
-    '<option></option>' +
-    '<option value="Tokyo">Tokyo</option>' +
-    '<option value="Singapore">Singapore</option>' +
-    '<option value="London">London</option>' +
-    '<option value="New York">New York</option>' +
-    '<option value="Edinburgh">Edinburgh</option>' +
-    '<option value="San Francisco">San Francisco</option>' +
-    '</select>' +
-    '</label>' +
-    '<label>Age: <input name="age" type="number" data-qa="age"></label>' +
-    '<label>Salary: <input name="salary" type="number" data-qa="salary"></label>' +
-    '<button>Save to table</button>';
-  document.body.appendChild(form);
-  return form;
-};
 
-const fieldValues = form.querySelectorAll('[data-qa]');
-const fieldsArray = [...fieldValues];
+  form.className = 'new-employee-form';
 
-const pushNotification = (title, description, type) => {
+  const formInputs = [
+    {
+      label: 'Name', type: 'text', name: 'name', qa: 'name',
+    },
+    {
+      label: 'Position', type: 'text', name: 'position', qa: 'position',
+    },
+    {
+      label: 'Office',
+      type: 'select',
+      name: 'office',
+      qa: 'office',
+      options: ['Tokyo', 'Singapore', 'London',
+        'New York', 'Edinburgh', 'San Francisco'],
+    },
+    {
+      label: 'Age', type: 'number', name: 'age', qa: 'age',
+    },
+    {
+      label: 'Salary', type: 'number', name: 'salary', qa: 'salary',
+    },
+  ];
+
   const notification = document.createElement('div');
-  notification.classList.add('notification', type);
+
   notification.setAttribute('data-qa', 'notification');
-  notification.style.top = '15px';
-  notification.style.right = '15px';
-  const titleContext = document.createElement('h2');
-  titleContext.classList.add('title');
-  titleContext.innerText = title;
-  const descriptionContext = document.createElement('p');
-  descriptionContext.innerText = description;
-  notification.appendChild(titleContext);
-  notification.appendChild(descriptionContext);
+
+  let editableCell = null;
+
+  const createFormInput = ({ label, type, name, qa, options }) => {
+    const inputWrapper = document.createElement('label');
+    const input = type === 'select'
+      ? document.createElement('select')
+      : document.createElement('input');
+
+    input.name = name;
+    input.type = type;
+
+    if (type === 'select') {
+      options.forEach((optionText) => {
+        const option = document.createElement('option');
+
+        option.value = optionText;
+        option.text = optionText;
+        input.appendChild(option);
+      });
+    }
+
+    inputWrapper.innerHTML = `${label}: `;
+    inputWrapper.appendChild(input);
+    inputWrapper.setAttribute('data-qa', qa);
+    form.appendChild(inputWrapper);
+
+    return input;
+  };
+
+  formInputs.forEach(createFormInput);
+
+  const submitButton = document.createElement('button');
+
+  submitButton.type = 'button';
+  submitButton.textContent = 'Save to table';
+  submitButton.addEventListener('click', handleFormSubmit);
+  form.appendChild(submitButton);
+
+  document.body.appendChild(form);
   document.body.appendChild(notification);
-  setTimeout(() => {
-    document.body.removeChild(notification);
-  }, 2000);
-};
 
-thead.addEventListener('click', e => {
-  const target = e.target;
+  tableHeaders.forEach((header, index) => {
+    header.addEventListener('click', () => sortTable(index));
+  });
 
-  for (let i = 0; i < mainColumn.children.length; i++) {
-    if (target === mainColumn.children[i] && i > 2) {
-      sortAscDesc(i);
-      const sortedRows = rowsArray.sort((a, b) => {
-        const numA = toNumber(a.cells[i].innerText);
-        const numB = toNumber(b.cells[i].innerText);
-        return sortingOrder === 'asc' ? numA - numB : numB - numA;
-      });
-      sortRow(sortedRows);
+  table.addEventListener('click', (event) => selectRow(event));
+
+  table.addEventListener('dblclick', (event) => startEditingCell(event));
+
+  function handleFormSubmit() {
+    const formData = {};
+    let isValid = true;
+
+    formInputs.forEach(({ name, type, qa }) => {
+      const input = form.querySelector(`[name="${name}"]`);
+
+      formData[name] = type === 'number'
+        ? parseFloat(input.value)
+        : input.value;
+
+      if (!input.checkValidity()) {
+        isValid = false;
+
+        showNotification(
+          'error', 'Invalid form data. Please check the inputs.',
+        );
+      }
+    });
+
+    if (isValid) {
+      addEmployeeToTable(formData);
+      showNotification('success', 'Employee added successfully.');
+      form.reset();
     }
-
-    if (target === mainColumn.children[i] && i <= 2) {
-      sortAscDesc(i);
-      const sortedRows = rowsArray.sort((a, b) => {
-        const nameA = a.cells[i].innerText.toLowerCase();
-        const nameB = b.cells[i].innerText.toLowerCase();
-        return sortingOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-      });
-      sortRow(sortedRows);
-    }
-
-    rowsArray.forEach(element => element.classList.remove('active'));
   }
-});
 
-tBody.addEventListener('click', e => {
-  const target = e.target;
-  if (target.tagName === 'TD') {
-    rowsArray.forEach(element => element.classList.remove('active'));
-    target.parentElement.classList.add('active');
+  function addEmployeeToTable(employee) {
+    const newRow = document.createElement('tr');
+
+    Object.values(employee).forEach((value) => {
+      const cell = document.createElement('td');
+
+      cell.textContent = value;
+      newRow.appendChild(cell);
+    });
+    table.appendChild(newRow);
   }
-  rowsArray = Array.from(tBody.rows);
-});
 
-form.addEventListener('click', e => {
-  const target = e.target;
-  const button = form.querySelector('button');
+  function showNotification(type, message) {
+    notification.className = type;
+    notification.textContent = message;
 
-  if (target === button) {
-    e.preventDefault();
+    setTimeout(() => {
+      notification.textContent = '';
+    }, 3000);
+  }
 
-    const newRow = tBody.insertRow(tBody.rows.length);
-    const fields = {
-      name: fieldsArray[0].value,
-      position: fieldsArray[1].value,
-      office: fieldsArray[2].value,
-      age: fieldsArray[3].value,
-      salary: fieldsArray[4].value,
-    };
+  function sortTable(columnIndex) {
+    const rows = Array.from(document.querySelectorAll('table tbody tr'));
 
-    for (const [key, value] of Object.entries(fields)) {
-      if (!value.length) {
-        pushNotification('Error', 'Fill all lines', 'error');
-        return;
-      }
+    const sortOrder = rows[0].children[columnIndex]
+      .textContent.toLowerCase() === 'name' ? 1 : -1;
 
-      if (key === 'name' && value.length < 4) {
-        pushNotification('Name is too short', 'Name has to be at least 4 characters', 'error');
-        return;
-      }
+    rows.sort((a, b) => {
+      const aValue = a.children[columnIndex].textContent;
+      const bValue = b.children[columnIndex].textContent;
 
-      if (key === 'age' && (value < 18 || value > 90)) {
-        pushNotification('Wrong age', 'Age has to be between 18 and 60 years', 'error');
-        return;
-      }
-    }
-
-    fieldsArray.forEach(field => {
-      const cell = newRow.insertCell();
-      if (field.name === 'salary') {
-        const formattedSalary = '$' + field.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        cell.innerText = formattedSalary;
+      if (aValue < bValue) {
+        return -1 * sortOrder;
+      } else if (aValue > bValue) {
+        return 1 * sortOrder;
       } else {
-        cell.innerText = field.value;
+        return 0;
       }
     });
 
-    pushNotification('Hooray!', 'New employee is successfully added to the table', 'success');
+    const tbody = document.querySelector('table tbody');
 
-    rowsArray = Array.from(tBody.rows);
-    form.reset();
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
   }
-});
 
-tBody.addEventListener('dblclick', e => {
-  const target = e.target;
+  function selectRow(event) {
+    const selectedRow = event.target.closest('tr');
 
-  if (target.tagName === 'TD') {
-    const parentRow = target.parentElement;
-    const originalText = target.innerText;
-    const newInput = document.createElement('INPUT');
+    if (selectedRow && !selectedRow.classList.contains('active')) {
+      const rows = document.querySelectorAll('table tbody tr');
 
-    const handleInput = () => {
-      if (newInput.value.trim() === '') {
-        target.innerText = originalText;
-      } else {
-        target.innerText = newInput.value;
-      }
+      rows.forEach(row => row.classList.remove('active'));
 
-      if (newInput.classList.contains('salary')) {
-        target.innerText = '$' + newInput.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      }
-    };
-
-    target.innerText = '';
-    newInput.classList.add('cell-input');
-    newInput.value = originalText;
-
-    if (target === parentRow.children[3]) {
-      newInput.setAttribute('type', 'number');
+      selectedRow.classList.add('active');
     }
+  }
 
-    if (target === parentRow.children[4]) {
-      newInput.value = Number(originalText.replace(/\D/g, ''));
-      newInput.setAttribute('type', 'number');
-      newInput.classList.add('salary');
+  function startEditingCell(event) {
+    const cell = event.target.closest('td');
+
+    if (cell && !editableCell) {
+      editableCell = cell;
+
+      const oldValue = cell.textContent;
+      const input = document.createElement('input');
+
+      input.className = 'cell-input';
+      input.value = oldValue;
+
+      input.addEventListener('blur', () => {
+        saveChanges(input.value);
+      });
+
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          saveChanges(input.value);
+        }
+      });
+
+      cell.textContent = '';
+      cell.appendChild(input);
+      input.focus();
     }
+  }
 
-    target.appendChild(newInput);
-    newInput.focus();
-
-    newInput.addEventListener('blur', () => {
-      handleInput();
-    });
-
-    newInput.addEventListener('keypress', press => {
-      if (press.key === 'Enter') {
-        handleInput();
-      }
-    });
+  function saveChanges(newValue) {
+    if (editableCell) {
+      editableCell.textContent = newValue;
+      editableCell = null;
+    }
   }
 });
