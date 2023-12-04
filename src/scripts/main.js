@@ -94,12 +94,11 @@ document.addEventListener('DOMContentLoaded', function() {
         ? parseFloat(input.value)
         : input.value;
 
-      if (!input.checkValidity()) {
+      if (!input.checkValidity() || input.value.trim() === '') {
         isValid = false;
 
-        showNotification(
-          'error', 'Invalid form data. Please check the inputs.',
-        );
+        showNotification('error',
+          'All fields are required. Please fill in all the inputs.');
       }
     });
 
