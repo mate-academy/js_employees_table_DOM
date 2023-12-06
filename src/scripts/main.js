@@ -240,12 +240,12 @@ function handleInput(input, target, originalText) {
 
 body.append(form);
 
-[...employeeRows].forEach((employeeCell) =>
-  employeeCell.addEventListener('click', () => {
+[...employeeRows].forEach((employeeRow) =>
+  employeeRow.addEventListener('click', () => {
     [...employeeRows].forEach((elem) => {
       elem.classList = '';
     });
-    employeeCell.classList.add('active');
+    employeeRow.classList.add('active');
   }),
 );
 
