@@ -30,7 +30,6 @@ function stringToNumber(currencyString) {
 
 function numberToDollarString(input) {
   const number = Number(input);
-
   const currencyString = number.toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD',
