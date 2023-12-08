@@ -155,7 +155,9 @@ function handleCellEdit(e) {
   const editedCell = e.target;
   const originalValue = editedCell.innerText;
   const newInput = document.createElement('input');
-  const newInputType = !toNum(editedCell.innerText) ? 'text' : 'number';
+  const newInputType = Number.isNaN(toNum(editedCell.innerText))
+    ? 'text'
+    : 'number';
 
   newInput.classList.add('cell-input');
   newInput.value = originalValue;
