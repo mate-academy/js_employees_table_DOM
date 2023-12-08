@@ -33,6 +33,9 @@ const notificationMessage = {
     type: 'error',
   },
 };
+const AGE_COLUMN_INDEX = 3;
+const SALARY_COLUMN_INDEX = 4;
+const SALARY_FIELD_NAME = 'salary';
 
 body.append(form);
 
@@ -163,7 +166,8 @@ function showNotification(message) {
 }
 
 function handeleDoubleClick(target) {
-  const parentRow = target.parentElement;
+  const age = target.parentElement.children[AGE_COLUMN_INDEX];
+  const salary = target.parentElement.children[SALARY_COLUMN_INDEX];
   const originalText = target.innerText;
   const newInput = document.createElement('INPUT');
 
@@ -175,11 +179,11 @@ function handeleDoubleClick(target) {
     tableHeader.rows[0].cells[target.cellIndex].innerText.toLocaleLowerCase(),
   );
 
-  if (target === parentRow.children[3]) {
+  if (target === age) {
     newInput.setAttribute('type', 'number');
   }
 
-  if (target === parentRow.children[4]) {
+  if (target === salary) {
     newInput.value = convertToNumber(originalText);
     newInput.setAttribute('type', 'number');
   }
@@ -189,7 +193,7 @@ function handeleDoubleClick(target) {
   newInput.focus();
 
   const handleInput = () => {
-    if (newInput.name === 'salary') {
+    if (newInput.name === SALARY_FIELD_NAME) {
       target.innerText
         = '$' + newInput.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     } else {
@@ -218,7 +222,7 @@ tableBody.addEventListener('click', (e) => {
   const targetRow = e.target.closest('tr');
 
   if (targetRow) {
-    [...tableBody.rows].forEach((row) => {
+    Array.from(tableBody.rows).forEach((row) => {
       row.classList.remove('active');
     });
 
