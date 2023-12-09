@@ -7,11 +7,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const form = document.createElement('form');
   const notification = document.createElement('div');
 
-  let sortOrder = -1;
+  let sortOrder = 1;
   let editedCell = false;
 
   notification.setAttribute('data-qa', 'notification');
-
   form.className = 'new-employee-form';
 
   const formInputs = [
@@ -205,12 +204,12 @@ document.addEventListener('DOMContentLoaded', function() {
     sortOrder = -sortOrder;
 
     rows.sort((a, b) => {
-      const aValue
-      = parseFloat(a.children[index].textContent.replace(/[$,]/g, ''))
-      || a.children[index].textContent;
-      const bValue
-      = parseFloat(b.children[index].textContent.replace(/[$,]/g, ''))
-      || b.children[index].textContent;
+      const parseValue = (value) => {
+        return parseFloat(value.replace(/[$,]/g, '')) || value;
+      };
+
+      const aValue = parseValue(a.children[index].textContent);
+      const bValue = parseValue(b.children[index].textContent);
 
       if (aValue < bValue) {
         return 1 * sortOrder;
