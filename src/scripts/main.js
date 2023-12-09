@@ -18,19 +18,19 @@ document.addEventListener('DOMContentLoaded', function() {
     {
       label: 'Name',
       type: 'text',
-      name: 'name',
+      fieldName: 'name',
       qa: 'name',
     },
     {
       label: 'position',
       type: 'text',
-      name: 'position',
+      fieldName: 'position',
       qa: 'position',
     },
     {
       label: 'Office',
       type: 'select',
-      name: 'office',
+      fieldName: 'office',
       qa: 'office',
       options: ['Tokyo', 'Singapore', 'London', 'New York',
         'Edinburgh', 'San Francisco'],
@@ -38,24 +38,24 @@ document.addEventListener('DOMContentLoaded', function() {
     {
       label: 'age',
       type: 'number',
-      name: 'age',
+      fieldName: 'age',
       qa: 'age',
     },
     {
       label: 'salary',
       type: 'number',
-      name: 'salary',
+      fieldName: 'salary',
       qa: 'salary',
     },
   ];
 
-  const createForm = ({ label, type, name, qa, options }) => {
+  const createForm = ({ label, type, fieldName, qa, options }) => {
     const inputLabel = document.createElement('label');
     const input = type === 'select'
       ? document.createElement('select')
       : document.createElement('input');
 
-    input.name = name;
+    input.name = fieldName;
 
     if (type === 'select') {
       options.forEach((elem) => {
@@ -70,13 +70,13 @@ document.addEventListener('DOMContentLoaded', function() {
       input.type = type;
     }
 
-    if (name === 'name') {
+    if (fieldName === 'name') {
       input.setAttribute('minLength', '4');
       input.setAttribute('maxLength', '50');
       input.setAttribute('placeholder', 'length between 4-50');
     }
 
-    if (name === 'age') {
+    if (fieldName === 'age') {
       input.setAttribute('min', '18');
       input.setAttribute('max', '90');
       input.setAttribute('placeholder', 'age between 18-90');
@@ -131,10 +131,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const newEmployee = {};
     let isCorrect = true;
 
-    formInputs.forEach(({ name }) => {
-      const input = form.querySelector(`[name='${name}']`);
+    formInputs.forEach(({ fieldName }) => {
+      const input = form.querySelector(`[name='${fieldName}']`);
 
-      newEmployee[name] = name === 'salary'
+      newEmployee[fieldName] = fieldName === 'salary'
         ? `$${parseFloat(input.value).toLocaleString(
           'en-US')}`
         : input.value;
@@ -205,8 +205,12 @@ document.addEventListener('DOMContentLoaded', function() {
     sortOrder = -sortOrder;
 
     rows.sort((a, b) => {
-      const aValue = a.children[index].textContent;
-      const bValue = b.children[index].textContent;
+      const aValue
+      = parseFloat(a.children[index].textContent.replace(/[$,]/g, ''))
+      || a.children[index].textContent;
+      const bValue
+      = parseFloat(b.children[index].textContent.replace(/[$,]/g, ''))
+      || b.children[index].textContent;
 
       if (aValue < bValue) {
         return 1 * sortOrder;
