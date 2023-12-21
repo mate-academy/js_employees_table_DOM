@@ -157,13 +157,13 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   }, 2000);
 };
 
-// eslint-disable-next-line no-unused-vars
-const handleSubmit = (e) => {
+const form = document.querySelector('.new-employee-form');
+
+form.addEventListener('submit', (e) => {
   const tableBody = document.querySelector('tbody');
 
   e.preventDefault();
 
-  const form = document.querySelector('form');
   const dataFromServer = new FormData(form);
 
   const data = Object.fromEntries(dataFromServer.entries());
@@ -239,4 +239,4 @@ const handleSubmit = (e) => {
   );
 
   form.reset();
-};
+});
