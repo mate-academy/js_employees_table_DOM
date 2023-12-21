@@ -92,7 +92,7 @@ tr.active {
   position: relative;
   margin-left: 24px;
 
-  &:before {
+  &::before {
     position: absolute;
     content: "New employee";
     color: #fff;
