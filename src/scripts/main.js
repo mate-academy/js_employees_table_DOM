@@ -237,7 +237,6 @@ employeeForm.addEventListener('submit', (e) => {
 
 const indexCompare = [];
 let validCell;
-let isThereInput = false;
 
 const changeOnInput = (e, prev) => {
   let cellWidth = getComputedStyle(e.target).width;
@@ -266,13 +265,10 @@ const changeOnInput = (e, prev) => {
 
     case 3:
     case 4:
-      if (!isThereInput) {
-        e.target.innerHTML = `
-          <input type="number" class="cell-input" placeholder="${prev}">
-        `;
-        cellWidth = `${parseFloat(cellWidth) + 30}px`;
-        isThereInput = true;
-      }
+      e.target.innerHTML = `
+        <input type="number" class="cell-input" placeholder="${prev}">
+      `;
+      cellWidth = `${parseFloat(cellWidth) + 30}px`;
       break;
   }
 
@@ -358,7 +354,6 @@ const saveChangesOnTable = (e, prev) => {
   if (!validCell) {
     e.target.style.border = 'none';
     indexCompare.length = 0;
-    isThereInput = false;
 
     return editCells(e, prev);
   }
