@@ -363,17 +363,22 @@ tbody.addEventListener('dblclick', (e) => {
 
     input = cellText;
 
-    cell.innerHTML = `
+    cell.removeChild(cell.firstChild);
+
+    cell.insertAdjacentHTML('beforeend', `
       <input
         type="text"
         name="name"
         class="cell-input"
         value="${cellText}"
-        onblur="handleOnBlur(event)"
-        oninput="handleChange(event)"
-        onkeyup="handleKeyUp(event)"
       >
-    `;
+    `);
+
+    const inputElement = cell.firstElementChild;
+
+    inputElement.addEventListener('blur', handleOnBlur);
+    inputElement.addEventListener('input', handleChange);
+    inputElement.addEventListener('keyup', handleKeyUp);
   }
 
   if (cell.cellIndex === 1) {
@@ -381,17 +386,22 @@ tbody.addEventListener('dblclick', (e) => {
 
     input = cellText;
 
-    cell.innerHTML = `
+    cell.removeChild(cell.firstChild);
+
+    cell.insertAdjacentHTML('beforeend', `
       <input
         type="text"
         name="position"
         class="cell-input"
         value="${cellText}"
-        onblur="handleOnBlur(event)"
-        oninput="handleChange(event)"
-        onkeyup="handleKeyUp(event)"
       >
-    `;
+    `);
+
+    const inputElement = cell.firstElementChild;
+
+    inputElement.addEventListener('blur', handleOnBlur);
+    inputElement.addEventListener('input', handleChange);
+    inputElement.addEventListener('keyup', handleKeyUp);
   }
 
   if (cell.cellIndex === 2) {
@@ -399,12 +409,11 @@ tbody.addEventListener('dblclick', (e) => {
 
     input = cellText;
 
-    cell.innerHTML = `
+    cell.removeChild(cell.firstChild);
+
+    cell.insertAdjacentHTML('beforeend', `
       <select
         name="office"
-        onblur="handleOnBlur(event)"
-        oninput="handleChange(event)"
-        onkeyup="handleKeyUp(event)"
         class="cell-input"
       >
         <option value="Tokyo" ${cellText === 'Tokyo' ? 'selected' : ''}>
@@ -434,7 +443,13 @@ tbody.addEventListener('dblclick', (e) => {
           San Francisco
         </option>
       </select>
-    `;
+    `);
+
+    const inputElement = cell.firstElementChild;
+
+    inputElement.addEventListener('blur', handleOnBlur);
+    inputElement.addEventListener('input', handleChange);
+    inputElement.addEventListener('keyup', handleKeyUp);
   }
 
   if (cell.cellIndex === 3) {
@@ -442,17 +457,22 @@ tbody.addEventListener('dblclick', (e) => {
 
     input = cellText;
 
-    cell.innerHTML = `
+    cell.removeChild(cell.firstChild);
+
+    cell.insertAdjacentHTML('beforeend', `
       <input
         type="number"
-        class="cell-input"
         name="age"
+        class="cell-input"
         value="${cellText}"
-        onblur="handleOnBlur(event)"
-        oninput="handleChange(event)"
-        onkeyup="handleKeyUp(event)"
       >
-    `;
+    `);
+
+    const inputElement = cell.firstElementChild;
+
+    inputElement.addEventListener('blur', handleOnBlur);
+    inputElement.addEventListener('input', handleChange);
+    inputElement.addEventListener('keyup', handleKeyUp);
   }
 
   if (cell.cellIndex === 4) {
@@ -460,16 +480,21 @@ tbody.addEventListener('dblclick', (e) => {
 
     input = cellText;
 
-    cell.innerHTML = `
+    cell.removeChild(cell.firstChild);
+
+    cell.insertAdjacentHTML('beforeend', `
       <input
         type="number"
-        class="cell-input"
         name="salary"
+        class="cell-input"
         value="${cellText}"
-        onblur="handleOnBlur(event)"
-        oninput="handleChange(event)"
-        onkeyup="handleKeyUp(event)"
       >
-    `;
+    `);
+
+    const inputElement = cell.firstElementChild;
+
+    inputElement.addEventListener('blur', handleOnBlur);
+    inputElement.addEventListener('input', handleChange);
+    inputElement.addEventListener('keyup', handleKeyUp);
   }
 });
