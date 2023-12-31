@@ -75,9 +75,9 @@ form.addEventListener('submit', (e) => {
     <td>${'$' + valueSalary}</td>
   `;
 
-  if (!formName.trim() || !formPosition || !formAge) {
+  if (!formName.trim() || !formAge) {
     errorNotification(10, 1000, 'Error!',
-    'All inputs must be filled!', 'error');
+      'All inputs must be filled!', 'error');
 
     return false;
   }
@@ -90,7 +90,7 @@ form.addEventListener('submit', (e) => {
     return false;
   }
 
-  if (formPosition.length === 0) {
+  if (formPosition.trim().length === 0) {
     errorNotification(10, 1000, 'Error!',
       `Position field cannot be empty!`, 'error');
 
