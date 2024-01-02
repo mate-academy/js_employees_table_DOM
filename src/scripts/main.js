@@ -1,6 +1,8 @@
 'use strict';
 
 // write code here
+const table = document.querySelector('table');
+const tBody = table.tBodies[0];
 // ADDING FORM
 const form = document.createElement('form');
 const body = document.querySelector('body');
@@ -77,7 +79,7 @@ form.append(button);
 body.firstElementChild.after(form);
 // END FORM
 
-document.addEventListener('click', (e) => {
+table.addEventListener('click', e => {
   if (e.target.parentElement.parentElement.tagName === 'THEAD') {
     sortTable(e.target);
   }
@@ -87,12 +89,10 @@ document.addEventListener('click', (e) => {
   }
 });
 
-document.addEventListener('submit', e => {
+form.addEventListener('submit', e => {
   e.preventDefault();
 
   if (validateForm()) {
-    const table = document.querySelector('table');
-    const tBody = table.tBodies[0];
     const newRow = tBody.insertRow(-1);
     const listOfValues = [];
 
@@ -111,7 +111,13 @@ document.addEventListener('submit', e => {
 
       newCell.textContent = listOfValues[i];
     }
+
+    form.reset();
   }
+});
+
+tBody.addEventListener('dblclick', e => {
+  handleDoubleClick(e.target);
 });
 
 function sortTable(head) {
@@ -127,8 +133,6 @@ function sortTable(head) {
   }
 
   // CREATE AND SORT ELEMENTS IN THE COLUMN
-  const table = document.querySelector('table');
-  const tBody = table.tBodies[0];
   const list = [];
 
   for (let i = 0; i < tBody.rows.length; i++) {
@@ -244,4 +248,46 @@ function validateForm() {
   body.append(notification);
 
   return true;
+}
+
+function handleDoubleClick(td) {
+  const text = td.innerText;
+  const input = document.createElement('input');
+  const age = td.parentElement.children[3];
+  const salary = td.parentElement.children[4];
+  const handleInput = () => {
+    if (input.name === 'salary') {
+      td.innerText = prepareSalary(input.value);
+    } else {
+      td.innerText = input.value || text;
+    }
+  };
+
+  td.innerText = '';
+
+  input.value = text;
+  input.className = 'cell-input';
+
+  if (td === age) {
+    input.type = 'number';
+  }
+
+  if (td === salary) {
+    input.value = parseFloat(text.replace(/[$,]/g, ''));
+    input.type = 'number';
+    input.name = 'salary';
+  }
+
+  td.append(input);
+  input.focus();
+
+  input.addEventListener('blur', () => {
+    handleInput();
+  });
+
+  input.addEventListener('keypress', key => {
+    if (key.key === 'Enter') {
+      handleInput();
+    }
+  });
 }
