@@ -259,7 +259,7 @@ function handleDoubleClick(td) {
     if (input.name === 'salary') {
       td.innerText = prepareSalary(input.value);
     } else {
-      td.innerText = input.value || text;
+      td.innerText = input.value.trim() || text;
     }
   };
 
