@@ -49,21 +49,23 @@ const checkValuesSorted = function(value1, value2) {
 
 Cypress.Commands.add('checkValuesSorted', (columnName, direction) => {
   cy.get(
-    `tr:nth-child(n) td:nth-child(${ColumnsNames[columnName.toLowerCase()]})`
-  ).then(($rowValues) => {
-    const columnValues = [...$rowValues].map((rowValue) =>
-      rowValue.innerText.replace('$', '').replace(',', ''));
+    `tr:nth-child(n) td:nth-child(${ColumnsNames[columnName.toLowerCase()]})`)
+    .then(($rowValues) => {
+      const columnValues = [...$rowValues].map((rowValue) =>
+        rowValue.innerText.replace('$', '').replace(',', ''));
 
-    for (let i = 1; i < columnValues.length; i++) {
-      if (direction === 'ASC') {
-        expect(checkValuesSorted(columnValues[i - 1], columnValues[i]))
-          .to.be.true;
-      } else if (direction === 'DESC') {
-        expect(checkValuesSorted(columnValues[i], columnValues[i - 1]))
-          .to.be.true;
+      for (let i = 1; i < columnValues.length; i++) {
+        if (direction === 'ASC') {
+          // eslint-disable-next-line no-unused-expressions
+          expect(checkValuesSorted(columnValues[i - 1], columnValues[i]))
+            .to.be.true;
+        } else if (direction === 'DESC') {
+          // eslint-disable-next-line no-unused-expressions
+          expect(checkValuesSorted(columnValues[i], columnValues[i - 1]))
+            .to.be.true;
+        }
       }
-    }
-  });
+    });
 });
 
 describe('Employees table', () => {
@@ -139,7 +141,7 @@ describe('Employees table', () => {
     cy.checkDataDoesntExist('Ada', 50000);
   });
 
-  it(`should have warning notification on position 
+  it(`should have warning notification on position
   field with invalid input`, () => {
     cy.get('[data-qa="name"]').type('Adam');
     cy.get('[data-qa="office"]').select('San Francisco');
