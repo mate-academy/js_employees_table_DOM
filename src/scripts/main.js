@@ -3,7 +3,7 @@
 // write code here
 const table = document.querySelector('table');
 const tBody = table.tBodies[0];
-// ADDING FORM
+// ADD FORM
 const form = document.createElement('form');
 const body = document.querySelector('body');
 const headerElements = document.querySelectorAll('thead tr th');
