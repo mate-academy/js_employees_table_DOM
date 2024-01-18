@@ -8,7 +8,6 @@ const tbody = document.querySelector('tbody');
 
 form.classList.add('new-employee-form');
 
-// Create input fields
 const fields = ['name', 'position', 'office', 'age', 'salary'];
 
 fields.forEach(field => {
@@ -43,14 +42,12 @@ fields.forEach(field => {
   form.appendChild(label);
 });
 
-// Create submit button
 const submitButton = document.createElement('button');
 
 submitButton.type = 'submit';
 submitButton.textContent = 'Save to table';
 form.appendChild(submitButton);
 
-// Append form to the document body
 document.body.appendChild(form);
 
 form.addEventListener('submit', e => {
@@ -111,7 +108,6 @@ form.addEventListener('submit', e => {
     const cell = document.createElement('td');
     let value = form.elements[field].value;
 
-    // If the field is salary, add a dollar sign to the value
     if (field === 'salary') {
       value = `$${value}`;
     }
@@ -168,7 +164,6 @@ users.forEach(user => {
 });
 
 const pushNotification = (posTop, posRight, title, description, type) => {
-  // write code here
   const notification = document.createElement('div');
 
   notification.classList.add('notification');
