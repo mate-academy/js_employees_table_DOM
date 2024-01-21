@@ -4,26 +4,26 @@ const body = document.querySelector('body');
 const table = document.querySelector('table');
 const header = document.querySelector('thead tr');
 const tbody = document.querySelector('tbody');
-const form = document.createElement('form');
+const Form = document.createElement('form');
 let isSortingAscDesc = false;
 let selectedIndexColumnForSort = -1;
 const activeTrRow = [];
 
-const formFieldsSettings = [
+const formFieldsAttributes = [
   {
-    lab: 'Name:', dSet: 'name', elem: 'input', type: 'text',
+    label: 'Name:', dataSet: 'name', element: 'input', type: 'text',
   },
   {
-    lab: 'Position:', dSet: 'position', elem: 'input', type: 'text',
+    label: 'Position:', dataSet: 'position', element: 'input', type: 'text',
   },
   {
-    lab: 'Office:', dSet: 'office', elem: 'select',
+    label: 'Office:', dataSet: 'office', element: 'select',
   },
   {
-    lab: 'Age:', dSet: 'age', elem: 'input', type: 'number',
+    label: 'Age:', dataSet: 'age', element: 'input', type: 'number',
   },
   {
-    lab: 'Salary:', dSet: 'salary', elem: 'input', type: 'number',
+    label: 'Salary:', dataSet: 'salary', element: 'input', type: 'number',
   },
 ];
 
@@ -38,7 +38,7 @@ const selectOffices = [
 
 table.style.margin = '0 0 auto';
 
-createForm(form);
+createForm(Form);
 
 tbody.addEventListener('click', (e) => {
   const item = e.target.closest('tr');
@@ -76,10 +76,10 @@ header.addEventListener('click', (e) => {
     isSortingAscDesc = false;
   }
 
-  sortTableByColumnASC(index);
+  sortTableByColumn(index);
 });
 
-form.addEventListener('submit', (e) => {
+Form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const Name = e.target.name.value;
@@ -88,11 +88,21 @@ form.addEventListener('submit', (e) => {
   const Age = e.target.age.value;
   const Salary = e.target.salary.value;
 
-  if (Name.trim().length < 4) {
+  if (Name.trim().length < 5) {
     notification(
       'error',
       'Error',
       'The Name field must have at least 5 characters.',
+    );
+
+    return;
+  }
+
+  if (!Position.trim()) {
+    notification(
+      'error',
+      'Error',
+      'The Position field cannot be empty.',
     );
 
     return;
@@ -108,7 +118,18 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  const salar = '$' + (+Salary).toFixed(3).replace(/\./g, ',');
+  if (+Salary < 1) {
+    notification(
+      'error',
+      'Error',
+      'The Salary field must be no less than 1 dollar',
+    );
+
+    return;
+  }
+
+  const numberFormatter = Intl.NumberFormat('en-US');
+  const salar = `$${numberFormatter.format(Salary)}`;
 
   const newEmployee = {
     name: Name.trim(),
@@ -138,12 +159,9 @@ form.addEventListener('submit', (e) => {
   e.target.salary.value = '';
 });
 
-function sortTableByColumnASC(index) {
+function sortTableByColumn(index) {
   const activeRows = document.querySelectorAll('.active');
-
-  const sortArr = (index === 4)
-    ? sortBySalaryColumn(index)
-    : sortByRestColumns(index);
+  const sortArr = sortByColumn(index);
 
   for (let y = 0; y < [...tbody.children].length; y++) {
     for (let x = 0; x < [...tbody.children][y].children.length; x++) {
@@ -160,26 +178,28 @@ function sortTableByColumnASC(index) {
   }
 }
 
-function sortBySalaryColumn(index) {
-  return (isSortingAscDesc)
-    ? [...tbody.children]
-      .map(r => [...r.children].map(c => c.textContent))
-      .sort((it1, it2) => (+it2[index].slice(1).replace(/,/g, '.'))
-          - (+it1[index].slice(1).replace(/,/g, '.')))
-    : [...tbody.children]
-      .map(r => [...r.children].map(c => c.textContent))
-      .sort((it1, it2) => (+it1[index].slice(1).replace(/,/g, '.'))
-          - (+it2[index].slice(1).replace(/,/g, '.')));
+function sortByColumn(index) {
+  const arr = [...tbody.children]
+    .map(r => [...r.children].map(c => c.textContent))
+    .sort((a, b) => {
+      const [it1, it2] = isSortingAscDesc ? [b, a] : [a, b];
+
+      switch (index) {
+        case 4: {
+          return formattingSalaryForSort(it1[index])
+            - (formattingSalaryForSort(it2[index]));
+        }
+
+        default:
+          return it1[index].localeCompare(it2[index]);
+      }
+    });
+
+  return arr;
 }
 
-function sortByRestColumns(index) {
-  return (isSortingAscDesc)
-    ? [...tbody.children]
-      .map(r => [...r.children].map(c => c.textContent))
-      .sort((it1, it2) => it2[index].localeCompare(it1[index]))
-    : [...tbody.children]
-      .map(r => [...r.children].map(c => c.textContent))
-      .sort((it1, it2) => it1[index].localeCompare(it2[index]));
+function formattingSalaryForSort(str) {
+  return +str.slice(1).replace(/,/g, '.');
 }
 
 function isActiveRow(indexColumn) {
@@ -188,70 +208,70 @@ function isActiveRow(indexColumn) {
     .every(item => item);
 }
 
-function createForm(f) {
-  f.className = 'new-employee-form';
+function createForm(form) {
+  form.className = 'new-employee-form';
 
-  for (const fS of formFieldsSettings) {
-    const { lab, dSet, elem, type } = fS;
-    const label = document.createElement('label');
+  for (const fieldAttributes of formFieldsAttributes) {
+    const { label, dataSet, element, type } = fieldAttributes;
+    const Label = document.createElement('label');
 
-    label.textContent = lab;
+    Label.textContent = label;
 
-    const input = document.createElement(elem);
+    const input = document.createElement(element);
 
-    if (elem === 'select') {
-      input.name = dSet;
-      label.dataset.qa = dSet;
+    if (element === 'select') {
+      input.name = dataSet;
+      input.dataset.qa = dataSet;
 
-      for (const selOffice of selectOffices) {
+      for (const selectOffice of selectOffices) {
         const option = document.createElement('option');
 
-        option.textContent = selOffice;
+        option.textContent = selectOffice;
         input.required = true;
         input.append(option);
       }
     } else {
       input.type = type;
-      input.name = dSet;
-      label.dataset.qa = dSet;
+      input.name = dataSet;
+      input.dataset.qa = dataSet;
       input.required = true;
     }
 
-    label.append(input);
+    Label.append(input);
 
-    f.append(label);
+    form.append(Label);
   }
 
   const button = document.createElement('button');
 
   button.type = 'submit';
   button.textContent = 'Save to Table';
-  f.append(button);
+  form.append(button);
 
-  body.append(f);
+  body.append(form);
 }
 
-function notification(succesRes, title, text) {
-  const notific = document.createElement('div');
+function notification(typeClass, titlE, text) {
+  const notificationBlock = document.createElement('div');
 
-  notific.dataset.qa = 'notification';
-  notific.className = `notification ${succesRes}`;
+  notificationBlock.dataset.qa = 'notification';
+  notificationBlock.className = `notification ${typeClass}`;
 
-  const titl = document.createElement('h2');
+  const title = document.createElement('h2');
 
-  titl.classList = 'title';
-  titl.textContent = title;
-  titl.style.whiteSpace = 'nowrap';
-  notific.append(titl);
+  title.classList = 'title';
+  title.textContent = titlE;
+  title.style.whiteSpace = 'nowrap';
+  notificationBlock.append(title);
 
   const desc = document.createElement('p');
 
   desc.textContent = text;
-  notific.append(desc);
+  notificationBlock.append(desc);
 
-  body.append(notific);
+  body.append(notificationBlock);
 
   setTimeout(() => {
-    notific.remove();
+    notificationBlock.remove();
   }, 3000);
 }
