@@ -16,6 +16,101 @@ let employees = [...allRows].splice(1);
 
 employees.pop();
 
+const notification = document.createElement('div');
+
+let title;
+let description;
+
+notification.dataset.qa = 'notification';
+notification.classList.add('notification');
+
+function errorNotification() {
+  title = 'Error message';
+  description = 'Data is invalid';
+
+  notification.innerHTML = `
+    <h2>${title}</h2>
+    <p>${description}</p>
+    `;
+
+  notification.classList.add('error');
+  notification.classList.remove('success');
+  table.after(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 2000);
+}
+
+function successNotification() {
+  title = 'Success message';
+  description = 'Data is valid';
+
+  notification.innerHTML = `
+    <h2>${title}</h2>
+    <p>${description}</p>
+  `;
+
+  notification.classList.add('success');
+  notification.classList.remove('error');
+  table.after(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 2000);
+}
+
+function cellValidation(currentCellInput, currentElement, currentText) {
+  let newText = currentCellInput.value;
+
+  if (!newText) {
+    currentCellInput.remove();
+    currentElement.innerText = currentText;
+
+    return;
+  }
+
+  if (isNaN(convertToNumber(currentText))
+    && !isNaN(convertToNumber(newText))) {
+    errorNotification();
+    currentElement.innerText = currentText;
+
+    return;
+  }
+
+  if (!isNaN(convertToNumber(currentText))
+    && isNaN(convertToNumber(newText))) {
+    errorNotification();
+    currentElement.innerText = currentText;
+
+    return;
+  }
+
+  if (!currentText.includes('$') && !isNaN(convertToNumber(currentText))
+    && ((convertToNumber(newText)) < minAge
+      || convertToNumber(newText) > maxAge)) {
+    errorNotification();
+    currentElement.innerText = currentText;
+
+    return;
+  }
+
+  if (currentText.includes('$') && !isNaN(convertToNumber(currentText))
+    && convertToNumber(newText) <= 0) {
+    errorNotification();
+    currentElement.innerText = currentText;
+
+    return;
+  }
+
+  if (currentText.includes('$') && !newText.includes('$')) {
+    newText = `$${newText}`;
+  }
+
+  currentCellInput.remove();
+  currentElement.innerText = newText;
+}
+
 function updateEmployeesList() {
   allRows = document.querySelectorAll('tr');
   employees = [...allRows].splice(1);
@@ -35,52 +130,39 @@ function selectEmployee() {
   });
 }
 
+const minNameLength = 4;
+const minAge = 18;
+const maxAge = 90;
+
 function addAbilityToEdit() {
   const tableCells = document.querySelectorAll('td');
 
   [...tableCells].forEach(element => {
-    const initialText = element.innerText;
+    let initialText;
 
     element.addEventListener('dblclick', () => {
       const cellInput = document.createElement('input');
-      const text = element.innerText;
+
+      initialText = element.innerText;
 
       element.innerText = '';
       element.append(cellInput);
       cellInput.classList.add('cell-input');
-      cellInput.value = text;
+      cellInput.value = initialText;
       cellInput.focus();
     });
 
-    element.addEventListener('blur', () => {
+    element.addEventListener('focusout', () => {
       const cellInput = document.querySelector('.cell-input');
-      const newText = cellInput.value;
 
-      if (!newText) {
-        cellInput.remove();
-        element.innerText = initialText;
-
-        return;
-      }
-
-      cellInput.remove();
-      element.innerText = newText;
+      cellValidation(cellInput, element, initialText);
     });
 
     element.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         const cellInput = document.querySelector('.cell-input');
-        const newText = cellInput.value;
 
-        if (!newText) {
-          cellInput.remove();
-          element.innerText = initialText;
-
-          return;
-        }
-
-        cellInput.remove();
-        element.innerText = newText;
+        cellValidation(cellInput, element, initialText);
       }
     });
   });
@@ -142,9 +224,6 @@ form.innerHTML = `
 
 table.after(form);
 
-form.method = 'POST';
-form.action = '/';
-
 form.classList.add('new-employee-form');
 
 const saveButton = document.querySelector('button');
@@ -172,43 +251,13 @@ saveButton.addEventListener('click', () => {
     </tr>
   `;
 
-  let title;
-  let description;
-
-  const notification = document.createElement('div');
-
-  setTimeout(() => {
-    notification.remove();
-  }, 2000);
-
-  notification.dataset.qa = 'notification';
-  notification.classList.add('notification');
-
-  if (employeeName.length < 4 || age < 18 || age > 90) {
-    title = 'Error message';
-    description = 'Data is invalid';
-
-    notification.innerHTML = `
-    <h2>${title}</h2>
-    <p>${description}</p>
-    `;
-
-    notification.classList.add('error');
-    table.after(notification);
+  if (employeeName.length < minNameLength || age < minAge || age > maxAge) {
+    errorNotification();
 
     return;
   }
 
-  title = 'Success message';
-  description = 'Data is valid';
-
-  notification.innerHTML = `
-    <h2>${title}</h2>
-    <p>${description}</p>
-  `;
-
-  notification.classList.add('success');
-  table.after(notification);
+  successNotification();
   tableBody.append(newRow);
   updateEmployeesList();
   form.reset();
@@ -229,7 +278,8 @@ tableHead.addEventListener('click', e => {
         case false:
           employees.sort((employee1, employee2) => {
             return convertToNumber(employee1.children[4].innerText)
-              > convertToNumber(employee2.children[4].innerText) ? 1 : -1;
+              > convertToNumber(employee2.children[4]
+                .innerText) ? 1 : -1;
           });
 
           salaryClicked = true;
@@ -238,7 +288,8 @@ tableHead.addEventListener('click', e => {
         case true:
           employees.sort((employee1, employee2) => {
             return convertToNumber(employee1.children[4].innerText)
-              < convertToNumber(employee2.children[4].innerText) ? 1 : -1;
+              < convertToNumber(employee2.children[4]
+                .innerText) ? 1 : -1;
           });
 
           salaryClicked = false;
