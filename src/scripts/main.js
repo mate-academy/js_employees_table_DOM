@@ -232,7 +232,7 @@ saveButton.addEventListener('submit', (e) => {
   e.preventDefault();
 });
 
-saveButton.addEventListener('click', () => {
+saveButton.addEventListener('click', (e) => {
   const newRow = document.createElement('tr');
 
   const employeeName = form.children[0].firstElementChild.value;
@@ -251,18 +251,22 @@ saveButton.addEventListener('click', () => {
     </tr>
   `;
 
-  if (employeeName.length < minNameLength || age < minAge || age > maxAge) {
+  if (employeeName.length < minNameLength || age < minAge || age > maxAge
+    || !isNaN(+position) || !isNaN(+employeeName)) {
+    e.preventDefault();
     errorNotification();
+    form.reset();
 
     return;
   }
 
   successNotification();
   tableBody.append(newRow);
-  updateEmployeesList();
   form.reset();
-  selectEmployee();
+
   addAbilityToEdit();
+  updateEmployeesList();
+  selectEmployee();
 });
 
 let salaryClicked = false;
