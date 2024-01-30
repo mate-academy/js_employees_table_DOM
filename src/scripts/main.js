@@ -1,3 +1,4 @@
+/* eslint-disable no-tabs */
 'use strict';
 
 function convertToNumber(text) {
@@ -24,9 +25,9 @@ let description;
 notification.dataset.qa = 'notification';
 notification.classList.add('notification');
 
-function errorNotification() {
-  title = 'Error message';
-  description = 'Data is invalid';
+function errorNotification(data = 'Data') {
+  title = 'Error!';
+  description = `${data} is invalid`;
 
   notification.innerHTML = `
     <h2>${title}</h2>
@@ -43,7 +44,7 @@ function errorNotification() {
 }
 
 function successNotification() {
-  title = 'Success message';
+  title = 'Success!';
   description = 'Data is valid';
 
   notification.innerHTML = `
@@ -97,7 +98,7 @@ function cellValidation(currentCellInput, currentElement, currentText) {
 
   if (currentText.includes('$') && !isNaN(convertToNumber(currentText))
     && convertToNumber(newText) <= 0) {
-    errorNotification();
+    errorNotification('Salary');
     currentElement.innerText = currentText;
 
     return;
@@ -251,11 +252,30 @@ saveButton.addEventListener('click', (e) => {
     </tr>
   `;
 
-  if (employeeName.length < minNameLength || age < minAge || age > maxAge
-    || !isNaN(+position) || !isNaN(+employeeName)) {
+  if (employeeName.length < minNameLength || !isNaN(+employeeName)) {
     e.preventDefault();
+    errorNotification('Name');
+
+    return;
+  }
+
+  if (age < minAge || age > maxAge) {
+    e.preventDefault();
+    errorNotification('Age');
+
+    return;
+  }
+
+  if (salary <= 0) {
+    e.preventDefault();
+    errorNotification('Salary');
+
+    return;
+  }
+
+  if (!isNaN(+position)) {
+    e.preventDefault('Position');
     errorNotification();
-    form.reset();
 
     return;
   }
