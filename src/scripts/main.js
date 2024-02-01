@@ -117,6 +117,10 @@ function createForm() {
       select.name = name;
       select.dataset.qa = dataQa;
 
+      if (required) {
+        select.setAttribute('required', true);
+      }
+
       if (options) {
         options.forEach((option) => {
           const theOption = document.createElement('option');
@@ -133,6 +137,10 @@ function createForm() {
       input.name = name;
       input.type = type;
       input.dataset.qa = dataQa;
+
+      if (required) {
+        input.setAttribute('required', true);
+      }
       theLabel.appendChild(input);
     }
 
@@ -149,13 +157,17 @@ function createForm() {
   submitButton.addEventListener('click', (e) => {
     e.preventDefault();
 
-    const formData = {};
-    const inputTypes = document.querySelectorAll('select, input');
+    if (form.checkValidity()) {
+      const formData = {};
+      const inputTypes = form.querySelectorAll('select, input');
 
-    inputTypes.forEach((input) => {
-      formData[input.name] = input.type === 'number' ? parseInt(input.value, 10) : input.value;
-    });
-    getValidForm(formData);
+      inputTypes.forEach((input) => {
+        formData[input.name] = input.type === 'number' ? parseInt(input.value, 10) : input.value;
+      });
+      getValidForm(formData);
+    } else {
+      form.reportValidity();
+    }
   });
 }
 
@@ -197,7 +209,13 @@ function getValidForm(formData) {
   }
 
   if (formData.age < 18 || formData.age > 90) {
-    getNotification('Please insert and age between 18 - 90', 'error');
+    getNotification('Please insert an age between 18 - 90', 'error');
+
+    return false;
+  }
+
+  if (formData.salary <= 0) {
+    getNotification('Please insert a valid salary', 'error');
 
     return false;
   }
