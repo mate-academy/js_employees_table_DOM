@@ -83,6 +83,10 @@ for (const category of categories) {
 
 const labels = [...document.querySelectorAll('label')];
 
+const locations = [
+  'Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco',
+];
+
 for (const label of labels) {
   const labelType = label.innerText.slice(0, -1).toLowerCase();
 
@@ -107,10 +111,6 @@ for (const label of labels) {
     }
   } else {
     const select = document.createElement('select');
-
-    const locations = [
-      'Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco',
-    ];
 
     locations.forEach(city => {
       const option = document.createElement('option');
@@ -143,13 +143,17 @@ form.addEventListener('submit', (e) => {
   const age = formData.get('age');
   const salary = formData.get('salary');
 
-  if (newName.length < 4) {
+  const minNameLength = 4;
+  const minAge = 18;
+  const maxAge = 90;
+
+  if (newName.length < minNameLength) {
     showNotification('warning', 'Name can not be less than 4 characters');
 
     return;
   };
 
-  if (age < 18 || age > 90) {
+  if (age < minAge || age > maxAge) {
     showNotification('error', 'Please enter correct age');
 
     return;
@@ -213,9 +217,10 @@ tbody.addEventListener('dblclick', (e) => {
   function handleInput() {
     if (isEmpty()) {
       cellInput.value = initialValue;
-    } else {
-      changedCell.innerText = cellInput.value;
+
+      return;
     }
+    changedCell.innerText = cellInput.value;
   };
 
   cellInput.onblur = function() {
