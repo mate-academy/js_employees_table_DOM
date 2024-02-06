@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     input.name = inputIds[i];
     input.dataset.qa = inputIds[i];
-    input.required = true;
 
     label.appendChild(input);
 
@@ -50,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
       officeSelect.name = 'office';
       officeSelect.dataset.qa = 'office';
-      officeSelect.required = true;
 
       // eslint-disable-next-line max-len
       const officeOptions = ['Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco'];
@@ -92,9 +90,22 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    addEmployeeToTable(employeeData);
+    const data = Object.fromEntries(formData.entries());
 
-    form.reset();
+    if (data.name.length < 4) {
+      // eslint-disable-next-line max-len
+      pushNotification('error', 'Error', 'Name should be at least 4 characters long');
+    } else if (data.age < 18 || data.age > 90) {
+      // eslint-disable-next-line max-len
+      pushNotification('error', 'Error', 'Age should be a number between 18 and 90');
+    } else if (!data.position || !data.salary) {
+      pushNotification('error', 'Error', 'All fields are required');
+    } else {
+      pushNotification('success', 'Success', 'Employee was added');
+      addEmployeeToTable(employeeData);
+
+      form.reset();
+    }
   });
 
   function convertSalary(salaryString) {
@@ -108,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function addEmployeeToTable(employeeData) {
-    // eslint-disable-next-line max-len
     const newRow = tableContent.insertRow(-1);
 
     const cellsOrder = ['name', 'position', 'office', 'age', 'salary'];
@@ -168,3 +178,67 @@ function sortRows([...rows], index) {
 
   return rows;
 }
+
+function pushNotification(type, title, description) {
+  const notification = document.createElement('div');
+
+  notification.classList.add('notification', type);
+  notification.dataset.qa = 'notification';
+
+  const titleElement = document.createElement('h2');
+
+  titleElement.textContent = title;
+
+  const descriptionElement = document.createElement('p');
+
+  descriptionElement.textContent = description;
+  notification.appendChild(titleElement);
+  notification.appendChild(descriptionElement);
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 2500);
+}
+
+table.addEventListener('dblclick', function(events) {
+  const clickedCell = events.target.closest('td');
+
+  if (!clickedCell) {
+    return;
+  }
+
+  const oldValue = clickedCell.textContent;
+
+  clickedCell.textContent = '';
+
+  const input = document.createElement('input');
+
+  input.type = 'text';
+  input.classList.add('cell-input');
+
+  function saveChanges(cell, text) {
+    const newValue = text.value.trim();
+
+    if (newValue === '') {
+      cell.textContent = oldValue;
+    } else {
+      cell.textContent = newValue;
+    }
+  }
+
+  input.addEventListener('blur', function() {
+    saveChanges(clickedCell, input);
+  });
+
+  input.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      saveChanges(clickedCell, input);
+    }
+  });
+
+  clickedCell.appendChild(input);
+  input.focus();
+});
+
+document.querySelector('body').style.alignItems = 'flex-start';
