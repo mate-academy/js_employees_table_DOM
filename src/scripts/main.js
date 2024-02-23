@@ -53,7 +53,8 @@ tbody.addEventListener('click', (e) => {
   rowsCollection.forEach(
     (row) => row !== clickedRow && row.classList.remove('active'),
   );
-  e.target.closest('tr').classList.toggle('active');
+  
+  clickedRow.classList.toggle('active');
 });
 
 const form = document.createElement('form');
