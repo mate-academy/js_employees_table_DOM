@@ -94,7 +94,7 @@ tr.active {
 
   &::before {
     position: absolute;
-    content: "New employee";
+    content: 'New employee';
     color: #fff;
     font-size: 16px;
     font-weight: 700;
@@ -130,7 +130,10 @@ tr.active {
     font-family: Roboto, sans-serif;
     font-size: 14px;
     cursor: pointer;
-    transition: 0.25s ease color, 0.25s ease background, 0.25s ease border;
+    transition:
+      0.25s ease color,
+      0.25s ease background,
+      0.25s ease border;
     font-weight: 700;
 
     &:hover {
