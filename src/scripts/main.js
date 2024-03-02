@@ -63,9 +63,9 @@ form.classList.add('new-employee-form');
 form.method = 'post';
 
 form.innerHTML = `
-<label>Name: <input data-qa="name" name="name" type="text" required></label>
+<label>Name: <input id="name" data-qa="name" name="name" type="text" required></label>
 <label>Position: <input
-  data-qa="position" name="position" type="text" required></label>
+  id="position" data-qa="position" name="position" type="text" required></label>
 <label>Office: <select data-qa="office" name="office">
   <option>Tokyo</option>
   <option>Singapore</option>
@@ -95,6 +95,8 @@ form.addEventListener('submit', (e) => {
   const office = formData.get('office');
   const age = parseInt(formData.get('age'));
   const salary = parseSalary(formData.get('salary'));
+  const inputName = document.getElementById('name');
+  const inputPosition = document.getElementById('position');
 
   if (formName.length < 4) {
     pushNote(
@@ -104,6 +106,12 @@ form.addEventListener('submit', (e) => {
       'Name must be at least 4 characters long.',
       'error',
     );
+
+    return;
+  }
+
+  if (inputName.value.trim() === '' || inputPosition.value.trim() === '') {
+    pushNote(10, 10, 'Error', 'This field cannot be empty', 'error');
 
     return;
   }
