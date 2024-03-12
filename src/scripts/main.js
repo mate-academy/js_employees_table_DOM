@@ -3,7 +3,7 @@
 const tbody = document.querySelector('tbody');
 const body = document.querySelector('body');
 const theader = document.querySelector('thead');
-const rowsCollection = tbody.querySelectorAll('tr');
+const rowsCollection = tbody.children;
 
 const sortingState = {};
 
@@ -139,7 +139,6 @@ form.addEventListener('submit', (e) => {
   `;
 
   tbody.appendChild(newRow);
-
   pushNote(10, 10, 'Success', 'New employee added successfully.', 'success');
 
   form.reset();
