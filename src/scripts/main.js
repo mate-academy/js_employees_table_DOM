@@ -118,11 +118,11 @@ form.addEventListener('submit', (e) => {
   const age = data.get('age');
   const position = data.get('position');
 
-  if (namePerson.length < 4) {
+  if (namePerson.trim().length < 4) {
     document.body.append(
       createMessage('Name value has less than 4 letters', 'error'),
     );
-  } else if (position.length === 0) {
+  } else if (position.trim().length === 0) {
     document.body.append(
       createMessage('Position field cannot be empty', 'error'),
     );
