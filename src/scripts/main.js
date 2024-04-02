@@ -131,10 +131,8 @@ form.addEventListener('submit', (e) => {
     document.body.append(
       createMessage('Age value is less than 18 or more than 90', 'error'),
     );
-  } else if (+salary === 0) {
-    document.body.append(
-      createMessage('Add salary', 'error'),
-    );
+  } else if (+salary <= 0) {
+    document.body.append(createMessage('Add salary', 'error'));
   } else {
     document.body.append(
       createMessage('Employee successfully added', 'success'),
@@ -192,7 +190,7 @@ table.addEventListener('blur', (e) => {
 table.addEventListener('keypress', (e) => {
   const input = e.target;
 
-  if (event.key === 'Enter' && input.classList.contains('cell-input')) {
+  if (e.key === 'Enter' && input.classList.contains('cell-input')) {
     const newText = input.value.trim() || editedCell;
     const cell = input.closest('td');
 
