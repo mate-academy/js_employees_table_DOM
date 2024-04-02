@@ -117,6 +117,7 @@ form.addEventListener('submit', (e) => {
   const namePerson = data.get('name');
   const age = data.get('age');
   const position = data.get('position');
+  const salary = data.get('salary');
 
   if (namePerson.trim().length < 4) {
     document.body.append(
@@ -130,6 +131,10 @@ form.addEventListener('submit', (e) => {
     document.body.append(
       createMessage('Age value is less than 18 or more than 90', 'error'),
     );
+  } else if (+salary === 0) {
+    document.body.append(
+      createMessage('Add salary', 'error'),
+    );
   } else {
     document.body.append(
       createMessage('Employee successfully added', 'success'),
@@ -140,7 +145,7 @@ form.addEventListener('submit', (e) => {
       position,
       data.get('office'),
       age,
-      `$${(+(data.get('salary') / 1000)).toFixed(3).replace('.', ',')}`,
+      `$${(+(salary / 1000)).toFixed(3).replace('.', ',')}`,
     ];
 
     const newRow = tableBody.insertRow(-1);
@@ -168,8 +173,8 @@ let editedCell = null;
 table.addEventListener('dblclick', (e) => {
   editedCell = e.target.textContent;
 
-  event.target.innerHTML = `<input class="cell-input" value="${editedCell}">`;
-  event.target.querySelector('.cell-input').focus();
+  e.target.innerHTML = `<input class="cell-input" value="${editedCell}">`;
+  e.target.querySelector('.cell-input').focus();
 });
 
 table.addEventListener('blur', (e) => {
