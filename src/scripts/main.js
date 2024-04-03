@@ -133,10 +133,27 @@ form.addEventListener('submit', (e) => {
 document.body.append(form);
 
 table.addEventListener('dblclick', (e) => {
+  const column = e.target.cellIndex;
+  const columnName = inputNames[column];
   editedCell = e.target.textContent;
 
-  e.target.innerHTML = `<input class="cell-input" value="${editedCell}">`;
-  e.target.firstChild.focus();
+  if (columnName === 'Office') {
+    const select = document.createElement('select');
+    ['Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco'].forEach(city => {
+      const option = document.createElement('option');
+      option.value = city;
+      option.textContent = city;
+      option.selected = city === editedCell;
+      select.appendChild(option);
+    });
+    e.target.innerHTML = '';
+    e.target.appendChild(select);
+    select.focus();
+  } else {
+    const inputType = columnName === 'Age' || columnName === 'Salary' ? 'number' : 'text';
+    e.target.innerHTML = `<input class="cell-input" type="${inputType}" value="${editedCell}">`;
+    e.target.firstChild.focus();
+  }
 });
 
 document.addEventListener(
@@ -229,7 +246,10 @@ function validateData(data) {
     errors.age = 'Age must be between 18 and 90.';
   }
 
-  if (data['salary'] && (data['salary'] <= '0' || data['salary'].trim() === '')) {
+  if (
+    data['salary'] &&
+    (data['salary'] <= '0' || data['salary'].trim() === '')
+  ) {
     errors.salary = 'Salary is required';
   }
 
