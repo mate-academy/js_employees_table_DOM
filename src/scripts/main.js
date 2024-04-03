@@ -33,7 +33,6 @@ tableHead.addEventListener('click', (e) => {
   const index = e.target.cellIndex;
   const rowsTable = Array.from(tableBody.querySelectorAll('tr'));
 
-  // console.log(sortedColumn);
   if (index === sortedColumn) {
     sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
   } else {
@@ -114,54 +113,76 @@ form.addEventListener('submit', (e) => {
 
   const data = new FormData(form);
 
-  const namePerson = data.get('name');
-  const age = data.get('age');
-  const position = data.get('position');
-  const salary = data.get('salary');
+  const namePerson = data.get('name').trim();
+  const age = data.get('age').trim();
+  const position = data.get('position').trim();
+  const salary = data.get('salary').trim();
+  const office = data.get('office');
 
-  if (namePerson.trim().length < 4) {
+  function isLatinAndSpaceOnly(str) {
+    return /^[A-Za-z\s]+$/.test(str);
+  }
+
+  if (namePerson.length < 4) {
     document.body.append(
       createMessage('Name value has less than 4 letters', 'error'),
     );
-  } else if (position.trim().length === 0) {
+
+    return;
+  } else if (
+    !isLatinAndSpaceOnly(namePerson) ||
+    !isLatinAndSpaceOnly(position)
+  ) {
+    document.body.append(
+      createMessage(
+        'Name and Position must contain only Latin letters and spaces.',
+        'error',
+      ),
+    );
+
+    return;
+  } else if (position.length === 0) {
     document.body.append(
       createMessage('Position field cannot be empty', 'error'),
     );
-  } else if (+age < 18 || +age >= 90 || isNaN(age)) {
+
+    return;
+  } else if (+age < 18 || +age > 90) {
     document.body.append(
       createMessage('Age value is less than 18 or more than 90', 'error'),
     );
+
+    return;
   } else if (+salary <= 0) {
     document.body.append(createMessage('Add salary', 'error'));
-  } else {
-    document.body.append(
-      createMessage('Employee successfully added', 'success'),
-    );
 
-    const newPerson = [
-      namePerson,
-      position,
-      data.get('office'),
-      age,
-      `$${(+(salary / 1000)).toFixed(3).replace('.', ',')}`,
-    ];
-
-    const newRow = tableBody.insertRow(-1);
-
-    newPerson.forEach((item, index) => {
-      const cell = newRow.insertCell(index);
-
-      cell.innerText = item;
-    });
-
-    form.reset();
+    return;
   }
+
+  const newPerson = [
+    namePerson,
+    position,
+    office,
+    age,
+    `$${(+(salary / 1000)).toFixed(3).replace('.', ',')}`,
+  ];
+
+  const newRow = tableBody.insertRow(-1);
+
+  newPerson.forEach((item, index) => {
+    const cell = newRow.insertCell(index);
+
+    cell.innerText = item;
+  });
+
+  document.body.append(createMessage('Employee successfully added', 'success'));
+  form.reset();
 
   setTimeout(() => {
     const notifications = document.querySelectorAll('.notification');
 
     notifications.forEach((notification) => {
-      notification.parentNode.removeChild(notification);
+      notification.remove();
     });
   }, 3000);
 });
@@ -191,10 +212,18 @@ table.addEventListener('keypress', (e) => {
   const input = e.target;
 
   if (e.key === 'Enter' && input.classList.contains('cell-input')) {
-    const newText = input.value.trim() || editedCell;
+    const newText = input.value.trim();
+
+    if (!/^[A-Za-z\s]+$/.test(newText)) {
+      alert('Використовуйте тільки латинські літери та пробіли.');
+      e.preventDefault();
+
+      return;
+    }
+
     const cell = input.closest('td');
 
-    cell.innerText = newText;
+    cell.innerText = newText || editedCell;
     editedCell = null;
   }
 });
