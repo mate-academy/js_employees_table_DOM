@@ -184,6 +184,7 @@ function sortTable(a, b, columnName) {
   ) {
     first = first.toLowerCase();
     second = second.toLowerCase();
+
     return first.localeCompare(second);
   }
 
@@ -213,28 +214,24 @@ function render(board, content) {
   });
 }
 
-function validateData(data, text) {
-  if (data['name'].trim().length < 4) {
-    text.textContent = 'Please, enter a correct name!';
+function validateData(data) {
+  const errors = {};
 
-    return true;
+  if (data['name'] && data['name'].trim().length < 4) {
+    errors.name = 'Please, enter a correct name!';
   }
 
-  if (data['position'].trim() === '') {
-    text.textContent = 'Position is required';
-
-    return true;
+  if (data['position'] && data['position'].trim() === '') {
+    errors.position = 'Position is required';
   }
 
-  if (data['age'] < 18 || data['age'] > 90) {
-    text.textContent = 'Age must be between 18 and 90.';
-
-    return true;
+  if (data['age'] && (data['age'] < 18 || data['age'] > 90)) {
+    errors.age = 'Age must be between 18 and 90.';
   }
 
-  if (data['salary'] <= '0' || data['salary'].trim() === '') {
-    text.textContent = 'Salary is required';
-
-    return true;
+  if (data['salary'] && (data['salary'] <= '0' || data['salary'].trim() === '')) {
+    errors.salary = 'Salary is required';
   }
+
+  return errors;
 }
