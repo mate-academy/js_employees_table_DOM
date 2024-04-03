@@ -1,257 +1,200 @@
 'use strict';
 
-const table = document.querySelector('tbody');
-const captions = document.querySelector('thead');
-const employees = [];
-const form = document.createElement('form');
-const submitBtn = document.createElement('button');
-const inputNames = ['Name', 'Position', 'Office', 'Age', 'Salary'];
-let editedCell;
-let currOrder = 'asc';
-let currColumnName = '';
-let activeLine;
+const table = document.querySelector('table');
+const tableHead = table.querySelector('thead');
+const tableBody = table.querySelector('tbody');
+const countries = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
 
-Array.from(table.children).forEach((el) => {
-  employees.push({
-    Name: el.children[0].textContent,
-    Position: el.children[1].textContent,
-    Office: el.children[2].textContent,
-    Age: el.children[3].textContent,
-    Salary: +el.children[4].textContent.replace(/[,$]/g, ''),
+let sortedColumn = null;
+let sortOrder = 'asc';
+const rows = Array.from(tableBody.querySelectorAll('tr'));
+
+function selectRow(row) {
+  rows.forEach((item) => {
+    item.classList.remove('active');
+  });
+  row.classList.add('active');
+}
+
+rows.forEach((row) => {
+  row.addEventListener('click', () => {
+    selectRow(row);
   });
 });
 
-captions.addEventListener('click', (e) => {
-  const sortValue = e.target.textContent;
+tableHead.addEventListener('click', (e) => {
+  const index = e.target.cellIndex;
+  const rowsTable = Array.from(tableBody.querySelectorAll('tr'));
 
-  employees.sort((a, b) => sortTable(a, b, sortValue));
-
-  if (currColumnName === sortValue && currOrder === 'desc') {
-    currOrder = 'asc';
-  } else if (currColumnName === sortValue && currOrder === 'asc') {
-    currOrder = 'desc';
-    employees.reverse();
+  // console.log(sortedColumn);
+  if (index === sortedColumn) {
+    sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortedColumn = index;
+    sortOrder = 'asc';
   }
 
-  if (currColumnName !== sortValue) {
-    currColumnName = sortValue;
-    currOrder = 'asc';
+  const sortedRows = rowsTable.sort((rowA, rowB) => {
+    switch (index) {
+      case 0:
+      case 1:
+      case 2:
+        return rowA.cells[index].innerText.localeCompare(
+          rowB.cells[index].innerText,
+        );
+      case 3:
+        return +rowA.cells[index].innerText - +rowB.cells[index].innerText;
+      case 4:
+        return (
+          parseFloat(rowA.cells[index].innerText.slice(1)) -
+          parseFloat(rowB.cells[index].innerText.slice(1))
+        );
+      default:
+    }
+  });
+
+  if (sortOrder === 'desc') {
+    sortedRows.reverse();
   }
 
-  render(table, employees);
+  tableBody.append(...sortedRows);
 });
 
-table.addEventListener('click', (e) => {
-  if (activeLine && activeLine !== e.target.parentNode) {
-    activeLine.classList.remove('active');
-  }
-
-  activeLine = e.target.parentNode;
-  activeLine.classList.add('active');
-});
+const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
 
-inputNames.forEach((field) => {
-  if (field !== 'Office') {
-    const inputType = field === 'Age' || field === 'Salary' ? 'number' : 'text';
+document.body.append(form);
 
-    form.insertAdjacentHTML(
-      'beforeend',
-      `<label>${field}: <input name="${field.toLowerCase()}"
-        type="${inputType}" data-qa="${field.toLowerCase()}"
-        ></label>`,
-    );
-  } else {
-    const selectOptions = [
-      'Tokyo',
-      'Singapore',
-      'London',
-      'New York',
-      'Edinburgh',
-      'San Francisco',
-    ];
-    const options = selectOptions.map(
-      (item) => `<option name=${item}>${item}</option>`,
-    );
+const formName =
+  '<label>Name: <input name="name" data-qa="name" type="text"></label>';
+const formPosition = `<label>Position:
+    <input name="position" data-qa="position" type="text"></label>`;
+const formCountry = `
+  <label> Country:
+  <select name="office" data-qa="office">
+    ${countries.map((country) => `<option value="${country}">${country}</option>`).join('')}
+  </select>
+  </label>`;
+const formAge = `<label>Age:
+    <input name="age" data-qa="age" type="number">
+  </label>`;
+const formSalary = `<label>Salary: <input name="salary"
+   data-qa="salary"
+   type="number">
+  </label>`;
+const button = '<button>Save to table</button>';
 
-    form.insertAdjacentHTML(
-      'beforeend',
-      `<label>${field}: <select name="${field.toLowerCase()}" type="text"
-        data-qa="${field.toLowerCase()}" required
-        >
-        ${options}
-        </select></label>`,
-    );
-  }
-});
-submitBtn.textContent = 'Save to table';
-form.append(submitBtn);
+form.insertAdjacentHTML('afterbegin', button);
+form.insertAdjacentHTML('afterbegin', formSalary);
+form.insertAdjacentHTML('afterbegin', formAge);
+form.insertAdjacentHTML('afterbegin', formCountry);
+form.insertAdjacentHTML('afterbegin', formPosition);
+form.insertAdjacentHTML('afterbegin', formName);
+
+function createMessage(text, className) {
+  const messageElement = document.createElement('div');
+
+  messageElement.setAttribute('data-qa', 'notification');
+  messageElement.classList.add('notification', className);
+  messageElement.innerText = text;
+
+  return messageElement;
+}
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  const notification = document.createElement('div');
-  const notificationTitle = document.createElement('h2');
-  const notificationBody = document.createElement('p');
+  const data = new FormData(form);
 
-  notification.setAttribute('data-qa', 'notification');
-  notification.className = 'notification';
-  notification.append(notificationTitle);
-  notification.append(notificationBody);
+  const namePerson = data.get('name');
+  const age = data.get('age');
+  const position = data.get('position');
+  const salary = data.get('salary');
 
-  const formData = new FormData(e.target);
-  const data = Object.fromEntries(formData.entries());
-  const isError = validateData(data, notificationBody);
+  if (namePerson.trim().length < 4) {
+    document.body.append(
+      createMessage('Name value has less than 4 letters', 'error'),
+    );
+  } else if (position.trim().length === 0) {
+    document.body.append(
+      createMessage('Position field cannot be empty', 'error'),
+    );
+  } else if (+age < 18 || +age >= 90 || isNaN(age)) {
+    document.body.append(
+      createMessage('Age value is less than 18 or more than 90', 'error'),
+    );
+  } else if (+salary <= 0) {
+    document.body.append(createMessage('Add salary', 'error'));
+  } else {
+    document.body.append(
+      createMessage('Employee successfully added', 'success'),
+    );
 
-  if (!isError) {
-    employees.push({
-      Name: data['name'],
-      Position: data['position'],
-      Office: data['office'],
-      Age: +data['age'],
-      Salary: +data['salary'],
+    const newPerson = [
+      namePerson,
+      position,
+      data.get('office'),
+      age,
+      `$${(+(salary / 1000)).toFixed(3).replace('.', ',')}`,
+    ];
+
+    const newRow = tableBody.insertRow(-1);
+
+    newPerson.forEach((item, index) => {
+      const cell = newRow.insertCell(index);
+
+      cell.innerText = item;
     });
 
-    notification.classList.add('success');
-    notificationTitle.textContent = 'Success';
-    notificationBody.textContent = 'Data successfully added';
-
-    render(table, employees);
-    e.target.reset();
-  } else {
-    notificationTitle.textContent = 'Error';
-    notification.classList.add('error');
+    form.reset();
   }
-  document.body.append(notification);
 
   setTimeout(() => {
-    document.body.removeChild(notification);
+    const notifications = document.querySelectorAll('.notification');
+
+    notifications.forEach((notification) => {
+      notification.parentNode.removeChild(notification);
+    });
   }, 3000);
 });
 
-document.body.append(form);
+let editedCell = null;
 
 table.addEventListener('dblclick', (e) => {
-  const column = e.target.cellIndex;
-  const columnName = inputNames[column];
   editedCell = e.target.textContent;
 
-  if (columnName === 'Office') {
-    const select = document.createElement('select');
-    ['Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco'].forEach(city => {
-      const option = document.createElement('option');
-      option.value = city;
-      option.textContent = city;
-      option.selected = city === editedCell;
-      select.appendChild(option);
-    });
-    e.target.innerHTML = '';
-    e.target.appendChild(select);
-    select.focus();
-  } else {
-    const inputType = columnName === 'Age' || columnName === 'Salary' ? 'number' : 'text';
-    e.target.innerHTML = `<input class="cell-input" type="${inputType}" value="${editedCell}">`;
-    e.target.firstChild.focus();
+  e.target.innerHTML = `<input class="cell-input" value="${editedCell}">`;
+  e.target.querySelector('.cell-input').focus();
+});
+
+table.addEventListener('blur', (e) => {
+  const input = e.target;
+
+  if (input.classList.contains('cell-input')) {
+    const newText = input.value.trim() || editedCell;
+    const cell = input.closest('td');
+
+    cell.innerText = newText;
+    editedCell = null;
   }
 });
 
-document.addEventListener(
-  'blur',
-  (e) => {
-    const target = e.target;
+table.addEventListener('keypress', (e) => {
+  const input = e.target;
 
-    if (target.classList.contains('cell-input')) {
-      const newText = target.value;
+  if (e.key === 'Enter' && input.classList.contains('cell-input')) {
+    const newText = input.value.trim() || editedCell;
+    const cell = input.closest('td');
 
-      if (newText.trim() !== '') {
-        target.parentNode.textContent = newText;
-      } else {
-        target.parentNode.textContent = editedCell;
-      }
-    }
-  },
-  true,
-);
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    const target = e.target;
-
-    if (target.classList.contains('cell-input')) {
-      const newText = target.value;
-
-      if (newText.trim() !== '') {
-        target.parentNode.textContent = newText;
-      } else {
-        target.parentNode.textContent = editedCell;
-      }
-    }
+    cell.innerText = newText;
+    editedCell = null;
   }
 });
-
-function sortTable(a, b, columnName) {
-  let first = a[columnName];
-  let second = b[columnName];
-
-  if (
-    columnName === 'Name' ||
-    columnName === 'Position' ||
-    columnName === 'Office'
-  ) {
-    first = first.toLowerCase();
-    second = second.toLowerCase();
-
-    return first.localeCompare(second);
-  }
-
-  return first - second;
-}
-
-function render(board, content) {
-  board.innerHTML = '';
-
-  content.forEach((employee) => {
-    const row = document.createElement('tr');
-
-    for (const [key, data] of Object.entries(employee)) {
-      const column = document.createElement('td');
-
-      column.textContent = data;
-
-      if (key === 'Salary') {
-        const salary = `$${data.toLocaleString()}`;
-
-        column.textContent = salary;
-      }
-
-      row.append(column);
-    }
-    board.append(row);
-  });
-}
-
-function validateData(data) {
-  const errors = {};
-
-  if (data['name'] && data['name'].trim().length < 4) {
-    errors.name = 'Please, enter a correct name!';
-  }
-
-  if (data['position'] && data['position'].trim() === '') {
-    errors.position = 'Position is required';
-  }
-
-  if (data['age'] && (data['age'] < 18 || data['age'] > 90)) {
-    errors.age = 'Age must be between 18 and 90.';
-  }
-
-  if (
-    data['salary'] &&
-    (data['salary'] <= '0' || data['salary'].trim() === '')
-  ) {
-    errors.salary = 'Salary is required';
-  }
-
-  return errors;
-}
