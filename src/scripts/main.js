@@ -174,14 +174,16 @@ document.addEventListener('keydown', (e) => {
 });
 
 function sortTable(a, b, columnName) {
-  const first = a[columnName];
-  const second = b[columnName];
+  let first = a[columnName];
+  let second = b[columnName];
 
   if (
     columnName === 'Name' ||
     columnName === 'Position' ||
     columnName === 'Office'
   ) {
+    first = first.toLowerCase();
+    second = second.toLowerCase();
     return first.localeCompare(second);
   }
 
