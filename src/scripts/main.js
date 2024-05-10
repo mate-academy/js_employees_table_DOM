@@ -16,6 +16,14 @@ const offices = [
 ];
 let isEnterPressed = false;
 
+const notificationDiv = document.createElement('div');
+
+notificationDiv.style.position = 'absolute';
+notificationDiv.style.top = '10px';
+notificationDiv.style.right = '10px';
+
+document.body.appendChild(notificationDiv);
+
 // #region validation
 const validateName = (name) => {
   if (name.length < 4) {
@@ -63,8 +71,6 @@ const validateAge = (age) => {
 
 const validateRequired = (value) => {
   if (value.length === 0) {
-    pushNotification('Error', 'All fields are required', 'error');
-
     return true;
   }
 
@@ -73,19 +79,32 @@ const validateRequired = (value) => {
 
 const validation = (values) => {
   let hasError = false;
+  let requiredError = false;
 
   for (const fieldsValue of values) {
     const { key, value } = fieldsValue;
 
-    hasError = validateRequired(value) ? true : hasError;
+    if (validateRequired(value)) {
+      requiredError = true;
+      hasError = true;
+    }
 
     if (key === 'name') {
-      hasError = validateName(value) ? true : hasError;
+      hasError = hasError || validateName(value);
     }
 
     if (key === 'age') {
-      hasError = validateAge(value) ? true : hasError;
+      hasError = hasError || validateAge(value);
     }
+
+    if (key === 'salary' && value === '$') {
+      requiredError = true;
+      hasError = true;
+    }
+  }
+
+  if (requiredError) {
+    pushNotification('Error', 'All fields are required', 'error');
   }
 
   return hasError;
@@ -253,10 +272,12 @@ const pushNotification = (title, description, type) => {
   notification.appendChild(messageTitle);
   notification.appendChild(messageDescription);
 
-  document.body.appendChild(notification);
+  notification.style.position = 'relative';
+
+  notificationDiv.appendChild(notification);
 
   setTimeout(() => {
-    notification.style.visibility = 'hidden';
+    notification.remove();
   }, 2000);
 };
 // #endregion
