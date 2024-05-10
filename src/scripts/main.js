@@ -133,27 +133,28 @@ const changeValue = (oldData) => {
   const input = document.querySelector('.cell-input');
   const cell = input.closest('td');
   const index = [...cell.parentNode.children].indexOf(cell);
+  const value = input.value.trim();
   let hasError = false;
 
   switch (index) {
     case 0:
-      hasError = validateName(input.value) ? true : hasError;
+      hasError = validateName(value) ? true : hasError;
       break;
     case 3:
-      hasError = validateAge(input.value) ? true : hasError;
+      hasError = validateAge(value) ? true : hasError;
       break;
     case 4:
-      hasError = validateSalary(input.value) ? true : hasError;
+      hasError = validateSalary(value) ? true : hasError;
       break;
   }
 
   if (index !== 4) {
-    cell.textContent = input.value === '' || hasError ? oldData : input.value;
+    cell.textContent = value === '' || hasError ? oldData : value;
   } else {
     cell.textContent =
-      input.value === '' || hasError
+      value === '' || hasError
         ? oldData
-        : '$' + input.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        : '$' + value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
   input.remove();
@@ -270,7 +271,7 @@ const formSubmit = (e) => {
   const fields = ['name', 'position', 'office', 'age', 'salary'];
 
   const fieldValues = fields.map((field) => {
-    let value = formData.get(field);
+    let value = formData.get(field).trim();
 
     if (field === 'salary') {
       value = '$' + value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
