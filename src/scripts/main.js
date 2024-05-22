@@ -92,6 +92,9 @@ const showNotification = (message, type) => {
 
   div.setAttribute('data-qa', 'notification');
   div.classList.add('notification', type);
+  div.style.display = 'flex';
+  div.style.justifyContent = 'center';
+  div.style.alignItems = 'center';
   div.textContent = message;
   document.body.appendChild(div);
 
@@ -101,13 +104,13 @@ const showNotification = (message, type) => {
 };
 
 const validateInput = (obj) => {
-  if (obj.name.length < 4) {
+  if (obj.name.length < 4 || !obj.name.trim()) {
     showNotification('Name must be at least 4 letters', 'error');
 
     return false;
   }
 
-  if (obj.position.length === 0) {
+  if (obj.position.length === 0 || !obj.position.trim()) {
     showNotification('Position is required', 'error');
 
     return false;
@@ -174,6 +177,11 @@ button.addEventListener('click', (e) => {
     }
     tbody.appendChild(tr);
     showNotification('You added the new employee', 'success');
+    editRow(tr);
+
+    for (const input of form) {
+      input.value = '';
+    }
   }
 });
 
@@ -195,7 +203,7 @@ tableRows.forEach((row, i) => {
   });
 });
 
-tableRows.forEach((row) => {
+const editRow = (row) => {
   row.addEventListener('dblclick', (e) => {
     const input = document.createElement('input');
     const target = e.target;
@@ -220,6 +228,10 @@ tableRows.forEach((row) => {
       }
     });
   });
+};
+
+tableRows.forEach((value) => {
+  editRow(value);
 });
 
 function sortByText(rows, pos) {
