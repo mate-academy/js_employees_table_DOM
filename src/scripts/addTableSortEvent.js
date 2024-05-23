@@ -9,12 +9,50 @@ import {
   ORDER_DESC,
 } from './utils';
 
-import { tableBody, tableHead } from './constants';
-
 let currentHeader = null;
 let order = null;
 
-export function addTableSortEvent() {
+function sortRows(rows, currentOrder, currentHeaderName, currentHeaderIndex) {
+  return rows.sort((rowA, rowB) => {
+    const cellValueA = rowA.children[currentHeaderIndex].textContent;
+    const cellValueB = rowB.children[currentHeaderIndex].textContent;
+
+    let result = 0;
+
+    switch (currentHeaderName) {
+      case HEADER_NAME:
+      case HEADER_POSITION:
+      case HEADER_OFFICE:
+        result = cellValueA.localeCompare(cellValueB);
+        break;
+
+      case HEADER_AGE:
+        result = +cellValueA - +cellValueB;
+        break;
+
+      case HEADER_SALARY:
+        result =
+          +cellValueA.replace(/[^0-9.-]+/g, '') -
+          +cellValueB.replace(/[^0-9.-]+/g, '');
+        break;
+
+      default:
+        result = 0;
+        break;
+    }
+
+    if (currentOrder === ORDER_DESC) {
+      result = -result;
+    }
+
+    return result;
+  });
+}
+
+export function addTableSortEvent(table) {
+  const tableHead = table.querySelector('thead');
+  const tableBody = table.querySelector('tbody');
+
   tableHead.addEventListener('click', (e) => {
     const header = e.target.closest('th');
 
@@ -37,43 +75,10 @@ export function addTableSortEvent() {
 
     const rows = Array.from(tableBody.querySelectorAll('tr'));
 
-    rows
-      .sort((rowA, rowB) => {
-        const cellA = rowA.children[currentHeaderIndex].textContent;
-        const cellB = rowB.children[currentHeaderIndex].textContent;
-
-        let result = 0;
-
-        switch (currentHeaderName) {
-          case HEADER_NAME:
-          case HEADER_POSITION:
-          case HEADER_OFFICE:
-            result = cellA.localeCompare(cellB);
-            break;
-
-          case HEADER_AGE:
-            result = +cellA - +cellB;
-            break;
-
-          case HEADER_SALARY:
-            result =
-              +cellA.replaceAll('$', '').replaceAll(',', '') -
-              +cellB.replaceAll('$', '').replaceAll(',', '');
-            break;
-
-          default:
-            result = 0;
-            break;
-        }
-
-        if (order === ORDER_DESC) {
-          result = -result;
-        }
-
-        return result;
-      })
-      .forEach((row) => {
+    sortRows(rows, order, currentHeaderName, currentHeaderIndex).forEach(
+      (row) => {
         tableBody.append(row);
-      });
+      },
+    );
   });
 }

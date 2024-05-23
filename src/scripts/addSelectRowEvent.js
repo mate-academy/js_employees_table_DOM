@@ -1,29 +1,27 @@
 'use strict';
-import { tableBody } from './constants';
 
-let currentRow = null;
-let prevRow = null;
+const ACTIVE_CLASS = 'active';
 
-export function addSelectRowEvent() {
+let selectedRow = null;
+let previousSelectedRow = null;
+
+export function addSelectRowEvent(table) {
+  const tableBody = table.querySelector('tbody');
+
   tableBody.addEventListener('click', (e) => {
     const row = e.target.closest('tr');
 
-    if (!row) {
+    if (!row || row === selectedRow) {
       return;
     }
 
-    currentRow = row;
-
-    if (currentRow !== prevRow) {
-      if (prevRow !== null) {
-        prevRow.className = '';
-      }
-    } else {
-      return;
+    if (previousSelectedRow) {
+      previousSelectedRow.classList.remove(ACTIVE_CLASS);
     }
 
-    currentRow.className = 'active';
+    selectedRow = row;
+    selectedRow.className = ACTIVE_CLASS;
 
-    prevRow = currentRow;
+    previousSelectedRow = selectedRow;
   });
 }

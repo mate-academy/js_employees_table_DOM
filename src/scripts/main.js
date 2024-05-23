@@ -6,8 +6,12 @@ import { addSelectRowEvent } from './addSelectRowEvent';
 import { addTableSortEvent } from './addTableSortEvent';
 import { createForm } from './createForm';
 
-addTableSortEvent();
-addSelectRowEvent();
-createForm();
-addFormSubmitEvent();
-addEditingEvent();
+const table = document.querySelector('table');
+
+addTableSortEvent(table);
+addSelectRowEvent(table);
+
+const form = createForm();
+
+addFormSubmitEvent(form);
+addEditingEvent(table);

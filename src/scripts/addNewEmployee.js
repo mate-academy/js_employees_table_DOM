@@ -1,30 +1,39 @@
 'use strict';
-import { tableBody } from './constants';
 
-export function addNewEmployee(formElements) {
-  const row = document.createElement('tr');
-  const nameCell = document.createElement('td');
-  const positionCell = document.createElement('td');
-  const officeCell = document.createElement('td');
-  const ageCell = document.createElement('td');
-  const salaryCell = document.createElement('td');
+import { employeeFields } from './utils';
 
-  nameCell.textContent = formElements.name.value;
-  positionCell.textContent = formElements.position.value;
-  officeCell.textContent = formElements.office.value;
-  ageCell.textContent = formElements.age.value;
-
-  salaryCell.textContent = new Intl.NumberFormat('en-US', {
+export function formatSalary(salary) {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 0,
-  }).format(+formElements.salary.value);
+  }).format(+salary);
+}
 
-  row.appendChild(nameCell);
-  row.appendChild(positionCell);
-  row.appendChild(officeCell);
-  row.appendChild(ageCell);
-  row.appendChild(salaryCell);
+function createRow(formElements) {
+  const row = document.createElement('tr');
+
+  for (const field of employeeFields) {
+    const formFieldName = field.nameValue;
+
+    const cell = document.createElement('td');
+
+    if (formFieldName === 'salary') {
+      cell.textContent = formatSalary(formElements[formFieldName].value);
+    } else {
+      cell.textContent = formElements[formFieldName].value;
+    }
+
+    row.appendChild(cell);
+  }
+
+  return row;
+}
+
+export function addNewEmployee(formElements) {
+  const tableBody = document.querySelector('tbody');
+
+  const row = createRow(formElements);
 
   tableBody.appendChild(row);
 }

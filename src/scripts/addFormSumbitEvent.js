@@ -1,35 +1,40 @@
 'use strict';
 
 import { addNewEmployee } from './addNewEmployee';
-import { form } from './constants';
 import { showNotification } from './showNotification';
+import { ERROR_TITLE, SUCCESS_MESSAGE, SUCCES_TITLE } from './utils';
+import { validateNumber, validateText } from './validation';
 
-export function addFormSubmitEvent() {
+export function addFormSubmitEvent(form) {
   form.onsubmit = (e) => {
     e.preventDefault();
 
-    const nameInputValue = form.elements.name.value;
-    const ageInputValue = form.elements.age.value;
+    for (const element of form.elements) {
+      if (element.type === 'submit') {
+        continue;
+      }
 
-    if (nameInputValue.length < 4) {
-      showNotification(
-        'Error',
-        'Name must be at least 4 characters long',
-        false,
-      );
+      let error;
 
-      return;
-    }
+      switch (element.type) {
+        case 'text':
+          error = validateText(element);
+          break;
+        case 'number':
+          error = validateNumber(element);
+          break;
+      }
 
-    if (+ageInputValue < 18 || +ageInputValue > 90) {
-      showNotification('Error', 'Age must be between 18 and 90', false);
+      if (error) {
+        showNotification(ERROR_TITLE, error, false);
 
-      return;
+        return;
+      }
     }
 
     addNewEmployee(form.elements);
 
-    showNotification('Success', 'Employee added successfully', true);
+    showNotification(SUCCES_TITLE, SUCCESS_MESSAGE, true);
     form.reset();
   };
 }

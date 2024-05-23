@@ -1,53 +1,68 @@
 'use strict';
 import { TAG_SELECT, employeeFields } from './utils';
-import { form } from './constants';
 
-export function createForm() {
-  form.className = 'new-employee-form';
+const NEW_EMPLOYEE_FORM_CLASS = 'new-employee-form';
+const SUBMIT_TYPE = 'submit';
+const SUBMIT_BUTTON_TEXT = 'Save to table';
 
-  for (const field of employeeFields) {
-    const { nameValue, tag, type, required, options } = field;
-    const label = document.createElement('label');
-    const formField = document.createElement(tag);
+function createFormField(field) {
+  const { nameValue, tag, type, required, options } = field;
+  const label = document.createElement('label');
+  const formField = document.createElement(tag);
 
-    label.textContent = nameValue[0].toUpperCase() + nameValue.slice(1) + ': ';
+  label.textContent = `${nameValue[0].toUpperCase()}${nameValue.slice(1)}: `;
 
-    formField.name = nameValue;
-    formField.required = required;
-    formField.dataset.qa = nameValue;
+  formField.name = nameValue;
+  formField.required = required;
+  formField.dataset.qa = nameValue;
 
-    label.appendChild(formField);
+  label.appendChild(formField);
 
-    form.appendChild(label);
+  if (tag === TAG_SELECT) {
+    options.forEach((option, index) => {
+      const optionElement = document.createElement('option');
 
-    if (tag === TAG_SELECT) {
-      options.forEach((option) => {
-        const optionElement = document.createElement('option');
+      if (index === 0) {
+        optionElement.selected = true;
+      }
 
-        const { selected, town } = option;
+      optionElement.value = option;
+      optionElement.textContent = option;
 
-        if (selected) {
-          optionElement.selected = selected;
-        }
-
-        optionElement.value = town;
-        optionElement.textContent = town;
-
-        formField.append(optionElement);
-      });
-
-      continue;
-    }
-
+      formField.append(optionElement);
+    });
+  } else {
     formField.type = type;
   }
 
+  return label;
+}
+
+function createSubmitButton() {
   const submit = document.createElement('button');
 
-  submit.type = 'submit';
-  submit.textContent = 'Save to table';
+  submit.type = SUBMIT_TYPE;
+  submit.textContent = SUBMIT_BUTTON_TEXT;
+
+  return submit;
+}
+
+export function createForm() {
+  const form = document.createElement('form');
+
+  form.className = NEW_EMPLOYEE_FORM_CLASS;
+
+  for (const field of employeeFields) {
+    const formField = createFormField(field);
+
+    form.appendChild(formField);
+  }
+
+  const submit = createSubmitButton();
 
   form.appendChild(submit);
 
   document.body.insertBefore(form, document.querySelector('script'));
+
+  return form;
 }
