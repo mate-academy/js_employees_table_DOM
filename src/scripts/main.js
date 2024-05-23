@@ -1,8 +1,11 @@
 'use strict';
 
 const tableHeaders = [...document.querySelectorAll('thead th')];
-const tableRows = [...document.querySelectorAll('tbody tr')];
+let tableRows = [...document.querySelectorAll('tbody tr')];
 const tbody = document.querySelector('tbody');
+let orderSort = true;
+let lastClickedHeader = null;
+let indexRow = null;
 
 const form = document.createElement('form');
 
@@ -87,19 +90,27 @@ form.append(
 
 document.body.appendChild(form);
 
+tableRows.forEach((tr) => {
+  tr.children[0].setAttribute('data-qa', 'name');
+  tr.children[1].setAttribute('data-qa', 'position');
+  tr.children[2].setAttribute('data-qa', 'office');
+  tr.children[3].setAttribute('data-qa', 'age');
+  tr.children[4].setAttribute('data-qa', 'salary');
+});
+
 const showNotification = (message, type) => {
   const div = document.createElement('div');
 
   div.setAttribute('data-qa', 'notification');
-  div.classList.add('notification', type);
   div.style.display = 'flex';
   div.style.justifyContent = 'center';
   div.style.alignItems = 'center';
+  div.classList.add('notification', type);
   div.textContent = message;
   document.body.appendChild(div);
 
   setTimeout(() => {
-    div.setAttribute('hidden', 'true');
+    div.remove();
   }, 3000);
 };
 
@@ -166,6 +177,9 @@ button.addEventListener('click', (e) => {
 
     for (const key in formDataObj) {
       const td = document.createElement('td');
+
+      td.setAttribute('data-qa', key);
+
       const value = formDataObj[key];
 
       if (key === 'salary') {
@@ -183,31 +197,96 @@ button.addEventListener('click', (e) => {
       input.value = '';
     }
   }
+  updateTableRows();
 });
 
-let orderSort = true;
-let lastClickedHeader = null;
-let indexRow = null;
+const updateTableRows = () => {
+  tableRows = [...document.querySelectorAll('tbody tr')];
 
-tableRows.forEach((row, i) => {
-  row.addEventListener('click', () => {
-    const selectedRow = tableRows.find((r) => r.classList.contains('active'));
+  tableRows.forEach((row, i) => {
+    row.addEventListener('click', () => {
+      const selectedRow = tableRows.find((r) => r.classList.contains('active'));
 
-    if (indexRow !== i) {
-      if (selectedRow) {
-        selectedRow.classList.remove('active');
+      if (indexRow !== i) {
+        if (selectedRow) {
+          selectedRow.classList.remove('active');
+        }
+        row.classList.add('active');
+        indexRow = i;
       }
-      row.classList.add('active');
-      indexRow = i;
-    }
+    });
   });
-});
+};
+
+updateTableRows();
+
+const validateField = (field, value) => {
+  switch (field) {
+    case 'name':
+      if (value.length < 4 || !value.trim()) {
+        showNotification('Name must be at least 4 letters', 'warning');
+
+        return false;
+      }
+      break;
+
+    case 'position':
+      if (value.length === 0 || !value.trim()) {
+        showNotification('Position is required', 'warning');
+
+        return false;
+      }
+      break;
+
+    case 'office':
+      if (value.length === 0 || !value.trim()) {
+        showNotification('Country is required', 'warning');
+
+        return false;
+      }
+      break;
+
+    case 'age':
+      if (
+        value < 18 ||
+        value > 90 ||
+        !value.trim() ||
+        value.toLowerCase() !== value.toUpperCase()
+      ) {
+        showNotification('Age must be between 18 and 90', 'warning');
+
+        return false;
+      }
+      break;
+    case 'salary':
+      if (
+        value.length === 0 ||
+        !value.trim() ||
+        value.toLowerCase() !== value.toUpperCase()
+      ) {
+        showNotification('Salary is required', 'warning');
+
+        return false;
+      }
+      break;
+    default:
+      return true;
+  }
+
+  return true;
+};
 
 const editRow = (row) => {
   row.addEventListener('dblclick', (e) => {
     const input = document.createElement('input');
     const target = e.target;
     const oldContent = e.target.textContent;
+
+    const field = target.getAttribute('data-qa');
+
+    if (!field) {
+      return;
+    }
 
     input.classList.add('cell-input');
     target.textContent = '';
@@ -217,7 +296,15 @@ const editRow = (row) => {
     const saveChanges = () => {
       const newValue = input.value.trim();
 
-      target.textContent = newValue === '' ? oldContent : newValue;
+      if (validateField(field, newValue)) {
+        if (field === 'salary') {
+          target.textContent = `$${addComa(newValue)}`;
+        } else {
+          target.textContent = newValue === '' ? oldContent : newValue;
+        }
+      } else {
+        target.textContent = oldContent;
+      }
     };
 
     input.addEventListener('blur', saveChanges);
@@ -230,8 +317,8 @@ const editRow = (row) => {
   });
 };
 
-tableRows.forEach((value) => {
-  editRow(value);
+tableRows.forEach((row) => {
+  editRow(row);
 });
 
 function sortByText(rows, pos) {
