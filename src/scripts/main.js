@@ -91,11 +91,11 @@ form.append(
 document.body.appendChild(form);
 
 tableRows.forEach((tr) => {
-  tr.children[0].setAttribute('data-qa', 'name');
-  tr.children[1].setAttribute('data-qa', 'position');
-  tr.children[2].setAttribute('data-qa', 'office');
-  tr.children[3].setAttribute('data-qa', 'age');
-  tr.children[4].setAttribute('data-qa', 'salary');
+  tr.children[0].setAttribute('data-row', 'name');
+  tr.children[1].setAttribute('data-row', 'position');
+  tr.children[2].setAttribute('data-row', 'office');
+  tr.children[3].setAttribute('data-row', 'age');
+  tr.children[4].setAttribute('data-row', 'salary');
 });
 
 const showNotification = (message, type) => {
@@ -133,7 +133,7 @@ const validateInput = (obj) => {
     return false;
   }
 
-  if (obj.salary.length === 0) {
+  if (obj.salary.length === 0 || obj.salary < 0) {
     showNotification('Salary is required', 'error');
 
     return false;
@@ -179,6 +179,7 @@ button.addEventListener('click', (e) => {
       const td = document.createElement('td');
 
       td.setAttribute('data-qa', key);
+      td.setAttribute('data-row', key);
 
       const value = formDataObj[key];
 
@@ -224,7 +225,7 @@ const validateField = (field, value) => {
   switch (field) {
     case 'name':
       if (value.length < 4 || !value.trim()) {
-        showNotification('Name must be at least 4 letters', 'warning');
+        showNotification('Name must be at least 4 letters', 'error');
 
         return false;
       }
@@ -232,7 +233,7 @@ const validateField = (field, value) => {
 
     case 'position':
       if (value.length === 0 || !value.trim()) {
-        showNotification('Position is required', 'warning');
+        showNotification('Position is required', 'error');
 
         return false;
       }
@@ -240,7 +241,7 @@ const validateField = (field, value) => {
 
     case 'office':
       if (value.length === 0 || !value.trim()) {
-        showNotification('Country is required', 'warning');
+        showNotification('Country is required', 'error');
 
         return false;
       }
@@ -253,7 +254,7 @@ const validateField = (field, value) => {
         !value.trim() ||
         value.toLowerCase() !== value.toUpperCase()
       ) {
-        showNotification('Age must be between 18 and 90', 'warning');
+        showNotification('Age must be between 18 and 90', 'error');
 
         return false;
       }
@@ -262,6 +263,7 @@ const validateField = (field, value) => {
       if (
         value.length === 0 ||
         !value.trim() ||
+        +value < 0 ||
         value.toLowerCase() !== value.toUpperCase()
       ) {
         showNotification('Salary is required', 'warning');
@@ -282,7 +284,7 @@ const editRow = (row) => {
     const target = e.target;
     const oldContent = e.target.textContent;
 
-    const field = target.getAttribute('data-qa');
+    const field = target.getAttribute('data-row');
 
     if (!field) {
       return;
