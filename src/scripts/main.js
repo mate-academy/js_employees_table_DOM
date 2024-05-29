@@ -5,22 +5,31 @@ const table = document.querySelector('table');
 const tableHeaders = table.querySelectorAll('th');
 const tbody = table.tBodies[0];
 const rows = Array.from(tbody.rows);
-const sortDirection = Array.from(tableHeaders).map(() => true);
+const sortDirection = Array.from(tableHeaders).map(() => 'asc');
 
 // <-- SORTING -->
 const sortTable = (columnIndex) => {
-  const isAcsending = sortDirection[columnIndex];
+  const currentDirection = sortDirection[columnIndex];
+  const nextDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+
+  sortDirection.fill('asc');
+  sortDirection[columnIndex] = nextDirection;
 
   rows.sort((a, b) => {
     const valueA = a.cells[columnIndex].textContent.trim();
     const valueB = b.cells[columnIndex].textContent.trim();
 
-    const comparison = valueA.localeCompare(valueB, 'en', { numeric: true });
+    const numberA = parseFloat(valueA.replace(/[$,]/g, ''));
+    const numberB = parseFloat(valueB.replace(/[$,]/g, ''));
 
-    return isAcsending ? comparison : -comparison;
+    if (!isNaN(numberA) && !isNaN(numberB)) {
+      return currentDirection === 'asc' ? numberA - numberB : numberB - numberA;
+    }
+
+    return currentDirection === 'asc'
+      ? valueA.localeCompare(valueB)
+      : valueB.localeCompare(valueA);
   });
-
-  sortDirection[columnIndex] = !isAcsending;
 
   tbody.innerHTML = '';
   rows.forEach((row) => tbody.appendChild(row));
@@ -123,8 +132,6 @@ const validateData = (value, fieldName) => {
     default:
       break;
   }
-
-  return null;
 };
 
 // <-- SUBMIT FORM -->
@@ -165,6 +172,8 @@ const formSubmitHandler = (e) => {
 
   tbody.appendChild(newRow);
   rows.push(newRow);
+
+  newRow.addEventListener('click', () => toggleActiveClass(newRow));
 
   form.reset();
 
