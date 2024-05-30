@@ -4,11 +4,12 @@ const table = document.querySelector('table');
 
 const tableHeaders = table.querySelectorAll('th');
 const tbody = table.tBodies[0];
-const rows = Array.from(tbody.rows);
 const sortDirection = Array.from(tableHeaders).map(() => 'asc');
 
 // <-- SORTING -->
 const sortTable = (columnIndex) => {
+  const rows = Array.from(tbody.rows);
+
   const currentDirection = sortDirection[columnIndex];
   const nextDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 
@@ -37,6 +38,8 @@ const sortTable = (columnIndex) => {
 
 // <-- ACTIVE CLASS -->
 const toggleActiveClass = (row) => {
+  const rows = Array.from(tbody.rows);
+
   rows.forEach((r) => r.classList.remove('active'));
   row.classList.toggle('active');
 };
@@ -169,12 +172,8 @@ const formSubmitHandler = (e) => {
 
     newRow.appendChild(cell);
   });
-  
-  newRow.addEventListener('click', () => toggleActiveClass(newRow));
 
   tbody.appendChild(newRow);
-  rows.push(newRow);
-
   form.reset();
 
   showNotification('success', 'Employee added successfully');
@@ -205,8 +204,14 @@ tableHeaders.forEach((header, index) => {
   header.addEventListener('click', () => sortTable(index));
 });
 
-rows.forEach((row) => {
-  row.addEventListener('click', () => toggleActiveClass(row));
+tbody.addEventListener('click', (e) => {
+  const row = e.target.closest('tr');
+
+  if (!row) {
+    return;
+  }
+
+  toggleActiveClass(row);
 });
 
 form.addEventListener('submit', formSubmitHandler);
