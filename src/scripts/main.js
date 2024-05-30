@@ -6,6 +6,14 @@ const tableHeaders = table.querySelectorAll('th');
 const tbody = table.tBodies[0];
 const sortDirection = Array.from(tableHeaders).map(() => 'asc');
 
+const getFormattedSalary = (num) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+  }).format(num);
+};
+
 // <-- SORTING -->
 const sortTable = (columnIndex) => {
   const rows = Array.from(tbody.rows);
@@ -117,7 +125,7 @@ const validateData = (value, fieldName) => {
       }
       break;
     case 'age':
-      if (value < 18 || value > 90) {
+      if (isNaN(value) || value < 18 || value > 90) {
         return {
           type: 'error',
           message: 'Age must be between 18 and 90',
@@ -129,6 +137,16 @@ const validateData = (value, fieldName) => {
         return {
           type: 'error',
           message: 'Position cannot be empty',
+        };
+      }
+      break;
+    case 'salary':
+      const salary = value.replace(/[$,]/g, '');
+
+      if (isNaN(salary) || salary < 0) {
+        return {
+          type: 'error',
+          message: 'Salary must be a positive number',
         };
       }
       break;
@@ -153,11 +171,8 @@ const formSubmitHandler = (e) => {
     }
   }
 
-  const formattedSalary = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-  }).format(formData.get('salary'));
+  const salary = formData.get('salary');
+  const formattedSalary = getFormattedSalary(salary);
 
   const newRow = document.createElement('tr');
 
@@ -199,6 +214,64 @@ const showNotification = (type, message) => {
   }, 2000);
 };
 
+// <-- EDITING -->
+let currentlyEditedCell = null;
+
+const editCell = (cell) => {
+  if (currentlyEditedCell) {
+    return;
+  }
+
+  const currentText = cell.textContent;
+  const input = document.createElement('input');
+
+  input.classList.add('cell-input');
+
+  input.value = currentText;
+  cell.textContent = '';
+  cell.appendChild(input);
+  input.focus();
+
+  currentlyEditedCell = cell;
+
+  input.addEventListener('blur', () => {
+    saveCell(input);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      saveCell(input);
+    }
+  });
+};
+
+const saveCell = (input) => {
+  const cell = input.parentElement;
+  let newValue = input.value.trim();
+
+  const columnIndex = Array.from(cell.parentElement.cells).indexOf(cell);
+  const fieldName = tableHeaders[columnIndex].textContent.trim().toLowerCase();
+
+  const validationError = validateData(newValue, fieldName);
+
+  if (validationError) {
+    showNotification(validationError.type, validationError.message);
+
+    input.focus();
+
+    return;
+  }
+
+  if (fieldName === 'salary') {
+    newValue = newValue.replace(/[$,]/g, '');
+    newValue = getFormattedSalary(newValue);
+  }
+
+  cell.textContent = newValue;
+
+  currentlyEditedCell = null;
+};
+
 // <-- EVENT LISTENERS -->
 tableHeaders.forEach((header, index) => {
   header.addEventListener('click', () => sortTable(index));
@@ -215,3 +288,9 @@ tbody.addEventListener('click', (e) => {
 });
 
 form.addEventListener('submit', formSubmitHandler);
+
+tbody.addEventListener('dblclick', (e) => {
+  const cell = e.target.closest('td');
+
+  editCell(cell);
+});
