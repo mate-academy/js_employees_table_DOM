@@ -103,19 +103,21 @@ tableHeadCollection.forEach((headItem) => {
   });
 });
 
-const tableRows = tableContent.querySelectorAll('tr');
+const setActiveClass = () => {
+  const tableRows = tableContent.querySelectorAll('tr');
 
-tableRows.forEach((row) => {
-  row.addEventListener('click', (e) => {
-    const oldActive = tableContent.querySelector('.active');
+  tableRows.forEach((row) => {
+    row.addEventListener('click', (e) => {
+      const oldActive = tableContent.querySelector('.active');
 
-    if (oldActive) {
-      oldActive.classList.remove('active');
-    }
+      if (oldActive) {
+        oldActive.classList.remove('active');
+      }
 
-    e.currentTarget.classList.add('active');
+      e.currentTarget.classList.add('active');
+    });
   });
-});
+};
 
 const newEmployeeForm = document.createElement('form');
 
@@ -323,8 +325,10 @@ function addNewEmployee() {
   salaryInput.value = '';
 
   setEditableCells();
+  setActiveClass();
 
   return showNotify('Employee successfully added.', 'success');
 }
 
+setActiveClass();
 setEditableCells();
