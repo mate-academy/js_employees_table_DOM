@@ -294,6 +294,10 @@ function addNewEmployee() {
     warning.push('Salary field should be filled.');
   }
 
+  if (+salaryInput.value < 0) {
+    warning.push('Salary field should be with a positive number.');
+  }
+
   if (+ageInput.value < 18 || +ageInput.value > 90) {
     warning.push('Age should be between 18 and 90 y.o.');
   }
