@@ -2,16 +2,36 @@
 
 const tableHead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
-const rows = [...tbody.rows];
-
+let rows = [...tbody.rows]; // Initialize rows array
 let sortedColumn = null;
 let sortOrder = 'asc';
 
-tableHead.addEventListener('click', (e) => {
-  if (e.target.closest('th')) {
-    const header = e.target.closest('th');
+const addRow = (empName, empPosition, empOffice, empAge, empSalary) => {
+  const newPerson = [
+    empName.trim(),
+    empPosition.trim(),
+    empOffice,
+    empAge,
+    `$${(+(empSalary / 1000)).toFixed(3).replace('.', ',')}`,
+  ];
+
+  const newRow = tbody.insertRow(-1);
+
+  newPerson.forEach((item, index) => {
+    const cell = newRow.insertCell(index);
+
+    cell.innerText = item;
+  });
+
+  // Update rows array
+  rows = [...tbody.rows];
+};
+
+tableHead.addEventListener('click', (headerClickEvent) => {
+  if (headerClickEvent.target.closest('th')) {
+    const header = headerClickEvent.target.closest('th');
     const sortName = header.textContent;
-    const cellIndex = e.target.closest('th').cellIndex;
+    const cellIndex = headerClickEvent.target.closest('th').cellIndex;
 
     if (cellIndex === sortedColumn) {
       sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
@@ -20,46 +40,41 @@ tableHead.addEventListener('click', (e) => {
       sortOrder = 'asc';
     }
 
-    if (sortOrder === 'asc') {
-      rows.sort((a, b) => {
-        switch (sortName) {
-          case 'Position':
-          case 'Name':
-          case 'Office':
-            return a.cells[cellIndex].textContent.localeCompare(
-              b.cells[cellIndex].textContent,
-            );
+    rows.sort((a, b) => {
+      switch (sortName) {
+        case 'Position':
+        case 'Name':
+        case 'Office':
+          return a.cells[cellIndex].textContent.localeCompare(
+            b.cells[cellIndex].textContent,
+          );
 
-          case 'Salary':
-            const salaryA = a.cells[cellIndex].textContent.replace(/[$,]/g, '');
-            const salaryB = b.cells[cellIndex].textContent.replace(/[$,]/g, '');
+        case 'Salary':
+          const salaryA = a.cells[cellIndex].textContent.replace(/[$,]/g, '');
+          const salaryB = b.cells[cellIndex].textContent.replace(/[$,]/g, '');
 
-            return salaryA - salaryB;
+          return salaryA - salaryB;
 
-          default:
-            return (
-              a.cells[cellIndex].textContent - b.cells[cellIndex].textContent
-            );
-        }
-      });
-
-      tbody.innerHTML = '';
-      rows.forEach((row) => tbody.appendChild(row));
-    }
+        default:
+          return (
+            a.cells[cellIndex].textContent - b.cells[cellIndex].textContent
+          );
+      }
+    });
 
     if (sortOrder === 'desc') {
       rows.reverse();
-
-      tbody.innerHTML = '';
-      rows.forEach((row) => tbody.appendChild(row));
     }
+
+    tbody.innerHTML = '';
+    rows.forEach((row) => tbody.appendChild(row));
   }
 });
 
 let selectedRow = null;
 
-tbody.addEventListener('click', (e) => {
-  const row = e.target.closest('tr');
+tbody.addEventListener('click', (rowClickEvent) => {
+  const row = rowClickEvent.target.closest('tr');
   const rowIndex = row.sectionRowIndex;
 
   if (selectedRow === null) {
@@ -67,7 +82,6 @@ tbody.addEventListener('click', (e) => {
     selectedRow = rowIndex;
   } else {
     tbody.rows[selectedRow].classList.remove('active');
-
     selectedRow = rowIndex;
     tbody.rows[rowIndex].classList.add('active');
   }
@@ -89,22 +103,11 @@ const countries = [
 ];
 
 const formName =
-  '<label>Name: <input name="name" data-qa="name" type="text"></label>';
-const formPosition = `<label>Position:
-<input name="position" data-qa="position" type="text"></label>`;
-const formCountry = `
-  <label> Country:
-  <select name="office" data-qa="office">
-    ${countries.map((country) => `<option value="${country}">${country}</option>`).join('')}
-  </select>
-  </label>`;
-const formAge = `<label>Age:
-  <input name="age" data-qa="age" type="number">
-</label>`;
-const formSalary = `<label>Salary: <input name="salary"
-   data-qa="salary"
-   type="number">
-  </label>`;
+  '<label>Name: <input name="empName" data-qa="name" type="text"></label>';
+const formPosition = `<label>Position: <input name="position" data-qa="position" type="text"></label>`;
+const formCountry = `<label> Country: <select name="office" data-qa="office">${countries.map((country) => `<option value="${country}">${country}</option>`).join('')}</select></label>`;
+const formAge = `<label>Age: <input name="age" data-qa="age" type="number"></label>`;
+const formSalary = `<label>Salary: <input name="salary" data-qa="salary" type="number"></label>`;
 const button = '<button>Save to table</button>';
 
 form.insertAdjacentHTML('afterbegin', button);
@@ -124,35 +127,34 @@ const createNotification = (text, className) => {
   notification.classList.add('notification', className);
   notification.setAttribute('data-qa', 'notification');
 
-  const desctiption = document.createElement('h1');
+  const description = document.createElement('h1');
 
-  desctiption.classList.add('title');
-  desctiption.textContent = text;
-  notification.appendChild(desctiption);
+  description.classList.add('title');
+  description.textContent = text;
+  notification.appendChild(description);
 
   return notification;
 };
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
+form.addEventListener('submit', (formSubmitEvent) => {
+  formSubmitEvent.preventDefault();
 
-  // eslint-disable-next-line no-shadow
-  const name = form.querySelector('[data-qa="name"]').value;
-  const position = form.querySelector('[data-qa="position"]').value;
-  const age = form.querySelector('[data-qa="age"]').value;
-  const salary = form.querySelector('[data-qa="salary"]').value;
-  const office = form.querySelector('[data-qa="office"]').value;
+  const empName = form.querySelector('[data-qa="name"]').value;
+  const empPosition = form.querySelector('[data-qa="position"]').value;
+  const empAge = form.querySelector('[data-qa="age"]').value;
+  const empSalary = form.querySelector('[data-qa="salary"]').value;
+  const empOffice = form.querySelector('[data-qa="office"]').value;
 
   let isValid = true;
   let message = '';
 
-  if (name.trim().length < 4) {
+  if (empName.trim().length < 4) {
     message = 'Name value has less than 4 letters';
     isValid = false;
-  } else if (position.trim().length === 0) {
+  } else if (empPosition.trim().length === 0) {
     message = 'Position value is invalid';
     isValid = false;
-  } else if (age < 18 || age > 90) {
+  } else if (empAge < 18 || empAge > 90) {
     message = 'Age value is less than 18 or more than 90';
     isValid = false;
   }
@@ -163,23 +165,7 @@ form.addEventListener('submit', (e) => {
     document.body.append(
       createNotification('Employee successfully added', 'success'),
     );
-
-    const newPerson = [
-      name.trim(),
-      position.trim(),
-      office,
-      age,
-      `$${(+(salary / 1000)).toFixed(3).replace('.', ',')}`,
-    ];
-
-    const newRow = tbody.insertRow(-1);
-
-    newPerson.forEach((item, index) => {
-      const cell = newRow.insertCell(index);
-
-      cell.innerText = item;
-    });
-
+    addRow(empName, empPosition, empOffice, empAge, empSalary);
     form.reset();
   }
 
@@ -192,21 +178,22 @@ form.addEventListener('submit', (e) => {
   }, 3000);
 });
 
-// eslint-disable-next-line no-shadow
-tbody.addEventListener('dblclick', (e) => {
-  const cell = e.target;
+tbody.addEventListener('dblclick', (cellDblClickEvent) => {
+  const cell = cellDblClickEvent.target;
   let editedCell = cell.textContent;
 
   cell.innerHTML = `<input class='cell-input' value='${editedCell}' />`;
 
-  const input = e.target.querySelector('.cell-input');
+  const input = cell.querySelector('.cell-input');
 
   input.focus();
 
-  // eslint-disable-next-line no-shadow
-  const saveChanges = (e) => {
-    if (e.type === 'blur' || (e.type === 'keyup' && e.key === 'Enter')) {
-      const newText = e.target.value.trim() || editedCell;
+  const saveChanges = (saveEvent) => {
+    if (
+      saveEvent.type === 'blur' ||
+      (saveEvent.type === 'keyup' && saveEvent.key === 'Enter')
+    ) {
+      const newText = saveEvent.target.value.trim() || editedCell;
 
       cell.innerText = newText;
       editedCell = null;
