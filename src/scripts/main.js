@@ -3,8 +3,6 @@
 
 const tbody = document.querySelector('tbody');
 const title = document.querySelector('thead');
-
-// const rows = [...tbody.querySelectorAll('tr')];
 let revers = '';
 
 const handleActiveClas = () => {
@@ -223,8 +221,6 @@ td.forEach((item) => {
     const findInput = document.querySelector('.cell-input');
     const oldValue = e.target.textContent;
 
-    console.log();
-
     if (findInput) {
       findInput.remove();
       e.target.textContent = oldValue;
@@ -245,7 +241,34 @@ td.forEach((item) => {
     input.focus();
 
     input.onblur = () => {
-      if (!input.value) {
+      if (item.cellIndex <= 2) {
+        if (input.value.length < 4) {
+          e.target.textContent = oldValue;
+          input.remove();
+
+          return;
+        }
+      }
+
+      if (item.cellIndex === 3) {
+        if (input.value < 18 || input.value > 90) {
+          e.target.textContent = oldValue;
+          input.remove();
+
+          return;
+        }
+      }
+
+      if (item.cellIndex === 4) {
+        if (input.value < 0) {
+          e.target.textContent = oldValue;
+          input.remove();
+
+          return;
+        }
+      }
+
+      if (!input.value.trim()) {
         e.target.textContent = oldValue;
       } else {
         e.target.textContent =
@@ -258,6 +281,24 @@ td.forEach((item) => {
     };
 
     input.onkeydown = (even) => {
+      if (item.cellIndex <= 2) {
+        if (input.value.length < 4) {
+          return;
+        }
+      }
+
+      if (item.cellIndex === 3) {
+        if (input.value < 18 || input.value > 90) {
+          return;
+        }
+      }
+
+      if (item.cellIndex === 4) {
+        if (input.value < 0) {
+          return;
+        }
+      }
+
       if (even.key === 'Enter') {
         if (!input.value) {
           e.target.textContent = oldValue;
