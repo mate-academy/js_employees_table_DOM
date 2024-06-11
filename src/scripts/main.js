@@ -187,25 +187,35 @@ form.addEventListener('submit', (e) => {
 
   div.style.position = 'absolute';
 
-  if (inputName.value.length < 4) {
+  if (
+    inputAge.value < 18 ||
+    inputAge.value > 90 ||
+    inputName.value.length < 4 ||
+    inputPosition.value.trim().length === 0
+  ) {
     const titleElement = document.createElement('h2');
+    const titleElementName = document.createElement('h2');
+    const titleElementPosition = document.createElement('h2');
 
     titleElement.style.fontWeight = '900';
     titleElement.style.fontSize = '20px';
-    titleElement.textContent = 'Name should be at least 4';
+
+    if (inputName.value.length < 4) {
+      titleElementName.textContent = 'Name should be at least 4';
+    }
+
+    if (inputPosition.value.trim().length === 0) {
+      titleElementPosition.textContent = 'Position value is invalid';
+    }
+
+    if (inputAge.value < 18 || inputAge.value > 90) {
+      titleElement.textContent = 'Age should be between 18 and 90 y.o.';
+    }
 
     div.append(titleElement);
-    div.classList.add('error');
-  }
+    div.append(titleElementName);
+    div.append(titleElementPosition);
 
-  if (inputAge.value < 18 || inputAge.value > 90) {
-    const titleElement = document.createElement('h2');
-
-    titleElement.style.fontWeight = '900';
-    titleElement.style.fontSize = '20px';
-    titleElement.textContent = 'Age should be between 18 and 90 y.o.';
-
-    div.append(titleElement);
     div.classList.add('error');
   } else {
     const titleSuccess = document.createElement('h2');
@@ -227,8 +237,6 @@ form.addEventListener('submit', (e) => {
     setTimeout(() => {
       div.style.display = 'none';
     }, 4000);
-
-    return;
   }
 
   newName.textContent = inputName.value;
@@ -244,9 +252,10 @@ form.addEventListener('submit', (e) => {
   }, 4000);
 
   if (
-    inputAge.value > 18 &&
-    inputAge.value < 90 &&
-    inputName.value.length > 4
+    inputAge.value >= 18 &&
+    inputAge.value <= 90 &&
+    inputName.value.length >= 4 &&
+    inputPosition.value.trim().length > 0
   ) {
     tbody.append(newRows);
     form.reset();
