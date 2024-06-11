@@ -4,54 +4,8 @@
 const tbody = document.querySelector('tbody');
 const title = document.querySelector('thead');
 
-const rows = [...tbody.querySelectorAll('tr')];
+// const rows = [...tbody.querySelectorAll('tr')];
 let revers = '';
-
-title.addEventListener('click', (e) => {
-  const value = e.target.closest('th').textContent.toLowerCase();
-
-  const intex = e.target.cellIndex;
-  const cells = [];
-
-  tbody.querySelectorAll('tr').forEach((item) => {
-    cells.push(item.cells[intex].textContent);
-  });
-
-  const newRows = rows.sort((a, b) => {
-    const cellsA = a.cells[intex].textContent;
-    const cellsB = b.cells[intex].textContent;
-
-    switch (value) {
-      case 'name':
-      case 'position':
-        return cellsA.localeCompare(cellsB);
-
-      case 'age':
-        return cellsA - cellsB;
-
-      case 'salary':
-        return (
-          +cellsA.replace(',', '').slice(1) - +cellsB.replace(',', '').slice(1)
-        );
-
-      default:
-        return null;
-    }
-  });
-
-  if (value === revers) {
-    newRows.reverse();
-    revers = '';
-  } else {
-    revers = value;
-  }
-
-  tbody.innerHTML = '';
-
-  newRows.forEach((item) => {
-    tbody.appendChild(item);
-  });
-});
 
 const handleActiveClas = () => {
   tbody.querySelectorAll('tr').forEach((item) => {
@@ -269,6 +223,8 @@ td.forEach((item) => {
     const findInput = document.querySelector('.cell-input');
     const oldValue = e.target.textContent;
 
+    console.log();
+
     if (findInput) {
       findInput.remove();
       e.target.textContent = oldValue;
@@ -276,7 +232,13 @@ td.forEach((item) => {
 
     const input = document.createElement('input');
 
-    input.setAttribute('autofocus', true);
+    if (item.cellIndex > 2) {
+      input.setAttribute('type', 'number');
+      input.style.width = '60px';
+    } else {
+      input.setAttribute('type', 'text');
+    }
+
     input.setAttribute('class', 'cell-input');
     e.target.textContent = '';
     e.target.append(input);
@@ -286,7 +248,10 @@ td.forEach((item) => {
       if (!input.value) {
         e.target.textContent = oldValue;
       } else {
-        e.target.textContent = input.value;
+        e.target.textContent =
+          item.cellIndex === 4
+            ? `$${(+input.value).toLocaleString('en-US')}`
+            : input.value;
       }
 
       input.remove();
@@ -297,11 +262,62 @@ td.forEach((item) => {
         if (!input.value) {
           e.target.textContent = oldValue;
         } else {
-          e.target.textContent = input.value;
+          e.target.textContent =
+            item.cellIndex === 4
+              ? `$${(+input.value).toLocaleString('en-US')}`
+              : input.value;
         }
 
         input.remove();
       }
     };
+  });
+});
+
+title.addEventListener('click', (e) => {
+  const sortTody = document.querySelector('tbody');
+  const rows = [...sortTody.querySelectorAll('tr')];
+  const value = e.target.closest('th').textContent.toLowerCase();
+
+  const intex = e.target.cellIndex;
+  const cells = [];
+
+  sortTody.querySelectorAll('tr').forEach((item) => {
+    cells.push(item.cells[intex].textContent);
+  });
+
+  const newRows = rows.sort((a, b) => {
+    const cellsA = a.cells[intex].textContent;
+    const cellsB = b.cells[intex].textContent;
+
+    switch (value) {
+      case 'name':
+      case 'position':
+        return cellsA.localeCompare(cellsB);
+
+      case 'age':
+        return cellsA - cellsB;
+
+      case 'salary':
+        return (
+          +cellsA.replace(',', '').slice(1) - +cellsB.replace(',', '').slice(1)
+        );
+
+      default:
+        return null;
+    }
+  });
+
+  if (value === revers) {
+    newRows.reverse();
+    revers = '';
+  } else {
+    revers = value;
+  }
+
+  sortTody.innerHTML = '';
+
+  newRows.forEach((item) => {
+    sortTody.appendChild(item);
   });
 });
