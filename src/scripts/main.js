@@ -248,7 +248,6 @@ form.addEventListener('submit', (e) => {
     inputAge.value < 90 &&
     inputName.value.length > 4
   ) {
-    // console.log('dd ');
     tbody.append(newRows);
     form.reset();
   }
