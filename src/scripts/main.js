@@ -35,4 +35,21 @@ document.addEventListener('DOMContentLoaded', () => {
       sortOrders[index] = currentOrder === 'asc' ? 'desc' : 'asc';
     });
   });
+
+  const setActiveClass = (row) => {
+    const activeRow = tbody.querySelector('.active');
+
+    if (activeRow) {
+      activeRow.classList.remove('active');
+    }
+    row.classList.add('active');
+  };
+
+  tbody.addEventListener('click', (e) => {
+    const row = e.target.closest('tr');
+
+    if (row && !row.classList.contains('active')) {
+      setActiveClass(row);
+    }
+  });
 });
