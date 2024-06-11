@@ -187,11 +187,6 @@ form.addEventListener('submit', (e) => {
 
   div.style.position = 'absolute';
 
-  // div.style.top = `10px`;
-  // div.style.right = `10px`;
-  // div.style.borderRadius = '10px';
-  // div.style.padding = '10px';
-
   if (inputName.value.length < 4) {
     const titleElement = document.createElement('h2');
 
@@ -251,10 +246,11 @@ form.addEventListener('submit', (e) => {
   if (
     inputAge.value > 18 &&
     inputAge.value < 90 &&
-    inputName.value.length < 4
+    inputName.value.length > 4
   ) {
-    form.reset();
+    // console.log('dd ');
     tbody.append(newRows);
+    form.reset();
   }
 });
 
