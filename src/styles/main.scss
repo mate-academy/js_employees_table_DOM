@@ -5,7 +5,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 100px;
+  padding: 140px;
   font-family: Roboto, sans-serif;
   margin: 0;
   box-sizing: border-box;
@@ -155,7 +155,7 @@ tr.active {
 
 .notification {
   position: absolute;
-  width: 300px;
+  width: 280px;
   min-height: 100px;
   padding: 0 16px;
   box-sizing: border-box;
@@ -173,14 +173,14 @@ tr.active {
   }
 
   &.warning {
-    background: rgba(255, 212, 39, 0.3);
+    background: rgba(255, 212, 39, 0.5);
   }
 
   &.success {
-    background: rgba(10, 189, 0, 0.3);
+    background: rgba(10, 189, 0, 0.5);
   }
 
   &.error {
-    background: rgba(253, 0, 0, 0.3);
+    background: rgba(253, 0, 0, 0.5);
   }
 }
