@@ -139,46 +139,12 @@ form.addEventListener('submit', (e) => {
 
   div.style.position = 'absolute';
 
-  if (
-    inputAge.value < 18 ||
-    inputAge.value > 90 ||
-    inputName.value.length < 4 ||
-    inputPosition.value.trim().length === 0
-  ) {
-    const titleElement = document.createElement('h2');
-    const titleElementName = document.createElement('h2');
-    const titleElementPosition = document.createElement('h2');
+  const valid = checkValidValueError();
 
-    titleElement.style.fontWeight = '900';
-    titleElement.style.fontSize = '20px';
-
-    if (inputName.value.length < 4) {
-      titleElementName.textContent = 'Name should be at least 4';
-    }
-
-    if (inputPosition.value.trim().length === 0) {
-      titleElementPosition.textContent = 'Position value is invalid';
-    }
-
-    if (inputAge.value < 18 || inputAge.value > 90) {
-      titleElement.textContent = 'Age should be between 18 and 90 y.o.';
-    }
-
-    div.append(titleElement);
-    div.append(titleElementName);
-    div.append(titleElementPosition);
-
-    div.classList.add('error');
+  if (valid) {
+    createMessageError(div);
   } else {
-    const titleSuccess = document.createElement('h2');
-
-    titleSuccess.style.fontWeight = '900';
-    titleSuccess.style.fontSize = '20px';
-    titleSuccess.textContent = 'Added successfully';
-    div.style.background = 'rgba(10, 189, 0, 0.3)';
-    div.classList.add('success');
-    div.append(titleSuccess);
-    document.body.append(div);
+    createMessagSaccess(div);
   }
 
   document.body.append(div);
@@ -203,12 +169,9 @@ form.addEventListener('submit', (e) => {
     div.style.display = 'none';
   }, 4000);
 
-  if (
-    inputAge.value >= 18 &&
-    inputAge.value <= 90 &&
-    inputName.value.length >= 4 &&
-    inputPosition.value.trim().length > 0
-  ) {
+  const validSaccess = checkValidValueSaccess();
+
+  if (validSaccess) {
     tbody.append(newRows);
     form.reset();
   }
@@ -242,7 +205,7 @@ td.forEach((item) => {
 
     input.onblur = () => {
       if (item.cellIndex <= 2) {
-        if (input.value.length < 4) {
+        if (input.value.trim().length < 4) {
           e.target.textContent = oldValue;
           input.remove();
 
@@ -362,3 +325,60 @@ title.addEventListener('click', (e) => {
     sortTody.appendChild(item);
   });
 });
+
+const createMessagSaccess = (div) => {
+  const titleSuccess = document.createElement('h2');
+
+  titleSuccess.style.fontWeight = '900';
+  titleSuccess.style.fontSize = '20px';
+  titleSuccess.textContent = 'Added successfully';
+  div.style.background = 'rgba(10, 189, 0, 0.3)';
+  div.classList.add('success');
+  div.append(titleSuccess);
+  document.body.append(div);
+};
+
+const createMessageError = (div) => {
+  const titleElement = document.createElement('h2');
+  const titleElementName = document.createElement('h2');
+  const titleElementPosition = document.createElement('h2');
+
+  titleElement.style.fontWeight = '900';
+  titleElement.style.fontSize = '20px';
+
+  if (inputName.value.length < 4) {
+    titleElementName.textContent = 'Name should be at least 4';
+  }
+
+  if (inputPosition.value.trim().length === 0) {
+    titleElementPosition.textContent = 'Position value is invalid';
+  }
+
+  if (inputAge.value < 18 || inputAge.value > 90) {
+    titleElement.textContent = 'Age should be between 18 and 90 y.o.';
+  }
+
+  div.append(titleElement);
+  div.append(titleElementName);
+  div.append(titleElementPosition);
+
+  div.classList.add('error');
+};
+
+const checkValidValueError = () => {
+  return (
+    inputAge.value < 18 ||
+    inputAge.value > 90 ||
+    inputName.value.length < 4 ||
+    inputPosition.value.trim().length === 0
+  );
+};
+
+const checkValidValueSaccess = () => {
+  return (
+    inputAge.value >= 18 &&
+    inputAge.value <= 90 &&
+    inputName.value.length >= 4 &&
+    inputPosition.value.trim().length > 0
+  );
+};
