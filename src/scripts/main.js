@@ -58,11 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
   form.className = 'new-employee-form';
 
   const formInputs = [
-    { name: 'name', label: 'Name', type: 'text' },
-    { name: 'position', label: 'Position', type: 'text' },
+    { inputName: 'name', type: 'text' },
+    { inputName: 'position', type: 'text' },
     {
-      name: 'office',
-      label: 'Office',
+      inputName: 'office',
       type: 'select',
       options: [
         'Tokyo',
@@ -73,30 +72,30 @@ document.addEventListener('DOMContentLoaded', () => {
         'San Francisco',
       ],
     },
-    { name: 'age', label: 'Age', type: 'number' },
-    { name: 'salary', label: 'Salary', type: 'number' },
+    { inputName: 'age', type: 'number' },
+    { inputName: 'salary', type: 'number' },
   ];
 
-  formInputs.forEach(({ name, label, type, options }) => {
-    const inputLabel = document.createElement('label');
+  formInputs.forEach(({ inputName, type, options }) => {
+    const label = document.createElement('label');
 
-    inputLabel.textContent = `${label}: `;
+    label.textContent = `${inputName.charAt(0).toUpperCase() + inputName.slice(1)}: `;
 
     const input = document.createElement(
       type === 'select' ? 'select' : 'input',
     );
 
-    input.name = name;
-    input.setAttribute('data-qa', name);
+    input.name = inputName;
+    input.setAttribute('data-qa', inputName);
 
     if (type === 'select') {
-      options.forEach((optionText) => input.add(new Option(optionText)));
+      options.forEach((option) => input.add(new Option(option)));
     } else {
       input.type = type;
     }
 
-    inputLabel.appendChild(input);
-    form.appendChild(inputLabel);
+    label.appendChild(input);
+    form.appendChild(label);
   });
 
   form.appendChild(
@@ -107,4 +106,110 @@ document.addEventListener('DOMContentLoaded', () => {
   );
 
   document.body.appendChild(form);
+
+  const pushNotification = (description, type) => {
+    const notification = document.createElement('div');
+
+    notification.className = `notification ${type}`;
+    notification.setAttribute('data-qa', 'notification');
+
+    notification.innerHTML = `
+      <h2 class='title'>${type}</h2>
+      <p>${description}</p>
+    `;
+    document.body.append(notification);
+    setTimeout(() => (notification.style.display = 'none'), 2000);
+  };
+
+  const validators = {
+    name: (value) =>
+      value.trim().length >= 4 || 'Name must be at least 4 characters long',
+    age: (value) =>
+      (!isNaN(value) && value >= 18 && value <= 90) ||
+      'Age must be between 18 and 90',
+    position: (value) => value.trim().length > 0 || 'Position cannot be empty',
+    salary: (value) => {
+      const salary = parseFloat(value.replace(/[$,]/g, ''));
+
+      return (
+        (!isNaN(salary) && salary >= 0) || 'Salary must be a positive number'
+      );
+    },
+  };
+
+  const validateData = (inputName, value) => {
+    if (inputName === 'office') {
+      return null;
+    }
+
+    const isValid = validators[inputName](value);
+
+    return isValid === true ? null : { type: 'error', message: isValid };
+  };
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    for (const [key, value] of formData.entries()) {
+      const validationError = validateData(key, value);
+
+      if (validationError) {
+        pushNotification(validationError.message, validationError.type);
+
+        return;
+      }
+    }
+
+    const newRow = document.createElement('tr');
+
+    formData.forEach((value, key) => {
+      const cell = document.createElement('td');
+
+      if (key === 'salary') {
+        cell.textContent = '$' + Number(value).toLocaleString('en-US');
+      } else {
+        cell.textContent = value;
+      }
+
+      newRow.appendChild(cell);
+    });
+
+    tbody.appendChild(newRow);
+    form.reset();
+
+    pushNotification('Employee added successfully', 'success');
+  });
+
+  tbody.addEventListener('dblclick', (e) => {
+    const cell = e.target;
+    const initialValue = cell.textContent.trim();
+
+    const input = document.createElement('input');
+
+    input.className = 'cell-input';
+    input.type = 'text';
+    input.value = initialValue;
+
+    cell.textContent = '';
+    cell.appendChild(input);
+    input.focus();
+
+    input.addEventListener('blur', () => saveChanges(input, initialValue));
+
+    input.addEventListener('keypress', (kpEvent) => {
+      if (kpEvent.key === 'Enter') {
+        saveChanges(input, initialValue);
+      }
+    });
+  });
+
+  const saveChanges = (input, initialValue) => {
+    const newValue = input.value.trim() || initialValue;
+    const cell = input.parentElement;
+
+    cell.textContent = newValue;
+    input.remove();
+  };
 });
