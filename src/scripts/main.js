@@ -33,7 +33,6 @@ const labelSalary = document.createElement('label');
 
 const inputName = document.createElement('input');
 const inputPosition = document.createElement('input');
-const selectOffice = document.createElement('select');
 const inputAge = document.createElement('input');
 const inputSalary = document.createElement('input');
 const buttonSubmit = document.createElement('button');
@@ -59,44 +58,55 @@ inputPosition.required = true;
 inputPosition.setAttribute('type', 'text');
 labelPosition.appendChild(inputPosition);
 
+const createSelect = () => {
+  const optionsTokyo = document.createElement('option');
+  const optionsSingapore = document.createElement('option');
+  const optionsLondon = document.createElement('option');
+  const optionsNewYork = document.createElement('option');
+  const optionsEdinburgh = document.createElement('option');
+  const optionsSanFrancisco = document.createElement('option');
+
+  selectOffice.required = true;
+
+  optionsTokyo.textContent = 'Tokyo';
+  optionsTokyo.setAttribute('value', 'Tokyo');
+  optionsSingapore.textContent = 'Singapore';
+  optionsSingapore.setAttribute('value', 'Singapore');
+
+  optionsLondon.textContent = 'London';
+  optionsLondon.setAttribute('value', 'London');
+
+  optionsNewYork.textContent = 'New York';
+  optionsNewYork.setAttribute('value', 'New York');
+
+  optionsEdinburgh.textContent = 'Edinburgh';
+  optionsEdinburgh.setAttribute('value', 'Edinburgh');
+
+  optionsSanFrancisco.textContent = 'San Francisco';
+  optionsSanFrancisco.setAttribute('value', 'San Francisco');
+
+  return [
+    optionsTokyo,
+    optionsSingapore,
+    optionsLondon,
+    optionsNewYork,
+    optionsEdinburgh,
+    optionsSanFrancisco,
+  ];
+};
+
+const selectOffice = document.createElement('select');
+
 selectOffice.setAttribute('data-qa', 'office');
 selectOffice.setAttribute('name', 'office');
 
-const optionsTokyo = document.createElement('option');
-const optionsSingapore = document.createElement('option');
-const optionsLondon = document.createElement('option');
-const optionsNewYork = document.createElement('option');
-const optionsEdinburgh = document.createElement('option');
-const optionsSanFrancisco = document.createElement('option');
+const select = createSelect();
 
-optionsTokyo.textContent = 'Tokyo';
-optionsTokyo.setAttribute('value', 'Tokyo');
-optionsSingapore.textContent = 'Singapore';
-optionsSingapore.setAttribute('value', 'Singapore');
-
-optionsLondon.textContent = 'London';
-optionsLondon.setAttribute('value', 'London');
-
-optionsNewYork.textContent = 'New York';
-optionsNewYork.setAttribute('value', 'New York');
-
-optionsEdinburgh.textContent = 'Edinburgh';
-optionsEdinburgh.setAttribute('value', 'Edinburgh');
-
-optionsSanFrancisco.textContent = 'San Francisco';
-optionsSanFrancisco.setAttribute('value', 'San Francisco');
-
-selectOffice.append(
-  optionsTokyo,
-  optionsSingapore,
-  optionsLondon,
-  optionsNewYork,
-  optionsEdinburgh,
-  optionsSanFrancisco,
-);
+select.forEach((item) => {
+  selectOffice.appendChild(item);
+});
 
 labelOffice.append(selectOffice);
-selectOffice.required = true;
 
 inputAge.setAttribute('data-qa', 'age');
 inputAge.setAttribute('name', 'age');
@@ -236,6 +246,25 @@ tbody.addEventListener('dblclick', (e) => {
 
   const input = document.createElement('input');
 
+  if (e.target === e.target.parentElement.children[2]) {
+    const selectEdit = createSelect();
+    const editSelect = document.createElement('select');
+
+    selectEdit.forEach((item) => {
+      editSelect.appendChild(item);
+    });
+
+    e.target.textContent = '';
+    e.target.append(editSelect);
+
+    editSelect.addEventListener('click', (even) => {
+      e.target.textContent = even.currentTarget.value;
+      editSelect.remove();
+    });
+
+    return;
+  }
+
   input.setAttribute('class', 'cell-input');
   e.target.textContent = '';
   e.target.append(input);
@@ -347,7 +376,7 @@ const createMessageError = (div) => {
   titleElement.style.fontWeight = '900';
   titleElement.style.fontSize = '20px';
 
-  if (inputName.value.length < 4) {
+  if (inputName.value.trim().length < 4) {
     titleElementName.textContent = 'Name should be at least 4';
   }
 
@@ -375,7 +404,7 @@ const checkValidValueError = () => {
     inputAge.value < 18 ||
     inputAge.value > 90 ||
     inputSalary.value < 0 ||
-    inputName.value.length < 4 ||
+    inputName.value.trim().length < 4 ||
     inputPosition.value.trim().length === 0
   );
 };
@@ -385,7 +414,7 @@ const checkValidValueSaccess = () => {
     inputAge.value >= 18 &&
     inputAge.value <= 90 &&
     inputSalary.value > 0 &&
-    inputName.value.length >= 4 &&
+    inputName.value.trim().length >= 4 &&
     inputPosition.value.trim().length > 0
   );
 };
