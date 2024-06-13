@@ -177,107 +177,6 @@ form.addEventListener('submit', (e) => {
   }
 });
 
-const td = document.querySelectorAll('td');
-
-td.forEach((item) => {
-  item.addEventListener('dblclick', (e) => {
-    const findInput = document.querySelector('.cell-input');
-    const oldValue = e.target.textContent;
-
-    if (findInput) {
-      findInput.remove();
-      e.target.textContent = oldValue;
-    }
-
-    const input = document.createElement('input');
-
-    if (item.cellIndex > 2) {
-      input.setAttribute('type', 'number');
-      input.style.width = '60px';
-    } else {
-      input.setAttribute('type', 'text');
-    }
-
-    input.setAttribute('class', 'cell-input');
-    e.target.textContent = '';
-    e.target.append(input);
-    input.focus();
-
-    input.onblur = () => {
-      if (item.cellIndex <= 2) {
-        if (input.value.trim().length < 4) {
-          e.target.textContent = oldValue;
-          input.remove();
-
-          return;
-        }
-      }
-
-      if (item.cellIndex === 3) {
-        if (input.value < 18 || input.value > 90) {
-          e.target.textContent = oldValue;
-          input.remove();
-
-          return;
-        }
-      }
-
-      if (item.cellIndex === 4) {
-        if (input.value < 0) {
-          e.target.textContent = oldValue;
-          input.remove();
-
-          return;
-        }
-      }
-
-      if (!input.value.trim()) {
-        e.target.textContent = oldValue;
-      } else {
-        e.target.textContent =
-          item.cellIndex === 4
-            ? `$${(+input.value).toLocaleString('en-US')}`
-            : input.value;
-      }
-
-      input.remove();
-    };
-
-    input.onkeydown = (even) => {
-      if (item.cellIndex <= 2) {
-        if (input.value.length < 4) {
-          return;
-        }
-      }
-
-      if (item.cellIndex === 3) {
-        if (input.value < 18 || input.value > 90) {
-          return;
-        }
-      }
-
-      if (item.cellIndex === 4) {
-        if (input.value < 0) {
-          return;
-        }
-      }
-
-      if (even.key === 'Enter') {
-        if (!input.value) {
-          e.target.textContent = oldValue;
-        } else {
-          e.target.textContent =
-            item.cellIndex === 4
-              ? `$${(+input.value).toLocaleString('en-US')}`
-              : input.value;
-        }
-
-        input.remove();
-      }
-    };
-  });
-});
-
 title.addEventListener('click', (e) => {
   const sortTody = document.querySelector('tbody');
   const rows = [...sortTody.querySelectorAll('tr')];
@@ -326,6 +225,108 @@ title.addEventListener('click', (e) => {
   });
 });
 
+tbody.addEventListener('dblclick', (e) => {
+  const findInput = document.querySelector('.cell-input');
+  const oldValue = e.target.textContent;
+
+  if (findInput) {
+    findInput.remove();
+    e.target.textContent = oldValue;
+  }
+
+  const input = document.createElement('input');
+
+  input.setAttribute('class', 'cell-input');
+  e.target.textContent = '';
+  e.target.append(input);
+  input.focus();
+
+  if (
+    e.target === e.target.parentElement.children[3] ||
+    e.target === e.target.parentElement.children[4]
+  ) {
+    input.style.width = '60px';
+  } else {
+    input.style.width = '100px';
+  }
+
+  input.onkeydown = (even) => {
+    if (even.key === 'Enter') {
+      if (e.target === e.target.parentElement.children[3]) {
+        input.setAttribute('type', 'number');
+
+        if (input.value < 18 || input.value > 90) {
+          e.target.textContent = oldValue;
+          input.remove();
+
+          return;
+        }
+      }
+
+      if (e.target === e.target.parentElement.children[4]) {
+        input.setAttribute('type', 'number');
+
+        if (input.value <= 0) {
+          e.target.textContent = oldValue;
+          input.remove();
+
+          return;
+        } else {
+          e.target.textContent = `$${(+input.value).toLocaleString('en-US')}`;
+          input.remove();
+
+          return;
+        }
+      }
+
+      if (!input.value.trim()) {
+        e.target.textContent = oldValue;
+      } else {
+        e.target.textContent = input.value;
+      }
+
+      input.remove();
+    }
+  };
+
+  input.onblur = () => {
+    if (e.target === e.target.parentElement.children[3]) {
+      input.setAttribute('type', 'number');
+
+      if (input.value < 18 || input.value > 90) {
+        e.target.textContent = oldValue;
+        input.remove();
+
+        return;
+      }
+    }
+
+    if (e.target === e.target.parentElement.children[4]) {
+      input.setAttribute('type', 'number');
+
+      if (input.value <= 0) {
+        e.target.textContent = oldValue;
+        input.remove();
+
+        return;
+      } else {
+        e.target.textContent = `$${(+input.value).toLocaleString('en-US')}`;
+        input.remove();
+
+        return;
+      }
+    }
+
+    if (!input.value.trim()) {
+      e.target.textContent = oldValue;
+    } else {
+      e.target.textContent = input.value;
+    }
+
+    input.remove();
+  };
+});
+
 const createMessagSaccess = (div) => {
   const titleSuccess = document.createElement('h2');
 
@@ -350,8 +351,12 @@ const createMessageError = (div) => {
     titleElementName.textContent = 'Name should be at least 4';
   }
 
-  if (inputPosition.value.trim().length === 0) {
+  if (!inputPosition.value.trim()) {
     titleElementPosition.textContent = 'Position value is invalid';
+  }
+
+  if (inputSalary.value < 0) {
+    titleElementPosition.textContent = 'salary must be greater than 0';
   }
 
   if (inputAge.value < 18 || inputAge.value > 90) {
@@ -369,6 +374,7 @@ const checkValidValueError = () => {
   return (
     inputAge.value < 18 ||
     inputAge.value > 90 ||
+    inputSalary.value < 0 ||
     inputName.value.length < 4 ||
     inputPosition.value.trim().length === 0
   );
@@ -378,6 +384,7 @@ const checkValidValueSaccess = () => {
   return (
     inputAge.value >= 18 &&
     inputAge.value <= 90 &&
+    inputSalary.value > 0 &&
     inputName.value.length >= 4 &&
     inputPosition.value.trim().length > 0
   );
