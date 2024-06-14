@@ -280,8 +280,17 @@ tbody.addEventListener('dblclick', (e) => {
   }
 
   const input = document.createElement('input');
+  let valueText = '';
 
-  input.value = oldValue;
+  if (e.target === e.target.parentElement.children[4]) {
+    valueText = e.target.textContent.replace('$', '').replace(',', '');
+
+    input.setAttribute('type', 'number');
+  } else {
+    valueText = e.target.textContent;
+  }
+
+  input.value = valueText;
   input.setAttribute('class', 'cell-input');
   e.target.textContent = '';
   e.target.append(input);
@@ -301,14 +310,16 @@ tbody.addEventListener('dblclick', (e) => {
       }
 
       if (e.target === e.target.parentElement.children[4]) {
-        if (!input.value.trim()) {
+        const value = input.value.replace('$', '').replace(',', '');
+
+        if (+value <= 0) {
           e.target.textContent = oldValue;
 
           input.remove();
 
           return;
         } else {
-          e.target.textContent = input.value;
+          e.target.textContent = `$${(+value).toLocaleString('en-US')}`;
           input.remove();
 
           return;
@@ -343,14 +354,16 @@ tbody.addEventListener('dblclick', (e) => {
     }
 
     if (e.target === e.target.parentElement.children[4]) {
-      if (!input.value.trim()) {
+      const value = input.value.replace('$', '').replace(',', '');
+
+      if (+value <= 0) {
         e.target.textContent = oldValue;
 
         input.remove();
 
         return;
       } else {
-        e.target.textContent = input.value;
+        e.target.textContent = `$${(+value).toLocaleString('en-US')}`;
         input.remove();
 
         return;
