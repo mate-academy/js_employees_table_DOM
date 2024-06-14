@@ -266,7 +266,6 @@ tbody.addEventListener('dblclick', (e) => {
     e.target.append(editSelect);
 
     editSelect.addEventListener('change', (even) => {
-
       e.target.textContent = even.currentTarget.value;
       editSelect.remove();
     });
@@ -282,19 +281,11 @@ tbody.addEventListener('dblclick', (e) => {
 
   const input = document.createElement('input');
 
+  input.value = oldValue;
   input.setAttribute('class', 'cell-input');
   e.target.textContent = '';
   e.target.append(input);
   input.focus();
-
-  if (
-    e.target === e.target.parentElement.children[3] ||
-    e.target === e.target.parentElement.children[4]
-  ) {
-    input.style.width = '60px';
-  } else {
-    input.style.width = '100px';
-  }
 
   input.onkeydown = (even) => {
     if (even.key === 'Enter') {
@@ -325,7 +316,7 @@ tbody.addEventListener('dblclick', (e) => {
         }
       }
 
-      if (!input.value.trim()) {
+      if (!input.value.trim() || input.value.trim().length < 4) {
         e.target.textContent = oldValue;
       } else {
         e.target.textContent = input.value;
@@ -338,38 +329,42 @@ tbody.addEventListener('dblclick', (e) => {
   input.onblur = () => {
     if (e.target === e.target.parentElement.children[3]) {
       input.setAttribute('type', 'number');
-  
+
       if (input.value < 18 || input.value > 90 || !input.value.trim()) {
         e.target.textContent = oldValue;
         input.remove();
+
         return;
       } else {
         e.target.textContent = input.value;
         input.remove();
+
         return;
       }
     }
-  
+
     if (e.target === e.target.parentElement.children[4]) {
       input.setAttribute('type', 'number');
-  
+
       if (input.value <= 0 || !input.value.trim()) {
         e.target.textContent = oldValue;
         input.remove();
+
         return;
       } else {
         e.target.textContent = `$${(+input.value).toLocaleString('en-US')}`;
         input.remove();
+
         return;
       }
     }
-  
-    if (!input.value.trim()) {
+
+    if (!input.value.trim() || input.value.trim().length < 4) {
       e.target.textContent = oldValue;
     } else {
       e.target.textContent = input.value;
     }
-  
+
     input.remove();
   };
 });
