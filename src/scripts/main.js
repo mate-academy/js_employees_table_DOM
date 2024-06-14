@@ -235,21 +235,28 @@ title.addEventListener('click', (e) => {
   });
 });
 
+let old = '';
+let oldEl = '';
+
 tbody.addEventListener('dblclick', (e) => {
   const findInput = document.querySelector('.cell-input');
   const oldValue = e.target.textContent;
 
   if (e.target === e.target.parentElement.children[2]) {
     if (findInput) {
-      e.target.textContent = oldValue;
+      oldEl.textContent = old;
 
       findInput.remove();
     }
+
+    oldEl = e.target;
+    old = e.target.textContent;
 
     const selectEdit = createSelect();
     const editSelect = document.createElement('select');
 
     editSelect.classList.add('cell-input');
+    editSelect.focus();
 
     selectEdit.forEach((item) => {
       editSelect.appendChild(item);
@@ -258,12 +265,8 @@ tbody.addEventListener('dblclick', (e) => {
     e.target.textContent = '';
     e.target.append(editSelect);
 
-    editSelect.onblur = () => {
-      e.target.textContent = oldValue;
-      editSelect.remove();
-    };
+    editSelect.addEventListener('change', (even) => {
 
-    editSelect.addEventListener('click', (even) => {
       e.target.textContent = even.currentTarget.value;
       editSelect.remove();
     });
@@ -272,9 +275,9 @@ tbody.addEventListener('dblclick', (e) => {
   }
 
   if (findInput) {
+    oldEl.textContent = old;
 
     findInput.remove();
-    e.target.textContent = oldValue;
   }
 
   const input = document.createElement('input');
@@ -335,37 +338,38 @@ tbody.addEventListener('dblclick', (e) => {
   input.onblur = () => {
     if (e.target === e.target.parentElement.children[3]) {
       input.setAttribute('type', 'number');
-
-      if (input.value < 18 || input.value > 90) {
+  
+      if (input.value < 18 || input.value > 90 || !input.value.trim()) {
         e.target.textContent = oldValue;
         input.remove();
-
+        return;
+      } else {
+        e.target.textContent = input.value;
+        input.remove();
         return;
       }
     }
-
+  
     if (e.target === e.target.parentElement.children[4]) {
       input.setAttribute('type', 'number');
-
-      if (input.value <= 0) {
+  
+      if (input.value <= 0 || !input.value.trim()) {
         e.target.textContent = oldValue;
         input.remove();
-
         return;
       } else {
         e.target.textContent = `$${(+input.value).toLocaleString('en-US')}`;
         input.remove();
-
         return;
       }
     }
-
+  
     if (!input.value.trim()) {
       e.target.textContent = oldValue;
     } else {
       e.target.textContent = input.value;
     }
-
+  
     input.remove();
   };
 });
