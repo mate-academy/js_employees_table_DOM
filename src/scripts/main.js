@@ -301,15 +301,14 @@ tbody.addEventListener('dblclick', (e) => {
       }
 
       if (e.target === e.target.parentElement.children[4]) {
-        input.setAttribute('type', 'number');
-
-        if (input.value <= 0) {
+        if (!input.value.trim()) {
           e.target.textContent = oldValue;
+
           input.remove();
 
           return;
         } else {
-          e.target.textContent = `$${(+input.value).toLocaleString('en-US')}`;
+          e.target.textContent = input.value;
           input.remove();
 
           return;
@@ -344,15 +343,14 @@ tbody.addEventListener('dblclick', (e) => {
     }
 
     if (e.target === e.target.parentElement.children[4]) {
-      input.setAttribute('type', 'number');
-
-      if (input.value <= 0 || !input.value.trim()) {
+      if (!input.value.trim()) {
         e.target.textContent = oldValue;
+
         input.remove();
 
         return;
       } else {
-        e.target.textContent = `$${(+input.value).toLocaleString('en-US')}`;
+        e.target.textContent = input.value;
         input.remove();
 
         return;
