@@ -239,16 +239,17 @@ tbody.addEventListener('dblclick', (e) => {
   const findInput = document.querySelector('.cell-input');
   const oldValue = e.target.textContent;
 
-  if (findInput) {
-    findInput.remove();
-    e.target.textContent = oldValue;
-  }
-
-  const input = document.createElement('input');
-
   if (e.target === e.target.parentElement.children[2]) {
+    if (findInput) {
+      e.target.textContent = oldValue;
+
+      findInput.remove();
+    }
+
     const selectEdit = createSelect();
     const editSelect = document.createElement('select');
+
+    editSelect.classList.add('cell-input');
 
     selectEdit.forEach((item) => {
       editSelect.appendChild(item);
@@ -257,6 +258,11 @@ tbody.addEventListener('dblclick', (e) => {
     e.target.textContent = '';
     e.target.append(editSelect);
 
+    editSelect.onblur = () => {
+      e.target.textContent = oldValue;
+      editSelect.remove();
+    };
+
     editSelect.addEventListener('click', (even) => {
       e.target.textContent = even.currentTarget.value;
       editSelect.remove();
@@ -264,6 +270,14 @@ tbody.addEventListener('dblclick', (e) => {
 
     return;
   }
+
+  if (findInput) {
+
+    findInput.remove();
+    e.target.textContent = oldValue;
+  }
+
+  const input = document.createElement('input');
 
   input.setAttribute('class', 'cell-input');
   e.target.textContent = '';
