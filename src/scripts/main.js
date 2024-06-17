@@ -60,24 +60,42 @@ trTbody.forEach((tr) => {
 // #endregion
 
 // #region Form
-const form = document.querySelector('form[name="login"]');
-
-const error = '<div class="error" data-qa="notification"></div>';
-const success = '<div class="success" data-qa="notification"></div>';
+const form = document.querySelector('form[name="employee"]');
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const data = new FormData(form);
 
-  if (data.get('name') < 4) {
-    body.appendChild(error);
+  if (data.get('name').length < 4) {
+    const errorElement = document.createElement('div');
+
+    errorElement.classList.add('error');
+    errorElement.setAttribute('data-qa', 'notification');
+
+    body.appendChild(errorElement);
   }
 
   if (data.get('age') < 18 || data.get('age') > 90) {
-    body.appendChild(error);
+    const errorElement = document.createElement('div');
+
+    errorElement.classList.add('error');
+    errorElement.setAttribute('data-qa', 'notification');
+
+    body.appendChild(errorElement);
   }
 
-  body.appendChild(success);
+  if (
+    data.get('name').length >= 4 &&
+    data.get('age') >= 18 &&
+    data.get('age') <= 90
+  ) {
+    const successElement = document.createElement('div');
+
+    successElement.classList.add('success');
+    successElement.setAttribute('data-qa', 'notification');
+
+    body.appendChild(successElement);
+  }
 });
 // #endregion
