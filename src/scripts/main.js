@@ -69,7 +69,8 @@ form.addEventListener('submit', (e) => {
 
   const data = new FormData(form);
 
-  if (data.get('name').length < 4) {
+  // #region error or sucess
+  if (data.get('name').trim().length < 4 && data.get('name').trim() === '') {
     const errorElement = document.createElement('div');
 
     errorElement.classList.add('notification', 'error');
@@ -81,9 +82,7 @@ form.addEventListener('submit', (e) => {
     setTimeout(() => {
       errorElement.remove();
     }, 3000);
-  }
-
-  if (data.get('age') < 18 || data.get('age') > 90) {
+  } else if (data.get('age') < 18 || data.get('age') > 90) {
     const errorElement = document.createElement('div');
 
     errorElement.classList.add('notification', 'error');
@@ -95,9 +94,19 @@ form.addEventListener('submit', (e) => {
     setTimeout(() => {
       errorElement.remove();
     }, 3000);
-  }
+  } else if (data.get('position').trim() === '') {
+    const errorElement = document.createElement('div');
 
-  if (
+    errorElement.classList.add('notification', 'error');
+    errorElement.setAttribute('data-qa', 'notification');
+    errorElement.textContent = 'fill in the position line';
+
+    body.appendChild(errorElement);
+
+    setTimeout(() => {
+      errorElement.remove();
+    }, 3000);
+  } else if (
     data.get('name').length >= 4 &&
     data.get('age') >= 18 &&
     data.get('age') <= 90
@@ -113,6 +122,7 @@ form.addEventListener('submit', (e) => {
     setTimeout(() => {
       successElement.remove();
     }, 3000);
+    // #endregion
 
     // #region new row
     const newRow = document.createElement('tr');
@@ -127,7 +137,7 @@ form.addEventListener('submit', (e) => {
     positionCell.textContent = data.get('position');
     officeCell.textContent = data.get('office');
     ageCell.textContent = data.get('age');
-    salaryCell.textContent = data.get('salary');
+    salaryCell.textContent = `$${parseFloat(data.get('salary')).toLocaleString('en-US')}`;
 
     newRow.appendChild(nameCell);
     newRow.appendChild(positionCell);
