@@ -62,6 +62,38 @@ tbody.addEventListener('click', (e) => {
   selectedRow = tableRow;
 });
 
+tbody.addEventListener('dblclick', (e) => {
+  const originalContent = e.target.textContent;
+  const input = document.createElement('input');
+
+  input.classList.add('cell-input');
+  input.style.width = getComputedStyle(e.target).width;
+  input.value = originalContent;
+
+  const closeInput = () => {
+    if (input.value === '') {
+      e.target.textContent = originalContent;
+
+      return;
+    }
+
+    e.target.textContent = input.value;
+
+    input.remove();
+  };
+
+  input.addEventListener('blur', closeInput);
+
+  input.addEventListener('keypress', (keyEvent) => {
+    if (keyEvent.key === 'Enter') {
+      closeInput();
+    }
+  });
+
+  e.target.replaceChildren(input);
+  input.focus();
+});
+
 function normalizedParseInt(value) {
   return parseInt(value.replaceAll('$', '').replaceAll(',', ''));
 }
@@ -124,6 +156,21 @@ function handleSubmit(e) {
   const employeeOffice = e.target.office.value;
   const employeeAge = parseInt(e.target.age.value);
   const employeeSalary = parseInt(e.target.salary.value);
+
+  if (
+    employeeName.trim().length === 0 ||
+    employeePosition.trim().length === 0
+  ) {
+    pushNotification(
+      10,
+      10,
+      'Error!',
+      'Some of values contains only spaces.',
+      'error',
+    );
+
+    return;
+  }
 
   if (employeePosition.length === 0) {
     pushNotification(
