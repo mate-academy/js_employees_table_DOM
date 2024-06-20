@@ -158,6 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (age < 18 || age > 90) {
       message = 'Age value is less than 18 or more than 90';
       isValid = false;
+    } else if (salary.trim().length === 0) {
+      message = 'Salary value is invalid';
+      isValid = false;
     }
 
     if (!isValid) {
@@ -183,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.innerText = item;
       });
 
+      rows.push(newRow);
       form.reset();
     }
 
