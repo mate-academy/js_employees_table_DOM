@@ -34,8 +34,10 @@ function cellEdit(cell) {
     saveChanges(input.value, cell, prevValue);
   });
 
-  input.addEventListener('keypress', () => {
-    saveChanges(input.value, cell, prevValue);
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      saveChanges(input.value, cell, prevValue);
+    }
   });
 
   const saveChanges = (value, cellToChange, prev) => {
@@ -105,7 +107,6 @@ function createForm() {
 
       input.dataset.qa = data;
       input.type = data === 'age' || data === 'salary' ? 'number' : 'text';
-      input.required = 'true';
       input.name = data;
 
       label.appendChild(input);
@@ -225,28 +226,28 @@ function addUser(e) {
     return;
   }
 
+  if (!user.position.trim().length) {
+    createNotification(
+      'error',
+      'Fix your position',
+      'Position field can not be empty.',
+    );
+
+    return;
+  }
+
+  if (user.office === null) {
+    createNotification(
+      'error',
+      'Fix your office',
+      'Ofice field can not be empty.',
+    );
+
+    return;
+  }
+
   if (user.age < 18 || user.age > 90) {
     createNotification('error', 'Fix your age', 'Your age is not appropriate.');
-
-    return;
-  }
-
-  if (!user.position.trim().length) {
-    createNotification(
-      'error',
-      'Fix your position',
-      'Position field can not be empty.',
-    );
-
-    return;
-  }
-
-  if (!user.position.trim().length) {
-    createNotification(
-      'error',
-      'Fix your position',
-      'Position field can not be empty.',
-    );
 
     return;
   }
