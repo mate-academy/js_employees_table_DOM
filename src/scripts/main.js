@@ -45,7 +45,9 @@ function handlerBlur(e) {
 
   showMessage(message);
 
-  if (!message.isSuccess) {
+  if (message.type === 'error' || message.type === 'warning') {
+    input.focus();
+
     return;
   }
 
@@ -65,7 +67,7 @@ function handlerKeypress(e) {
 
   showMessage(message);
 
-  if (!message.isSuccess) {
+  if (message.type === 'error' || message.type === 'warning') {
     return;
   }
 
