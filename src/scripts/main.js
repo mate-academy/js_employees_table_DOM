@@ -206,12 +206,16 @@ const handleAddEmployee = (action) => {
 
   const warning = [];
 
-  if (nameInput.value.length < 4) {
+  if (nameInput.value.trim().length < 4) {
     warning.push('Name should be at least 4 symbols length.');
   }
 
   if (!positionInput.value) {
     warning.push('Position field should be filled.');
+  }
+
+  if (positionInput.value.trim() === '' && positionInput.value) {
+    warning.push('Position field should not contain only spaces.');
   }
 
   if (!salaryInput.value) {
@@ -220,6 +224,10 @@ const handleAddEmployee = (action) => {
 
   if (+salaryInput.value < 0) {
     warning.push('Salary field should be with a positive number.');
+  }
+
+  if (+salaryInput.value === 0) {
+    warning.push('Salary should be bigger than zero.');
   }
 
   if (+ageInput.value < 18 || +ageInput.value > 90) {
