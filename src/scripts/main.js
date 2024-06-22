@@ -196,5 +196,5 @@ form.addEventListener('submit', (e) => {
 
   tableBody.appendChild(newRow);
 
-  form.reset(); // Clear the form inputs after submission
+  form.reset();
 });
