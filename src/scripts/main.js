@@ -160,10 +160,14 @@ form.addEventListener('submit', (e) => {
 
   if (nameInput.value.length < 4) {
     displayNotification('Name must be at least 4 letters long!', 'error');
-  } else if (ageInput.value < 18 || ageInput.value > 90) {
-    displayNotification('Your age dont suit our requirements', 'error');
-  } else {
-    displayNotification('New employee added successfully!', 'success');
+
+    return;
+  }
+
+  if (ageInput.value < 18 || ageInput.value > 90) {
+    displayNotification('Your age doesn\'t suit our requirements', 'error');
+
+    return;
   }
 
   const nameCell = document.createElement('td');
@@ -195,6 +199,8 @@ form.addEventListener('submit', (e) => {
   newRow.appendChild(salaryCell);
 
   tableBody.appendChild(newRow);
+
+  displayNotification('New employee added successfully!', 'success');
 
   form.reset();
 });
