@@ -149,40 +149,47 @@ function handlerSubmit(e) {
 }
 
 function showMessage(message) {
-  const errorBlock = document.createElement('div');
+  const newNotificationBlock = document.createElement('div');
+  const oldNotificationBlock = document.querySelector('.notification');
+
+  if (oldNotificationBlock) {
+    oldNotificationBlock.remove();
+  }
 
   const title = document.createElement('h1');
   const text = document.createElement('p');
 
-  errorBlock.className = 'notification';
-  errorBlock.dataset.qa = 'notification';
+  if (!newNotificationBlock.className) {
+    newNotificationBlock.className = 'notification';
+    newNotificationBlock.dataset.qa = 'notification';
+  }
 
   switch (message.type) {
     case 'error':
       title.innerText = 'ERROR';
-      errorBlock.classList.add('error');
+      newNotificationBlock.classList.add('error');
       break;
 
     case 'warning':
-      title.innerText = 'warning';
-      errorBlock.classList.add('warning');
+      title.innerText = 'ERROR';
+      newNotificationBlock.classList.add('error');
       break;
 
     default:
       title.innerText = 'SUCCESS';
-      errorBlock.classList.add('success');
+      newNotificationBlock.classList.add('success');
       break;
   }
 
   text.innerText = message.text;
 
-  errorBlock.insertAdjacentElement('afterbegin', title);
-  errorBlock.insertAdjacentElement('beforeend', text);
+  newNotificationBlock.insertAdjacentElement('afterbegin', title);
+  newNotificationBlock.insertAdjacentElement('beforeend', text);
 
-  document.body.append(errorBlock);
+  document.body.append(newNotificationBlock);
 
   window.setTimeout(() => {
-    errorBlock.remove();
+    newNotificationBlock.remove();
   }, 5000);
 }
 
