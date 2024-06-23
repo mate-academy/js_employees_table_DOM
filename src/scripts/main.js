@@ -196,7 +196,7 @@ function handleSubmit(e) {
   const data = new FormData(e.currentTarget);
 
   for (const value of data.values()) {
-    if (!value) {
+    if (!value.trim()) {
       pushNotification(10, 10, 'Error', 'All fields are required', 'error');
 
       return;
@@ -264,7 +264,7 @@ function handleEdit(e) {
   input.className = 'cell-input';
 
   function handleEnteredText(TextEnterEvent) {
-    const enteredText = TextEnterEvent.target.value;
+    const enteredText = TextEnterEvent.target.value.trim();
 
     if (enteredText) {
       cell.textContent = enteredText;
