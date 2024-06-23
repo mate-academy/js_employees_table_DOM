@@ -20,39 +20,42 @@ tableHead.addEventListener('click', (e) => {
       sortOrder = 'asc';
     }
 
-    if (sortOrder === 'asc') {
-      rows.sort((a, b) => {
-        switch (sortName) {
-          case 'Position':
-          case 'Name':
-          case 'Office':
-            return a.cells[cellIndex].textContent.localeCompare(
-              b.cells[cellIndex].textContent,
-            );
+    rows.sort((a, b) => {
+      switch (sortName) {
+        case 'Position':
+        case 'Name':
+        case 'Office':
+          return a.cells[cellIndex].textContent.localeCompare(
+            b.cells[cellIndex].textContent,
+          );
 
-          case 'Salary':
-            const salaryA = a.cells[cellIndex].textContent.replace(/[$,]/g, '');
-            const salaryB = b.cells[cellIndex].textContent.replace(/[$,]/g, '');
+        case 'Salary':
+          const salaryA = Number(
+            a.cells[cellIndex].textContent.replace(/[$,]/g, ''),
+          );
+          const salaryB = Number(
+            b.cells[cellIndex].textContent.replace(/[$,]/g, ''),
+          );
 
-            return salaryA - salaryB;
+          return salaryA - salaryB;
 
-          default:
-            return (
-              a.cells[cellIndex].textContent - b.cells[cellIndex].textContent
-            );
-        }
-      });
-
-      tbody.textContent = '';
-      rows.forEach((row) => tbody.appendChild(row));
-    }
+        default:
+          return (
+            Number(a.cells[cellIndex].textContent) -
+            Number(b.cells[cellIndex].textContent)
+          );
+      }
+    });
 
     if (sortOrder === 'desc') {
       rows.reverse();
-
-      tbody.textContent = '';
-      rows.forEach((row) => tbody.appendChild(row));
     }
+
+    tbody.textContent = '';
+
+    rows.forEach((row) => {
+      tbody.appendChild(row);
+    });
   }
 });
 
@@ -208,7 +211,14 @@ tbody.addEventListener('dblclick', (e) => {
     if (e.type === 'blur' || (e.type === 'keyup' && e.key === 'Enter')) {
       const newText = e.target.value.trim() || editedCell;
 
-      cell.innerText = newText;
+      if (cell.cellIndex === 4) {
+        const formattedSalary = formatSalary(newText);
+
+        cell.innerText = formattedSalary;
+      } else {
+        cell.innerText = newText;
+      }
+
       editedCell = null;
     }
   };
@@ -216,3 +226,9 @@ tbody.addEventListener('dblclick', (e) => {
   input.addEventListener('blur', saveChanges);
   input.addEventListener('keyup', saveChanges);
 });
+
+function formatSalary(salary) {
+  const formatted = `$${(+(salary / 1000)).toFixed(3).replace('.', ',')}`;
+
+  return formatted;
+}
