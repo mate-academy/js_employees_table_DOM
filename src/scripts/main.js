@@ -27,9 +27,14 @@ function handlerDblClick(e) {
   const cellInput = document.createElement('input');
 
   cellInput.className = 'cell-input';
-  cellInput.value = value;
   cellInput.autofocus = true;
   cellInput.dataset.oldValue = value;
+  cellInput.value = value;
+
+  if (!targetCell.nextElementSibling) {
+    cellInput.type = 'number';
+    cellInput.value = parseFloat(value.slice(1).replace(/,/g, ''));
+  }
 
   targetCell.innerText = '';
   targetCell.insertAdjacentElement('beforeend', cellInput);
@@ -75,8 +80,12 @@ function handlerKeypress(e) {
 }
 
 function saveCellValue(input) {
-  const newValue = input.value;
+  let newValue = input.value;
   const targetCell = input.closest('td');
+
+  if (!targetCell.nextElementSibling) {
+    newValue = `$${parseFloat(newValue).toLocaleString('en-EN')}`;
+  }
 
   targetCell.innerText = newValue;
   input.remove();
