@@ -121,7 +121,7 @@ button.onclick = (e) => {
   const formData = {};
 
   values.forEach((v) => {
-    formData[v.name] = v.value;
+    formData[v.name] = v.value.trim();
   });
 
   if (formData.name.length < 4) {
