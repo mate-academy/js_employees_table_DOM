@@ -326,6 +326,7 @@ form.addEventListener('submit', (e) => {
   const notification = document.createElement('div');
   const title = document.createElement('h2');
   const description = document.createElement('p');
+  const labels = [...document.querySelectorAll('.new-employee-form label')];
 
   notification.dataset.qa = 'notification';
   notification.append(title, description);
@@ -368,6 +369,7 @@ form.addEventListener('submit', (e) => {
 
     if (unvalidAge) {
       valid = false;
+      labels[3].style.color = 'red';
       notification.classList.add('notification', 'error');
       title.textContent = 'Error.';
       title.className = 'title';
@@ -378,6 +380,7 @@ form.addEventListener('submit', (e) => {
 
     if (unvalidName) {
       valid = false;
+      labels[0].style.color = 'red';
       notification.classList.add('notification', 'error');
       title.className = 'title';
       title.textContent = 'Error.';
@@ -402,18 +405,23 @@ form.addEventListener('submit', (e) => {
   }
 
   if (valid) {
+    if (labels[3].style.color === 'red') {
+      labels[3].style.color = '#808080';
+    } else if (labels[0].style.color === 'red') {
+      labels[0].style.color = '#808080';
+    }
+
     notification.classList.add('notification', 'success');
     title.className = 'title';
     title.textContent = 'Success.';
     description.textContent = 'New employee has been added successfully.';
     document.body.append(notification);
     body.append(tr);
+    e.target.reset();
   }
 
   // make notification invisible after 3,5sec
   setTimeout(() => {
     notification.style.display = 'none';
   }, 3500);
-
-  e.target.reset();
 });
