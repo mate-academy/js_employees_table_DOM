@@ -344,6 +344,28 @@ form.addEventListener('submit', (e) => {
       unvalidName = value.length < 4;
     }
 
+    // name cannot be just spaces
+    if (key === 'name' && !value.replaceAll(' ', '').length) {
+      valid = false;
+      notification.classList.add('notification', 'error');
+      title.textContent = 'Error.';
+      title.className = 'title';
+      description.textContent = 'Please, type name value';
+      document.body.append(notification);
+      break;
+    }
+
+    // position cannot be just spaces
+    if (key === 'position' && !value.replaceAll(' ', '').length) {
+      valid = false;
+      notification.classList.add('notification', 'error');
+      title.textContent = 'Error.';
+      title.className = 'title';
+      description.textContent = 'Please, type position value';
+      document.body.append(notification);
+      break;
+    }
+
     if (unvalidAge) {
       valid = false;
       notification.classList.add('notification', 'error');
