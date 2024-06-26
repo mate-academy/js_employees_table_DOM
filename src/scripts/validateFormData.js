@@ -13,7 +13,7 @@ function isValid(fieldName, value) {
       return value >= 18 && value < 90;
 
     case 'salary':
-      return value >= 0;
+      return value >= 0 && value;
 
     default:
       break;
