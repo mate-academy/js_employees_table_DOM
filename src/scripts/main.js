@@ -28,7 +28,13 @@ function createInput(inputLabel, inputName, inputType = 'text') {
   const input = document.createElement('input');
 
   input.name = inputName;
-  input.type = inputType;
+
+  if (inputLabel === 'Age' || inputLabel === 'Salary') {
+    input.type = 'number';
+  } else {
+    input.type = inputType;
+  }
+
   input.setAttribute('data-qa', inputName.toLowerCase());
   label.appendChild(input);
 
@@ -75,7 +81,7 @@ document.body.appendChild(newEmployeeForm);
 document.addEventListener('DOMContentLoaded', () => {
   const header = document.querySelectorAll('thead th');
   const table = document.querySelector('tbody');
-  const tableRows = Array.from(table.querySelectorAll('tr'));
+  let tableRows = Array.from(table.querySelectorAll('tr'));
   const sortOrder = {};
 
   header.forEach((element, index) => {
@@ -171,19 +177,101 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const cellForEdit = e.target;
     const initialValue = e.target.textContent;
+    const columnName = cellForEdit.dataset.columnName
+      || columnNames[cellForEdit.cellIndex];
 
-    const input = document.createElement('input');
+    let input;
 
-    input.value = initialValue;
-    input.type = 'text';
+    if (columnName === 'Office') {
+      input = document.createElement('select');
+
+      offices.forEach((office) => {
+        const option = document.createElement('option');
+
+        option.value = office;
+        option.textContent = office;
+
+        if (office === initialValue) {
+          option.selected = true;
+        }
+        input.appendChild(option);
+      });
+    } else {
+      input = document.createElement('input');
+      input.value = initialValue;
+
+      if (columnName === 'Age' || columnName === 'Salary') {
+        input.type = 'number';
+        input.min = 18;
+        input.max = 90;
+      } else {
+        input.type = 'text';
+      }
+
+    }
+
     input.classList.add('cell-input');
 
     cellForEdit.textContent = '';
     cellForEdit.appendChild(input);
     input.focus();
 
+    let isSaving = false;
+
     function save() {
-      cellForEdit.textContent = input.value || initialValue;
+      if (isSaving) {
+        return;
+      }
+      isSaving = true;
+
+      if (columnName === 'Age') {
+        const age = parseInt(input.value);
+
+        if (age >= 18 && age <= 90) {
+          cellForEdit.textContent = age;
+        } else {
+          cellForEdit.textContent = initialValue;
+
+          pushNotification(
+            'Error message',
+            'Age must be 18 - 90 years',
+            'error',
+          );
+        }
+      } else if (columnName === 'Name') {
+        if (input.value.trim().length >= 4) {
+          cellForEdit.textContent = input.value;
+        } else {
+          cellForEdit.textContent = initialValue;
+
+          pushNotification(
+            'Error message',
+            'Name must have at least 4 letters',
+            'error',
+          );
+        }
+      } else if (columnName === 'Position') {
+        if (input.value.trim().length > 0) {
+          cellForEdit.textContent = input.value;
+        } else {
+          cellForEdit.textContent = initialValue;
+
+          pushNotification(
+            'Error message',
+            'Position must be...',
+            'error',
+          );
+        }
+      } else if (columnName === 'Salary') {
+        if (input.value.trim().length > 0) {
+          cellForEdit.textContent = '$' + Number(input.value)
+            .toLocaleString('en-US');
+        } else {
+          cellForEdit.textContent = initialValue;
+        }
+      } else {
+        cellForEdit.textContent = input.value || initialValue;
+      }
       input.remove();
     }
 
@@ -194,7 +282,6 @@ document.addEventListener('DOMContentLoaded', () => {
         save();
       }
     });
-
   });
 
   newEmployeeForm.addEventListener('submit', (e) => {
@@ -215,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (columnName === 'Name') {
-        if (inputValue.value.length >= 4) {
+        if (inputValue.value.trim().length >= 4) {
           newCell.textContent = inputValue.value;
           newRow.appendChild(newCell);
         } else {
@@ -243,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
           );
         }
       } else if (columnName === 'Position') {
-        if (inputValue.value.length > 0) {
+        if (inputValue.value.trim().length > 0) {
           newCell.textContent = inputValue.value;
           newRow.appendChild(newCell);
         } else {
@@ -256,9 +343,19 @@ document.addEventListener('DOMContentLoaded', () => {
           );
         }
       } else if (columnName === 'Salary') {
-        newCell.textContent = '$' + Number(inputValue.value)
-          .toLocaleString('en-US');
-        newRow.appendChild(newCell);
+        if (inputValue.value.trim().length > 0) {
+          newCell.textContent = '$' + Number(inputValue.value)
+            .toLocaleString('en-US');
+          newRow.appendChild(newCell);
+        } else {
+          isValid = false;
+
+          pushNotification(
+            'Error message',
+            'Salary must be...',
+            'error',
+          );
+        }
 
       } else {
         newCell.textContent = inputValue.value;
@@ -269,6 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (isValid) {
       table.appendChild(newRow);
+      tableRows = Array.from(table.querySelectorAll('tr'));
 
       pushNotification(
         'Success message',
@@ -279,6 +377,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+const notifications = [];
+
+function updateNotifications() {
+  notifications.forEach((notification, index) => {
+    notification.style.top = `${10 + index * 120}px`;
+  });
+}
 
 const pushNotification = (title, description, type) => {
   const body = document.querySelector('body');
@@ -293,7 +399,15 @@ const pushNotification = (title, description, type) => {
   notificationDescription.innerText = description;
 
   body.appendChild(notification);
-  setTimeout(() => (notification.style.visibility = 'hidden'), 2000);
+  notifications.push(notification);
+  updateNotifications();
+  // setTimeout(() => (notification.style.visibility = 'hidden'), 2000);
+
+  setTimeout(() => {
+    notification.remove();
+    notifications.shift();
+    updateNotifications();
+  }, 2000);
 
   notification.appendChild(notificationTitle);
   notification.appendChild(notificationDescription);
