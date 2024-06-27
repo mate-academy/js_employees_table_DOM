@@ -15,7 +15,7 @@ Let's get started. Briefly about the tasks:
 2. When user clicks on a row, it should become selected.
 3. Write a script to add a form to the document. Form allows users to add new employees to the spreadsheet.
 4. Show notification if form data is invalid (use notification from the previous tasks).
-5. Implement editing of table cells by double-clicking on it.
+5. Implement editing of table cells by double-clicking on it. (optional)
 
 As always, all the necessary styles have already been written for you, you do not need to change the layout or styles in this task.
 
