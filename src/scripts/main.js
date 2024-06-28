@@ -312,7 +312,7 @@ function validateFormData(target, columns, offices) {
   columns.forEach((columnName) => {
     [...target.form].forEach((field) => {
       if (field.dataset.qa === columnName) {
-        data[columnName] = field.value;
+        data[columnName] = field.value.trim();
       }
     });
   });
@@ -330,7 +330,7 @@ function validateFormData(target, columns, offices) {
   }
 
   for (const [key, value] of Object.entries(data)) {
-    if (!value) {
+    if (!value || value.length === 0) {
       validationErrors.push(`Enter ${key}`);
     }
   }
