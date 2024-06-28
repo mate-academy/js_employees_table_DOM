@@ -155,13 +155,15 @@ function saveChanges(input) {
     newValue = editableCell.cellInitialValue;
   }
 
-  if (columnName === 'age' && !validate.extremumValue(+newValue, 18, 90)) {
-    createNotificationElement(
-      'Error!',
-      [`Incorrect ${columnName} value!`],
-      'error',
-    );
-    newValue = editableCell.cellInitialValue;
+  if (columnName === 'age') {
+    if (!validate.extremumValue(+newValue, 18, 90) || isNaN(Number(newValue))) {
+      createNotificationElement(
+        'Error!',
+        [`Incorrect ${columnName} value!`],
+        'error',
+      );
+      newValue = editableCell.cellInitialValue;
+    }
   }
 
   if (columnName === 'office' && !validate.oneOfMany(newValue, officesList)) {
