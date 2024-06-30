@@ -157,6 +157,7 @@ function createNewEmploee(e) {
   e.preventDefault();
 
   const newRow = document.createElement('tr');
+
   const chekoutText = valuesValidation(newCustomerForm);
 
   showMessage(chekoutText);
@@ -184,6 +185,8 @@ function createNewEmploee(e) {
   }
 
   tbody.insertAdjacentElement('beforeend', newRow);
+
+  rows.push(newRow);
 
   newCustomerForm.reset();
 }
