@@ -9,7 +9,7 @@ const headings = document.querySelectorAll('th');
 const footerHeadings = document.querySelectorAll('tfoot th');
 const rows = [...tbody.querySelectorAll('tr')];
 
-const sortDirections = Array.from({ length: headings.length }, () => 1);
+const sortDirections = Array.from({ length: headings.length }, () => -1);
 
 headings.forEach((heading, index) => {
   heading.addEventListener('click', () => {
