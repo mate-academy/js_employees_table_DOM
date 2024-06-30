@@ -240,23 +240,29 @@ function valuesValidation(inputToCheck) {
   const office = inputToCheck['office'].value;
   const salary = inputToCheck['salary'].value;
 
+  const ERROR_EMPTY_FIELDS = 'All fields must be filled in';
+  const ERROR_TO_SHORT_NAME = 'Name can not be less then 4 letters';
+  const ERROR_TO_SMALL_AGE = 'Age can not be less then 18';
+  const ERROR_TO_BIG_AGE = 'Age can not be bigger then 90';
+  const SUCCESSFUL_INPUT = 'User added successfully';
+
   if (position === '' || office === '' || salary === '') {
-    return { type: 'error', text: 'All fields must be filled in' };
+    return { type: 'error', text: ERROR_EMPTY_FIELDS };
   }
 
   if (nameValue.length < 4) {
-    return { type: 'error', text: 'Name can not be less then 4 letters' };
+    return { type: 'error', text: ERROR_TO_SHORT_NAME };
   }
 
   if (age < 18) {
-    return { type: 'error', text: 'Age can not be less then 18' };
+    return { type: 'error', text: ERROR_TO_SMALL_AGE };
   }
 
   if (age > 90) {
-    return { type: 'error', text: 'Age can not be bigger then 90' };
+    return { type: 'error', text: ERROR_TO_BIG_AGE };
   }
 
-  return { type: 'success', text: 'User added successfully' };
+  return { type: 'success', text: SUCCESSFUL_INPUT };
 }
 
 // #endregion
@@ -350,25 +356,31 @@ function cellValid(input) {
 
   const value = input.value;
 
+  const WARNING_EMPTY_CELL = 'Cell can not be empty';
+  const WARNING_SHORT_NAME = 'Name can not be less then 4 letters';
+  const WARNING_SMALL_AGE = 'Age can not be less then 18';
+  const WARNING_BIG_AGE = 'Age can not be bigger then 90';
+  const SUCCESS_VALIDATION = 'User updated successfully';
+
   if (value.length === 0) {
     return {
       type: 'warning',
-      text: 'Cell can not be empty',
+      text: WARNING_EMPTY_CELL,
     };
   }
 
   if (currentIndex === 0 && value.length < 4) {
     return {
       type: 'warning',
-      text: 'Name can not be less then 4 letters',
+      text: WARNING_SHORT_NAME,
     };
   } else if (currentIndex === 3 && +value < 18) {
-    return { type: 'warning', text: 'Age can not be less then 18' };
+    return { type: 'warning', text: WARNING_SMALL_AGE };
   } else if (currentIndex === 3 && +value > 90) {
-    return { type: 'warning', text: 'Age can not be bigger then 90' };
+    return { type: 'warning', text: WARNING_BIG_AGE };
   }
 
-  return { type: 'success', text: 'User updated successfully' };
+  return { type: 'success', text: SUCCESS_VALIDATION };
 }
 
 // #endregion
