@@ -362,21 +362,21 @@ function cellValid(input) {
   const WARNING_BIG_AGE = 'Age can not be bigger then 90';
   const SUCCESS_VALIDATION = 'User updated successfully';
 
-  if (value.length === 0) {
+  if (value.length === 0 || value.trim() === '') {
     return {
       type: 'warning',
       text: WARNING_EMPTY_CELL,
     };
   }
 
-  if (currentIndex === 0 && value.length < 4) {
+  if ((currentIndex === 0 && value.length < 4) || value.trim() === '') {
     return {
       type: 'warning',
       text: WARNING_SHORT_NAME,
     };
-  } else if (currentIndex === 3 && +value < 18) {
+  } else if ((currentIndex === 3 && +value < 18) || value.trim() === '') {
     return { type: 'warning', text: WARNING_SMALL_AGE };
-  } else if (currentIndex === 3 && +value > 90) {
+  } else if ((currentIndex === 3 && +value > 90) || value.trim() === '') {
     return { type: 'warning', text: WARNING_BIG_AGE };
   }
 
