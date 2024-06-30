@@ -1,12 +1,14 @@
 'use strict';
 
+const MIN_AGE = 18;
+const MAX_AGE = 100;
 const pageBody = document.querySelector('body');
 const tableHeader = document.querySelector('thead');
 const tableHeaderCells = tableHeader.querySelector('tr');
 const tableBody = document.querySelector('tbody');
 let isSecondClick = false;
 const toNumber = (string) => {
-  if (typeof string === 'string' && string.length !== 0) {
+  if (typeof string === 'string' && string) {
     const clearNum = string.replace(/[$, ]/g, '');
 
     return parseInt(clearNum, 10);
@@ -31,22 +33,22 @@ tableHeaderCells.addEventListener('click', (e) => {
     clickedSortTable = columnName;
 
     const columnsSorted = columnsToSort.sort((a, b) => {
-      const elemA = a.children[sortedColumn].innerHTML;
-      const elemB = b.children[sortedColumn].innerHTML;
+      const elemA = a.children[sortedColumn].textContent;
+      const elemB = b.children[sortedColumn].textContent;
 
       const aToNum = toNumber(elemA);
       const bToNum = toNumber(elemB);
 
       if (Number.isNaN(aToNum)) {
-        return !isSecondClick
-          ? elemA.localeCompare(elemB)
-          : elemB.localeCompare(elemA);
+        return isSecondClick
+          ? elemB.localeCompare(elemA)
+          : elemA.localeCompare(elemB);
       }
 
-      return !isSecondClick ? aToNum - bToNum : bToNum - aToNum;
+      return isSecondClick ? bToNum - aToNum : aToNum - bToNum;
     });
 
-    tableBody.innerHTML = '';
+    tableBody.textContent = '';
 
     columnsSorted.forEach((el) => {
       tableBody.appendChild(el);
@@ -55,18 +57,18 @@ tableHeaderCells.addEventListener('click', (e) => {
 });
 
 tableBody.addEventListener('click', (e) => {
-  const headerChildren = [...tableBody.children];
+  const rowsChildren = [...tableBody.children];
   const columnName = e.target.closest('tr');
 
-  headerChildren.forEach((el) => el.removeAttribute('class'));
+  rowsChildren.forEach((row) => row.removeAttribute('class'));
   columnName.classList.add('active');
 });
 
 const formContainer = document.createElement('form');
 const nameLabel = document.createElement('label');
 const nameInput = document.createElement('input');
-const posiitionLabel = document.createElement('label');
-const posiitionInput = document.createElement('input');
+const positionLabel = document.createElement('label');
+const positionInput = document.createElement('input');
 const officeLabel = document.createElement('label');
 const officeChoose = document.createElement('select');
 const ageLabel = document.createElement('label');
@@ -82,10 +84,10 @@ const cityOptions = [
   `Edinburgh`,
   `San Francisco`,
 ];
-const inputs = [nameInput, posiitionInput, officeChoose, ageInput, salaryInput];
+const inputs = [nameInput, positionInput, officeChoose, ageInput, salaryInput];
 
 const modifyElement = (parentEl, child, cellName, type) => {
-  parentEl.innerHTML = `${cellName}:`;
+  parentEl.textContent = `${cellName}:`;
   parentEl.setAttribute('data-qa', cellName.toLowerCase());
   child.required = true;
   child.type = type;
@@ -93,16 +95,17 @@ const modifyElement = (parentEl, child, cellName, type) => {
 };
 
 modifyElement(nameLabel, nameInput, 'Name', 'text');
-modifyElement(posiitionLabel, posiitionInput, 'Position', 'text');
+modifyElement(positionLabel, positionInput, 'Position', 'text');
 modifyElement(ageLabel, ageInput, 'Age', 'number');
 modifyElement(salaryLabel, salaryInput, 'Salary', 'number');
 
 formContainer.classList.add('new-employee-form');
 
-officeLabel.innerHTML = 'Office:';
+officeLabel.textContent = 'Office:';
 officeLabel.setAttribute('data-qa', 'office');
 officeLabel.appendChild(officeChoose);
 officeChoose.required = true;
+formButton.type = 'Submit';
 formButton.innerText = 'Save to table';
 
 cityOptions.forEach((el) => {
@@ -114,7 +117,7 @@ cityOptions.forEach((el) => {
 });
 
 formContainer.appendChild(nameLabel);
-formContainer.appendChild(posiitionLabel);
+formContainer.appendChild(positionLabel);
 formContainer.appendChild(officeLabel);
 formContainer.appendChild(ageLabel);
 formContainer.appendChild(salaryLabel);
@@ -127,7 +130,6 @@ const pushNotification = (title, description, type) => {
   const containerTitle = document.createElement('h2');
   const containerDescr = document.createElement('p');
 
-  container.classList.add('notification');
   container.setAttribute('data-qa', 'notification');
   containerTitle.classList.add('title');
 
@@ -152,10 +154,10 @@ formButton.addEventListener('click', (e) => {
 
   if (
     nameInput.value === '' ||
-    posiitionInput.value === '' ||
+    positionInput.value === '' ||
     ageInput.value === '' ||
-    ageInput.value < 18 ||
-    ageInput.value > 100 ||
+    ageInput.value < MIN_AGE ||
+    ageInput.value > MAX_AGE ||
     salaryInput.value === ''
   ) {
     return pushNotification(
@@ -173,9 +175,9 @@ formButton.addEventListener('click', (e) => {
     if (cell === 4) {
       const inputNumber = parseInt(inputs[cell].value);
 
-      newCell.innerHTML = `$${inputNumber.toLocaleString('en-US')}`;
+      newCell.textContent = `$${inputNumber.toLocaleString('en-US')}`;
     } else {
-      newCell.innerHTML = inputs[cell].value;
+      newCell.textContent = inputs[cell].value;
     }
 
     newEmployee.appendChild(newCell);
@@ -217,7 +219,7 @@ tableBody.addEventListener('dblclick', (e) => {
     edCellForm.setAttribute('cellType', cellInfo[indexOfCell]);
     edCellForm.appendChild(edCellLabel);
 
-    editedCell.innerHTML = '';
+    editedCell.textContent = '';
     editedCell.appendChild(edCellForm);
   }
 });
@@ -241,7 +243,7 @@ const onSubmitForm = (e) => {
       ev.preventDefault();
 
       if (inputElem.value.trim() !== '') {
-        parentElem.innerHTML = '';
+        parentElem.textContent = '';
 
         if (formCellTypeSalary) {
           const inputNumber = parseInt(inputElem.value);
@@ -251,7 +253,7 @@ const onSubmitForm = (e) => {
           parentElem.innerText = inputElem.value;
         }
       } else {
-        parentElem.innerHTML = '';
+        parentElem.textContent = '';
         parentElem.innerText = formPreviousName.value;
       }
     });
