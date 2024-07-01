@@ -50,7 +50,7 @@ function pushNotification(posTop, posRight, title, description, type = '') {
 }
 
 function checkData(formData) {
-  if (formData.name.length < 4) {
+  if (formData.name.trim().length < 4) {
     pushNotification(
       500,
       10,
@@ -62,7 +62,7 @@ function checkData(formData) {
     return false;
   }
 
-  if (!formData.position) {
+  if (!formData.position.trim()) {
     pushNotification(
       500,
       10,
