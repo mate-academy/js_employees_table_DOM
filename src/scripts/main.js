@@ -1,5 +1,3 @@
-/* eslint-disable no-shadow */
-/* eslint-disable prettier/prettier */
 /* eslint-disable max-len */
 'use strict';
 
@@ -38,12 +36,13 @@ table.forEach((row) => {
 });
 
 topHeaders.forEach((header) => {
-  header.addEventListener('click', (event) => {
-    switch (event.target.textContent) {
+  header.addEventListener('click', (e) => {
+    switch (e.target.textContent) {
       case NAME:
         const acsSortedName = staff.sort((a, b) =>
           a.name.localeCompare(b.name),
         );
+
         const sortedByName = isClickedName
           ? acsSortedName.reverse()
           : acsSortedName;
@@ -184,8 +183,8 @@ topHeaders.forEach((header) => {
 const setActiveClick = (prop) => {
   prop.forEach((cell) => {
     cell.addEventListener('click', () => {
-      table.forEach((cell) => {
-        cell.classList.remove('active');
+      table.forEach((cellForDelete) => {
+        cellForDelete.classList.remove('active');
       });
 
       cell.classList.add('active');
@@ -291,7 +290,7 @@ const addForm = () => {
   body.appendChild(containerForm);
 };
 
-const addNotification = (status) => {
+const addNotification = (statusProp) => {
   const mainBox = document.createElement('div');
 
   mainBox.setAttribute('data-qa', 'notification');
@@ -304,7 +303,7 @@ const addNotification = (status) => {
   mainBox.style.width = '500px';
   mainBox.style.height = '50px';
 
-  switch (status) {
+  switch (statusProp) {
     case DONE:
       mainBox.style.backgroundColor = 'green';
       mainBox.textContent = 'new member staff added';
@@ -317,7 +316,7 @@ const addNotification = (status) => {
       mainBox.classList.add('error');
 
       mainBox.textContent =
-        'Age biggest 18 and lower 90, Name length must have 4';
+        'Age biggest 18 and lower 90, Name length must have 4. Maybe empty name or position';
       break;
   }
 
@@ -333,25 +332,34 @@ addForm();
 const addedButton = document.getElementsByTagName('button')[0];
 
 function formatToEU(number) {
-  const formatter = new Intl.NumberFormat('en-GB'); // 'en-GB' represents English (United Kingdom), which uses comma as thousand separator and dot as decimal separator
+  const formatter = new Intl.NumberFormat('en-GB');
 
   return formatter.format(number);
 }
 
-addedButton.addEventListener('click', (event) => {
-  event.preventDefault();
+addedButton.addEventListener('click', (e) => {
+  e.preventDefault();
 
   const form = document.getElementsByTagName('form')[0];
   const inputs = Array.from(form.elements).slice(0, -1);
 
-  if (!form.checkValidity()) {
-    return addNotification(NOT_DONE);
+  for (let i = 0; i < inputs.length; i++) {
+    const element = inputs[i];
+
+    if (element.value.trim() === '') {
+      return addNotification(NOT_DONE);
+    }
   }
 
   const newMember = {};
 
   for (let i = 0; i < inputs.length; i++) {
     const element = inputs[i];
+
+    if (element.getAttribute('name') === 'salary') {
+      newMember[element.getAttribute('name')] = `$${formatToEU(element.value)}`;
+      continue;
+    }
 
     newMember[element.getAttribute('name')] = element.value;
   }
@@ -360,12 +368,6 @@ addedButton.addEventListener('click', (event) => {
 
   for (const key of Object.keys(newMember)) {
     const newCell = document.createElement('td');
-
-    if (key === 'salary') {
-      newCell.textContent = `$${formatToEU(newMember[key])}`;
-      newRow.appendChild(newCell);
-      continue;
-    }
 
     newCell.textContent = newMember[key];
     newRow.appendChild(newCell);
@@ -376,7 +378,6 @@ addedButton.addEventListener('click', (event) => {
 
   table = tbody.querySelectorAll('tr');
 
-  console.log(table, staff);
   setActiveClick(table);
   form.reset();
 
