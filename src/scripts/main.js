@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 'use strict';
 
 const NAME = 'Name';
@@ -39,9 +38,9 @@ topHeaders.forEach((header) => {
   header.addEventListener('click', (e) => {
     switch (e.target.textContent) {
       case NAME:
-        const acsSortedName = staff.sort((a, b) =>
-          a.name.localeCompare(b.name),
-        );
+        const acsSortedName = staff.sort((a, b) => {
+          return a.name.localeCompare(b.name);
+        });
 
         const sortedByName = isClickedName
           ? acsSortedName.reverse()
@@ -67,9 +66,9 @@ topHeaders.forEach((header) => {
         break;
 
       case POSITION:
-        const acsSortedPosition = staff.sort((a, b) =>
-          a.position.localeCompare(b.position),
-        );
+        const acsSortedPosition = staff.sort((a, b) => {
+          return a.position.localeCompare(b.position);
+        });
 
         const sortedByPosition = isClickedPosition
           ? acsSortedPosition.reverse()
@@ -97,9 +96,9 @@ topHeaders.forEach((header) => {
         break;
 
       case OFFICE:
-        const acsSortedOffice = staff.sort((a, b) =>
-          a.office.localeCompare(b.office),
-        );
+        const acsSortedOffice = staff.sort((a, b) => {
+          return a.office.localeCompare(b.office);
+        });
 
         const sortedByOffice = isClickedOffice
           ? acsSortedOffice.reverse()
@@ -316,7 +315,7 @@ const addNotification = (statusProp) => {
       mainBox.classList.add('error');
 
       mainBox.textContent =
-        'Age biggest 18 and lower 90, Name length must have 4. Maybe empty name or position';
+        'Age must be 18-90, name must be 4<. Maybe empty name or position';
       break;
   }
 
