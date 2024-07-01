@@ -1,11 +1,14 @@
 'use strict';
 
-import { onTableSort, setActiveRow } from './utils';
+import { setActiveRow } from './utils';
 import { Form } from './form';
 import { CellEdit } from './cell-edit';
+import { TableSort } from './table-sort';
 
 const tHead = document.querySelector('thead');
 const tBody = document.querySelector('tbody');
+
+const { onTableSort } = new TableSort();
 const { createForm: form } = new Form();
 const { editCell } = new CellEdit();
 
