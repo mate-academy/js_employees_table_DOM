@@ -1,10 +1,6 @@
 export class FormNotification {
   notification = null;
 
-  // static NOTIFICATION_TYPE_SUCCESS = 'success';
-  // static NOTIFICATION_TYPE_WARNING = 'warning';
-  // static NOTIFICATION_TYPE_ERROR = 'error';
-
   #createNotification(type = '') {
     const notification = document.createElement('div');
 
