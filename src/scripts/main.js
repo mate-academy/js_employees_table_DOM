@@ -74,6 +74,18 @@ function checkData(formData) {
     return false;
   }
 
+  if (+formData.salary < 0) {
+    pushNotification(
+      500,
+      10,
+      'Error!',
+      `Salary field cannot be negative!`,
+      'error',
+    );
+
+    return false;
+  }
+
   if (+formData.age < 18 || +formData.age > 90) {
     pushNotification(500, 10, 'Error!', `Age must be more 18`, 'error');
 
