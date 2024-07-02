@@ -2,80 +2,33 @@
 
 const MIN_AGE = 18;
 const MAX_AGE = 100;
+const MIN_SALARY = 50000;
+const TIMER_DURATION = 10000; // Milisecond (s = 1000ms)
 const pageBody = document.querySelector('body');
 const tableHeader = document.querySelector('thead');
 const tableHeaderCells = tableHeader.querySelector('tr');
 const tableBody = document.querySelector('tbody');
-let isSecondClick = false;
 const toNumber = (string) => {
   if (typeof string === 'string' && string) {
     const clearNum = string.replace(/[$, ]/g, '');
 
     return parseInt(clearNum, 10);
   }
+
+  return NaN;
 };
-let clickedSortTable;
+const sortTable = (elemA, elemB) => {
+  const aToNum = toNumber(elemA);
+  const bToNum = toNumber(elemB);
 
-tableHeaderCells.addEventListener('click', (e) => {
-  const headerChildren = [...tableHeaderCells.children];
-  const columnName = e.target.closest('th');
-
-  if (columnName !== null) {
-    const sortedColumn = headerChildren.indexOf(columnName);
-    const columnsToSort = [...tableBody.children];
-
-    if (clickedSortTable === columnName) {
-      isSecondClick = !isSecondClick;
-    } else {
-      isSecondClick = false;
-    }
-
-    clickedSortTable = columnName;
-
-    const columnsSorted = columnsToSort.sort((a, b) => {
-      const elemA = a.children[sortedColumn].textContent;
-      const elemB = b.children[sortedColumn].textContent;
-
-      const aToNum = toNumber(elemA);
-      const bToNum = toNumber(elemB);
-
-      if (Number.isNaN(aToNum)) {
-        return isSecondClick
-          ? elemB.localeCompare(elemA)
-          : elemA.localeCompare(elemB);
-      }
-
-      return isSecondClick ? bToNum - aToNum : aToNum - bToNum;
-    });
-
-    tableBody.textContent = '';
-
-    columnsSorted.forEach((el) => {
-      tableBody.appendChild(el);
-    });
+  if (Number.isNaN(aToNum)) {
+    return isSecondClick
+      ? elemB.localeCompare(elemA)
+      : elemA.localeCompare(elemB);
   }
-});
 
-tableBody.addEventListener('click', (e) => {
-  const rowsChildren = [...tableBody.children];
-  const columnName = e.target.closest('tr');
-
-  rowsChildren.forEach((row) => row.removeAttribute('class'));
-  columnName.classList.add('active');
-});
-
-const formContainer = document.createElement('form');
-const nameLabel = document.createElement('label');
-const nameInput = document.createElement('input');
-const positionLabel = document.createElement('label');
-const positionInput = document.createElement('input');
-const officeLabel = document.createElement('label');
-const officeChoose = document.createElement('select');
-const ageLabel = document.createElement('label');
-const ageInput = document.createElement('input');
-const salaryLabel = document.createElement('label');
-const salaryInput = document.createElement('input');
-const formButton = document.createElement('button');
+  return isSecondClick ? bToNum - aToNum : aToNum - bToNum;
+};
 const cityOptions = [
   `Tokyo`,
   `Singapore`,
@@ -84,43 +37,64 @@ const cityOptions = [
   `Edinburgh`,
   `San Francisco`,
 ];
-const inputs = [nameInput, positionInput, officeChoose, ageInput, salaryInput];
+let clickedSortTable;
+let isSecondClick = false;
 
-const modifyElement = (parentEl, child, cellName, type) => {
-  parentEl.textContent = `${cellName}:`;
-  parentEl.setAttribute('data-qa', cellName.toLowerCase());
-  child.required = true;
-  child.type = type;
-  parentEl.appendChild(child);
+const createElement = (cellName, type) => {
+  const label = document.createElement('label');
+  const input = document.createElement('input');
+
+  label.textContent = `${cellName}:`;
+  input.setAttribute('data-qa', cellName.toLowerCase());
+  input.required = true;
+  input.type = type;
+  label.appendChild(input);
+
+  return label;
 };
 
-modifyElement(nameLabel, nameInput, 'Name', 'text');
-modifyElement(positionLabel, positionInput, 'Position', 'text');
-modifyElement(ageLabel, ageInput, 'Age', 'number');
-modifyElement(salaryLabel, salaryInput, 'Salary', 'number');
+const getElInput = (element) => {
+  return element.firstElementChild;
+};
+
+const formContainer = document.createElement('form');
+const nameElement = createElement('Name', 'text');
+const positionElement = createElement('Position', 'text');
+const officeLabel = document.createElement('label');
+const officeChoose = document.createElement('select');
+const ageElement = createElement('Age', 'number');
+const salaryElement = createElement('Salary', 'number');
+const formButton = document.createElement('button');
+const inputs = [
+  getElInput(nameElement),
+  getElInput(positionElement),
+  officeChoose,
+  getElInput(ageElement),
+  getElInput(salaryElement),
+];
 
 formContainer.classList.add('new-employee-form');
 
 officeLabel.textContent = 'Office:';
-officeLabel.setAttribute('data-qa', 'office');
 officeLabel.appendChild(officeChoose);
+officeChoose.setAttribute('data-qa', 'office');
 officeChoose.required = true;
 formButton.type = 'Submit';
-formButton.innerText = 'Save to table';
+formButton.textContent = 'Save to table';
 
 cityOptions.forEach((el) => {
   const option = document.createElement('option');
 
   option.value = el;
-  option.innerText = el;
+  option.textContent = el;
   officeChoose.appendChild(option);
 });
 
-formContainer.appendChild(nameLabel);
-formContainer.appendChild(positionLabel);
+formContainer.appendChild(nameElement);
+formContainer.appendChild(positionElement);
 formContainer.appendChild(officeLabel);
-formContainer.appendChild(ageLabel);
-formContainer.appendChild(salaryLabel);
+formContainer.appendChild(ageElement);
+formContainer.appendChild(salaryElement);
 formContainer.appendChild(formButton);
 
 pageBody.appendChild(formContainer);
@@ -136,9 +110,8 @@ const pushNotification = (title, description, type) => {
   if (type === 'success' || type === 'error') {
     container.classList.add('notification', type);
   }
-  containerTitle.classList.add('title');
-  containerTitle.innerText = title;
-  containerDescr.innerText = description;
+  containerTitle.textContent = title;
+  containerDescr.textContent = description;
 
   container.appendChild(containerTitle);
   container.appendChild(containerDescr);
@@ -146,25 +119,82 @@ const pushNotification = (title, description, type) => {
 
   setTimeout(() => {
     container.style.display = 'none';
-  }, 3000);
+  }, TIMER_DURATION);
+};
+
+const onSubmitForm = (e) => {
+  e.preventDefault();
+
+  const formHandle = e.target.closest('form');
+
+  if (!formHandle) {
+    return;
+  }
+
+  const parentElem = formHandle.parentElement;
+  const formAttributes = [...formHandle.attributes];
+  const formPreviousName = formAttributes.find((el) => el.name === 'previous');
+  const formCellType = formAttributes.find((el) => el.name === 'celltype');
+  const formCellTypeSalary = formCellType.value === 'Salary';
+  const inputElem = formHandle.querySelector('input');
+
+  if (inputElem.value.trim() !== '') {
+    parentElem.textContent = '';
+
+    if (formCellTypeSalary) {
+      const inputNumber = parseInt(inputElem.value);
+
+      parentElem.textContent = `$${inputNumber.toLocaleString('en-US')}`;
+    } else {
+      parentElem.textContent = inputElem.value;
+    }
+  } else {
+    parentElem.textContent = '';
+    parentElem.textContent = formPreviousName.value;
+  }
 };
 
 formButton.addEventListener('click', (e) => {
   e.preventDefault();
 
+  const notification = document.querySelector('.notification');
+  let errorToFix = [];
+
+  if (notification) {
+    notification.remove();
+  }
+
+  if (getElInput(nameElement).value.trim().length < 4) {
+    errorToFix = [...errorToFix, 'Name must be longer that 4 symbol'];
+  }
+
+  if (getElInput(positionElement).value.trim().length < 4) {
+    errorToFix = [...errorToFix, 'Position must be longer that 4 symbol'];
+  }
+
   if (
-    nameInput.value === '' ||
-    positionInput.value === '' ||
-    ageInput.value === '' ||
-    ageInput.value < MIN_AGE ||
-    ageInput.value > MAX_AGE ||
-    salaryInput.value === ''
+    getElInput(ageElement).value === '' ||
+    getElInput(ageElement).value < MIN_AGE ||
+    getElInput(ageElement).value > MAX_AGE
   ) {
-    return pushNotification(
-      'Error',
-      'Please, fix all the problems in form',
-      'error',
-    );
+    errorToFix = [
+      ...errorToFix,
+      'Age must be bigger than 18, but less then 100',
+    ];
+  }
+
+  if (
+    getElInput(salaryElement).value === '' ||
+    getElInput(salaryElement).value < MIN_SALARY
+  ) {
+    errorToFix = [
+      ...errorToFix,
+      'Our workers is not homeless. They earns more that 50000$/year',
+    ];
+  }
+
+  if (errorToFix.length !== 0) {
+    return pushNotification('Error', errorToFix.join('\n'), 'error');
   }
 
   const newEmployee = document.createElement('tr');
@@ -173,11 +203,11 @@ formButton.addEventListener('click', (e) => {
     const newCell = document.createElement('td');
 
     if (cell === 4) {
-      const inputNumber = parseInt(inputs[cell].value);
+      const inputNumber = parseInt(inputs[cell].value.trim());
 
       newCell.textContent = `$${inputNumber.toLocaleString('en-US')}`;
     } else {
-      newCell.textContent = inputs[cell].value;
+      newCell.textContent = inputs[cell].value.trim();
     }
 
     newEmployee.appendChild(newCell);
@@ -191,14 +221,14 @@ formButton.addEventListener('click', (e) => {
 
   tableBody.appendChild(newEmployee);
 
-  return pushNotification('Done', 'New employee was added to list', 'success');
+  return pushNotification('Done', 'New employee added to list', 'success');
 });
 
 tableBody.addEventListener('dblclick', (e) => {
   const editedCell = e.target.closest('td');
   const cellRow = e.target.closest('tr');
   const indexOfCell = [...cellRow.children].indexOf(editedCell);
-  const cellInitialtName = editedCell.innerText;
+  const cellInitialtName = editedCell.textContent;
 
   if (editedCell.firstChild.tagName !== 'FORM') {
     const edCellForm = document.createElement('form');
@@ -224,40 +254,45 @@ tableBody.addEventListener('dblclick', (e) => {
   }
 });
 
-const onSubmitForm = (e) => {
-  const formHandle = e.target.closest('form');
+tableHeaderCells.addEventListener('click', (e) => {
+  const headerChildren = [...tableHeaderCells.children];
+  const columnName = e.target.closest('th');
 
-  if (formHandle) {
-    e.preventDefault();
+  if (columnName !== null) {
+    const sortedColumn = headerChildren.indexOf(columnName);
+    const columnsToSort = [...tableBody.children];
 
-    const parentElem = formHandle.parentElement;
-    const formAttributes = [...formHandle.attributes];
-    const formPreviousName = formAttributes.find(
-      (el) => el.name === 'previous',
-    );
-    const formCellType = formAttributes.find((el) => el.name === 'celltype');
-    const formCellTypeSalary = formCellType.value === 'Salary';
-    const inputElem = formHandle.querySelector('input');
+    if (clickedSortTable === columnName) {
+      isSecondClick = !isSecondClick;
+    } else {
+      isSecondClick = false;
+    }
 
-    formHandle.addEventListener('submit', (ev) => {
-      ev.preventDefault();
+    clickedSortTable = columnName;
 
-      if (inputElem.value.trim() !== '') {
-        parentElem.textContent = '';
+    const columnsSorted = columnsToSort.sort((a, b) => {
+      const elemA = a.children[sortedColumn].textContent;
+      const elemB = b.children[sortedColumn].textContent;
 
-        if (formCellTypeSalary) {
-          const inputNumber = parseInt(inputElem.value);
+      return sortTable(elemA, elemB);
+    });
 
-          parentElem.innerText = `$${inputNumber.toLocaleString('en-US')}`;
-        } else {
-          parentElem.innerText = inputElem.value;
-        }
-      } else {
-        parentElem.textContent = '';
-        parentElem.innerText = formPreviousName.value;
-      }
+    tableBody.textContent = '';
+
+    columnsSorted.forEach((el) => {
+      tableBody.appendChild(el);
     });
   }
-};
+});
 
-tableBody.addEventListener('click', onSubmitForm);
+tableBody.addEventListener('click', (e) => {
+  const selectedRow = e.target.closest('tr');
+  const activeRow = tableBody.querySelector('.active');
+
+  if (activeRow) {
+    activeRow.classList.remove('active');
+  }
+  selectedRow.classList.add('active');
+});
+
+tableBody.addEventListener('submit', onSubmitForm);
