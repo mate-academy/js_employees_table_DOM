@@ -166,6 +166,7 @@ tBody.addEventListener('dblclick', (e) => {
   }
 
   const inputText = document.getElementById('changeCell');
+  const inputTextValue = inputText.value.trim();
 
   inputText.focus();
 
@@ -179,13 +180,13 @@ tBody.addEventListener('dblclick', (e) => {
 
   function changedCells() {
     if (
-      inputText.value.length > 0 &&
-      !validateCahgeCell(inputText.value, changeCellIndex)
+      inputTextValue.length > 0 &&
+      !validateCahgeCell(inputTextValue, changeCellIndex)
     ) {
       if (changeCellIndex === 4) {
-        changeCells.textContent = convertToUSD(inputText.value);
+        changeCells.textContent = convertToUSD(inputTextValue);
       } else {
-        changeCells.textContent = inputText.value;
+        changeCells.textContent = inputTextValue;
       }
     } else {
       changeCells.textContent = contentCell;
