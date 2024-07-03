@@ -166,7 +166,6 @@ tBody.addEventListener('dblclick', (e) => {
   }
 
   const inputText = document.getElementById('changeCell');
-  const inputTextValue = inputText.value.trim();
 
   inputText.focus();
 
@@ -179,6 +178,8 @@ tBody.addEventListener('dblclick', (e) => {
   });
 
   function changedCells() {
+    const inputTextValue = inputText.value.trim();
+
     if (
       inputTextValue.length > 0 &&
       !validateCahgeCell(inputTextValue, changeCellIndex)
