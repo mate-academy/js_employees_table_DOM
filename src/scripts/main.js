@@ -1,7 +1,7 @@
 'use strict';
 
 const MIN_AGE = 18;
-const MAX_AGE = 100;
+const MAX_AGE = 90;
 const MIN_SALARY = 50000;
 const TIMER_DURATION = 10000; // Milisecond (s = 1000ms)
 const pageBody = document.querySelector('body');
@@ -40,64 +40,65 @@ const cityOptions = [
 let clickedSortTable;
 let isSecondClick = false;
 
-const createElement = (cellName, type) => {
-  const label = document.createElement('label');
-  const input = document.createElement('input');
+const createEmployeeForm = (cityes) => {
+  const createElement = (cellName, type) => {
+    const label = document.createElement('label');
+    const input = document.createElement('input');
 
-  label.textContent = `${cellName}:`;
-  input.setAttribute('data-qa', cellName.toLowerCase());
-  input.required = true;
-  input.type = type;
-  label.appendChild(input);
+    label.textContent = `${cellName}:`;
+    input.setAttribute('data-qa', cellName.toLowerCase());
+    input.required = true;
+    input.type = type;
+    label.appendChild(input);
 
-  return label;
+    return label;
+  };
+
+  const formContainer = document.createElement('form');
+  const nameFormField = createElement('Name', 'text');
+  const positionFormField = createElement('Position', 'text');
+  const officeFormField = document.createElement('label');
+  const officeChoose = document.createElement('select');
+  const ageFormField = createElement('Age', 'number');
+  const salaryFormField = createElement('Salary', 'number');
+  const formButtonField = document.createElement('button');
+
+  formContainer.classList.add('new-employee-form');
+
+  officeFormField.textContent = 'Office:';
+  officeFormField.appendChild(officeChoose);
+  officeChoose.setAttribute('data-qa', 'office');
+  officeChoose.required = true;
+  formButtonField.type = 'Submit';
+  formButtonField.textContent = 'Save to table';
+
+  cityes.forEach((el) => {
+    const option = document.createElement('option');
+
+    option.value = el;
+    option.textContent = el;
+    officeChoose.appendChild(option);
+  });
+
+  formContainer.appendChild(nameFormField);
+  formContainer.appendChild(positionFormField);
+  formContainer.appendChild(officeFormField);
+  formContainer.appendChild(ageFormField);
+  formContainer.appendChild(salaryFormField);
+  formContainer.appendChild(formButtonField);
+
+  pageBody.appendChild(formContainer);
+
+  return formContainer;
 };
 
-const getElInput = (element) => {
-  return element.firstElementChild;
-};
+const form = createEmployeeForm(cityOptions);
 
-const formContainer = document.createElement('form');
-const nameElement = createElement('Name', 'text');
-const positionElement = createElement('Position', 'text');
-const officeLabel = document.createElement('label');
-const officeChoose = document.createElement('select');
-const ageElement = createElement('Age', 'number');
-const salaryElement = createElement('Salary', 'number');
-const formButton = document.createElement('button');
-const inputs = [
-  getElInput(nameElement),
-  getElInput(positionElement),
-  officeChoose,
-  getElInput(ageElement),
-  getElInput(salaryElement),
-];
+const formFields = [...form.children]
+  .slice(0, -1)
+  .map((field) => field.firstElementChild);
 
-formContainer.classList.add('new-employee-form');
-
-officeLabel.textContent = 'Office:';
-officeLabel.appendChild(officeChoose);
-officeChoose.setAttribute('data-qa', 'office');
-officeChoose.required = true;
-formButton.type = 'Submit';
-formButton.textContent = 'Save to table';
-
-cityOptions.forEach((el) => {
-  const option = document.createElement('option');
-
-  option.value = el;
-  option.textContent = el;
-  officeChoose.appendChild(option);
-});
-
-formContainer.appendChild(nameElement);
-formContainer.appendChild(positionElement);
-formContainer.appendChild(officeLabel);
-formContainer.appendChild(ageElement);
-formContainer.appendChild(salaryElement);
-formContainer.appendChild(formButton);
-
-pageBody.appendChild(formContainer);
+const formButton = form.querySelector('button');
 
 const pushNotification = (title, description, type) => {
   const container = document.createElement('div');
@@ -164,18 +165,18 @@ formButton.addEventListener('click', (e) => {
     notification.remove();
   }
 
-  if (getElInput(nameElement).value.trim().length < 4) {
+  if (formFields[0].value.trim().length < 4) {
     errorToFix = [...errorToFix, 'Name must be longer that 4 symbol'];
   }
 
-  if (getElInput(positionElement).value.trim().length < 4) {
+  if (formFields[1].value.trim().length < 4) {
     errorToFix = [...errorToFix, 'Position must be longer that 4 symbol'];
   }
 
   if (
-    getElInput(ageElement).value === '' ||
-    getElInput(ageElement).value < MIN_AGE ||
-    getElInput(ageElement).value > MAX_AGE
+    formFields[3].value === '' ||
+    formFields[3].value < MIN_AGE ||
+    formFields[3].value > MAX_AGE
   ) {
     errorToFix = [
       ...errorToFix,
@@ -183,10 +184,7 @@ formButton.addEventListener('click', (e) => {
     ];
   }
 
-  if (
-    getElInput(salaryElement).value === '' ||
-    getElInput(salaryElement).value < MIN_SALARY
-  ) {
+  if (formFields[4].value === '' || formFields[4].value < MIN_SALARY) {
     errorToFix = [
       ...errorToFix,
       'Our workers is not homeless. They earns more that 50000$/year',
@@ -199,21 +197,21 @@ formButton.addEventListener('click', (e) => {
 
   const newEmployee = document.createElement('tr');
 
-  for (let cell = 0; cell < inputs.length; cell++) {
+  for (let cell = 0; cell < formFields.length; cell++) {
     const newCell = document.createElement('td');
 
     if (cell === 4) {
-      const inputNumber = parseInt(inputs[cell].value.trim());
+      const inputNumber = parseInt(formFields[cell].value.trim());
 
       newCell.textContent = `$${inputNumber.toLocaleString('en-US')}`;
     } else {
-      newCell.textContent = inputs[cell].value.trim();
+      newCell.textContent = formFields[cell].value.trim();
     }
 
     newEmployee.appendChild(newCell);
   }
 
-  inputs.forEach((input, i) => {
+  formFields.forEach((input, i) => {
     if (i !== 2) {
       input.value = '';
     }
