@@ -122,11 +122,14 @@ form.addEventListener('submit', function (e) {
   e.preventDefault();
 
   const newRow = document.createElement('tr');
-  const inputName = form.querySelector('input[name="name"]').value;
-  const inputAge = form.querySelector('input[name="age"]').value;
-  const inputPosition = form.querySelector('input[name="position"]').value;
+  const inputName = form.querySelector('input[name="name"]').value.trim();
+  const inputAge = form.querySelector('input[name="age"]').value.trim();
+  const inputSalary = form.querySelector('input[name="salary"]').value.trim();
+  const inputPosition = form
+    .querySelector('input[name="position"]')
+    .value.trim();
 
-  if (!inputPosition || !inputName || !inputAge) {
+  if (!inputPosition || !inputName || !inputAge || !inputSalary) {
     return pushNotification(
       'All fields must be filled',
       'Please fill in all fields',
