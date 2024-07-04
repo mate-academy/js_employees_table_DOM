@@ -29,13 +29,13 @@ const form = document.querySelector('.new-employee-form');
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  const nameEmployee = document.getElementById('name').value;
+  const nameEmployee = document.getElementById('name').value.trim();
 
   if (validation(nameEmployee, 'name')) {
     return;
   }
 
-  const positionEmployee = document.getElementById('position').value;
+  const positionEmployee = document.getElementById('position').value.trim();
 
   if (validation(positionEmployee, 'position')) {
     return;
