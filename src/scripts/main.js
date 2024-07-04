@@ -107,13 +107,13 @@ table.addEventListener('dblclick', function (e) {
       saveChanges(chosenCell, cellTextDefault);
     };
 
-    const handleKeyDown = function (ev) {
+    editInput.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') {
+        editInput.removeEventListener('blur', handleBlur);
         saveChanges(chosenCell, cellTextDefault);
       }
-    };
+    });
 
-    editInput.addEventListener('keydown', handleKeyDown);
     editInput.addEventListener('blur', handleBlur);
   }
 });
