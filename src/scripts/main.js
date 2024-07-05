@@ -8,6 +8,7 @@ const pushNotification = (type, description) => {
   const title = type.charAt(0).toUpperCase() + type.slice(1);
 
   message.classList.add('notification', type);
+  message.classList.add(type === 'Success' ? 'success' : 'error');
 
   message.innerHTML = `
     <h2 class="title">${title}</h2>
@@ -23,7 +24,7 @@ const pushNotification = (type, description) => {
 
   setTimeout(() => {
     message.remove();
-  }, 2000);
+  }, 5000);
 };
 
 const table = document.querySelector('table');
@@ -48,7 +49,6 @@ const initializePeopleArray = () => {
 
     item.addEventListener('click', () => {
       trs.forEach((tr) => tr.classList.remove('active'));
-
       item.classList.add('active');
     });
 
@@ -149,7 +149,10 @@ const handleSort = (e) => {
 };
 
 const addEventListeners = () => {
-  headers.forEach((header) => {
+  headers.forEach((header, index) => {
+    const columnName = header.innerText.toLowerCase().replace(' ', '-');
+
+    header.setAttribute('data-qa', `header-${columnName}`);
     header.addEventListener('click', (e) => handleSort(e));
   });
 };
@@ -160,6 +163,7 @@ addEventListeners();
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
+form.setAttribute('novalidate', 'true');
 
 const attributes = ['name', 'position', 'office', 'age', 'salary'];
 
@@ -296,140 +300,15 @@ const onSubmit = (e) => {
 
   table.insertBefore(row, table.lastElementChild);
 
-  pushNotification(
-    'Success',
-    'New employee is successfully added to the table',
-  );
+  row.addEventListener('click', () => {
+    const trs = document.querySelectorAll('tr');
+
+    trs.forEach((tr) => tr.classList.remove('active'));
+    row.classList.add('active');
+  });
 
   form.reset();
+  pushNotification('success', 'Employee successfully added to the table');
 };
 
-form.addEventListener('submit', (e) => onSubmit(e));
-
-table.addEventListener('click', (e) => {
-  const value = e.target.innerText;
-  const target = e.target;
-
-  if (target.tagName.toLowerCase() !== 'td') {
-    return;
-  }
-
-  const input = document.createElement('input');
-
-  input.classList.add('cell-input');
-  input.value = value;
-  target.innerHTML = '';
-  target.appendChild(input);
-  input.focus();
-
-  const validateInput = (inputValue, column) => {
-    switch (column) {
-      case 0: // Name
-        if (inputValue.length < 4) {
-          pushNotification('error', 'Name value must have at least 4 letters');
-
-          return false;
-        }
-
-        if (people.some((person) => person.name === inputValue)) {
-          pushNotification(
-            'error',
-            'An employee with this name already exists',
-          );
-
-          return false;
-        }
-        break;
-      case 1: // Position
-        if (inputValue.trim() === '') {
-          pushNotification('error', 'Position cannot be empty');
-
-          return false;
-        }
-        break;
-      case 2: // Office
-        const validOffices = [
-          'Tokyo',
-          'Singapore',
-          'London',
-          'New York',
-          'Edinburgh',
-          'San Francisco',
-        ];
-
-        if (!validOffices.includes(inputValue)) {
-          pushNotification(
-            'error',
-            'Office must be one of the predefined options',
-          );
-
-          return false;
-        }
-        break;
-      case 3: // Age
-        const age = parseInt(inputValue);
-
-        if (age < 18 || age > 90) {
-          pushNotification('error', 'Age value must be between 18 and 90');
-
-          return false;
-        }
-        break;
-      case 4: // Salary
-        const salary = parseFloat(inputValue.replace(/[$,]/g, ''));
-
-        if (isNaN(salary) || salary <= 0) {
-          pushNotification('error', 'Salary must be a positive number');
-
-          return false;
-        }
-        break;
-      default:
-        break;
-    }
-
-    return true;
-  };
-
-  const columnIndex = target.cellIndex;
-
-  input.addEventListener('blur', () => {
-    const inputValue = input.value;
-
-    if (!validateInput(inputValue, columnIndex)) {
-      target.innerHTML = value;
-
-      return;
-    }
-
-    target.innerHTML = inputValue;
-
-    const rowIndex = target.parentElement.rowIndex - 1;
-
-    switch (columnIndex) {
-      case 0:
-        people[rowIndex].name = inputValue;
-        break;
-      case 1:
-        people[rowIndex].position = inputValue;
-        break;
-      case 2:
-        people[rowIndex].office = inputValue;
-        break;
-      case 3:
-        people[rowIndex].age = parseInt(inputValue);
-        break;
-      case 4:
-        people[rowIndex].salary = parseFloat(inputValue.replace(/[$,]/g, ''));
-        break;
-      default:
-        break;
-    }
-  });
-
-  input.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Enter') {
-      input.blur();
-    }
-  });
-});
+form.addEventListener('submit', onSubmit);
