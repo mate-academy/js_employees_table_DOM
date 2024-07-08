@@ -95,8 +95,8 @@ form.innerHTML = `
     <option value="San Francisco">San Francisco</option>
   </select>
 </label>
-<label>Age: <input name="age" type="text" data-qa="age" ></label>
-<label>Salary: <input name="salary" type="text" data-qa="salary" ></label>
+<label>Age: <input name="age" type="number" data-qa="age" ></label>
+<label>Salary: <input name="salary" type="number" data-qa="salary" ></label>
 <button name="button" type="submit">Save to table</button>
 `;
 
@@ -151,8 +151,8 @@ form.addEventListener('submit', (ev) => {
   const formName = data.get('name');
   const position = data.get('position');
   const office = form.querySelector('[name="office"]').value;
-  const age = convertToNumber(data.get('age'));
-  const salary = convertToNumber(data.get('salary'));
+  const age = data.get('age');
+  const salary = data.get('salary');
 
   const newRow = document.createElement('tr');
 
@@ -161,16 +161,26 @@ form.addEventListener('submit', (ev) => {
 
   newName.textContent = formName;
 
-  if (
-    formName === '' ||
-    position === '' ||
-    office === '' ||
-    isNaN(age) ||
-    age === 0 ||
-    isNaN(salary) ||
-    salary === 0
-  ) {
-    pushErrorNotification('Please enter your data');
+  if (formName === '') {
+    pushErrorNotification('Please enter your name');
+
+    return;
+  }
+
+  if (position === '') {
+    pushErrorNotification('Please enter your position');
+
+    return;
+  }
+
+  if (age.toString() === '') {
+    pushErrorNotification('Please enter your age');
+
+    return;
+  }
+
+  if (salary.toString() === '') {
+    pushErrorNotification('Please enter your salary');
 
     return;
   }
@@ -228,31 +238,51 @@ form.addEventListener('submit', (ev) => {
 
 tbody.addEventListener('dblclick', (eve) => {
   const cell = eve.target.closest('td');
-  const inputEdit = document.createElement('input');
+  const newInput = document.createElement('input');
+  const cellIndex = Array.from(cell.parentElement.children).indexOf(cell) + 1;
   const currentValue = cell.textContent;
 
   if (!cell) {
     return;
   }
 
-  inputEdit.classList.add('cell-input');
-  inputEdit.value = currentValue;
+  newInput.textContent = '';
+
+  if (cellIndex === 4 || cellIndex === 5) {
+    newInput.setAttribute('type', 'number');
+  } else {
+    newInput.setAttribute('type', 'text');
+  }
+
+  newInput.classList.add('cell-input');
+  newInput.value = currentValue;
 
   cell.textContent = '';
-  cell.appendChild(inputEdit);
+  cell.appendChild(newInput);
 
-  inputEdit.addEventListener('blur', () => {
-    const newValue = inputEdit.value.trim();
+  newInput.addEventListener('blur', () => {
+    let newValue = newInput.value.trim();
+
+    if (cellIndex === 5) {
+      newValue = `$${newInput.value
+        .toString()
+        .split('')
+        .reverse()
+        .map((num, index) => (index % 3 === 0 && index !== 0 ? `${num},` : num))
+        .reverse()
+        .join('')}`;
+    }
 
     cell.textContent = newValue === '' ? currentValue : newValue;
   });
 
-  inputEdit.addEventListener('keydown', (k) => {
+  newInput.addEventListener('keydown', (k) => {
     if (k.key === 'Enter') {
-      inputEdit.blur();
+      newInput.blur();
     }
   });
 
-  inputEdit.focus();
+  newInput.focus();
 });
+
 // #endregion
