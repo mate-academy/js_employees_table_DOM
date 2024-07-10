@@ -17,16 +17,6 @@ const handleInputs = (ev, ths) => {
   cell.append(input);
   input.focus();
 
-  // input.style.cssText = `
-  //   width: 150px;
-  //   box-sizing: border-box;
-  //   border: 1px solid #808080;
-  //   border-radius: 4px;
-  //   color: #808080;
-  //   padding: 4px;
-  //   outline-color: #808080;
-  // `;
-
   if (thIndex === 2) {
     cell.firstChild.remove();
     addSelect(cell, ths[thIndex]);

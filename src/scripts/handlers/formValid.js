@@ -30,6 +30,19 @@ const formValid = (form) => {
       }
     }
 
+    if (input.name === 'salary') {
+      if (!input.value.length) {
+        pushNotification(
+          'Error!',
+          `An error occurred while trying to add employee to the table.
+          Reason: salary input cannot be empty`,
+          'error',
+        );
+
+        return false;
+      }
+    }
+
     if (input.name === 'age') {
       if (+input.value < 18 || +input.value > 90) {
         pushNotification(
