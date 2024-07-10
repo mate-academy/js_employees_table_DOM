@@ -7,10 +7,10 @@ let prevLink;
 tableElement.addEventListener('click', (e) => {
   const bodyElement = document.querySelector('tbody');
   const bodyRows = [...bodyElement.rows];
-  let sortedData = [];
   const newBodyElement = document.createElement('tbody');
-
   const headElement = e.target.closest('thead');
+  const link = e.target.closest('tr');
+  let sortedData = [];
 
   if (headElement) {
     const data = bodyRows.map((trElement) => {
@@ -144,10 +144,6 @@ tableElement.addEventListener('click', (e) => {
     });
   }
 
-  // -----------------------------------------------------------------
-
-  const link = e.target.closest('tr');
-
   if (bodyRows.includes(link)) {
     if (prevLink && prevLink !== link) {
       prevLink.classList.remove('active');
@@ -162,3 +158,136 @@ tableElement.addEventListener('click', (e) => {
     }
   }
 });
+
+// ----------------------------------------------------
+
+const formElement = document.createElement('form');
+
+formElement.className = 'new-employee-form';
+
+formElement.innerHTML = `
+  <label>Name: <input name="name" type="text" data-qa="name"></label>
+  <label>Position: <input name="position" type="text" data-qa="position"></label>
+  <label>Office:
+    <select name="office" data-qa="office">
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    </select>
+  </label>
+  <label>Age: <input name="age" type="number" data-qa="age"></label>
+  <label>Salary: <input name="salary" type="number" data-qa="salary"></label>
+  <button type="submit">Save to table</button>
+  `;
+
+document.body.append(formElement);
+
+formElement.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const data = new FormData(formElement);
+  const trElement = document.createElement('tr');
+
+  for (const [key, value] of data) {
+    if (key === 'name' && value.length < 4) {
+      pushNotification(key, value);
+
+      return;
+    }
+
+    if (!value) {
+      pushNotification(key, value);
+
+      return;
+    }
+
+    if (key === 'age' && (value < 18 || value > 90)) {
+      pushNotification(key, value);
+
+      return;
+    }
+
+    const tdElement = document.createElement('td');
+
+    tdElement.textContent = value;
+
+    if (key === 'salary' && value > 0) {
+      const newValue = +value;
+
+      tdElement.textContent = `$${newValue.toLocaleString('en-US')}`;
+    }
+
+    trElement.append(tdElement);
+  }
+
+  pushNotification('great');
+
+  tableElement.tBodies[0].append(trElement);
+});
+
+// --------------------------------------------------
+
+const pushNotification = (key, value) => {
+  const divElement = document.createElement('div');
+  const h2Element = document.createElement('h2');
+  const pElement = document.createElement('p');
+
+  divElement.setAttribute('data-qa', 'notification');
+  h2Element.classList.add('title');
+
+  switch (key) {
+    case 'name': {
+      divElement.classList.add('notification', 'error');
+      h2Element.textContent = 'Title of Error message';
+
+      pElement.textContent =
+        'The "name" field must contain at least 4 characters.';
+
+      break;
+    }
+
+    case 'age': {
+      divElement.classList.add('notification', 'error');
+      h2Element.textContent = 'Title of Error message';
+
+      if (value < 18) {
+        pElement.textContent = 'You must be at least 18 years old.';
+        break;
+      }
+
+      if (value > 90) {
+        pElement.textContent = 'You are too old';
+        break;
+      }
+
+      pElement.textContent = 'The "age" field must not be empty.';
+      break;
+    }
+
+    case 'great': {
+      divElement.classList.add('notification', 'success');
+      h2Element.textContent = 'Title of Success message';
+      pElement.textContent = 'Data has been successfully added to the table!';
+      break;
+    }
+
+    default: {
+      divElement.classList.add('notification', 'error');
+      h2Element.textContent = 'Title of Error message';
+      pElement.textContent = `The "${key}" field must not be empty.`;
+      break;
+    }
+  }
+
+  divElement.prepend(h2Element);
+  divElement.append(pElement);
+  divElement.style.top = '450px';
+  divElement.style.right = '10px';
+
+  document.body.append(divElement);
+
+  setTimeout(() => (divElement.style.visibility = 'hidden'), 2000);
+};
