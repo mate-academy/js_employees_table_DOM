@@ -15,6 +15,17 @@ const formValid = (form) => {
 
         return false;
       }
+
+      if (input.value.trim().length === 0) {
+        pushNotification(
+          'Error!',
+          `An error occurred while trying to add employee to the table.
+          Reason: name cannot contain only whitespaces`,
+          'error',
+        );
+
+        return false;
+      }
     }
 
     if (input.name === 'position') {
@@ -23,6 +34,17 @@ const formValid = (form) => {
           'Error!',
           `An error occurred while trying to add employee to the table.
           Reason: choose position`,
+          'error',
+        );
+
+        return false;
+      }
+
+      if (input.value.trim().length === 0) {
+        pushNotification(
+          'Error!',
+          `An error occurred while trying to add employee to the table.
+          Reason: position cannot contain only whitespaces`,
           'error',
         );
 
