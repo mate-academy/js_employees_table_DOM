@@ -2,14 +2,12 @@
 
 const tableElement = document.querySelector('table');
 let sortedValue = '';
-let prevLink;
 
 tableElement.addEventListener('click', (e) => {
   const bodyElement = document.querySelector('tbody');
   const bodyRows = [...bodyElement.rows];
   const newBodyElement = document.createElement('tbody');
   const headElement = e.target.closest('thead');
-  const link = e.target.closest('tr');
   let sortedData = [];
 
   if (headElement) {
@@ -143,23 +141,42 @@ tableElement.addEventListener('click', (e) => {
       newBodyElement.append(corEl);
     });
   }
-
-  if (bodyRows.includes(link)) {
-    if (prevLink && prevLink !== link) {
-      prevLink.classList.remove('active');
-    }
-
-    if (prevLink === link) {
-      link.classList.remove('active');
-      prevLink = undefined;
-    } else {
-      link.classList.add('active');
-      prevLink = link;
-    }
-  }
 });
 
-// ----------------------------------------------------
+document.querySelectorAll('tbody tr').forEach((tr) => {
+  tr.addEventListener('click', () => {
+    document.querySelectorAll('tbody tr').forEach((row) => {
+      row.classList.remove('active');
+    });
+
+    tr.classList.add('active');
+  });
+});
+
+document.querySelectorAll('td').forEach((td) => {
+  td.addEventListener('dblclick', () => {
+    const input = document.createElement('input');
+
+    input.className = 'cell-input';
+    input.value = td.textContent;
+    input.defaultValue = td.textContent;
+    td.textContent = '';
+    td.appendChild(input);
+    input.focus();
+
+    input.addEventListener('blur', () => {
+      td.textContent = input.value || input.defaultValue;
+      input.remove();
+    });
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        td.textContent = input.value || input.defaultValue;
+        input.remove();
+      }
+    });
+  });
+});
 
 const formElement = document.createElement('form');
 
@@ -227,8 +244,6 @@ formElement.addEventListener('submit', (e) => {
 
   tableElement.tBodies[0].append(trElement);
 });
-
-// --------------------------------------------------
 
 const pushNotification = (key, value) => {
   const divElement = document.createElement('div');
