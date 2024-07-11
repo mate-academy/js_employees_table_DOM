@@ -80,7 +80,6 @@ function pushNotification(title, description, type = '') {
   }, 2000);
 }
 
-const tableRows = [...document.querySelector('tbody').rows];
 const tHead = document.querySelector('thead');
 const tBody = document.querySelector('tbody');
 const headerCells = tHead?.rows[0].cells;
@@ -151,6 +150,7 @@ for (let i = 0; i < tHead?.rows[0].cells.length; i++) {
 
 tHead?.addEventListener('click', (e) => {
   const acdStat = e.target.classList.contains(className);
+  const tableRows = [...document.querySelector('tbody').rows];
 
   sortRows(tableRows, sortMapIndx[e.target.textContent], !acdStat);
 
@@ -170,8 +170,8 @@ tHead?.addEventListener('click', (e) => {
 });
 
 tBody?.addEventListener('click', (e) => {
-  for (let i = 0; i < tableRows.length; i++) {
-    tableRows[i].classList.remove('active');
+  for (let i = 0; i < document.querySelector('tbody').rows.length; i++) {
+    document.querySelector('tbody').rows[i].classList.remove('active');
   }
   e.target.parentElement.classList.add('active');
 });
