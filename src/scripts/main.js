@@ -32,6 +32,7 @@ function sortRows(rows, sortIndex, accending) {
 function validator(data) {
   if (data.get('name').trim().length < 4) {
     pushNotification('Error', 'Name must have 4 or more characters', 'error');
+
     return false;
   }
 
@@ -41,16 +42,19 @@ function validator(data) {
       'Age should be older then 18 and yonger then 99',
       'error',
     );
+
     return false;
   }
 
   if (data.get('position').trim().length <= 0) {
     pushNotification('Error', 'Please enter position', 'error');
+
     return false;
   }
 
   if (+data.get('salary') <= 0) {
     pushNotification('Error', 'Please enter valid salary', 'error');
+
     return false;
   }
 
@@ -136,7 +140,9 @@ const formHTML = `<form
 
       <button type="submit">Save to table</button>
     </form>`;
+
 document.querySelector('table').insertAdjacentHTML('afterend', formHTML);
+
 const formElem = document.body.querySelector('#form-new-empl');
 
 for (let i = 0; i < tHead?.rows[0].cells.length; i++) {
@@ -145,10 +151,12 @@ for (let i = 0; i < tHead?.rows[0].cells.length; i++) {
 
 tHead?.addEventListener('click', (e) => {
   const acdStat = e.target.classList.contains(className);
+
   sortRows(tableRows, sortMapIndx[e.target.textContent], !acdStat);
 
   for (let i = 0; i < headerCells.length; i++) {
     const child = headerCells[i];
+
     child.classList.remove(className);
   }
 
@@ -172,6 +180,7 @@ formElem?.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const data = new FormData(formElem);
+
   if (!validator(data)) {
     return;
   }
@@ -201,22 +210,25 @@ formElem?.addEventListener('submit', (e) => {
 });
 
 tBody?.addEventListener('dblclick', (e) => {
-  function recInput(e) {
-    activeCell.textContent = !e.target.value ? curentTxt : e.target.value;
+  function recInput(ev) {
+    activeCell.textContent = !ev.target.value ? curentTxt : ev.target.value;
     newInput.remove();
   }
+
   const activeCell = e.target;
   const curentTxt = activeCell.textContent;
   const newInput = document.createElement('input');
+
   newInput.classList.add('cell-input');
   activeCell.textContent = '';
   activeCell.append(newInput);
   newInput.focus();
 
   newInput.addEventListener('focusout', recInput);
-  newInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      recInput(e);
+
+  newInput.addEventListener('keypress', (evnt) => {
+    if (evnt.key === 'Enter') {
+      recInput(evnt);
     }
   });
 });
