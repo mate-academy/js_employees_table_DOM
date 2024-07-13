@@ -29,33 +29,57 @@ function sortRows(rows, sortIndex, accending) {
   });
 }
 
-function validator(data) {
-  if (data.get('name').trim().length < 4) {
-    pushNotification('Error', 'Name must have 4 or more characters', 'error');
+function validator(data, formData = true) {
+  if (formData || (!formData && data.get('name'))) {
+    if (data.get('name').trim().length < 4) {
+      pushNotification('Error', 'Name must have 4 or more characters', 'error');
 
-    return false;
+      return false;
+    }
   }
 
-  if (+data.get('age') < 18 || +data.get('age') > 90) {
-    pushNotification(
-      'Error',
-      'Age should be older then 18 and yonger then 99',
-      'error',
-    );
+  if (formData || (!formData && data.get('position'))) {
+    if (data.get('position').trim().length <= 0) {
+      pushNotification('Error', 'Please enter position', 'error');
 
-    return false;
+      return false;
+    }
   }
 
-  if (data.get('position').trim().length <= 0) {
-    pushNotification('Error', 'Please enter position', 'error');
+  if (formData || (!formData && data.get('office'))) {
+    if (!offices.includes(data.get('office'))) {
+      pushNotification(
+        'Error',
+        `Invalid office locatioin please select from following: ${offices.join(', ')}`,
+        'error',
+      );
 
-    return false;
+      return false;
+    }
   }
 
-  if (+data.get('salary') <= 0) {
-    pushNotification('Error', 'Please enter valid salary', 'error');
+  if (formData || (!formData && data.get('age'))) {
+    if (
+      isNaN(data.get('age')) ||
+      +data.get('age') < 18 ||
+      +data.get('age') > 90
+    ) {
+      pushNotification(
+        'Error',
+        'Age should be older then 18 and yonger then 99',
+        'error',
+      );
 
-    return false;
+      return false;
+    }
+  }
+
+  if (formData || (!formData && +data.get('salary'))) {
+    if (isNaN(+data.get('salary')) || +data.get('salary') <= 0) {
+      pushNotification('Error', 'Please enter valid salary', 'error');
+
+      return false;
+    }
   }
 
   return true;
@@ -85,6 +109,15 @@ const tBody = document.querySelector('tbody');
 const headerCells = tHead?.rows[0].cells;
 const className = 'acdSorted';
 const sortMapIndx = {};
+const offices = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+  'London',
+];
 const formHTML = `<form
       id="form-new-empl"
       class="new-employee-form"
@@ -111,13 +144,13 @@ const formHTML = `<form
           type="text"
           data-qa="office"
         >
-          <option value="Tokyo">Tokyo</option>
-          <option value="Singapore">Singapore</option>
-          <option value="London">London</option>
-          <option value="New York">New York</option>
-          <option value="Edinburgh">Edinburgh</option>
-          <option value="San Francisco">San Francisco</option>
-          <option value="London">London</option>
+          <option value="${offices[0]}">${offices[0]}</option>
+          <option value="${offices[1]}">${offices[1]}</option>
+          <option value="${offices[2]}">${offices[2]}</option>
+          <option value="${offices[3]}">${offices[3]}</option>
+          <option value="${offices[4]}">${offices[4]}</option>
+          <option value="${offices[5]}">${offices[5]}</option>
+          <option value="${offices[6]}">${offices[6]}</option>
         </select>
       </label>
 
@@ -186,7 +219,6 @@ formElem?.addEventListener('submit', (e) => {
   }
 
   const newTr = document.createElement('tr');
-
   for (const pair of data.entries()) {
     const newTd = document.createElement('td');
 
@@ -211,8 +243,42 @@ formElem?.addEventListener('submit', (e) => {
 
 tBody?.addEventListener('dblclick', (e) => {
   function recInput(ev) {
-    activeCell.textContent = !ev.target.value ? curentTxt : ev.target.value;
-    newInput.remove();
+    const actvInputCont = ev.target.value;
+    const keyMap =
+      tHead.rows[0].cells[
+        [...activeCell.parentElement.cells].indexOf(activeCell)
+      ].textContent?.toLocaleLowerCase();
+
+    const tData = new FormData();
+
+    tData.append(keyMap, actvInputCont);
+
+    if (!actvInputCont) {
+      activeCell.textContent = curentTxt;
+      newInput.remove();
+
+      return;
+    }
+
+    if (validator(tData, false)) {
+      if (keyMap === 'salary') {
+        activeCell.textContent = parseInt(actvInputCont).toLocaleString(
+          'en-US',
+          {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          },
+        );
+      } else {
+        activeCell.textContent = actvInputCont;
+      }
+
+      newInput.remove();
+    } else {
+      newInput.focus();
+    }
   }
 
   const activeCell = e.target;
