@@ -10,6 +10,8 @@ table.tHead.addEventListener('click', (e) => {
 
 selectRow();
 
+createMsgBlock();
+
 function getIdx(title) {
   const idx = 0;
 
@@ -103,8 +105,6 @@ function sortEmployees(title, elem) {
 
   table.tBodies[0].remove();
   insertRows(sortedRows);
-
-  // cell function
   removeCellText();
 }
 
@@ -215,6 +215,7 @@ function addInputs() {
         const select = createSelect();
 
         select.setAttribute('name', value);
+        select.setAttribute('data-qa', value);
         select.required = true;
         label.append(select);
         break;
@@ -282,34 +283,48 @@ function editStr(val) {
 }
 
 function showNotification(calssValue, str) {
-  const msg = createMsgBlock();
-
   const title = calssValue[0].toUpperCase() + calssValue.slice(1);
+  const msg = document.querySelector('.notification');
 
-  const titleMsg = document.createElement('h2');
+  msg.children[0].textContent = title;
+  msg.children[1].textContent = str;
 
-  titleMsg.classList.add('title');
-  titleMsg.textContent = title;
-  titleMsg.style.textAlign = 'center';
+  if (!msg.className.split(' ')[1]) {
+    msg.className += ` ${calssValue}`;
+  } else {
+    const arrOfClasses = msg.className.split(' ');
 
-  const desc = document.createElement('p');
+    arrOfClasses[1] = calssValue;
 
-  desc.textContent = str;
+    msg.className = arrOfClasses.join(' ');
+  }
 
-  msg.className += ` ${calssValue}`;
-  msg.append(titleMsg, desc);
+  msg.style.visibility = 'visible';
+  setTimeout(timerNotification, 2000);
+}
 
-  document.body.append(msg);
+function timerNotification() {
+  const msg = document.querySelector('.notification');
 
-  setTimeout(() => msg.remove(), 2000);
+  msg.style.visibility = 'hidden';
 }
 
 function createMsgBlock() {
   const msgBlock = document.createElement('div');
+  const titleMsg = document.createElement('h2');
+  const desc = document.createElement('p');
+
+  titleMsg.classList.add('title');
+  titleMsg.style.textAlign = 'center';
+  desc.style.bold = '600';
 
   msgBlock.setAttribute('data-qa', 'notification');
   msgBlock.classList.add('notification');
   msgBlock.style.zIndex = '1';
+  msgBlock.style.visibility = 'hidden';
+
+  msgBlock.append(titleMsg, desc);
+  document.body.append(msgBlock);
 
   return msgBlock;
 }
