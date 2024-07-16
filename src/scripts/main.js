@@ -5,92 +5,66 @@ const tbody = document.querySelector('tbody');
 
 // table sorting by clicking on the title (in two directions)
 const nodeList = [...tbody.children].map((i) => i.innerText.split('\t'));
-let sortByName = 'asc';
-let sortByPosition = 'asc';
-let sortByOffice = 'asc';
-let sortByAge = 'asc';
-let sortBySalary = 'asc';
+let sortType = 'asc';
+let lastClikedTitle = '';
+
+const th = {
+  Name: 0,
+  Position: 1,
+  Office: 2,
+  Age: 3,
+  Salary: 4,
+};
 
 thead.onclick = (e) => {
   const sortBy = e.target.innerText;
 
-  if (sortBy === 'Name') {
-    if (sortByName === 'asc') {
-      nodeList.sort((a, b) => a[0].localeCompare(b[0]));
-      sortByName = 'decs';
-    } else {
-      nodeList.sort((a, b) => b[0].localeCompare(a[0]));
-      sortByName = 'asc';
-    }
-    sortByPosition = 'asc';
-    sortByOffice = 'asc';
-    sortByAge = 'asc';
-    sortBySalary = 'asc';
-  }
+  switch (sortBy) {
+    case 'Name':
+    case 'Position':
+    case 'Office':
+      if (lastClikedTitle !== sortBy || sortType === 'asc') {
+        nodeList.sort((a, b) => a[th[sortBy]].localeCompare(b[th[sortBy]]));
+        lastClikedTitle = sortBy;
+        sortType = 'desc';
+      } else {
+        nodeList.sort((a, b) => b[th[sortBy]].localeCompare(a[th[sortBy]]));
+        sortType = 'asc';
+      }
+      break;
 
-  if (sortBy === 'Position') {
-    if (sortByPosition === 'asc') {
-      nodeList.sort((a, b) => a[1].localeCompare(b[1]));
-      sortByPosition = 'decs';
-    } else {
-      nodeList.sort((a, b) => b[1].localeCompare(a[1]));
-      sortByPosition = 'asc';
-    }
-    sortByName = 'asc';
-    sortByOffice = 'asc';
-    sortByAge = 'asc';
-    sortBySalary = 'asc';
-  }
+    case 'Age':
+      if (lastClikedTitle !== sortBy || sortType === 'asc') {
+        nodeList.sort((a, b) => a[th[sortBy]] - b[th[sortBy]]);
+        lastClikedTitle = sortBy;
+        sortType = 'desc';
+      } else {
+        nodeList.sort((a, b) => b[th[sortBy]] - a[th[sortBy]]);
+        sortType = 'asc';
+      }
+      break;
 
-  if (sortBy === 'Office') {
-    if (sortByOffice === 'asc') {
-      nodeList.sort((a, b) => a[2].localeCompare(b[2]));
-      sortByOffice = 'decs';
-    } else {
-      nodeList.sort((a, b) => b[2].localeCompare(a[2]));
-      sortByOffice = 'asc';
-    }
-    sortByName = 'asc';
-    sortByPosition = 'asc';
-    sortByAge = 'asc';
-    sortBySalary = 'asc';
-  }
-
-  if (sortBy === 'Age') {
-    if (sortByAge === 'asc') {
-      nodeList.sort((a, b) => a[3] - b[3]);
-      sortByAge = 'decs';
-    } else {
-      nodeList.sort((a, b) => b[3] - a[3]);
-      sortByAge = 'asc';
-    }
-    sortByName = 'asc';
-    sortByPosition = 'asc';
-    sortByOffice = 'asc';
-    sortBySalary = 'asc';
-  }
-
-  if (sortBy === 'Salary') {
-    if (sortBySalary === 'asc') {
-      nodeList.sort(
-        (a, b) =>
-          a[4].slice(1).split(',').join('') - b[4].slice(1).split(',').join(''),
-      );
-      sortBySalary = 'decs';
-    } else {
-      nodeList.sort(
-        (a, b) =>
-          b[4].slice(1).split(',').join('') - a[4].slice(1).split(',').join(''),
-      );
-      sortBySalary = 'asc';
-    }
-    sortByName = 'asc';
-    sortByPosition = 'asc';
-    sortByOffice = 'asc';
-    sortByAge = 'asc';
+    case 'Salary':
+      if (lastClikedTitle !== sortBy || sortType === 'asc') {
+        nodeList.sort(
+          (a, b) =>
+            a[th[sortBy]].slice(1).split(',').join('') -
+            b[th[sortBy]].slice(1).split(',').join(''),
+        );
+        lastClikedTitle = sortBy;
+        sortType = 'desc';
+      } else {
+        nodeList.sort(
+          (a, b) =>
+            b[th[sortBy]].slice(1).split(',').join('') -
+            a[th[sortBy]].slice(1).split(',').join(''),
+        );
+        sortType = 'asc';
+      }
   }
 
   for (let i = 0; i < nodeList.length; i++) {
+    // remove selected row when we sort the table
     tbody.children[i].classList.remove('active');
 
     tbody.children[i].innerHTML = `
@@ -103,6 +77,7 @@ thead.onclick = (e) => {
   }
 };
 
+// add active class to selected row
 tbody.onclick = (e) => {
   const tr = e.target.parentNode;
 
@@ -141,6 +116,7 @@ document.body.insertAdjacentHTML(
 
 const form = document.querySelector('.new-employee-form');
 
+// add new employee to the table
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -166,6 +142,7 @@ form.addEventListener('submit', (e) => {
     setTimeout(() => notification.remove(), 3000);
   };
 
+  // check if all inputs are filled
   if (userName.length < 4) {
     return createNotification('error', 'Name has less than 4 letters');
   }
@@ -186,6 +163,7 @@ form.addEventListener('submit', (e) => {
     return createNotification('error', 'Salary must be entered');
   }
 
+  // insert new employee to the table
   tbody.insertAdjacentHTML(
     'beforeend',
     `
@@ -206,6 +184,7 @@ form.addEventListener('submit', (e) => {
     'New employee is successfully added to the table',
   );
 
+  // clear all inputs after submit
   form.elements.name.value = '';
   form.elements.position.value = '';
   form.elements.office.value = 'Tokyo';
