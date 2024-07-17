@@ -3,7 +3,6 @@
 const table = document.querySelector('table');
 const tHead = table.querySelector('thead tr');
 const tBody = table.querySelector('tbody');
-const tBodyDouble = table.querySelector('tbody');
 
 const markUpHeaders = [...tHead.children].map((th) => {
   return th.textContent;
@@ -115,11 +114,29 @@ tBody.addEventListener('click', (e) => {
 
   e.target.closest('tr').classList.add('active');
 
-  console.log(e.target);
+  // console.log(e.target);
 });
 
-tBody.addEventListener('dblClick', (e) => {
-  console.log(e.target);
+tBody.addEventListener('dblclick', (e) => {
+  // console.log(e.target);
+  console.dir(e.target.clientWidth);
+
+  const td = { elem: e.target, data: e.target.textContent };
+  const input = document.createElement('input');
+
+  input.style.maxWidth = e.target.clientWidth + 'px';
+  input.value = td.data;
+  e.target.textContent = '';
+
+  e.target.append(input);
+
+  // eslint-disable-next-line no-shadow
+  input.addEventListener('keyup', (event) => {
+    if (event.code === 'Enter') {
+      td.elem.innerText = event.target.value;
+      input.remove();
+    }
+  });
 });
 
 /* create from for next using */
