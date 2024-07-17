@@ -10,14 +10,22 @@ headers.forEach((header, index) => {
   });
 });
 
+const sortDirections = Array(headers.length).fill(true);
+
 function sortTableByColumn(columnIndex) {
   const rowsArray = Array.from(tbody.querySelectorAll('tr'));
+  const isAscending = sortDirections[columnIndex];
+
+  sortDirections[columnIndex] = !isAscending;
+
   const sortedRows = rowsArray.sort((rowA, rowB) => {
     const cellA = rowA.cells[columnIndex].innerText;
     const cellB = rowB.cells[columnIndex].innerText;
 
     if (headers[columnIndex].innerText === 'Age') {
-      return parseInt(cellA) - parseInt(cellB);
+      return isAscending
+        ? parseInt(cellA) - parseInt(cellB)
+        : parseInt(cellB) - parseInt(cellA);
     }
 
     if (headers[columnIndex].innerText === 'Salary') {
@@ -42,12 +50,11 @@ tbody.addEventListener('click', (e) => {
   }
 });
 
-const pushNotification = (title, description, type) => {
-  const posTop = 100;
-  const posRight = 5;
+const pushNotification = (posTop, posRight, title, description, type) => {
   const notification = document.createElement('div');
 
   notification.className = `notification ${type}`;
+  notification.setAttribute('data-qa', `notification ${type}`);
   notification.style.top = `${posTop}px`;
   notification.style.right = `${posRight}px`;
 
@@ -74,18 +81,34 @@ const form = document.createElement('form');
 form.classList.add('new-employee-form');
 
 form.innerHTML = `
-  <h3>Add New Employee</h3>
-  <label for="employeeName">Name:</label>
-  <input type="text" id="employeeName" name="employeeName"><br>
-  <label for="position">Position:</label>
-  <input type="text" id="position" name="position"><br>
-  <label for="office">Office:</label>
-  <input type="text" id="office" name="office"><br>
-  <label for="age">Age:</label>
-  <input type="number" id="age" name="age"><br>
-  <label for="salary">Salary:</label>
-  <input type="text" id="salary" name="salary"><br>
-  <button type="submit">Add Employee</button>
+  <label for="employeeName">
+    Name:
+    <input data-qa="name" type="text" id="employeeName" name="employeeName">
+  </label>
+  <label for="position">
+    Position:
+    <input data-qa="position" type="text" id="position" name="position">
+  </label>
+  <label for="office">
+    Office:
+    <select data-qa="office" id="office" name="office">
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
+    </select>
+  </label>
+  <label for="age">
+    Age:
+    <input data-qa="age" type="number" id="age" name="age">
+  </label>
+  <label for="salary">
+    Salary:
+    <input data-qa="salary" type="number" id="salary" name="salary">
+  </label>
+  <button type="submit">Save to table</button>
 `;
 
 document.body.appendChild(form);
@@ -106,24 +129,46 @@ form.addEventListener('submit', (e) => {
   const position = form.position.value;
   const office = form.office.value;
   const age = form.age.value;
-  const salary = salaryFormat(parseFloat(form.salary.value));
+  const salary = form.salary.value;
 
-  if (employeeName && position && office && age && salary) {
+  if (employeeName.length < 4) {
+    pushNotification(100, 5, 'Error', 'Name must be grater than 4', 'error');
+  }
+
+  if (age < 18 || age > 90) {
+    pushNotification(220, 5, 'Error', 'Age must be between 18 and 90', 'error');
+  }
+
+  if (
+    employeeName.length >= 4 &&
+    position &&
+    office &&
+    age > 18 &&
+    age < 90 &&
+    salary
+  ) {
     const newRow = document.createElement('tr');
+    const salaryFormated = salaryFormat(parseFloat(salary));
 
     newRow.innerHTML = `
     <td>${employeeName}</td>
     <td>${position}</td>
     <td>${office}</td>
     <td>${age}</td>
-    <td>${salary}</td>
+    <td>${salaryFormated}</td>
   `;
     tbody.appendChild(newRow);
     form.reset();
 
-    pushNotification('Success', 'Employee was successfully added', 'success');
+    pushNotification(
+      220,
+      5,
+      'Success',
+      'Employee was successfully added',
+      'success',
+    );
   } else {
-    pushNotification('Error', 'All fields must be filled!', 'error');
+    pushNotification(340, 5, 'Error', 'All fields must be filled!', 'error');
   }
 });
 
@@ -131,6 +176,9 @@ tbody.addEventListener('dblclick', (e) => {
   if (e.target && e.target.nodeName === 'TD') {
     const cell = e.target;
     const originalContent = cell.innerText;
+
+    cell.innerText = '';
+
     const input = document.createElement('input');
 
     input.type = 'text';
