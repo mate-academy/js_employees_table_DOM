@@ -1,11 +1,12 @@
 'use strict';
 
 const tHead = document.querySelector('thead').firstElementChild;
+
 let selectedColumn = null;
 
 let count = 1;
 
-tHead.addEventListener('click', (e) => {
+const sortColumns = (e) => {
   const column = [...tHead.children].indexOf(e.target);
 
   if (selectedColumn === column) {
@@ -42,17 +43,22 @@ tHead.addEventListener('click', (e) => {
   selectedColumn = column;
 
   tbody.replaceChildren(...rows);
-});
+};
 
-document.querySelector('tbody').addEventListener('click', (e) => {
+const focusOnRow = (e) => {
   document.querySelectorAll('.active').forEach((el) => {
     el.classList.remove('active');
   });
 
   e.target.parentElement.classList.add('active');
-});
+};
 
-const form = document.createElement('form');
+tHead.addEventListener('click', sortColumns);
+
+document.querySelector('tbody').addEventListener('click', focusOnRow);
+
+// #region form
+
 const createLabel = (inputName) => {
   const newElement = document.createElement('label');
 
@@ -102,11 +108,17 @@ const createSelect = () => {
   return selectItem;
 };
 
-const button = document.createElement('button');
+const createButton = () => {
+  const button = document.createElement('button');
 
-button.classList.add('button');
-button.innerText = 'Save to table';
-button.setAttribute('formnovalidate', 'true');
+  button.classList.add('button');
+  button.innerText = 'Save to table';
+  button.setAttribute('formnovalidate', 'true');
+
+  return button;
+};
+
+const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
 form.append(createInput('name', 'text'));
@@ -114,7 +126,7 @@ form.append(createInput('position', 'text'));
 form.append(createSelect());
 form.append(createInput('age', 'number'));
 form.append(createInput('salary', 'number'));
-form.append(button);
+form.append(createButton());
 form.setAttribute('autocomplete', 'off');
 
 const getNormalizedSalary = (n) => '$' + n.toLocaleString('en-US');
@@ -236,3 +248,35 @@ form.addEventListener('submit', (e) => {
 });
 
 document.body.append(form);
+
+// #endregion
+
+const createCellInput = (startText) => {
+  const input = document.createElement('input');
+
+  input.value = startText;
+  input.setAttribute('autofocus', 'true');
+  input.setAttribute('type', 'text');
+  input.classList.add('cellInput');
+
+  input.addEventListener('blur', (e) => {
+    input.replaceWith(input.value);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      input.replaceWith(startText);
+    }
+  });
+
+  return input;
+};
+
+const editCellInput = (e) => {
+  const currentEl = e.target;
+  const input = createCellInput(currentEl.innerText);
+
+  currentEl.replaceChildren(input);
+};
+
+document.querySelector('tbody').addEventListener('dblclick', editCellInput);
