@@ -159,7 +159,6 @@ tr.active {
   min-height: 100px;
   padding: 0 16px;
   box-sizing: border-box;
-
   border-radius: 10px;
   background: rgba(132, 132, 132, 0.3);
 
@@ -172,10 +171,6 @@ tr.active {
     font-weight: 900;
   }
 
-  &.warning {
-    background: rgba(255, 212, 39, 0.3);
-  }
-
   &.success {
     background: rgba(10, 189, 0, 0.3);
   }
@@ -183,4 +178,10 @@ tr.active {
   &.error {
     background: rgba(253, 0, 0, 0.3);
   }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
