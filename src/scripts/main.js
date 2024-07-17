@@ -150,7 +150,9 @@ const handleSubmit = (e) => {
   const salary = parseFloat(salaryInput.value);
 
   const VALID_NAME = name.length < 4;
-  const VALID_AGE = age < 18 || age > 90;
+  const VALID_YOUNG = age < 18;
+  const VALID_OLD = age > 90;
+  const VALID_SALARY = salary < 0;
 
   if (VALID_NAME) {
     pushNotification(
@@ -162,10 +164,30 @@ const handleSubmit = (e) => {
     return;
   }
 
-  if (VALID_AGE) {
+  if (VALID_YOUNG) {
     pushNotification(
       'Error message -_-',
-      'You are not old enough or too old to view this content!',
+      'You are not old enough to view this content!',
+      'error',
+    );
+
+    return;
+  }
+
+  if (VALID_OLD) {
+    pushNotification(
+      'Error message -_-',
+      'You are too old to view this content!',
+      'error',
+    );
+
+    return;
+  }
+
+  if (VALID_SALARY) {
+    pushNotification(
+      'Error message -_-',
+      'You cannot earn a negative amount! Only if you are a slave...',
       'error',
     );
 
@@ -186,6 +208,8 @@ const handleSubmit = (e) => {
   cellAge.textContent = age;
 
   cellSalary.textContent = `$${formatSalary(salary)}`;
+
+  rows.push(newRow);
 
   form.reset();
 
@@ -249,56 +273,75 @@ form.addEventListener('submit', handleSubmit);
 
 // #region editing of table cells
 
-const handleDoubleClick = (event) => {
-  const cell = event.target;
+let currentInput = null;
 
-  if (document.querySelector('.cell-input')) {
-    return;
+table.addEventListener('dblclick', function (event) {
+  const target = event.target;
+
+  if (target.tagName === 'TD' && !currentInput) {
+    const initialValue = target.textContent.trim();
+    const input = document.createElement('input');
+
+    input.type = 'text';
+    input.value = initialValue;
+    input.classList.add('cell-input');
+
+    target.textContent = '';
+    target.appendChild(input);
+    input.focus();
+
+    currentInput = input;
+
+    input.addEventListener('blur', function () {
+      saveChanges(target, input, initialValue);
+    });
+
+    input.addEventListener('keypress', function (event) {
+      if (event.key === 'Enter') {
+        saveChanges(target, input, initialValue);
+      }
+    });
+  }
+});
+
+function saveChanges(target, input, initialValue) {
+  const newValue = input.value.trim();
+  const columnIndex = target.cellIndex;
+
+  if (validateInput(newValue, columnIndex)) {
+    if (columnIndex === 4) {
+      target.textContent = saveFormatSalary(newValue);
+    } else {
+      target.textContent = newValue === '' ? initialValue : newValue;
+    }
+  } else {
+    alert('Invalid input. Please enter a valid value.');
+    target.textContent = initialValue;
   }
 
-  const initialValue = cell.textContent;
+  currentInput = null;
+}
 
-  cell.textContent = '';
-
-  const input = document.createElement('input');
-
-  input.type = 'text';
-  input.value = initialValue;
-  input.classList.add('cell-input');
-
-  cell.appendChild(input);
-  input.focus();
-
-  const saveChanges = () => {
-    const newValue = input.value.trim();
-
-    if (newValue === '') {
-      cell.textContent = initialValue;
-    } else {
-      cell.textContent = newValue;
-
-      pushNotification(
-        'Success!!!',
-        `Success! Your task was completed faster than you can say "supercalifragilisticexpialidocious!"`,
-        'success',
+function validateInput(value, columnIndex) {
+  switch (columnIndex) {
+    case 3:
+      return (
+        !isNaN(value) && Number.isInteger(parseFloat(value)) && value !== ''
       );
-    }
-    cell.removeChild(input);
-  };
+    case 4:
+      return /^\$?[\d,]+(\.\d{2})?$/.test(value);
+    default:
+      return true;
+  }
+}
 
-  input.addEventListener('blur', saveChanges);
+function saveFormatSalary(value) {
+  const num = value.replace(/[^0-9.-]+/g, '');
+  const parts = num.split('.');
 
-  input.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-      saveChanges();
-    }
-  });
-};
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-const tableCells = document.querySelectorAll('td');
-
-tableCells.forEach((cell) => {
-  cell.addEventListener('dblclick', handleDoubleClick);
-});
+  return '$' + parts.join('.');
+}
 
 // #endregion
