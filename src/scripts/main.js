@@ -252,7 +252,7 @@ const pushNotification = (title, description, type) => {
 
   titleElement.innerText = title;
   descriptionElement.innerText = description;
-  notification.dataset.qa = 'notification';
+  notification.setAttribute('data-qa', 'notification');
 
   notification.appendChild(titleElement);
   notification.appendChild(descriptionElement);
@@ -266,6 +266,18 @@ const hiddenNotification = (elem) => {
     elem.style.visibility = 'hidden';
   }, 3000);
 };
+
+pushNotification(
+  'Success!!!',
+  `Success! Your task was completed faster than you can say "supercalifragilisticexpialidocious!"`,
+  'success',
+);
+
+pushNotification(
+  'Error message -_-',
+  'You cannot earn a negative amount! Only if you are a slave...',
+  'error',
+);
 
 form.addEventListener('submit', handleSubmit);
 
