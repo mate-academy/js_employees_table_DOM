@@ -3,6 +3,7 @@
 const table = document.querySelector('table');
 const tHead = table.querySelector('thead tr');
 const tBody = table.querySelector('tbody');
+const tBodyDouble = table.querySelector('tbody');
 
 const markUpHeaders = [...tHead.children].map((th) => {
   return th.textContent;
@@ -113,8 +114,15 @@ tBody.addEventListener('click', (e) => {
   });
 
   e.target.closest('tr').classList.add('active');
+
+  console.log(e.target);
 });
 
+tBody.addEventListener('dblClick', (e) => {
+  console.log(e.target);
+});
+
+/* create from for next using */
 function addForm(selector) {
   const markUpForm = `
       <form
@@ -185,6 +193,8 @@ function addForm(selector) {
 
 addForm(table);
 
+/* --------------- */
+
 const form = document.querySelector('form');
 
 form.addEventListener('submit', (e) => {
@@ -229,7 +239,8 @@ form.addEventListener('submit', (e) => {
 });
 
 function validationValues(newEmployee) {
-  const [name, position, office, age, salary] = newEmployee;
+  const [nameEmp, , , age, ,] = newEmployee;
+
   let notification = `
      <div class="notification success" data-qa="notification">
        <h1 class="title">Sucsess</h1>
@@ -237,7 +248,7 @@ function validationValues(newEmployee) {
     </div>
     `;
 
-  if (name.length < 4) {
+  if (nameEmp.length < 4) {
     notification = `
     <div class="notification error" data-qa="notification">
       <h1 class="title">Error</h1>
@@ -277,23 +288,3 @@ function addEmployeeToTable(newEmployee) {
 
   tbody.insertAdjacentElement('beforeend', tr);
 }
-
-/*
-
-// function addButtonForm() {
-//   const buttonCreateForm = document.createElement('button');
-
-//   buttonCreateForm.innerText = 'Add Form';
-//   buttonCreateForm.classList.add('button');
-//   buttonCreateForm.style.cssText = `box-sizing: border-box;color: #fff;    cursor: pointer;    background: #e25644;    border: 2px solid #0000;    border-radius: 10px ;  margin-left: 10px;    padding: 8px 0;    font-family: Roboto, sans-serif;    font-size: 14px;    font-weight: 700;    transition: color .25s, background .25s, border .25s; align-self: flex-start; min-width: 100px`;
-//   table.insertAdjacentElement('afterend', buttonCreateForm);
-// }
-
-// function changeButtonForm() {
-//   const buttonCreateForm = document.createElement('button');
-
-//   console.log(buttonCreateForm)
-//   buttonCreateForm.innerText = 'Remove Form';
-// }
-
-*/
