@@ -178,6 +178,7 @@ button.addEventListener('click', (e) => {
 
   if (isValid) {
     tbody.append(newRow);
+    trArr.push(newRow);
     pushNotification('success');
     form.reset();
   } else {
