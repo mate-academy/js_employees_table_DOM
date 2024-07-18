@@ -119,6 +119,8 @@ document.querySelectorAll('thead th').forEach((header) => {
     tableBody.innerHTML = '';
 
     insertSortedRows(sortedRows);
+    selectRow();
+    getTableBodyRows().forEach(makeCellsEditable);
   });
 });
 
@@ -178,17 +180,21 @@ function insertSortedRows(data) {
  ***** SELECT ROW ****
  ********************/
 
-getTableBodyRows().forEach((row) => {
-  row.addEventListener('click', () => {
-    const isActive = row.classList.contains('active');
+function selectRow() {
+  const tBodyRows = getTableBodyRows();
 
-    getTableBodyRows().forEach((r) => r.classList.remove('active'));
+  tBodyRows.forEach((row) => {
+    row.addEventListener('click', () => {
+      const isActive = row.classList.contains('active');
 
-    if (!isActive) {
-      row.classList.add('active');
-    }
+      getTableBodyRows().forEach((r) => r.classList.remove('active'));
+
+      if (!isActive) {
+        row.classList.add('active');
+      }
+    });
   });
-});
+}
 
 /*******************
  ****** FORM *******
@@ -315,6 +321,16 @@ function addNewEmployee(e) {
   const inputs = form.querySelectorAll('input, select');
   const newRow = document.createElement('tr');
 
+  newRow.addEventListener('click', () => {
+    const isActive = newRow.classList.contains('active');
+
+    getTableBodyRows().forEach((r) => r.classList.remove('active'));
+
+    if (!isActive) {
+      newRow.classList.add('active');
+    }
+  });
+
   inputs.forEach((input) => {
     const newCell = document.createElement('td');
 
@@ -410,3 +426,4 @@ function makeCellsEditable(row) {
 }
 
 getTableBodyRows().forEach(makeCellsEditable);
+selectRow();
