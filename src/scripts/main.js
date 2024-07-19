@@ -4,6 +4,12 @@ const table = document.querySelector('table');
 
 let sortedRows = [];
 
+const cities = [...table.tBodies[0].children]
+  .map((row) => row.children[2].textContent)
+  .filter((city, i, arr) => {
+    return arr.indexOf(city) === i;
+  });
+
 table.tHead.addEventListener('click', (e) => {
   sortEmployees(e.target.textContent, e.target);
 });
@@ -29,75 +35,82 @@ function getIdx(title) {
   }
 }
 
+function normalizeSortByNum(arr, i, attr) {
+  return arr.sort((rowA, rowB) => {
+    if (attr === 'asc') {
+      return (
+        +[...rowA.children][i].textContent.replace(/[^0-9.]/g, '') -
+        +[...rowB.children][i].textContent.replace(/[^0-9.]/g, '')
+      );
+    } else {
+      return (
+        +[...rowB.children][i].textContent.replace(/[^0-9.]/g, '') -
+        +[...rowA.children][i].textContent.replace(/[^0-9.]/g, '')
+      );
+    }
+  });
+}
+
+function normalizeSortByStr(arr, i, attr) {
+  return arr.sort((rowA, rowB) => {
+    if (attr === 'asc') {
+      return [...rowA.children][i].textContent.localeCompare(
+        [...rowB.children][i].textContent,
+      );
+    } else {
+      return [...rowB.children][i].textContent.localeCompare(
+        [...rowA.children][i].textContent,
+      );
+    }
+  });
+}
+
 function sortEmployees(title, elem) {
   const idx = getIdx(title);
 
   switch (title) {
     case 'Age':
     case 'Salary':
-      if (elem.className === '' || elem.className === 'DESC') {
-        sortedRows = [...table.tBodies[0].children].sort((a, b) => {
-          if (
-            +[...a.children][idx].textContent.replace(/[^0-9.]/g, '') >
-            +[...b.children][idx].textContent.replace(/[^0-9.]/g, '')
-          ) {
-            return 1;
-          }
+      if (!elem.dataset.order || elem.dataset.order === 'desc') {
+        sortedRows = normalizeSortByNum(
+          [...table.tBodies[0].children],
+          idx,
+          'asc',
+        );
 
-          if (
-            +[...a.children][idx].textContent.replace(/[^0-9.]/g, '') <
-            +[...b.children][idx].textContent.replace(/[^0-9.]/g, '')
-          ) {
-            return -1;
-          }
-
-          return 0;
-        });
-
-        elem.classList.remove('DESC');
-        elem.classList.add('ASC');
+        elem.removeAttribute('desc');
+        elem.setAttribute('data-order', 'asc');
       } else {
-        sortedRows = [...table.tBodies[0].children].sort((a, b) => {
-          if (
-            +[...a.children][idx].textContent.replace(/[^0-9.]/g, '') <
-            +[...b.children][idx].textContent.replace(/[^0-9.]/g, '')
-          ) {
-            return 1;
-          }
-
-          if (
-            +[...a.children][idx].textContent.replace(/[^0-9.]/g, '') >
-            +[...b.children][idx].textContent.replace(/[^0-9.]/g, '')
-          ) {
-            return -1;
-          }
-
-          return 0;
-        });
-
-        elem.classList.remove('ASC');
-        elem.classList.add('DESC');
+        sortedRows = normalizeSortByNum(
+          [...table.tBodies[0].children],
+          idx,
+          'desc',
+        );
+        elem.removeAttribute('asc');
+        elem.setAttribute('data-order', 'desc');
       }
 
       break;
 
     default:
-      if (elem.className === '' || elem.className === 'DESC') {
-        sortedRows = [...table.tBodies[0].children].sort((a, b) => {
-          return [...a.children][idx].textContent.localeCompare(
-            [...b.children][idx].textContent,
-          );
-        });
-        elem.classList.remove('DESC');
-        elem.classList.add('ASC');
+      if (!elem.dataset.order || elem.dataset.order === 'desc') {
+        sortedRows = normalizeSortByStr(
+          [...table.tBodies[0].children],
+          idx,
+          'asc',
+        );
+
+        elem.removeAttribute('desc');
+        elem.setAttribute('data-order', 'asc');
       } else {
-        sortedRows = [...table.tBodies[0].children].sort((a, b) => {
-          return [...b.children][idx].textContent.localeCompare(
-            [...a.children][idx].textContent,
-          );
-        });
-        elem.classList.remove('ASC');
-        elem.classList.add('DESC');
+        sortedRows = normalizeSortByStr(
+          [...table.tBodies[0].children],
+          idx,
+          'desc',
+        );
+
+        elem.removeAttribute('asc');
+        elem.setAttribute('data-order', 'desc');
       }
 
       break;
@@ -168,12 +181,6 @@ function createButton() {
 
 function createSelect() {
   const select = document.createElement('select');
-
-  const cities = [...table.tBodies[0].children]
-    .map((row) => row.children[2].textContent)
-    .filter((city, i, arr) => {
-      return arr.indexOf(city) === i;
-    });
 
   cities.map((city) => {
     const option = document.createElement('option');
@@ -377,6 +384,8 @@ function removeCellText() {
 removeCellText();
 
 function inputBlur(element, value) {
+  element.focus();
+
   element.addEventListener('blur', (e) => {
     table.tBodies[0].querySelectorAll('td').forEach((td) => {
       if (td.firstChild.className === 'cell-input') {
