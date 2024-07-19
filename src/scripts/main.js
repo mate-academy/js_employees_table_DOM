@@ -113,28 +113,92 @@ tBody.addEventListener('click', (e) => {
   });
 
   e.target.closest('tr').classList.add('active');
-
-  // console.log(e.target);
 });
 
-tBody.addEventListener('dblclick', (e) => {
-  // console.log(e.target);
-  console.dir(e.target.clientWidth);
+function validateSalaryInput(value) {
+  const num = +[...value].filter((val) => +val >= 0).join('');
 
+  return '$' + num.toLocaleString('en-US');
+}
+
+function validateAgeInput(value, prevValue) {
+  const num = +[...value].filter((val) => +val >= 0).join('');
+
+  if (num < 18) {
+    return prevValue;
+  }
+
+  if (num > 90) {
+    return prevValue;
+  }
+
+  return num;
+}
+
+tBody.addEventListener('dblclick', (e) => {
   const td = { elem: e.target, data: e.target.textContent };
   const input = document.createElement('input');
+  const body = document.querySelector('body');
 
   input.style.maxWidth = e.target.clientWidth + 'px';
-  input.value = td.data;
+  input.value = td.data.trim();
   e.target.textContent = '';
 
   e.target.append(input);
 
+  input.focus();
+
+  // for validation when dblClick
+  let flagDoll = false;
+  let flagNumber = false;
+
+  if (input.value.includes('$') && input.closest('.active').children[4]) {
+    flagDoll = true;
+    input.value = input.value.slice(1);
+  }
+
+  if (
+    +input.value &&
+    typeof +input.value === 'number' &&
+    input.closest('.active').children[3]
+  ) {
+    flagNumber = true;
+  }
+
+  body.addEventListener('click', (ev) => {
+    if (ev.target.tagName !== 'INPUT') {
+      if (!input.value) {
+        td.elem.innerText = td.data;
+
+        return;
+      }
+
+      if (flagDoll) {
+        td.elem.innerText = validateSalaryInput(input.value);
+      } else if (flagNumber) {
+        td.elem.innerText = validateAgeInput(input.value, td.data);
+      } else {
+        td.elem.innerText = input.value;
+      }
+    }
+  });
+
   // eslint-disable-next-line no-shadow
   input.addEventListener('keyup', (event) => {
     if (event.code === 'Enter') {
-      td.elem.innerText = event.target.value;
-      input.remove();
+      if (!input.value) {
+        td.elem.innerText = td.data;
+
+        return;
+      }
+
+      if (flagDoll) {
+        td.elem.innerText = validateSalaryInput(input.value);
+      } else if (flagNumber) {
+        td.elem.innerText = validateAgeInput(input.value);
+      } else {
+        td.elem.innerText = input.value;
+      }
     }
   });
 });
