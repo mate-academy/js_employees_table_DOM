@@ -261,9 +261,11 @@ function addNewEmployee(e) {
   e.preventDefault();
 
   // Validation
-  const employeeName = form.querySelector('input[name="name"]').value;
+  const employeeName = form.querySelector('input[name="name"]').value.trim();
   const age = parseInt(form.querySelector('input[name="age"]').value, 10);
-  const position = document.querySelector('input[name="position"]').value;
+  const position = document
+    .querySelector('input[name="position"]')
+    .value.trim();
   const office = document.querySelector('select[name="office"]').value;
   const salaryValue = document.querySelector('input[name="salary"]').value;
 
