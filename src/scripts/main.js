@@ -36,6 +36,11 @@ const NOTIFICATIONS = {
     message: 'Age must be between 18 and 90.',
     type: 'error',
   },
+  ERROR_NEGATIVE_SALARY: {
+    title: 'Invalid Salary',
+    message: 'Salary cannot be negative.',
+    type: 'error',
+  },
   SUCCESS_NEW_EMPLOYEE: {
     title: 'Success',
     message: 'New employee added successfully.',
@@ -318,6 +323,16 @@ function addNewEmployee(e) {
     return;
   }
 
+  const salary = parseFloat(salaryValue);
+
+  if (salary < 0) {
+    const { title, message, type } = NOTIFICATIONS.ERROR_NEGATIVE_SALARY;
+
+    pushNotification(10, 10, title, message, type);
+
+    return;
+  }
+
   const inputs = form.querySelectorAll('input, select');
   const newRow = document.createElement('tr');
 
@@ -387,7 +402,7 @@ function makeCellsEditable(row) {
   row.querySelectorAll('td').forEach((cell) => {
     cell.addEventListener('dblclick', () => {
       const initialText = cell.textContent;
-
+      const isSalaryCell = cell.cellIndex === 4;
       const computedStyle = window.getComputedStyle(cell);
       const cellWidth = parseInt(computedStyle.width, 10);
 
@@ -396,33 +411,58 @@ function makeCellsEditable(row) {
       cell.textContent = '';
       input.type = 'text';
       input.className = 'cell-input';
-      input.value = initialText;
+
+      input.value = isSalaryCell
+        ? initialText.replace(/[$,]/g, '')
+        : initialText;
       input.style.width = `${cellWidth}px`;
       input.style.boxSizing = 'border-box';
 
       cell.appendChild(input);
       input.focus();
 
-      input.addEventListener('blur', finalizeEdit);
+      input.addEventListener('blur', () => {
+        return finalizeEdit(cell, initialText, isSalaryCell);
+      });
 
       input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-          finalizeEdit();
+          finalizeEdit(cell, initialText, isSalaryCell);
         }
       });
-
-      function finalizeEdit() {
-        const activeInput = document.querySelector('.cell-input');
-
-        if (activeInput) {
-          const newValue = activeInput.value.trim() || initialText;
-
-          activeInput.parentElement.textContent = newValue;
-          activeInput.remove();
-        }
-      }
     });
   });
+}
+
+function finalizeEdit(cell, initialText, isSalaryCell) {
+  const activeInput = cell.querySelector('.cell-input');
+
+  if (!activeInput) {
+    return;
+  }
+
+  let newValue = activeInput.value.trim();
+
+  if (cell.cellIndex === 3 && !isValidAge(activeInput.value)) {
+    newValue = initialText;
+  } else if (isSalaryCell) {
+    const numericValue = parseInt(newValue, 10);
+
+    newValue =
+      isNaN(numericValue) || numericValue < 0
+        ? initialText
+        : `$${numericValue.toLocaleString()}`;
+  } else {
+    newValue = newValue || initialText;
+  }
+
+  cell.textContent = newValue;
+}
+
+function isValidAge(age) {
+  const ageNumber = parseInt(age, 10);
+
+  return /^[0-9]+$/.test(age) && ageNumber >= 18 && ageNumber <= 90;
 }
 
 getTableBodyRows().forEach(makeCellsEditable);
