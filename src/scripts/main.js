@@ -62,7 +62,6 @@ const rowSelection = (e) => {
 };
 
 const pushNotification = (title, description, type) => {
-  console.log(type);
   const newDiv = document.createElement('div');
   const newHeading = document.createElement('h2');
   const newParagraph = document.createElement('p');
