@@ -67,8 +67,6 @@ const pushNotification = (title, description, type) => {
   const newParagraph = document.createElement('p');
 
   newDiv.style.position = 'fixed';
-  newDiv.style.top = '10px';
-  newDiv.style.right = '10px';
   newDiv.style.zIndex = '1000';
   newDiv.setAttribute('data-qa', 'notification');
   newDiv.classList.add('notification', type);
@@ -84,8 +82,8 @@ const pushNotification = (title, description, type) => {
   body.appendChild(newDiv);
 
   setTimeout(() => {
-    newDiv.style.display = 'none';
-  }, 4000);
+    newDiv.remove();
+  }, 5000);
 };
 
 const createFormElement = (labelText, n, type, qaAttribute, options) => {
@@ -192,11 +190,11 @@ document.querySelector('form').addEventListener('submit', function (e) {
   e.preventDefault();
 
   const formData = new FormData(e.target);
-  let error = false;
+  let isValid = true;
   let errorMessage = '';
 
   if (formData.get('name').length < 5) {
-    error = true;
+    isValid = false;
     errorMessage = 'Name must be at least 5 characters long.';
   }
 
@@ -204,12 +202,12 @@ document.querySelector('form').addEventListener('submit', function (e) {
     parseInt(formData.get('age'), 10) > 90 ||
     parseInt(formData.get('age'), 10) < 18
   ) {
-    error = true;
+    isValid = false;
     errorMessage = 'Age must be between 18 and 90.';
   }
 
-  if (error) {
-    pushNotification('Title of Error message', errorMessage, 'error');
+  if (!isValid) {
+    pushNotification('Error', errorMessage, 'error');
   } else {
     const employee = {
       name: formData.get('name'),
@@ -233,5 +231,7 @@ document.querySelector('form').addEventListener('submit', function (e) {
     bodyOfTable.appendChild(newRow);
 
     pushNotification('Success', 'New employee added successfully.', 'success');
+
+    form.reset();
   }
 });
