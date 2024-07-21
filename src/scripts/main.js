@@ -107,10 +107,22 @@ function configureInput(input) {
 }
 
 function validateInput(input) {
+  input.value = input.value.trim();
+
   switch (input.name) {
     case nameInput.name: {
       if (input.value.length < 4) {
         showNotification('error', 'Name must contain at least 4 letters');
+
+        return false;
+      }
+
+      break;
+    }
+
+    case positionInput.name: {
+      if (input.value.length < 4) {
+        showNotification('error', 'Possition must contain at least 4 letters');
 
         return false;
       }
@@ -159,12 +171,15 @@ function handleCellDoubleClick(cell) {
   let isEditing = false;
 
   const handleCellEdit = () => {
+    if (isEditing) {
+      return;
+    }
+
     isEditing = true;
 
     if (!input.value) {
       input.remove();
       cell.textContent = input.type === 'salary' ? parseCurrency(text) : text;
-      isEditing = false;
     }
 
     if (validateInput(input)) {
@@ -172,9 +187,9 @@ function handleCellDoubleClick(cell) {
 
       cell.textContent =
         input.name === 'salary' ? parseCurrency(input.value) : input.value;
-
-      isEditing = false;
     }
+
+    isEditing = false;
   };
 
   input.classList.add('cell-input');
@@ -196,11 +211,6 @@ function handleCellDoubleClick(cell) {
   input.addEventListener('keypress', (inputEvent) => {
     if (inputEvent.key === 'Enter') {
       inputEvent.preventDefault();
-
-      if (isEditing) {
-        return;
-      }
-
       handleCellEdit();
     }
   });
