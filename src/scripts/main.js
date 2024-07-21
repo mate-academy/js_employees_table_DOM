@@ -131,7 +131,7 @@ form.addEventListener('submit', (e) => {
   const age = form.age.value;
   const salary = form.salary.value;
 
-  if (employeeName.length < 4) {
+  if (employeeName.trim().length < 4) {
     pushNotification(100, 5, 'Error', 'Name must be grater than 4', 'error');
   }
 
@@ -140,8 +140,8 @@ form.addEventListener('submit', (e) => {
   }
 
   if (
-    employeeName.length >= 4 &&
-    position &&
+    employeeName.trim().length >= 4 &&
+    position.trim() &&
     office &&
     age > 18 &&
     age < 90 &&
