@@ -160,9 +160,21 @@ addNewPersonForm.addEventListener('submit', function (e) {
   const salary = addNewPersonForm.elements['salary'].value;
 
   if (nameIs.length < 4) {
-    pushNotification(40, 60, 'Name validation', 'Name has less than 4 characters!', 'error');
+    pushNotification(
+      40,
+      60,
+      'Name validation',
+      'Name has less than 4 characters!',
+      'error',
+    );
   } else if (age < 18 || age > 90) {
-    pushNotification(40, 60, 'Incorrect age', 'Age is has to be in the range from 18 to 90', 'error');
+    pushNotification(
+      40,
+      60,
+      'Incorrect age',
+      'Age is has to be in the range from 18 to 90',
+      'error',
+    );
   } else {
     const newRow = document.createElement('tr');
 
@@ -184,7 +196,13 @@ addNewPersonForm.addEventListener('submit', function (e) {
 
     addNewPersonForm.reset();
 
-    pushNotification(40, 60, 'New emploee', ' A new employee is successfully added to the table', 'success');
+    pushNotification(
+      40,
+      60,
+      'New emploee',
+      ' A new employee is successfully added to the table',
+      'success',
+    );
   }
 });
 
