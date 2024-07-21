@@ -159,23 +159,57 @@ addNewPersonForm.addEventListener('submit', function (e) {
   const age = addNewPersonForm.elements['age'].value;
   const salary = addNewPersonForm.elements['salary'].value;
 
-  const newRow = document.createElement('tr');
+  if (nameIs.length < 4) {
+    pushNotification(40, 60, 'Name validation', 'Name has less than 4 characters!', 'error');
+  } else if (age < 18 || age > 90) {
+    pushNotification(40, 60, 'Incorrect age', 'Age is has to be in the range from 18 to 90', 'error');
+  } else {
+    const newRow = document.createElement('tr');
 
-  newRow.innerHTML = `
-    <td>${nameIs}</td>
-    <td>${position}</td>
-    <td>${office}</td>
-    <td>${age}</td>
-    <td>$${salary}</td>
-  `;
+    newRow.innerHTML = `
+      <td>${nameIs}</td>
+      <td>${position}</td>
+      <td>${office}</td>
+      <td>${age}</td>
+      <td>$${salary}</td>
+    `;
 
-  tBody.appendChild(newRow);
-  rows.push(newRow);
+    tBody.appendChild(newRow);
+    rows.push(newRow);
 
-  newRow.addEventListener('click', function () {
-    rows.forEach((r) => r.classList.remove('active'));
-    newRow.classList.add('active');
-  });
+    newRow.addEventListener('click', function () {
+      rows.forEach((r) => r.classList.remove('active'));
+      newRow.classList.add('active');
+    });
 
-  addNewPersonForm.reset();
+    addNewPersonForm.reset();
+
+    pushNotification(40, 60, 'New emploee', ' A new employee is successfully added to the table', 'success');
+  }
 });
+
+// notifications function
+
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const notification = document.createElement('div');
+
+  notification.classList.add('notification', type);
+  notification.style.top = `${posTop}px`;
+  notification.style.right = `${posRight}px`;
+  notification.style.cursor = 'pointer';
+  notification.setAttribute('data-qa', 'notification');
+
+  const notificationTitle = document.createElement('h2');
+
+  notificationTitle.classList.add('title');
+  notificationTitle.textContent = title;
+
+  const notificationDescription = document.createElement('p');
+
+  notificationDescription.textContent = description;
+
+  notification.append(notificationTitle, notificationDescription);
+  document.body.append(notification);
+
+  setTimeout(() => (notification.style.visibility = 'hidden'), 5000);
+};
