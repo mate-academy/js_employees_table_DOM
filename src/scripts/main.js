@@ -118,7 +118,10 @@ rows.forEach((row, index) => {
 
     editingInput.type =
       columnTitle === 'age' || columnTitle === 'salary' ? 'number' : 'text';
-    editingInput.value = cell.textContent;
+
+    editingInput.value = cell.textContent
+      .replaceAll('$', '')
+      .replaceAll(',', '');
 
     cell.classList.add('editing');
     cell.innerHTML = '';
@@ -150,12 +153,27 @@ rows.forEach((row, index) => {
           errorMessage = 'Age should be from 18 to 90 years';
         }
       } else if (columnTitle === 'salary') {
-        cell.textContent = formatSalary(cell.textContent);
+        const salary = parseFloat(
+          editingInput.value.replaceAll('$', '').replaceAll(',', ''),
+        );
+
+        if (isNaN(salary) || salary < 0) {
+          isValid = false;
+          errorMessage = 'Salary should be a positive number';
+        }
       }
 
       if (isValid) {
         cell.classList.remove('editing');
-        cell.innerHTML = editingInput.value.trim() || cell.textContent;
+
+        if (columnTitle === 'salary') {
+          cell.textContent =
+            formatSalary(
+              editingInput.value.replaceAll('$', '').replaceAll(',', ''),
+            ) || cell.textContent;
+        } else {
+          cell.innerHTML = editingInput.value.trim() || cell.textContent;
+        }
 
         showNotification(
           'success',
@@ -170,8 +188,7 @@ rows.forEach((row, index) => {
 
     editingInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        cell.classList.remove('editing');
-        cell.innerHTML = editingInput.value.trim() || cell.textContent;
+        editingInput.blur();
       }
     });
   });
