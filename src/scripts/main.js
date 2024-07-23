@@ -63,37 +63,38 @@ form.classList.add('new-employee-form');
 
 form.insertAdjacentHTML(
   'beforeend',
-  '<label>Name: <input data-qa="name" name="name"type="text" required></label>',
+  '<label>Name: ' +
+    '<input data-qa="name" name="name" type="text" required></label>',
 );
 
 form.insertAdjacentHTML(
   'beforeend',
   '<label>Position: ' +
-  '<input data-qa="position" name="position" type="text" required></label>',
+    '<input data-qa="position" name="position" type="text" required></label>',
 );
 
 form.insertAdjacentHTML(
   'beforeend',
   '<label>Office: <select data-qa="office" name="office" required>' +
-  '<option value="Tokyo">Tokyo</option>' +
-  '<option value="Singapore">Singapore</option>' +
-  '<option value="London">London</option>' +
-  '<option value="New York">New York</option>' +
-  '<option value="Edinburgh">Edinburgh</option>' +
-  '<option value="San Francisco">San Francisco</option>' +
-  '</select></label>',
+    '<option value="Tokyo">Tokyo</option>' +
+    '<option value="Singapore">Singapore</option>' +
+    '<option value="London">London</option>' +
+    '<option value="New York">New York</option>' +
+    '<option value="Edinburgh">Edinburgh</option>' +
+    '<option value="San Francisco">San Francisco</option>' +
+    '</select></label>',
 );
 
 form.insertAdjacentHTML(
   'beforeend',
   '<label>Age: <input data-qa="age" name="age" ' +
-  'type="number" min="18" max="90" required></label>',
+    'type="number" min="18" max="90" required></label>',
 );
 
 form.insertAdjacentHTML(
   'beforeend',
   '<label>Salary: ' +
-  '<input data-qa="salary" name="salary" type="number" required></label>',
+    '<input data-qa="salary" name="salary" type="number" required></label>',
 );
 
 form.insertAdjacentHTML(
