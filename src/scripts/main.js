@@ -3,30 +3,42 @@
 let allRows = document.querySelector('tbody').querySelectorAll('tr');
 const tableHeader = document.querySelector('thead');
 let people = [];
-let sortOrder = '';
+let sortBy = '';
 let isReverse = '';
+const cities = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinbutgh',
+  'San Francisco',
+];
 
-for (const head of tableHeader.children) {
-  for (const info of head.children) {
-    info.addEventListener('click', () => {
-      if (sortOrder !== info.textContent) {
-        sortOrder = info.textContent;
-        isReverse = 1;
-      } else {
-        isReverse = isReverse * -1;
-      }
-      sort(sortOrder);
-    });
+function headerEventAdder() {
+  for (const head of tableHeader.children) {
+    for (const info of head.children) {
+      info.addEventListener('click', () => {
+        if (sortBy !== info.textContent) {
+          sortBy = info.textContent;
+          isReverse = 1;
+        } else {
+          isReverse = isReverse * -1;
+        }
+        sort(sortBy);
+      });
+    }
   }
 }
 
-for (const row of allRows) {
-  row.addEventListener('click', () => {
-    for (const rowReset of allRows) {
-      rowReset.classList.remove('active');
-    }
-    row.classList.add('active');
-  });
+function rowActiveEventAdder() {
+  for (const row of allRows) {
+    row.addEventListener('click', () => {
+      for (const rowReset of allRows) {
+        rowReset.classList.remove('active');
+      }
+      row.classList.add('active');
+    });
+  }
 }
 
 function getPeople() {
@@ -44,11 +56,11 @@ function getPeople() {
   }
 }
 
-function sort(sortBy) {
+function sort(sortParam) {
   getPeople();
 
   people = people.sort((a, b) => {
-    switch (sortBy) {
+    switch (sortParam) {
       case 'Name':
         return a.Name.localeCompare(b.Name) * isReverse;
 
@@ -107,132 +119,128 @@ function sort(sortBy) {
   }
 }
 
-const newForm = document.createElement('form');
+function formCreate() {
+  const newForm = document.createElement('form');
 
-newForm.classList.add('new-employee-form');
+  newForm.classList.add('new-employee-form');
 
-for (const field of ['Name:', 'Position:', 'Office:', 'Age:', 'Salary:']) {
-  const newLabel = document.createElement('label');
-  let newInput;
+  for (const field of ['Name:', 'Position:', 'Office:', 'Age:', 'Salary:']) {
+    const newLabel = document.createElement('label');
+    let newInput;
 
-  if (field !== 'Office:') {
-    newInput = document.createElement('input');
+    if (field !== 'Office:') {
+      newInput = document.createElement('input');
 
-    newInput.setAttribute('data-qa', field.toLowerCase().slice(0, -1));
-    newInput.setAttribute('name', field.toLowerCase().slice(0, -1));
-    newInput.setAttribute('type', 'text');
-  } else {
-    newInput = document.createElement('select');
-    newInput.setAttribute('data-qa', field.toLowerCase().slice(0, -1));
-    newInput.setAttribute('name', field.toLowerCase().slice(0, -1));
+      newInput.setAttribute('data-qa', field.toLowerCase().slice(0, -1));
+      newInput.setAttribute('name', field.toLowerCase().slice(0, -1));
+      newInput.setAttribute('type', 'text');
+    } else {
+      newInput = document.createElement('select');
+      newInput.setAttribute('data-qa', field.toLowerCase().slice(0, -1));
+      newInput.setAttribute('name', field.toLowerCase().slice(0, -1));
 
-    for (const office of [
-      'Tokyo',
-      'Singapore',
-      'London',
-      'New York',
-      'Edinbutgh',
-      'San Francisco',
-    ]) {
-      const newOption = document.createElement('option');
+      for (const office of cities) {
+        const newOption = document.createElement('option');
 
-      newOption.setAttribute('value', office);
-      newOption.textContent = office;
-      newInput.appendChild(newOption);
+        newOption.setAttribute('value', office);
+        newOption.textContent = office;
+        newInput.appendChild(newOption);
+      }
     }
+
+    if (field === 'Salary:') {
+      newInput.removeAttribute('type');
+      newInput.setAttribute('type', 'number');
+      newInput.setAttribute('step', 1000);
+    }
+    newInput.setAttribute('required', '');
+    newLabel.textContent = field;
+    newLabel.appendChild(newInput);
+    newForm.appendChild(newLabel);
   }
 
-  if (field === 'Salary:') {
-    newInput.removeAttribute('type');
-    newInput.setAttribute('type', 'number');
-    newInput.setAttribute('step', 1000);
-  }
-  newInput.setAttribute('required', '');
-  newLabel.textContent = field;
-  newLabel.appendChild(newInput);
-  newForm.appendChild(newLabel);
+  const newButton = document.createElement('button');
+
+  newButton.setAttribute('type', 'button');
+
+  newButton.textContent = 'Save to table';
+  newButton.classList.add('button');
+
+  newForm.appendChild(newButton);
+  document.querySelector('body').appendChild(newForm);
+
+  document.querySelector('button').addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const form = document.forms[0];
+    const nameCell = document.createElement('td');
+    const positionCell = document.createElement('td');
+    const officeCell = document.createElement('td');
+    const ageCell = document.createElement('td');
+    const salaryCell = document.createElement('td');
+
+    if (form.name.value.length < 4) {
+      pushNotification(
+        10,
+        10,
+        'Error!',
+        'Name must be at least 4 letters long!',
+        'error',
+      );
+    } else if (form.position.value === '') {
+      pushNotification(10, 10, 'Error!', `Position can't be empty!`, 'error');
+    } else if (
+      form.age.value < 18 ||
+      form.age.value > 90 ||
+      isNaN(parseInt(form.age.value))
+    ) {
+      pushNotification(
+        10,
+        10,
+        'Error!',
+        'Age must be between 18 and 90!',
+        'error',
+      );
+    } else {
+      const newRow = document.createElement('tr');
+
+      salaryCell.textContent = '$';
+      nameCell.textContent = form.name.value;
+      positionCell.textContent = form.position.value;
+      officeCell.textContent = form.office.value;
+      ageCell.textContent = +form.age.value;
+      salaryCell.textContent += (+form.salary.value).toLocaleString('En-US');
+
+      newRow.appendChild(nameCell);
+      newRow.appendChild(positionCell);
+      newRow.appendChild(officeCell);
+      newRow.appendChild(ageCell);
+      newRow.appendChild(salaryCell);
+
+      document.querySelector('tbody').appendChild(newRow);
+
+      allRows = document.querySelector('tbody').querySelectorAll('tr');
+
+      for (const row of allRows) {
+        row.addEventListener('click', () => {
+          for (const rowReset of allRows) {
+            rowReset.classList.remove('active');
+          }
+          row.classList.add('active');
+        });
+      }
+      getPeople();
+
+      pushNotification(
+        10,
+        10,
+        'Succesfully added new row!',
+        'New info added at the bottom of table.',
+        'success',
+      );
+    }
+  });
 }
-
-const newButton = document.createElement('button');
-
-newButton.setAttribute('type', 'button');
-
-newButton.textContent = 'Save to table';
-
-newForm.appendChild(newButton);
-document.querySelector('body').appendChild(newForm);
-
-newButton.addEventListener('click', (e) => {
-  e.preventDefault();
-
-  const form = document.forms[0];
-  const nameCell = document.createElement('td');
-  const positionCell = document.createElement('td');
-  const officeCell = document.createElement('td');
-  const ageCell = document.createElement('td');
-  const salaryCell = document.createElement('td');
-
-  if (form.name.value.length < 4) {
-    pushNotification(
-      10,
-      10,
-      'Error!',
-      'Name must be at least 4 letters long!',
-      'error',
-    );
-  } else if (form.position.value === '') {
-    pushNotification(10, 10, 'Error!', `Position can't be empty!`, 'error');
-  } else if (
-    form.age.value < 18 ||
-    form.age.value > 90 ||
-    isNaN(parseInt(form.age.value))
-  ) {
-    pushNotification(
-      10,
-      10,
-      'Error!',
-      'Age must be between 18 and 90!',
-      'error',
-    );
-  } else {
-    const newRow = document.createElement('tr');
-
-    salaryCell.textContent = '$';
-    nameCell.textContent = form.name.value;
-    positionCell.textContent = form.position.value;
-    officeCell.textContent = form.office.value;
-    ageCell.textContent = +form.age.value;
-    salaryCell.textContent += (+form.salary.value).toLocaleString('En-US');
-
-    newRow.appendChild(nameCell);
-    newRow.appendChild(positionCell);
-    newRow.appendChild(officeCell);
-    newRow.appendChild(ageCell);
-    newRow.appendChild(salaryCell);
-
-    document.querySelector('tbody').appendChild(newRow);
-
-    allRows = document.querySelector('tbody').querySelectorAll('tr');
-
-    for (const row of allRows) {
-      row.addEventListener('click', () => {
-        for (const rowReset of allRows) {
-          rowReset.classList.remove('active');
-        }
-        row.classList.add('active');
-      });
-    }
-    getPeople();
-
-    pushNotification(
-      10,
-      10,
-      'Succesfully added new row!',
-      'New info added at the bottom of table.',
-      'success',
-    );
-  }
-});
 
 const pushNotification = (posTop, posRight, title, description, type) => {
   const message = document.createElement('div');
@@ -259,3 +267,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
     message.remove();
   }, '2000');
 };
+
+headerEventAdder();
+rowActiveEventAdder();
+formCreate();
