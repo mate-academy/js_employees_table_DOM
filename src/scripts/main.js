@@ -1,9 +1,6 @@
 'use strict';
 
 const table = document.querySelector('table');
-// const form = document.createElement('form');
-// const headers = table.querySelectorAll('thead th');
-// const tBody = table.querySelector('tbody');
 
 function formatCurrency(value) {
   return new Intl.NumberFormat('en-US', {
@@ -11,6 +8,14 @@ function formatCurrency(value) {
     currency: 'USD',
     minimumFractionDigits: 0,
   }).format(value);
+}
+
+function addColumNames(row) {
+  const columnNames = ['name', 'position', 'office', 'age', 'salary'];
+
+  Array.from(row.cells).forEach((cell, index) => {
+    cell.dataset.columnName = columnNames[index];
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -32,12 +37,56 @@ document.addEventListener('DOMContentLoaded', () => {
       row.classList.add('active');
     });
 
-    Array.from(row.cells).forEach((cell) => {
+    Array.from(row.cells).forEach((cell, index) => {
       cell.addEventListener('dblclick', () => {
         editCell(cell);
       });
     });
+
+    addColumNames(row);
   });
+
+  function validate(data) {
+    const notification = document.createElement('div');
+
+    notification.classList.add('notification');
+    notification.setAttribute('data-qa', 'notification');
+
+    let res = true;
+
+    if (data.name.length < 4) {
+      notification.classList.add('error');
+
+      notification.innerText =
+        'Error: Name must be at least 4 characters long.';
+      document.body.appendChild(notification);
+
+      res = false;
+    } else if (!data.position.length) {
+      notification.classList.add('error');
+
+      notification.innerText = 'Error:Position should exist.';
+      document.body.appendChild(notification);
+
+      res = false;
+    } else if (data.age < 18 || data.age > 90) {
+      notification.classList.add('error');
+      notification.innerText = 'Error: Age must be between 18 and 90.';
+
+      res = false;
+    } else {
+      notification.classList.add('success');
+      notification.innerText = 'Success';
+    }
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 3000);
+
+    return res;
+  }
 
   function sortTable(columnIndex) {
     const tbody = table.querySelector('tbody');
@@ -102,31 +151,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const age = form.querySelector('input[name="age"]').value;
     const salary = form.querySelector('input[name="salary"]').value;
 
-    const notification = document.createElement('div');
-
-    notification.classList.add('notification');
-
-    notification.setAttribute('data-qa', 'notification');
-
-    if (n.length < 4) {
-      notification.classList.add('error');
-
-      notification.innerText =
-        'Error: Name must be at least 4 characters long.';
-      document.body.appendChild(notification);
-    } else if (!position.length) {
-      notification.classList.add('error');
-
-      notification.innerText = 'Error:Position should exist.';
-      document.body.appendChild(notification);
-    } else if (age < 18 || age > 90) {
-      notification.classList.add('error');
-      notification.innerText = 'Error: Age must be between 18 and 90.';
-      document.body.appendChild(notification);
-    } else {
-      notification.classList.add('success');
-      document.body.appendChild(notification);
-
+    if (
+      validate({
+        name: n,
+        position,
+        office,
+        age,
+        salary,
+      })
+    ) {
       const newRow = document.createElement('tr');
 
       newRow.innerHTML = `
@@ -148,30 +181,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
 
+      addColumNames(newRow);
+
       table.querySelector('tbody').appendChild(newRow);
 
       form.reset();
     }
   });
 
+  function getSalary(str) {
+    return str.replaceAll(',', '').replaceAll('$', '');
+  }
+
   function editCell(cell) {
     if (cell.querySelector('.cell-input')) {
       return;
     }
+
+    const columnName = cell.dataset.columnName;
+
+    const row = cell.closest('tr');
+    const initialData = {
+      name: row.querySelector('[data-column-name="name"]').innerText,
+      position: row.querySelector('[data-column-name="position"]').innerText,
+      age: row.querySelector('[data-column-name="age"]').innerText,
+      office: row.querySelector('[data-column-name="office"]').innerText,
+      salary: getSalary(
+        row.querySelector('[data-column-name="salary"]').innerText,
+      ),
+    };
 
     const initialValue = cell.innerText;
     const input = document.createElement('input');
 
     input.type = 'text';
     input.className = 'cell-input';
-    input.value = initialValue;
+
+    input.value =
+      columnName === 'salary' ? getSalary(initialValue) : initialValue;
 
     cell.innerText = '';
     cell.appendChild(input);
     input.focus();
 
     input.addEventListener('blur', () => {
-      saveCell(cell, initialValue, input.value);
+      const newValue = input.value;
+
+      const data = {
+        ...initialData,
+        [columnName]: newValue,
+      };
+
+      if (validate(data)) {
+        cell.innerText =
+          columnName === 'salary' ? formatCurrency(newValue) : newValue;
+      } else {
+        cell.innerText = initialValue;
+      }
+
+      if (cell.querySelector('.cell-input')) {
+        cell.removeChild(cell.querySelector('.cell-input'));
+      }
     });
 
     input.addEventListener('keypress', (e) => {
@@ -187,6 +257,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       cell.innerText = newValue;
     }
-    cell.removeChild(cell.querySelector('.cell-input'));
+
+    if (cell.querySelector('.cell-input')) {
+      cell.removeChild(cell.querySelector('.cell-input'));
+    }
   }
 });
