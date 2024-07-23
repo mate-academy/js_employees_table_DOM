@@ -20,11 +20,17 @@ export function createForm() {
       ${createHTMLSelect('office')}
 
       <label>Age:
-        <input type="number" name="age" data-qa="age" />
+        <input
+          type="number"
+          name="age"
+          data-qa="age"
+          min="18"
+          max="90"
+        />
       </label>
 
       <label>Salary:
-        <input type="number" name="salary" data-qa="salary" />
+        <input type="number" name="salary" min="1" data-qa="salary" />
       </label>
 
       <button>Save to table</button>
