@@ -117,7 +117,7 @@ saveButton.addEventListener('click', (e) => {
   const nameValue = document.querySelector('input[name="name"]').value;
 
   if (nameValue.length < 4) {
-    pushNotification(500, 100, 'Error!', 'Name too short', 'error');
+    pushNotification(500, 100, 'Error!', 'Name too short', 'warning');
 
     return;
   }
@@ -132,7 +132,7 @@ saveButton.addEventListener('click', (e) => {
       100,
       'Error!',
       'Age should be in range [18, 90]',
-      'error',
+      'warning',
     );
 
     return;
