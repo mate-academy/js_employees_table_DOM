@@ -102,97 +102,96 @@ rows.forEach((row, index) => {
   });
 });
 
-rows.forEach((row, index) => {
-  row.addEventListener('dblclick', (ev) => {
-    const cell = ev.target.closest('td');
+tbody.addEventListener('dblclick', (ev) => {
+  const cell = ev.target.closest('td');
 
-    if (!cell || cell.classList.contains('editing')) {
-      cell.classList.remove('editing');
+  if (!cell || cell.classList.contains('editing')) {
+    return;
+  }
 
-      return;
-    }
+  cell.classList.remove('editing');
 
-    const editingInput = document.createElement('input');
+  const editingInput = document.createElement('input');
 
-    editingInput.className = 'cell-input';
+  editingInput.className = 'cell-input';
 
-    const columnTitle = titles[cell.cellIndex].textContent.trim().toLowerCase();
+  const columnTitle = titles[cell.cellIndex].textContent.trim().toLowerCase();
 
-    editingInput.type =
-      columnTitle === 'age' || columnTitle === 'salary' ? 'number' : 'text';
+  editingInput.type =
+    columnTitle === 'age' || columnTitle === 'salary' ? 'number' : 'text';
 
-    editingInput.value = cell.textContent
-      .replaceAll('$', '')
-      .replaceAll(',', '');
+  editingInput.value = cell.textContent.replaceAll('$', '').replaceAll(',', '');
 
-    cell.classList.add('editing');
-    cell.innerHTML = '';
-    cell.append(editingInput);
-    editingInput.focus();
+  cell.classList.add('editing');
+  cell.innerHTML = '';
+  cell.append(editingInput);
+  editingInput.focus();
 
-    editingInput.addEventListener('blur', () => {
-      cell.classList.remove('editing');
+  editingInput.addEventListener('blur', () => {
+    cell.classList.remove('editing');
 
-      let isValid = true;
-      let errorMessage = '';
+    let isValid = true;
+    let errorMessage = '';
+
+    if (editingInput.value.trim().length < 1) {
+      isValid = false;
+      errorMessage = 'All fields are required';
+    } else if (
+      columnTitle === 'name' &&
+      (cell.textContent || editingInput.value.length < 4)
+    ) {
+      isValid = false;
+      errorMessage = 'The name must contain at least 4 letters';
+    } else if (columnTitle === 'age') {
+      const age = parseInt(cell.textContent, 10);
 
       if (
-        columnTitle === 'name' &&
-        (cell.textContent || editingInput.value.length < 4)
+        age < 18 ||
+        age > 90 ||
+        editingInput.value < 18 ||
+        editingInput.value > 90
       ) {
         isValid = false;
-        errorMessage = 'The name must contain at least 4 letters';
-      } else if (columnTitle === 'age') {
-        const age = parseInt(cell.textContent, 10);
-
-        if (
-          age < 18 ||
-          age > 90 ||
-          editingInput.value < 18 ||
-          editingInput.value > 90
-        ) {
-          isValid = false;
-          errorMessage = 'Age should be from 18 to 90 years';
-        }
-      } else if (columnTitle === 'salary') {
-        const salary = parseFloat(
-          editingInput.value.replaceAll('$', '').replaceAll(',', ''),
-        );
-
-        if (isNaN(salary) || salary < 0) {
-          isValid = false;
-          errorMessage = 'Salary should be a positive number';
-        }
+        errorMessage = 'Age should be from 18 to 90 years';
       }
+    } else if (columnTitle === 'salary') {
+      const salary = parseFloat(
+        editingInput.value.replaceAll('$', '').replaceAll(',', ''),
+      );
 
-      if (isValid) {
-        cell.classList.remove('editing');
+      if (isNaN(salary) || salary < 0) {
+        isValid = false;
+        errorMessage = 'Salary should be a positive number';
+      }
+    }
 
-        if (columnTitle === 'salary') {
-          cell.textContent =
-            formatSalary(
-              editingInput.value.replaceAll('$', '').replaceAll(',', ''),
-            ) || cell.textContent;
-        } else {
-          cell.innerHTML = editingInput.value.trim() || cell.textContent;
-        }
+    if (isValid) {
+      cell.classList.remove('editing');
 
-        showNotification(
-          'success',
-          'Success',
-          'The employee was updated successfully',
-        );
+      if (columnTitle === 'salary') {
+        cell.textContent =
+          formatSalary(
+            editingInput.value.replaceAll('$', '').replaceAll(',', ''),
+          ) || cell.textContent;
       } else {
-        showNotification('error', 'Error', errorMessage);
-        editingInput.focus();
+        cell.innerHTML = editingInput.value.trim() || cell.textContent;
       }
-    });
 
-    editingInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        editingInput.blur();
-      }
-    });
+      showNotification(
+        'success',
+        'Success',
+        'The employee was updated successfully',
+      );
+    } else {
+      showNotification('error', 'Error', errorMessage);
+      editingInput.focus();
+    }
+  });
+
+  editingInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      editingInput.blur();
+    }
   });
 });
 
