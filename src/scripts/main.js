@@ -182,7 +182,11 @@ newButton.addEventListener('click', (e) => {
     );
   } else if (form.position.value === '') {
     pushNotification(10, 10, 'Error!', `Position can't be empty!`, 'error');
-  } else if (form.age.value < 18 || form.age.value > 90) {
+  } else if (
+    form.age.value < 18 ||
+    form.age.value > 90 ||
+    isNaN(parseInt(form.age.value))
+  ) {
     pushNotification(
       10,
       10,
