@@ -47,6 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function validate(data) {
+    // remove previous
+    if (document.querySelector('.notification')) {
+      document.body.removeChild(document.querySelector('.notification'));
+    }
+
     const notification = document.createElement('div');
 
     notification.classList.add('notification');
@@ -54,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let res = true;
 
-    if (data.name.length < 4) {
+    if (data.name.trim().length < 4) {
       notification.classList.add('error');
 
       notification.innerText =
@@ -62,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.appendChild(notification);
 
       res = false;
-    } else if (!data.position.length) {
+    } else if (!data.position.trim().length) {
       notification.classList.add('error');
 
       notification.innerText = 'Error:Position should exist.';
@@ -252,12 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function saveCell(cell, initialValue, newValue) {
-    if (newValue.trim() === '') {
-      cell.innerText = initialValue;
-    } else {
-      cell.innerText = newValue;
-    }
-
     if (cell.querySelector('.cell-input')) {
       cell.removeChild(cell.querySelector('.cell-input'));
     }
