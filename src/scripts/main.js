@@ -60,28 +60,36 @@ document.addEventListener('DOMContentLoaded', () => {
     let res = true;
 
     if (data.name.trim().length < 4) {
-      notification.classList.add('error');
-
       notification.innerText =
         'Error: Name must be at least 4 characters long.';
       document.body.appendChild(notification);
 
       res = false;
     } else if (!data.position.trim().length) {
-      notification.classList.add('error');
-
       notification.innerText = 'Error:Position should exist.';
       document.body.appendChild(notification);
 
       res = false;
     } else if (data.age < 18 || data.age > 90) {
-      notification.classList.add('error');
       notification.innerText = 'Error: Age must be between 18 and 90.';
 
       res = false;
+    } else if (!Number.isInteger(+data.salary)) {
+      notification.innerText = 'Salary must be a number';
+
+      res = false;
+    } else if (+data.salary <= 0) {
+      notification.innerText = 'Salary must be more than zero';
+
+      res = false;
     } else {
-      notification.classList.add('success');
       notification.innerText = 'Success';
+    }
+
+    if (res) {
+      notification.classList.add('success');
+    } else {
+      notification.classList.add('error');
     }
 
     document.body.appendChild(notification);
