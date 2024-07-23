@@ -27,7 +27,9 @@ function formatSalary(salary) {
 }
 
 function sortTable(index, order) {
-  const sortedRows = Array.from(rows).sort((row1, row2) => {
+  const currentRows = tbody.querySelectorAll('tr');
+
+  const sortedRows = Array.from(currentRows).sort((row1, row2) => {
     const cell1 = row1.children[index].innerText
       .replaceAll('$', '')
       .replaceAll(',', '');
