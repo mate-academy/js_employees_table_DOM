@@ -130,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     rowsArray.forEach((row) => tbody.appendChild(row));
   }
 
-  // Create the form
   const form = document.createElement('form');
 
   form.classList.add('new-employee-form');
