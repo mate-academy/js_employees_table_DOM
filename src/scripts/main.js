@@ -1,6 +1,7 @@
 'use strict';
 
 const tBody = document.querySelector('tbody');
+
 // region SORTING
 const tHead = document.querySelector('thead');
 let lastSortedColumn = '';
@@ -40,7 +41,6 @@ function compareStrings(row1, row2, cellIndex) {
     row2.cells[cellIndex].textContent,
   );
 }
-
 // endregion
 
 // region SELECT ROW
@@ -66,43 +66,39 @@ form.classList.add('new-employee-form');
 
 form.insertAdjacentHTML(
   'beforeend',
-  '<label>Name: ' +
-    '<input data-qa="name" name="name" type="text" required></label>',
+  `<label>Name: <input data-qa="name" name="name" type="text"></label>`,
 );
 
 form.insertAdjacentHTML(
   'beforeend',
-  '<label>Position: ' +
-    '<input data-qa="position" name="position" type="text" required></label>',
+  `<label>Position: <input data-qa="position" name="position" type="text"></label>`,
 );
 
 form.insertAdjacentHTML(
   'beforeend',
-  '<label>Office: <select data-qa="office" name="office" required>' +
-    '<option value="Tokyo">Tokyo</option>' +
-    '<option value="Singapore">Singapore</option>' +
-    '<option value="London">London</option>' +
-    '<option value="New York">New York</option>' +
-    '<option value="Edinburgh">Edinburgh</option>' +
-    '<option value="San Francisco">San Francisco</option>' +
-    '</select></label>',
+  `<label>Office: <select data-qa="office" name="office">
+    <option value="Tokyo">Tokyo</option>
+    <option value="Singapore">Singapore</option>
+    <option value="London">London</option>
+    <option value="New York">New York</option>
+    <option value="Edinburgh">Edinburgh</option>
+    <option value="San Francisco">San Francisco</option>
+    </select></label>`,
 );
 
 form.insertAdjacentHTML(
   'beforeend',
-  '<label>Age: <input data-qa="age" name="age" ' +
-    'type="number" min="18" max="90" required></label>',
+  `<label>Age: <input data-qa="age" name="age" type="number" min="18" max="90"></label>`,
 );
 
 form.insertAdjacentHTML(
   'beforeend',
-  '<label>Salary: ' +
-    '<input data-qa="salary" name="salary" type="number" required></label>',
+  `<label>Salary: <input data-qa="salary" name="salary" type="number"></label>`,
 );
 
 form.insertAdjacentHTML(
   'beforeend',
-  '<button class="button button--save">Save to table</button>',
+  `<button class="button button--save" type="button">Save to table</button>`,
 );
 
 body.appendChild(form);
@@ -114,39 +110,20 @@ const saveButton = document.querySelector('.button--save');
 saveButton.addEventListener('click', (e) => {
   e.preventDefault();
 
-  const nameValue = document.querySelector('input[name="name"]').value;
+  const nameVal = document.querySelector('input[name="name"]').value;
+  const positionVal = document.querySelector('input[name="position"]').value;
+  const officeVal = document.querySelector('select[name="office"]').value;
+  const ageVal = document.querySelector('input[name="age"]').value;
+  const salaryVal = document.querySelector('input[name="salary"]').value;
 
-  if (nameValue.length < 4) {
-    pushNotification(500, 100, 'Error!', 'Name too short', 'warning');
-
+  if (!checkIfFormValid(nameVal, positionVal, ageVal, salaryVal)) {
     return;
   }
-
-  const positionValue = document.querySelector('input[name="position"]').value;
-  const officeValue = document.querySelector('select[name="office"]').value;
-  const ageValue = +document.querySelector('input[name="age"]').value;
-
-  if (ageValue < 18) {
-    pushNotification(
-      500,
-      100,
-      'Error!',
-      'Age should be in range [18, 90]',
-      'warning',
-    );
-
-    return;
-  }
-
-  const salaryValue =
-    '$' +
-    +document
-      .querySelector('input[name="salary"]')
-      .value.toLocaleString('en-US');
 
   tBody.insertAdjacentHTML(
     'beforeend',
-    `<tr><td>${nameValue}</td><td>${positionValue}</td><td>${officeValue}</td><td>${ageValue}</td><td>${salaryValue}</td></tr>`,
+    `<tr><td>${nameVal}</td><td>${positionVal}</td><td>${officeVal}</td><td>${ageVal}</td>
+      <td>$${(+salaryVal).toLocaleString('ua-US')}</td></tr>`,
   );
 
   form.reset();
@@ -155,19 +132,46 @@ saveButton.addEventListener('click', (e) => {
     500,
     100,
     'Saved!',
-    `Employee ${nameValue} successfully saved.`,
+    `Employee ${nameVal} successfully saved.`,
     'success',
   );
 });
-// endregion
 
-// region NOTIFICATIONS
+function checkIfFormValid(nameVal, positionVal, ageVal, salaryVal) {
+  if (!nameVal || !positionVal || !ageVal || !salaryVal) {
+    pushNotification(500, 100, 'Error!', 'Fill all field', 'error');
+
+    return false;
+  }
+
+  if (nameVal.length < 4) {
+    pushNotification(500, 100, 'Error!', 'Name too short', 'error');
+
+    return false;
+  }
+
+  if (+ageVal < 18 || +ageVal > 90) {
+    pushNotification(
+      500,
+      100,
+      'Error!',
+      'Age should be in range [18, 90]',
+      'error',
+    );
+
+    return false;
+  }
+
+  return true;
+}
+
 function pushNotification(posTop, posRight, title, description, type) {
   const notificationEl = document.createElement('div');
   const titleEl = document.createElement('h2');
   const descriptionEl = document.createElement('p');
 
   notificationEl.className = 'notification ' + type;
+  notificationEl.setAttribute('data-qa', 'notification');
   notificationEl.style.top = posTop + 'px';
   notificationEl.style.right = posRight + 'px';
   titleEl.className = 'title';
@@ -179,8 +183,7 @@ function pushNotification(posTop, posRight, title, description, type) {
   document.body.append(notificationEl);
 
   setTimeout(() => {
-    notificationEl.style.display = 'none';
+    notificationEl.outerHTML = '';
   }, 2000);
 }
-
 // endregion
