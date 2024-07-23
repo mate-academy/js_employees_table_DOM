@@ -1,8 +1,9 @@
 'use strict';
 
+const body = document.querySelector('tbody');
+// region SORTING
 const employees = [...document.querySelectorAll('tbody > tr')];
 const header = document.querySelector('thead');
-const body = document.querySelector('tbody');
 let lastSortedColumn = '';
 let isAscending = true;
 
@@ -39,3 +40,17 @@ function compareStrings(row1, row2, cellIndex) {
     row2.cells[cellIndex].textContent,
   );
 }
+
+// endregion
+
+// region SELECT ROW
+let selectedRow = null;
+
+body.addEventListener('click', (e) => {
+  const row = e.target.closest('tr');
+
+  row.classList.add('active');
+  selectedRow?.classList.remove('active');
+  selectedRow = row;
+});
+// endregion
