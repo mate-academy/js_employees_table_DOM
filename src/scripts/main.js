@@ -105,11 +105,15 @@ rows.forEach((row, index) => {
 tbody.addEventListener('dblclick', (ev) => {
   const cell = ev.target.closest('td');
 
-  if (!cell || cell.classList.contains('editing')) {
+  if (tbody.querySelector('.editing')) {
     return;
   }
 
-  cell.classList.remove('editing');
+  // if (!cell || cell.classList.contains('editing')) {
+  //   return;
+  // }
+
+  // cell.classList.remove('editing');
 
   const editingInput = document.createElement('input');
 
@@ -128,8 +132,6 @@ tbody.addEventListener('dblclick', (ev) => {
   editingInput.focus();
 
   editingInput.addEventListener('blur', () => {
-    cell.classList.remove('editing');
-
     let isValid = true;
     let errorMessage = '';
 
