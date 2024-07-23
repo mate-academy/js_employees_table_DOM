@@ -49,8 +49,11 @@ let selectedRow = null;
 tBody.addEventListener('click', (e) => {
   const row = e.target.closest('tr');
 
-  row.classList.add('active');
-  selectedRow?.classList.remove('active');
+  row.classList.toggle('active');
+
+  if (selectedRow !== row) {
+    selectedRow?.classList.remove('active');
+  }
   selectedRow = row;
 });
 // endregion
