@@ -109,12 +109,6 @@ tbody.addEventListener('dblclick', (ev) => {
     return;
   }
 
-  // if (!cell || cell.classList.contains('editing')) {
-  //   return;
-  // }
-
-  // cell.classList.remove('editing');
-
   const editingInput = document.createElement('input');
 
   editingInput.className = 'cell-input';
