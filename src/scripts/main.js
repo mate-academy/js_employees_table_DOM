@@ -41,7 +41,6 @@ function compareStrings(row1, row2, cellIndex) {
     row2.cells[cellIndex].textContent,
   );
 }
-
 // endregion
 
 // region SELECT ROW
@@ -59,7 +58,7 @@ tBody.addEventListener('click', (e) => {
 });
 // endregion
 
-// region FORM
+// region CREATE FORM
 const body = document.querySelector('body');
 const form = document.createElement('form');
 
@@ -117,7 +116,7 @@ saveButton.addEventListener('click', (e) => {
   const ageVal = document.querySelector('input[name="age"]').value;
   const salaryVal = document.querySelector('input[name="salary"]').value;
 
-  if (!checkIfFormValid(nameVal, positionVal, ageVal, salaryVal)) {
+  if (!validateForm(nameVal, positionVal, ageVal, salaryVal)) {
     return;
   }
 
@@ -138,15 +137,21 @@ saveButton.addEventListener('click', (e) => {
   );
 });
 
-function checkIfFormValid(nameVal, positionVal, ageVal, salaryVal) {
+function validateForm(nameVal, positionVal, ageVal, salaryVal) {
   if (!nameVal || !positionVal || !ageVal || !salaryVal) {
-    pushNotification(500, 100, 'Error!', 'Fill all field', 'error');
+    pushNotification(500, 100, 'Error!', 'Fill in all fields.', 'error');
 
     return false;
   }
 
   if (nameVal.length < 4) {
-    pushNotification(500, 100, 'Error!', 'Name too short', 'error');
+    pushNotification(
+      500,
+      100,
+      'Error!',
+      'The name is too short. 4 letters minimum.',
+      'error',
+    );
 
     return false;
   }
@@ -156,7 +161,7 @@ function checkIfFormValid(nameVal, positionVal, ageVal, salaryVal) {
       500,
       100,
       'Error!',
-      'Age should be in range [18, 90]',
+      'Age should be in range [18, 90].',
       'error',
     );
 
@@ -185,9 +190,8 @@ function pushNotification(posTop, posRight, title, description, type) {
 
   setTimeout(() => {
     notificationEl.outerHTML = '';
-  }, 2000);
+  }, 5000);
 }
-
 // endregion
 
 // region EDIT CELL
