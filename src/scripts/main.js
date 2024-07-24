@@ -80,9 +80,9 @@ const form = document.createElement('form');
 form.className = 'new-employee-form';
 form.action = '#';
 form.method = 'POST';
+form.setAttribute('novalidate', true);
 
 form.innerHTML = `
-<form class="new-employee-form">
   <label>
     Name:
     <input
@@ -140,7 +140,6 @@ form.innerHTML = `
     />
   </label>
   <button type="submit">Save to table</button>
-</form>
 `;
 
 body.append(form);
@@ -185,7 +184,7 @@ const checkData = (data) => {
     return false;
   }
 
-  if (!position) {
+  if (!position.trim()) {
     pushNotification(
       10,
       10,
