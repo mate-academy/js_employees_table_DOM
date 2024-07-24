@@ -41,6 +41,7 @@ function compareStrings(row1, row2, cellIndex) {
     row2.cells[cellIndex].textContent,
   );
 }
+
 // endregion
 
 // region SELECT ROW
@@ -186,4 +187,36 @@ function pushNotification(posTop, posRight, title, description, type) {
     notificationEl.outerHTML = '';
   }, 2000);
 }
+
+// endregion
+
+// region EDIT CELL
+tBody.addEventListener('dblclick', (e) => {
+  const cell = e.target.closest('td');
+
+  const cellValue = cell.textContent;
+  const input = document.createElement('input');
+
+  cell.textContent = '';
+  input.classList.add('cell-input');
+  input.type = 'text';
+  cell.appendChild(input);
+  input.focus();
+
+  input.addEventListener('blur', () => {
+    let inputValue = input.value;
+
+    if (!inputValue.trim()) {
+      inputValue = cellValue;
+    }
+
+    cell.textContent = inputValue;
+  });
+
+  input.addEventListener('keypress', (innerE) => {
+    if (['Enter', 'NumpadEnter'].includes(innerE.code)) {
+      input.blur();
+    }
+  });
+});
 // endregion
