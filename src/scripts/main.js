@@ -164,7 +164,10 @@ const pushNotification = (title, description, type) => {
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  if (inputName.value.length < 4 || inputPosition.value.length < 4) {
+  if (
+    inputName.value.trim().length < 4 ||
+    inputPosition.value.trim().length < 4
+  ) {
     pushNotification(
       'Error!',
       'Name must be at least 4 letters long!',
