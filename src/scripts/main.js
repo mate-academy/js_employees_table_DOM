@@ -1,66 +1,53 @@
 const body = document.querySelector('body');
 const headers = document.querySelectorAll('thead th');
 const tbody = document.querySelector('tbody');
-const sortOrder = Array.from(headers, () => true);
-const selectedRows = document.querySelectorAll('tbody tr');
+const rows = [...document.querySelectorAll('tbody tr')];
 
-// sorting table
+// sorting table and selecting row
 headers.forEach((header, index) => {
   header.addEventListener('click', () => {
-    sort(index, sortOrder[index]);
-    sortOrder[index] = !sortOrder[index];
+    const order = header.getAttribute('order');
+
+    rows.sort((a, b) => {
+      const cellA = a.children[index].textContent.trim();
+      const cellB = b.children[index].textContent.trim();
+
+      let comparison = 0;
+      const isNumericColumn = index === 4;
+
+      if (isNumericColumn) {
+        const salaryA = parseFloat(cellA.replace(/[^0-9.-]/g, ''));
+        const salaryB = parseFloat(cellB.replace(/[^0-9.-]/g, ''));
+
+        comparison = salaryA - salaryB;
+      } else if (!isNaN(cellA) && !isNaN(cellB)) {
+        comparison = cellA - cellB;
+      } else {
+        comparison = cellA.localeCompare(cellB);
+      }
+
+      if (order === 'asc') {
+        return -comparison;
+      } else {
+        return comparison;
+      }
+    });
+
+    headers.forEach((cell) => cell.removeAttribute('order'));
+    header.setAttribute('order', order === 'asc' ? 'dsc' : 'asc');
+
+    rows.forEach((row) => tbody.appendChild(row));
   });
 });
 
-function sort(index, ascending) {
-  const rows = Array.from(document.querySelectorAll('tbody tr'));
-
-  const rowData = rows.map((row) => {
-    return Array.from(row.cells).map((cell) => cell.textContent);
-  });
-
-  const isNumericColumn = index === 4;
-
-  rowData.sort((a, b) => {
-    let aValue = a[index];
-    let bValue = b[index];
-
-    if (isNumericColumn) {
-      aValue = parseFloat(aValue.replace(/[^0-9.-]/g, ''));
-      bValue = parseFloat(bValue.replace(/[^0-9.-]/g, ''));
-    }
-
-    if (ascending) {
-      if (isNumericColumn) {
-        return aValue - bValue;
-      } else {
-        return aValue.localeCompare(bValue);
-      }
-    } else {
-      if (isNumericColumn) {
-        return bValue - aValue;
-      } else {
-        return bValue.localeCompare(aValue);
-      }
-    }
-  });
-
-  rows.forEach((row, rowIndex) => {
-    row.innerHTML = rowData[rowIndex]
-      .map((cellData) => `<td>${cellData}</td>`)
-      .join('');
-  });
-}
-
-// setting sctive row selection
-selectedRows.forEach((row) => {
+rows.forEach((row) => {
   row.addEventListener('click', () => {
     if (row.classList.contains('active')) {
-      selectedRows.forEach((item) => {
+      rows.forEach((item) => {
         item.classList.remove('active');
       });
     } else {
-      selectedRows.forEach((item) => {
+      rows.forEach((item) => {
         item.classList.remove('active');
       });
       row.classList.add('active');
