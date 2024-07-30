@@ -200,6 +200,7 @@ const addNewEmployee = (form) => {
 
   if (!employeeName.trim() || !employeePosition.trim()) {
     errorMessage.style.display = 'block';
+
     return;
   }
 
