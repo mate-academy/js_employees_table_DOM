@@ -198,16 +198,20 @@ const addNewEmployee = (form) => {
     `$${Number(employeeSalary).toLocaleString()}`,
   ];
 
+  if (!employeeName.trim() || !employeePosition.trim()) {
+    errorMessage.style.display = 'block';
+
+    return;
+  }
+
   if (employeeName.length < 4) {
     errorMessage.style.display = 'block';
-    successMessage.style.display = 'none';
 
     return;
   }
 
   if (employeeAge < 18 || employeeAge > 90) {
     errorMessage.style.display = 'block';
-    successMessage.style.display = 'none';
 
     return;
   }
@@ -220,6 +224,10 @@ const addNewEmployee = (form) => {
 
   errorMessage.style.display = 'none';
   successMessage.style.display = 'block';
+
+  setTimeout(() => {
+    successMessage.style.display = 'none';
+  }, 2000);
 
   form.reset();
   tableList.push(tr);
