@@ -156,6 +156,7 @@ const FormInput = ({ type, attribute, required }) => {
 
   input.setAttribute(type, attribute);
   input.required = required;
+  input.min = 0;
 
   if (attribute === 'age' || attribute === 'salary') {
     input.setAttribute('type', 'number');
