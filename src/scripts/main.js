@@ -199,7 +199,9 @@ const addNewEmployee = (form) => {
   const employeeOffice = form.querySelector('[data-qa="office"]').value;
   const employeeAge = parseInt(form.querySelector('[data-qa="age"]').value);
   const employeeSalary = form.querySelector('[data-qa="salary"]').value;
-  const formattedSalary = Number(employeeSalary).toLocaleString();
+  const formattedSalary = Number(
+    employeeSalary.replaceAll(',', '').replaceAll('.', ''),
+  ).toLocaleString();
 
   const tr = document.createElement('tr');
   const newEmployee = [
@@ -209,12 +211,6 @@ const addNewEmployee = (form) => {
     employeeAge,
     `$${formattedSalary}`,
   ];
-
-  if (!hasOnlyDigits(employeeSalary)) {
-    showNotification(errorMessage);
-
-    return;
-  }
 
   if (!employeeName.trim() || !employeePosition.trim()) {
     showNotification(errorMessage);
