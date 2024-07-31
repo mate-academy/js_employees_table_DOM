@@ -40,8 +40,6 @@ const stringToDigit = (str) => {
   return +str.replaceAll(',', '').slice(1);
 };
 
-const hasOnlyDigits = (v) => /^\d+$/.test(v);
-
 const capitalize = (str) => {
   return str[0].toUpperCase() + str.slice(1);
 };
