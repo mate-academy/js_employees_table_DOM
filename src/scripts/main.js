@@ -40,6 +40,8 @@ const stringToDigit = (str) => {
   return +str.replaceAll(',', '').slice(1);
 };
 
+const hasOnlyDigits = (v) => /^\d+$/.test(v);
+
 const capitalize = (str) => {
   return str[0].toUpperCase() + str.slice(1);
 };
@@ -68,6 +70,14 @@ errorMessage.style.display = 'none';
 const successMessage = NotificationMessage('success');
 
 successMessage.style.display = 'none';
+
+const showNotification = (notification) => {
+  notification.style.display = 'block';
+
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, 3000);
+};
 
 const getEmployers = (employerList) => {
   const result = employerList.map((employer) => {
@@ -156,7 +166,7 @@ const FormInput = ({ type, attribute, required }) => {
 
   input.setAttribute(type, attribute);
   input.required = required;
-  
+
   if (attribute === 'age' || attribute === 'salary') {
     input.setAttribute('type', 'number');
     input.min = 0;
@@ -187,8 +197,9 @@ const addNewEmployee = (form) => {
   const employeeName = form.querySelector('[data-qa="name"]').value;
   const employeePosition = form.querySelector('[data-qa="position"]').value;
   const employeeOffice = form.querySelector('[data-qa="office"]').value;
-  const employeeAge = form.querySelector('[data-qa="age"]').value;
+  const employeeAge = parseInt(form.querySelector('[data-qa="age"]').value);
   const employeeSalary = form.querySelector('[data-qa="salary"]').value;
+  const formattedSalary = Number(employeeSalary).toLocaleString();
 
   const tr = document.createElement('tr');
   const newEmployee = [
@@ -196,23 +207,29 @@ const addNewEmployee = (form) => {
     employeePosition,
     employeeOffice,
     employeeAge,
-    `$${Number(employeeSalary).toLocaleString()}`,
+    `$${formattedSalary}`,
   ];
 
+  if (!hasOnlyDigits(employeeSalary)) {
+    showNotification(errorMessage);
+
+    return;
+  }
+
   if (!employeeName.trim() || !employeePosition.trim()) {
-    errorMessage.style.display = 'block';
+    showNotification(errorMessage);
 
     return;
   }
 
   if (employeeName.length < 4) {
-    errorMessage.style.display = 'block';
+    showNotification(errorMessage);
 
     return;
   }
 
   if (employeeAge < 18 || employeeAge > 90) {
-    errorMessage.style.display = 'block';
+    showNotification(errorMessage);
 
     return;
   }
@@ -223,12 +240,7 @@ const addNewEmployee = (form) => {
     tr.append(td);
   }
 
-  errorMessage.style.display = 'none';
-  successMessage.style.display = 'block';
-
-  setTimeout(() => {
-    successMessage.style.display = 'none';
-  }, 2000);
+  showNotification(successMessage);
 
   form.reset();
   tableList.push(tr);
