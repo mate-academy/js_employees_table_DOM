@@ -130,8 +130,14 @@ function createNewRow() {
     return;
   }
 
-  if (age < 18 || age > 90) {
+  if (isNaN(age) || age < 18 || age > 90) {
     showNotification('Age must be between 18 and 90.', 'error');
+
+    return;
+  }
+
+  if (isNaN(salary)) {
+    showNotification('Salary should be numbers', 'error');
 
     return;
   }
