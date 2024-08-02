@@ -5,28 +5,28 @@ const rows = Array.from(document.querySelectorAll('tbody tr'));
 let click = 0;
 
 const form = document.createElement('form');
-const label1 = document.createElement('label');
-const label2 = document.createElement('label');
+const labelName = document.createElement('label');
+const labelPosition = document.createElement('label');
 const selectLabel = document.createElement('label');
-const label3 = document.createElement('label');
-const label4 = document.createElement('label');
-const input1 = document.createElement('input');
-const input2 = document.createElement('input');
+const labelAge = document.createElement('label');
+const labelSalary = document.createElement('label');
+const inputName = document.createElement('input');
+const inputPosition = document.createElement('input');
 const select = document.createElement('select');
-const input3 = document.createElement('input');
-const input4 = document.createElement('input');
+const inputAge = document.createElement('input');
+const inputSalary = document.createElement('input');
 const button = document.createElement('button');
 
 form.classList.add('new-employee-form');
-label1.classList.add('label');
-label1.textContent = 'Name:';
-input1.classList.add('input');
-input1.setAttribute('data-qa', 'name');
+labelName.classList.add('label');
+labelName.textContent = 'Name:';
+inputName.classList.add('input');
+inputName.setAttribute('data-qa', 'name');
 
-label2.classList.add('label');
-label2.textContent = 'Position:';
-input2.classList.add('input');
-input2.setAttribute('data-qa', 'position');
+labelPosition.classList.add('label');
+labelPosition.textContent = 'Position:';
+inputPosition.classList.add('input');
+inputPosition.setAttribute('data-qa', 'position');
 
 selectLabel.classList.add('label');
 selectLabel.textContent = 'Office:';
@@ -50,32 +50,32 @@ offices.forEach((office) => {
   select.appendChild(option);
 });
 
-label3.classList.add('label');
-label3.textContent = 'Age:';
-input3.type = 'numbers';
-input3.classList.add('input');
-input3.setAttribute('data-qa', 'age');
+labelAge.classList.add('label');
+labelAge.textContent = 'Age:';
+inputAge.type = 'number';
+inputAge.classList.add('input');
+inputAge.setAttribute('data-qa', 'age');
 
-label4.classList.add('label');
-label4.textContent = 'Salary:';
-input4.classList.add('input');
-input4.type = 'numbers';
-input4.setAttribute('data-qa', 'salary');
+labelSalary.classList.add('label');
+labelSalary.textContent = 'Salary:';
+inputSalary.classList.add('input');
+inputSalary.type = 'number';
+inputSalary.setAttribute('data-qa', 'salary');
 
 button.classList.add('button');
 button.textContent = 'Save to table';
 
 document.body.appendChild(form);
-form.appendChild(label1);
-label1.appendChild(input1);
-form.appendChild(label2);
-label2.appendChild(input2);
+form.appendChild(labelName);
+labelName.appendChild(inputName);
+form.appendChild(labelPosition);
+labelPosition.appendChild(inputPosition);
 form.appendChild(selectLabel);
 selectLabel.appendChild(select);
-form.appendChild(label3);
-label3.appendChild(input3);
-form.appendChild(label4);
-label4.appendChild(input4);
+form.appendChild(labelAge);
+labelAge.appendChild(inputAge);
+form.appendChild(labelSalary);
+labelSalary.appendChild(inputSalary);
 form.appendChild(button);
 
 Array.from(titles).forEach((title, text) => {
