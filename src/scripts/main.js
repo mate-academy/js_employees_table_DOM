@@ -52,12 +52,14 @@ offices.forEach((office) => {
 
 label3.classList.add('label');
 label3.textContent = 'Age:';
+input3.type = 'numbers';
 input3.classList.add('input');
 input3.setAttribute('data-qa', 'age');
 
 label4.classList.add('label');
 label4.textContent = 'Salary:';
 input4.classList.add('input');
+input4.type = 'numbers';
 input4.setAttribute('data-qa', 'salary');
 
 button.classList.add('button');
