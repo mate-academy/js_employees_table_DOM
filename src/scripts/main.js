@@ -200,7 +200,6 @@ const inputPosition = document.createElement('input');
 
 inputPosition.setAttribute('name', 'position');
 inputPosition.setAttribute('type', 'text');
-// inputPosition.setAttribute('required', '');
 inputPosition.setAttribute('data-qa', 'position');
 labelPosition.appendChild(inputPosition);
 form.appendChild(labelPosition);
@@ -299,7 +298,7 @@ form.addEventListener('submit', (e) => {
   const positionValue = inputPosition.value;
   const ageValue = +inputAge.value;
 
-  if (nameValue.length < 4) {
+  if (nameValue.trim().length < 4) {
     showNotification('Name must have at least 4 letters', true);
 
     return;
@@ -309,10 +308,11 @@ form.addEventListener('submit', (e) => {
     positionValue
       .split('')
       .some((a) => a.toUpperCase() === a.toLowerCase() && a !== ' ') ||
-    !positionValue
+    !positionValue ||
+    positionValue.trim().length === 0
   ) {
     showNotification(
-      'Position required and must consist of letters only',
+      'Position is required and must consist of letters only',
       true,
     );
 
