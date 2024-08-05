@@ -13,7 +13,7 @@ headers.forEach((header, index) => {
 });
 
 function sortTable(columnIndex) {
-  const currentOrder = sortOrder[columnIndex] || 'asc';
+  const currentOrder = sortOrder[columnIndex] || 'none';
   const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
 
   sortOrder[columnIndex] = newOrder;
@@ -28,6 +28,7 @@ function sortTable(columnIndex) {
       return cellB.localeCompare(cellA, undefined, { numeric: true });
     }
   });
+
   tableBody.innerHTML = '';
   rows.forEach((row) => tableBody.appendChild(row));
 }
@@ -51,7 +52,6 @@ const inputName = document.createElement('input');
 
 inputName.name = 'name';
 inputName.type = 'text';
-
 inputName.setAttribute('data-qa', 'name');
 inputName.required = true;
 nameLabel.appendChild(inputName);
@@ -65,7 +65,6 @@ const positionInput = document.createElement('input');
 
 positionInput.name = 'position';
 positionInput.type = 'text';
-
 positionInput.setAttribute('data-qa', 'position');
 positionInput.required = true;
 positionLabel.appendChild(positionInput);
@@ -78,7 +77,6 @@ officeLabel.textContent = 'Office: ';
 const officeSelect = document.createElement('select');
 
 officeSelect.name = 'office';
-
 officeSelect.setAttribute('data-qa', 'office');
 officeSelect.required = true;
 
@@ -107,7 +105,6 @@ const ageInput = document.createElement('input');
 
 ageInput.name = 'age';
 ageInput.type = 'number';
-
 ageInput.setAttribute('data-qa', 'age');
 ageInput.required = true;
 ageLabel.appendChild(ageInput);
@@ -121,7 +118,6 @@ const salaryInput = document.createElement('input');
 
 salaryInput.name = 'salary';
 salaryInput.type = 'number';
-
 salaryInput.setAttribute('data-qa', 'salary');
 salaryInput.required = true;
 salaryLabel.appendChild(salaryInput);
@@ -150,6 +146,18 @@ form.addEventListener('submit', (e) => {
   const age = parseInt(form.elements.age.value, 10);
   const salary = parseFloat(form.elements.salary.value);
 
+  if (position.length < 3) {
+    showNotification('Position must be at least 3 characters long.', 'error');
+
+    return;
+  }
+
+  if (isNaN(salary) || salary <= 0) {
+    showNotification('Salary must be a positive number.', 'error');
+
+    return;
+  }
+
   if (nam.length < 4) {
     showNotification('Name must be at least 4 characters long.', 'error');
 
@@ -162,6 +170,13 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
+  const formattedSalary = salary.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+
   const tbody = document.querySelector('table tbody');
   const row = tbody.insertRow();
 
@@ -169,14 +184,13 @@ form.addEventListener('submit', (e) => {
   row.insertCell().textContent = position;
   row.insertCell().textContent = office;
   row.insertCell().textContent = age;
-  row.insertCell().textContent = salary;
+  row.insertCell().textContent = formattedSalary;
 
   showNotification('New employee added to the table.', 'success');
-
   form.reset();
 });
 
 function showNotification(message, type) {
   notificationContainer.textContent = message;
-  notificationContainer.className = `notification ${type}`;
+  notificationContainer.className = type;
 }
