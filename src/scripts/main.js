@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
       isValid = false;
     }
 
-    if (!name || !position || !office || !age || !salary) {
+    if (!name.trim() || !position.trim() || !office || !age || !salary) {
       showNotification('All fields are required.', 'error');
       isValid = false;
     }
