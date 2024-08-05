@@ -1,5 +1,6 @@
 'use strict';
-const table = document.querySelector('table');
+
+// const table = document.querySelector('table');
 const theads = document.querySelectorAll('th');
 const tbody = document.querySelector('table tbody');
 
@@ -46,36 +47,73 @@ tbody.addEventListener('click', (e) => {
   });
 
   const clickRow = e.target.closest('tr');
+
   if (clickRow) {
     clickRow.classList.add('active');
-  };
-})
-//*Form
-let form = document.createElement('form');
-form.className = "new-employee-form";
+  }
+});
+
+//* Form
+const form = document.createElement('form');
+
+form.className = 'new-employee-form';
 document.body.append(form);
 
 const fealds = [
-  { label: 'Name', name: 'name', type: 'text', qa: 'name' },
-  { label: 'Position', name: 'position', type: 'text', qa: 'position' },
-  { label: 'Age', name: 'age', type: 'number', qa: 'age' },
   {
-    label: 'Office', name: ' office', type: 'select', qa: 'office',
-    options: ['Select an office', 'Tokyo', 'Singapore', 'London', 'New York', 'Edinburgh', 'San Francisco'],
+    label: 'Name',
+    name: 'name',
+    type: 'text',
+    qa: 'name',
   },
-  { label: 'Salary', name: 'salary', type: 'number', qa: 'salary' },
+  {
+    label: 'Position',
+    name: 'position',
+    type: 'text',
+    qa: 'position',
+  },
+  {
+    label: 'Age',
+    name: 'age',
+    type: 'number',
+    qa: 'age',
+  },
+  {
+    label: 'Office',
+    name: ' office',
+    type: 'select',
+    qa: 'office',
+    options: [
+      'Select an office',
+      'Tokyo',
+      'Singapore',
+      'London',
+      'New York',
+      'Edinburgh',
+      'San Francisco',
+    ],
+  },
+  {
+    label: 'Salary',
+    name: 'salary',
+    type: 'number',
+    qa: 'salary',
+  },
 ];
 
-fealds.forEach(feald => {
+fealds.forEach((feald) => {
   const label = document.createElement('label');
+
   label.textContent = feald.label + ': ';
 
   let input = document.createElement('input');
+
   if (feald.type === 'select') {
     input = document.createElement('select');
 
-    feald.options.forEach(option => {
+    feald.options.forEach((option) => {
       const optionElement = document.createElement('option');
+
       optionElement.value = option;
       optionElement.textContent = option;
       input.appendChild(optionElement);
@@ -93,6 +131,7 @@ fealds.forEach(feald => {
 });
 
 const submitButton = document.createElement('button');
+
 submitButton.type = 'submit';
 submitButton.textContent = 'Save to table';
 form.append(submitButton);
