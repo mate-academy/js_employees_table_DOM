@@ -33,7 +33,6 @@ thead.addEventListener('click', (e) => {
       );
     }
   });
-  tbody.innerHTML = '';
   sortedRows.forEach((row) => tbody.appendChild(row));
   rows = sortedRows;
 });
