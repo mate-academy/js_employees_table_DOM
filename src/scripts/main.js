@@ -3,6 +3,7 @@
 const thead = document.querySelector('thead tr');
 const headers = [...thead.querySelectorAll('th')];
 const tbody = document.querySelector('tbody');
+const td = document.querySelectorAll('tbody td');
 let rows = [...tbody.rows];
 let sort = 'asc';
 let sortBy = null;
@@ -18,7 +19,7 @@ thead.addEventListener('click', (e) => {
     sort = sort === 'asc' ? 'desc' : 'asc';
   }
 
-  const sortedRows = [...rows];
+  const sortedRows = [...tbody.rows];
 
   sortedRows.sort((row1, row2) => {
     const cell1 = row1.cells[sortBy].textContent;
@@ -193,8 +194,6 @@ button.addEventListener('click', (e) => {
     form.reset();
   }
 });
-
-const td = document.querySelectorAll('tbody td');
 
 td.forEach((cell) => {
   cell.addEventListener('dblclick', () => {
