@@ -109,7 +109,6 @@ fields.forEach((field) => {
   input.name = field.name;
   input.type = field.type;
   input.setAttribute('data-qa', field.qa);
-  input.required = true;
 
   label.appendChild(input);
   form.appendChild(label);
@@ -124,7 +123,6 @@ const select = document.createElement('select');
 
 select.name = 'office';
 select.setAttribute('data-qa', 'office');
-select.required = true;
 
 const offices = [
   'Tokyo',
@@ -172,7 +170,6 @@ remainingFields.forEach((field) => {
   input.name = field.name;
   input.type = field.type;
   input.setAttribute('data-qa', field.qa);
-  input.required = true;
 
   label.appendChild(input);
   form.appendChild(label);
@@ -200,6 +197,20 @@ form.addEventListener('submit', (event) => {
 
   if (!document.body.contains(div)) {
     document.body.appendChild(div);
+  }
+
+  if (!names || !position || !office || isNaN(age) || isNaN(salary)) {
+    div.classList.add('error');
+    h2.textContent = 'All fields must be filled!';
+    div.style.display = 'block';
+
+    setTimeout(() => {
+      if (document.body.contains(div)) {
+        document.body.removeChild(div);
+      }
+    }, 2000);
+
+    return;
   }
 
   if (names.length < 4) {
@@ -303,10 +314,60 @@ tableBody.addEventListener(
     const newValue = input.value.trim();
 
     if (newValue === '') {
+      div.classList.add('error');
+      h2.textContent = 'The field cannot be empty!';
+      div.style.display = 'block';
+
+      setTimeout(() => {
+        if (document.body.contains(div)) {
+          document.body.removeChild(div);
+        }
+      }, 2000);
+
       cell.textContent = originalValue;
-    } else {
-      cell.textContent = newValue;
+
+      return;
     }
+
+    const columIndex = Array.from(cell.parentNode.children).indexOf(cell);
+
+    if (columIndex === 0 && newValue.length < 4) {
+      div.classList.add('error');
+      h2.textContent = 'The name must contain more than 4 letters!';
+      div.style.display = 'block';
+
+      setTimeout(() => {
+        if (document.body.contains(div)) {
+          document.body.removeChild(div);
+        }
+      }, 2000);
+
+      cell.textContent = originalValue;
+
+      return;
+    }
+
+    if (columIndex === 3) {
+      const age = parseInt(newValue, 10);
+
+      if (isNaN(age) || age < 18 || age > 90) {
+        div.classList.add('error');
+        h2.textContent = 'Age should be between 18 and 90 years!';
+        div.style.display = 'block';
+
+        setTimeout(() => {
+          if (document.body.contains(div)) {
+            document.body.removeChild(div);
+          }
+        }, 2000);
+
+        cell.textContent = originalValue;
+
+        return;
+      }
+    }
+
+    cell.textContent = newValue;
   },
   true,
 );
@@ -326,10 +387,59 @@ tableBody.addEventListener(
       const newValue = input.value.trim();
 
       if (newValue === '') {
+        div.classList.add('error');
+        h2.textContent = 'The field cannot be empty!';
+        div.style.display = 'block';
+
+        setTimeout(() => {
+          if (document.body.contains(div)) {
+            document.body.removeChild(div);
+          }
+        }, 2000);
+
         cell.textContent = originalValue;
-      } else {
-        cell.textContent = newValue;
+
+        return;
       }
+
+      const columIndex = Array.from(cell.parentNode.children).indexOf(cell);
+
+      if (columIndex === 0 && newValue.length < 4) {
+        div.classList.add('error');
+        h2.textContent = 'The name must contain more than 4 letters!';
+        div.style.display = 'block';
+
+        setTimeout(() => {
+          if (document.body.contains(div)) {
+            document.body.removeChild(div);
+          }
+        }, 2000);
+
+        cell.textContent = originalValue;
+
+        return;
+      }
+
+      if (columIndex === 3) {
+        const age = parseInt(newValue, 10);
+
+        if (isNaN(age) || age < 18 || age > 90) {
+          div.classList.add('error');
+          h2.textContent = 'Age should be between 18 and 90 years!';
+          div.style.display = 'block';
+
+          setTimeout(() => {
+            if (document.body.contains(div)) {
+              document.body.removeChild(div);
+            }
+          }, 2000);
+
+          cell.textContent = originalValue;
+
+          return;
+        }
+      }
+      cell.textContent = newValue;
     }
   },
   true,
