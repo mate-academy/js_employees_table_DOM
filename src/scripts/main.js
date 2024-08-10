@@ -9,12 +9,12 @@ let sortType = '';
 const pushNotification = (posTop, posRight, title, description, type) => {
   const block = document.createElement('div');
 
+  block.setAttribute('data-qa', 'notification');
   block.className = `notification ${type}`;
   block.style.display = 'relative';
   block.style.top = `${posTop}px`;
   block.style.right = `${posRight}px`;
   block.style.transition = 'all 300ms';
-  block.setAttribute('data-qa', 'notification');
 
   block.innerHTML = `
     <h2 class="title">${title}</h2>
@@ -152,7 +152,7 @@ form.addEventListener('submit', (e) => {
     );
   }
 
-  if (Number(ageInput.value) <= 18 || Number(ageInput.value) > 90) {
+  if (Number(ageInput.value) < 18 || Number(ageInput.value) > 90) {
     isError = true;
 
     pushNotification(
@@ -203,7 +203,12 @@ form.addEventListener('submit', (e) => {
     positionCell.innerText = positionInput.value;
     officeCell.innerText = office.value;
     ageCell.innerText = ageInput.value.trim();
-    salaryCell.innerText = salaryInput.value.trim();
+
+    salaryCell.innerText = Number(salaryInput.value).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+    });
 
     pushNotification(10, 10, 'Published', 'User was published.', 'success');
   }
