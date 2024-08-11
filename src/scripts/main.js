@@ -38,11 +38,10 @@ form.setAttribute('novalidate', 'novalidate');
 
 const notification = document.createElement('div');
 
-notification.className = 'notification';
+notification.classList.add('notification');
 notification.setAttribute('data-qa', 'notification');
 
 document.body.append(form);
-document.body.append(notification);
 
 const stringToDigit = (string) => {
   return +string.replace(/\D/g, '');
@@ -85,46 +84,54 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  form.addEventListener('submit', function (e) {
-    if (!this.checkValidity()) {
-      e.preventDefault();
+  form.addEventListener('submit', validationForm);
+});
 
-      const elements = this.elements;
+function validationForm(e) {
+  e.preventDefault();
 
-      if (!elements['name'].validity.valid) {
-        elements['name'].setCustomValidity(
-          'Text must be less than 4 characters long (you entered 3 characters)',
-        );
-      }
+  const invalidFields = [...form.querySelectorAll(':invalid')];
 
-      if (!elements['position'].validity.valid) {
-        elements['position'].setCustomValidity(
-          'Text must be less than 4 characters long (you entered 3 characters)',
-        );
-      }
-
-      if (!elements['age'].validity.valid) {
-        elements['age'].setCustomValidity(
-          'Text must be less than 4 characters long (you entered 3 characters)',
-        );
-      }
-
-      if (!elements['salary'].validity.valid) {
-        elements['salary'].setCustomValidity(
-          'Text must be less than 4 characters long (you entered 3 characters)',
-        );
-      }
-
-      notification.innerText = elements['name'].validationMessage;
-      notification.innerText = elements['position'].validationMessage;
-      notification.innerText = elements['age'].validationMessage;
-      notification.innerText = elements['salary'].validationMessage;
-
-      //   const invalidFields = [...this.querySelectorAll(':invalid')];
-
-      //   console.log(invalidFields);
-
-      //   invalidFields.forEach((field) => console.log(field.validationMessage, field.name));
+  [...form.elements].forEach((field) => {
+    if (field.checkValidity()) {
+      field.style.border = '';
+      field.style.backgroundColor = '';
     }
   });
-});
+
+  if (form.checkValidity()) {
+    notification.classList.remove('error');
+    notification.classList.add('success');
+    notification.innerText = 'The employee is added to the table';
+    notification.style.display = 'block';
+    document.body.prepend(notification);
+  } else {
+    notification.textContent = '';
+  }
+
+  invalidFields.forEach((field) => {
+    if (!field.checkValidity()) {
+      notification.classList.remove('success');
+      notification.classList.add('error');
+      notification.style.display = 'block';
+      document.body.prepend(notification);
+
+      field.style.border = '2px solid red';
+      field.style.backgroundColor = '#ffe6e6';
+
+      if (field.validity.valueMissing) {
+        notification.textContent = 'Fill in this field';
+      } else if (field.validity.tooShort) {
+        notification.textContent = `Text must be at least 4 characters long (you entered ${field.value.length} characters)`;
+      } else if (field.validity.rangeUnderflow) {
+        notification.textContent = 'Value must be greater than or equal to 18';
+      } else if (field.validity.rangeOverflow) {
+        notification.textContent = 'The value must be less than or equal to 90';
+      }
+    }
+  });
+
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, 2000);
+}
