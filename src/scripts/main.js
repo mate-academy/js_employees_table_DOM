@@ -171,8 +171,8 @@ function editingCells() {
         // cell.removeAttribute('contenteditable');
       });
 
-      input.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') {
+      input.addEventListener('keyup', (keyboard) => {
+        if (keyboard.key === 'Enter') {
           input.blur();
 
           //   cell.blur();
