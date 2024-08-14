@@ -16,7 +16,7 @@ function createTable() {
 
   form.innerHTML = `
   <label>Name: <input name="name" type="text" data-qa="name" required></label>
-  <label>Position: <input name="position" type="text" data-qa="position" required></label>
+  <label>Position: <input name="position" type="text" data-qa="position"></label>
   <label>Office:
     <select name="office" data-qa="office" required>
       <option value="" disabled selected>Select an office</option>
@@ -148,7 +148,7 @@ function sorting(e) {
         <td>${worker.position}</td>
         <td>${worker.office}</td>
         <td>${worker.age}</td>
-        <td>${worker.salary.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+        <td>$${worker.salary.toLocaleString('en-US')}</td>
       `;
       tbody.appendChild(row);
     }
@@ -189,6 +189,12 @@ function addEmployee(e) {
     return;
   }
 
+  if (position.length < 4) {
+    showNotification('error', 'Validation Error', 'Position must be valid.');
+
+    return;
+  }
+
   if (age < 18 || age > 90) {
     showNotification(
       'error',
@@ -206,7 +212,7 @@ function addEmployee(e) {
     <td>${position}</td>
     <td>${office}</td>
     <td>${age}</td>
-    <td>${salary.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+    <td>$${salary.toLocaleString('en-US', { minimumFractionDigits: 0 })}</td>
   `;
   tbody.appendChild(newRow);
 
