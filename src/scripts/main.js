@@ -131,12 +131,36 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
+  if (positionValue.length < 4) {
+    pushNotification(
+      150,
+      10,
+      'Incorrect position value',
+      'The value of the position must contain more than 4 letters',
+      'error',
+    );
+
+    return;
+  }
+
   if (ageValue < 18 || ageValue > 90) {
     pushNotification(
       150,
       10,
       'Incorrect age value',
       'The age value must be greater than 18 or less than 90 years',
+      'error',
+    );
+
+    return;
+  }
+
+  if (salaryValue <= 0) {
+    pushNotification(
+      150,
+      10,
+      'Incorrect salary value',
+      'The salary value must be greater than 0',
       'error',
     );
 
@@ -168,7 +192,6 @@ form.addEventListener('submit', (e) => {
 });
 
 // sorting table
-const arrRow = Array.from(colectionRow);
 let secondClickName = false;
 let secondClickPosition = false;
 let secondClickOffice = false;
@@ -182,6 +205,9 @@ document.addEventListener('click', function (e) {
     return;
   }
 
+  const table = document.querySelector('table').tBodies[0];
+  const colectionRows = table.children;
+  const arrRow = Array.from(colectionRows);
   let sorted;
 
   if (e.target.innerText === 'Name') {
@@ -283,6 +309,9 @@ document.addEventListener('click', function (e) {
 
 document.addEventListener('click', function (e) {
   const id = e.target.closest('tbody');
+  const table = document.querySelector('table').tBodies[0];
+  const colectionRows = table.children;
+  const arrRow = Array.from(colectionRows);
 
   if (!id) {
     return;
