@@ -133,6 +133,7 @@ form.addEventListener('submit', (e) => {
   const newTr = document.createElement('tr');
   const formData = new FormData(form);
   const inputsValues = {};
+  let isValid = true;
 
   inputsValues.name = formData.get('name');
   inputsValues.position = formData.get('position');
@@ -147,6 +148,7 @@ form.addEventListener('submit', (e) => {
     isNaN(parseFloat(inputsValues.salary)) ||
     parseFloat(inputsValues.salary) <= 0
   ) {
+    isValid = false;
     pushNotification(
       10,
       10,
@@ -157,6 +159,7 @@ form.addEventListener('submit', (e) => {
   }
 
   if (inputsValues.name.length < 4) {
+    isValid = false;
     pushNotification(
       150,
       10,
@@ -167,6 +170,7 @@ form.addEventListener('submit', (e) => {
   }
 
   if (inputsValues.age < 18 || inputsValues.age > 90) {
+    isValid = false;
     pushNotification(
       290,
       10,
@@ -176,30 +180,32 @@ form.addEventListener('submit', (e) => {
     );
   }
 
-  for (const input in inputsValues) {
-    const newTd = document.createElement('td');
+  if (isValid) {
+    for (const input in inputsValues) {
+      const newTd = document.createElement('td');
 
-    if (input === 'salary') {
-      newTd.textContent = +inputsValues[input].toLocaleString('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      });
+      if (input === 'salary') {
+        newTd.textContent = +inputsValues[input].toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        });
+      }
+
+      newTd.textContent =
+        inputsValues[input].slice(0, 1) + inputsValues[input].slice(1);
+      newTr.append(newTd);
     }
 
-    newTd.textContent =
-      inputsValues[input].slice(0, 1) + inputsValues[input].slice(1);
-    newTr.append(newTd);
+    tbody.append(newTr);
+
+    pushNotification(
+      10,
+      10,
+      'Success',
+      'Your data have been successfully attached',
+      'success',
+    );
   }
-
-  tbody.append(newTr);
-
-  pushNotification(
-    10,
-    10,
-    'Success',
-    'Your data have been successfully attached',
-    'success',
-  );
 });
 
 const pushNotification = (posTop, posRight, title, description, type) => {
