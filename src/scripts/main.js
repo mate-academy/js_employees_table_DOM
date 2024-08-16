@@ -4,30 +4,14 @@
 const body = document.querySelector('body');
 const theads = [...document.querySelectorAll('thead tr th')];
 const tbody = document.querySelector('tbody');
-const tbodyChildren = [...document.querySelectorAll('tbody tr')];
-const form = document.createElement('form');
-const formElements = {
-  name: 'Name',
-  position: 'Position',
-  office: 'Office',
-  age: 'Age',
-  salary: 'Salary',
-};
 
-const selectOptions = [
-  'Tokyo',
-  'Singapore',
-  'London',
-  'New York',
-  'Edinburgh',
-  'San Francisco',
-];
-const btn = document.createElement('button');
 let cellIndex = null;
 let row = null;
 
 theads.forEach((thead, index) => {
   thead.addEventListener('click', (e) => {
+    const tbodyChildren = [...document.querySelectorAll('tbody tr')];
+
     if (cellIndex !== e.target.cellIndex) {
       cellIndex = e.target.cellIndex;
 
@@ -62,6 +46,7 @@ theads.forEach((thead, index) => {
 });
 
 tbody.addEventListener('click', (e) => {
+  const tbodyChildren = [...document.querySelectorAll('tbody tr')];
   const currentRow = e.target.parentNode;
 
   if (row !== currentRow) {
@@ -78,8 +63,28 @@ tbody.addEventListener('click', (e) => {
   });
 });
 
+const form = document.createElement('form');
+
 form.className = 'new-employee-form';
+
 body.append(form);
+
+const formElements = {
+  name: 'Name',
+  position: 'Position',
+  office: 'Office',
+  age: 'Age',
+  salary: 'Salary',
+};
+
+const selectOptions = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
 
 for (const element in formElements) {
   const label = document.createElement('label');
@@ -88,6 +93,7 @@ for (const element in formElements) {
 
   label.textContent = `${formElements[element]}:`;
   input.name = element;
+  select.name = element;
   input.setAttribute('data-qa', element);
 
   if (element === 'office') {
@@ -114,23 +120,124 @@ for (const element in formElements) {
   }
 }
 
+const btn = document.createElement('button');
+
 btn.type = 'submit';
 btn.textContent = 'Save to table';
+
 form.append(btn);
 
-// const select = document.createElement('select');
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
 
-// select.name = element;
-// select.id = 'select-city';
-// label.for = 'select-city';
+  const newTr = document.createElement('tr');
+  const formData = new FormData(form);
+  const inputsValues = {};
+  let isValid = true;
 
-// for (const city in cities) {
-//   const option = document.createElement('option');
+  inputsValues.name = formData.get('name');
+  inputsValues.position = formData.get('position');
+  inputsValues.office = formData.get('office');
+  inputsValues.age = formData.get('age');
+  inputsValues.salary = formData.get('salary');
 
-//   option.value = city;
-//   option.textContent = cities[city];
+  if (
+    !inputsValues.position ||
+    !inputsValues.office ||
+    !inputsValues.salary ||
+    isNaN(parseFloat(inputsValues.salary)) ||
+    parseFloat(inputsValues.salary) <= 0
+  ) {
+    isValid = false;
 
-//   select.append(option);
-// }
+    pushNotification(
+      10,
+      10,
+      'Error',
+      'Please make sure all fields are filled out',
+      'error',
+    );
+  }
 
-// label.append(select);
+  if (inputsValues.name.length < 4) {
+    isValid = false;
+
+    pushNotification(
+      150,
+      10,
+      'Error',
+      'Please enter minimum 4 letters to "Name:"',
+      'error',
+    );
+  }
+
+  if (inputsValues.age < 18 || inputsValues.age > 90) {
+    isValid = false;
+
+    pushNotification(
+      290,
+      10,
+      'Error',
+      'Please enter minimum 4 letters to "Name:"',
+      'error',
+    );
+  }
+
+  if (isValid) {
+    for (const input in inputsValues) {
+      const newTd = document.createElement('td');
+
+      if (input === 'salary') {
+        newTd.textContent = inputsValues[input].toNumber.toLocaleString(
+          'en-US',
+          {
+            style: 'currency',
+            currency: 'USD',
+          },
+        );
+      }
+
+      newTd.textContent =
+        inputsValues[input].slice(0, 1) + inputsValues[input].slice(1);
+      newTr.append(newTd);
+    }
+
+    tbody.append(newTr);
+
+    pushNotification(
+      10,
+      10,
+      'Success',
+      'Your data have been successfully attached',
+      'success',
+    );
+  }
+});
+
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const notification = document.createElement('div');
+  const notificationTitle = document.createElement('h2');
+  const notificationDescription = document.createElement('p');
+
+  notification.className = 'notification ' + type;
+  notification.setAttribute('data-qa', 'notification');
+
+  notificationTitle.classList.add('title');
+  notificationDescription.classList.add('description');
+
+  notificationTitle.textContent = title;
+  notificationDescription.textContent = description;
+
+  notification.style.position = 'absolute';
+  notification.style.top = posTop + 'px';
+  notification.style.right = posRight + 'px';
+  notification.style.zIndex = 99;
+
+  notification.append(notificationTitle);
+  notification.append(notificationDescription);
+  body.append(notification);
+
+  setTimeout(() => {
+    body.remove(notification);
+  }, 2000);
+};
