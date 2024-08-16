@@ -141,14 +141,9 @@ form.addEventListener('submit', (e) => {
   inputsValues.age = formData.get('age');
   inputsValues.salary = formData.get('salary');
 
-  if (
-    !inputsValues.position ||
-    !inputsValues.office ||
-    !inputsValues.salary ||
-    isNaN(parseFloat(inputsValues.salary)) ||
-    parseFloat(inputsValues.salary) <= 0
-  ) {
+  if (!inputsValues.position || !inputsValues.office || !inputsValues.salary) {
     isValid = false;
+
     pushNotification(
       10,
       10,
@@ -160,6 +155,7 @@ form.addEventListener('submit', (e) => {
 
   if (inputsValues.name.length < 4) {
     isValid = false;
+
     pushNotification(
       150,
       10,
@@ -171,11 +167,27 @@ form.addEventListener('submit', (e) => {
 
   if (inputsValues.age < 18 || inputsValues.age > 90) {
     isValid = false;
+
     pushNotification(
       290,
       10,
       'Error',
-      'Please enter minimum 4 letters to "Name:"',
+      'Your age should be between 18 and 90',
+      'error',
+    );
+  }
+
+  if (
+    isNaN(parseFloat(inputsValues.salary)) ||
+    parseFloat(inputsValues.salary) <= 0
+  ) {
+    isValid = false;
+
+    pushNotification(
+      430,
+      10,
+      'Error',
+      'Salary has to be a positive number',
       'error',
     );
   }
@@ -189,6 +201,8 @@ form.addEventListener('submit', (e) => {
           style: 'currency',
           currency: 'USD',
         });
+        newTr.append(newTd);
+        continue;
       }
 
       newTd.textContent =
@@ -232,6 +246,24 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   body.append(notification);
 
   setTimeout(() => {
-    body.remove(notification);
+    notification.remove();
   }, 2000);
 };
+
+
+// for (const input in inputsValues) {
+//   const newTd = document.createElement('td');
+
+//   if (input === 'salary') {
+//     newTd.textContent = +inputsValues[input].toLocaleString('en-US', {
+//       style: 'currency',
+//       currency: 'USD',
+//     });
+//   }
+
+//   newTd.textContent =
+//     inputsValues[input].slice(0, 1) + inputsValues[input].slice(1);
+//   newTr.append(newTd);
+// }
+
+// tbody.append(newTr);
