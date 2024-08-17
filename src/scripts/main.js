@@ -291,34 +291,3 @@ const pushNotification = (posTop, posRight, title, description, type) => {
     notification.remove();
   }, 2000);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // const cellInput = document.createElement('input');
-  // const td = document.createElement('td');
-
-  // cellInput.className = 'cell-input';
-
-  // e.target.replaceWith(cellInput);
-
-  // const value = cellInput.value;
-
-  // if (value) {
-  //   cellInput.blur();
-  //   td.textContent = value;
-  //   console.log(value);
-
-  //   cellInput.addEventListener('keydown', () => {
-  //     cellInput.replaceWith(td);
-  //   });
-  // }
