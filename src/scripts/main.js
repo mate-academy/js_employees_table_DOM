@@ -5,15 +5,16 @@ const body = document.querySelector('body');
 const theads = [...document.querySelectorAll('thead tr th')];
 const tbody = document.querySelector('tbody');
 
-let cellIndex = null;
+let theadCellIndex = null;
 let row = null;
+// let rowCellIndex = null;
 
 theads.forEach((thead, index) => {
   thead.addEventListener('click', (e) => {
     const tbodyChildren = [...document.querySelectorAll('tbody tr')];
 
-    if (cellIndex !== e.target.cellIndex) {
-      cellIndex = e.target.cellIndex;
+    if (theadCellIndex !== e.target.cellIndex) {
+      theadCellIndex = e.target.cellIndex;
 
       const sorted = tbodyChildren.sort((a, b) => {
         const valueA = a
@@ -61,6 +62,50 @@ tbody.addEventListener('click', (e) => {
       el.classList.remove('active');
     }
   });
+});
+
+tbody.addEventListener('dblclick', (cle) => {
+  if (cle.target.tagName === 'TD') {
+    const cellInput = document.createElement('input');
+    const initialValue = cle.target.textContent;
+
+    cellInput.value = initialValue;
+
+    cellInput.className = 'cell-input';
+
+    cle.target.replaceWith(cellInput);
+
+    cellInput.focus();
+
+    cellInput.addEventListener('keydown', (kde) => {
+      const newTd = document.createElement('td');
+
+      if (kde.key === 'Enter') {
+        const newValue = cellInput.value;
+
+        if (newValue === '') {
+          newTd.textContent = initialValue;
+        } else {
+          newTd.textContent = newValue;
+        }
+
+        cellInput.replaceWith(newTd);
+      }
+    });
+
+    cellInput.addEventListener('blur', () => {
+      const newTd = document.createElement('td');
+      const newValue = cellInput.value;
+
+      if (newValue === '') {
+        newTd.textContent = initialValue;
+      } else {
+        newTd.textContent = newValue;
+      }
+
+      cellInput.replaceWith(newTd);
+    });
+  }
 });
 
 const form = document.createElement('form');
@@ -151,62 +196,59 @@ form.addEventListener('submit', (e) => {
       'Please make sure all fields are filled out',
       'error',
     );
-  }
-
-  if (inputsValues.name.length < 4) {
+  } else if (inputsValues.name.length < 4) {
     isValid = false;
 
     pushNotification(
-      150,
+      10,
       10,
       'Error',
       'Please enter minimum 4 letters to "Name:"',
       'error',
     );
-  }
-
-  if (inputsValues.age < 18 || inputsValues.age > 90) {
+  } else if (inputsValues.age < 18 || inputsValues.age > 90) {
     isValid = false;
 
     pushNotification(
-      290,
+      10,
       10,
       'Error',
       'Your age should be between 18 and 90',
       'error',
     );
-  }
-
-  if (
+  } else if (
     isNaN(parseFloat(inputsValues.salary)) ||
     parseFloat(inputsValues.salary) <= 0
   ) {
     isValid = false;
 
     pushNotification(
-      430,
+      10,
       10,
       'Error',
       'Salary has to be a positive number',
       'error',
     );
-  }
-
-  if (isValid) {
+  } else if (isValid) {
     for (const input in inputsValues) {
       const newTd = document.createElement('td');
 
       if (input === 'salary') {
-        newTd.textContent = +inputsValues[input].toLocaleString('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        });
+        newTd.textContent = Number(inputsValues[input]).toLocaleString(
+          'en-US',
+          {
+            style: 'currency',
+            currency: 'USD',
+          },
+        );
+
         newTr.append(newTd);
         continue;
       }
 
       newTd.textContent =
-        inputsValues[input].slice(0, 1) + inputsValues[input].slice(1);
+        inputsValues[input].slice(0, 1).toUpperCase() +
+        inputsValues[input].slice(1);
       newTr.append(newTd);
     }
 
@@ -251,19 +293,32 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 };
 
 
-// for (const input in inputsValues) {
-//   const newTd = document.createElement('td');
 
-//   if (input === 'salary') {
-//     newTd.textContent = +inputsValues[input].toLocaleString('en-US', {
-//       style: 'currency',
-//       currency: 'USD',
-//     });
-//   }
 
-//   newTd.textContent =
-//     inputsValues[input].slice(0, 1) + inputsValues[input].slice(1);
-//   newTr.append(newTd);
-// }
 
-// tbody.append(newTr);
+
+
+
+
+
+
+
+
+  // const cellInput = document.createElement('input');
+  // const td = document.createElement('td');
+
+  // cellInput.className = 'cell-input';
+
+  // e.target.replaceWith(cellInput);
+
+  // const value = cellInput.value;
+
+  // if (value) {
+  //   cellInput.blur();
+  //   td.textContent = value;
+  //   console.log(value);
+
+  //   cellInput.addEventListener('keydown', () => {
+  //     cellInput.replaceWith(td);
+  //   });
+  // }
