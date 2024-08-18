@@ -139,7 +139,7 @@ describe('Employees table', () => {
     cy.checkDataDoesntExist('Ada', 50000);
   });
 
-  it(`should have warning notification on position 
+  it(`should have warning notification on position
   field with invalid input`, () => {
     cy.get('[data-qa="name"]').type('Adam');
     cy.get('[data-qa="office"]').select('San Francisco');

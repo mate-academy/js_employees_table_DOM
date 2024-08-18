@@ -1,0 +1,47 @@
+{
+  "fields": [
+    {
+      "label": "Name:",
+      "name": "name",
+      "type": "text",
+      "dataQa": "name",
+      "minlength": 4
+    },
+
+    {
+      "label": "Position:",
+      "name": "position",
+      "type": "text",
+      "dataQa": "position",
+      "minlength": 4
+    },
+    {
+      "label": "Office:",
+      "name": "office",
+      "type": "select",
+      "dataQa": "office",
+      "options": [
+        "Tokyo",
+        "Singapore",
+        "London",
+        "New York",
+        "Edinburgh",
+        "San Francisco"
+      ]
+    },
+    {
+      "label": "Age:",
+      "name": "age",
+      "type": "number",
+      "dataQa": "age",
+      "min": 18,
+      "max": 90
+    },
+    {
+      "label": "Salary:",
+      "name": "salary",
+      "type": "number",
+      "dataQa": "salary"
+    }
+  ]
+}
