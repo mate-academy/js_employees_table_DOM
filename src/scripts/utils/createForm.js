@@ -2,15 +2,18 @@ const table = document.querySelector('table');
 
 export function createForm(globalData) {
   const form = document.createElement('form');
+
   form.classList.add('new-employee-form');
 
   globalData.fields.forEach((item) => {
     const label = createLabel(item);
+
     form.append(label);
   });
 
   function createLabel(item) {
     const label = document.createElement('label');
+
     label.textContent = item.label;
 
     if (item.type !== 'select') {
@@ -23,11 +26,13 @@ export function createForm(globalData) {
       label.append(input);
     } else if (item.type === 'select') {
       const select = document.createElement('select');
+
       select.setAttribute('data-qa', item.dataQa);
       select.name = item.name;
 
       item.options.forEach((option) => {
         const createOption = document.createElement('option');
+
         createOption.value = option;
         createOption.append(option);
         select.append(createOption);

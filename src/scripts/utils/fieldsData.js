@@ -8,9 +8,11 @@ export function fieldsData() {
 
     if (input) {
       const trimmedValue = input.value.trimStart();
+
       if (input.name === 'salary') {
         const number = +trimmedValue;
         const converted = `$${number.toLocaleString()}`;
+
         dataObject[input.name] = converted;
       } else {
         dataObject[input.name] = trimmedValue;
