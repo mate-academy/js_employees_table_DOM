@@ -18,6 +18,7 @@ function updateRowsArray() {
 createForm(formData);
 
 const button = document.querySelector('button');
+
 button.addEventListener('click', () => {
   const dataObject = fieldsData();
   const validatedForm = validationForm(dataObject);
