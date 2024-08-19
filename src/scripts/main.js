@@ -16,9 +16,9 @@ const cities = [
 ];
 
 form.innerHTML = `
-	<label>Name: <input name="name" type="text" minlength="4" required data-qa="name"></label>
+	<label>Name: <input name="name" type="text" minlength="4" pattern="\\S.{3,}" required data-qa="name"></label>
 
-	<label>Position: <input name="position" type="text" required data-qa="position"></label>
+	<label>Position: <input name="position" type="text" pattern="\\S.{3,}" required data-qa="position"></label>
 
 	<label>
 	Office: 
@@ -89,7 +89,9 @@ function validationForm(e) {
       field.style.border = '2px solid red';
       field.style.backgroundColor = '#ffe6e6';
 
-      if (field.validity.valueMissing) {
+      if (field.validity.patternMismatch) {
+        notification.textContent = 'This field cannot be just spaces';
+      } else if (field.validity.valueMissing) {
         notification.textContent = 'Fill in this field';
       } else if (field.validity.tooShort) {
         notification.textContent = `Text must be at least 4 characters long (you entered ${field.value.length} characters)`;
