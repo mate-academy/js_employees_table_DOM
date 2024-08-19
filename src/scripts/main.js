@@ -50,3 +50,43 @@ Array.from(tbody.rows).forEach((tr) => {
     tr.classList.toggle('active');
   });
 });
+
+Array.from(tbody.rows).forEach((row) => {
+  Array.from(row.cells).forEach((cell) => {
+    const input = document.createElement('input');
+
+    input.classList.add('cell-input');
+
+    cell.addEventListener('dblclick', (e) => {
+      const tr = e.target;
+
+      input.style.maxWidth = getComputedStyle(tr).width;
+
+      const text = tr.textContent;
+
+      tr.textContent = '';
+      tr.append(input);
+      input.focus();
+
+      saverInputCell(input, tr, text);
+    });
+
+    input.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        cell.textContent = input.value;
+      }
+    });
+  });
+});
+
+function saverInputCell(input, tr, text) {
+  const currentInput = document.getElementsByTagName('input');
+
+  input.onblur = function () {
+    if (!input.value) {
+      tr.textContent = text;
+    } else if (currentInput) {
+      currentInput.remove();
+    }
+  };
+}
