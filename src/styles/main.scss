@@ -166,10 +166,12 @@ tr.active {
   top: 10px;
   right: 10px;
 
-  .title {
-    display: block;
+  &.title {
     font-size: 20px;
     font-weight: 900;
+    text-align: center;
+    display: flex;
+    align-items: center;
   }
 
   &.warning {
