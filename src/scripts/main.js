@@ -116,7 +116,7 @@ form.addEventListener('submit', (e) => {
   const officeError = !officeSelect.value;
   const salaryError = salaryInput.value <= 0 || isNaN(salaryInput.value);
 
-  if (positionError) {
+  if (positionError && !hasNameError && !hasAgeError) {
     const positionErrorNotification = document.createElement('div');
 
     positionErrorNotification.classList.add('notification', 'error', 'title');
