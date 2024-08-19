@@ -81,7 +81,7 @@ tbody.addEventListener('dblclick', (cle) => {
       const newTd = document.createElement('td');
 
       if (kde.key === 'Enter') {
-        const newValue = cellInput.value;
+        const newValue = cellInput.value.trim();
 
         if (newValue === '') {
           newTd.textContent = initialValue;
@@ -95,7 +95,7 @@ tbody.addEventListener('dblclick', (cle) => {
 
     cellInput.addEventListener('blur', () => {
       const newTd = document.createElement('td');
-      const newValue = cellInput.value;
+      const newValue = cellInput.value.trim();
 
       if (newValue === '') {
         newTd.textContent = initialValue;
@@ -180,8 +180,8 @@ form.addEventListener('submit', (e) => {
   const inputsValues = {};
   let isValid = true;
 
-  inputsValues.name = formData.get('name');
-  inputsValues.position = formData.get('position');
+  inputsValues.name = formData.get('name').trim();
+  inputsValues.position = formData.get('position').trim();
   inputsValues.office = formData.get('office');
   inputsValues.age = formData.get('age');
   inputsValues.salary = formData.get('salary');
