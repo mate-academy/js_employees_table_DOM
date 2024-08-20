@@ -105,7 +105,7 @@ const validateForm = () => {
 
   const age = parseInt(form.elements.age.value, 10);
 
-  if ((age < 18 && age > 0) || age > 90) {
+  if ((age < 18 && age > 0) || age > 90 || age < 0) {
     pushNotification('Увага!', 'Перевір вік', 'error');
     isValid = false;
   }
