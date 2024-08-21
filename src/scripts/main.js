@@ -15,22 +15,10 @@ const sortOrder = {
   asc: true,
 };
 
-const rows = [];
+let rows = [];
 
 const theads = thead.querySelectorAll('th');
 const tbodies = tbody.querySelectorAll('tr');
-
-tbodies.forEach((tb) => {
-  const row = {};
-
-  const tds = tb.querySelectorAll('td');
-
-  for (let i = 0; i < tds.length; i++) {
-    row[theads[i].innerText] = tds[i].innerText;
-  }
-
-  rows.push(row);
-});
 
 thead.addEventListener('click', (e) => {
   const head = e.target.closest('th');
@@ -112,28 +100,12 @@ tbody.addEventListener('dblclick', (e) => {
     input.focus();
 
     input.addEventListener('blur', () => {
-      const endValue = input.value;
-
-      if (!input.value) {
-        td.innerHTML = content;
-
-        return;
-      }
-
-      td.innerHTML = endValue;
+      replaceEdited(input, td, content);
     });
 
     input.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') {
-        const endValue = input.value;
-
-        if (!input.value) {
-          td.innerHTML = content;
-
-          return;
-        }
-
-        td.innerHTML = endValue;
+        replaceEdited(input, td, content);
       }
     });
   }
@@ -218,6 +190,40 @@ const validateFormData = (data) => {
   return true;
 };
 
+const validateEditing = (field, typeIndex) => {
+  switch (typeIndex) {
+    case 1: {
+      return field.length > 4;
+    }
+
+    case 2: {
+      return field.length;
+    }
+
+    case 3: {
+      return field.length;
+    }
+
+    case 4: {
+      const num = parseInt(field);
+
+      if (!num) {
+        return false;
+      }
+
+      return num >= 18 && num <= 90;
+    }
+
+    case 5: {
+      return field.length;
+    }
+
+    default: {
+      return false;
+    }
+  }
+};
+
 const showNotification = (type, titleNot, descNot) => {
   const div = document.createElement('div');
 
@@ -264,3 +270,44 @@ const getFormattedSalary = (salary) => {
 
   return '$' + [...salaryReversed].reverse().reduce((p, c) => p + c, '');
 };
+
+const replaceEdited = (input, td, content) => {
+  const endValue = input.value;
+
+  const index = Array.from(td.parentNode.children).indexOf(td) + 1;
+
+  if (!input.value || !validateEditing(input.value, index)) {
+    td.innerHTML = content;
+
+    return;
+  }
+
+  let endValueCopy = endValue;
+
+  if (index === 5) {
+    endValueCopy = endValueCopy.replace(',', '');
+    endValueCopy = endValueCopy.replace('$', '');
+  }
+
+  td.innerHTML = getFormattedSalary(endValueCopy);
+
+  formTable();
+};
+
+const formTable = () => {
+  rows = [];
+
+  tbodies.forEach((tb) => {
+    const row = {};
+
+    const tds = tb.querySelectorAll('td');
+
+    for (let i = 0; i < tds.length; i++) {
+      row[theads[i].innerText] = tds[i].innerText;
+    }
+
+    rows.push(row);
+  });
+};
+
+formTable();
