@@ -130,6 +130,8 @@ button.addEventListener('click', function (e) {
 
   const nameInput = form.querySelector(`[data-qa='name']`);
   const ageInput = form.querySelector(`[data-qa='age']`);
+  const positionInput = form.querySelector(`[data-qa='position']`);
+  const salaryInput = form.querySelector(`[data-qa='salary']`);
   let isValid = true;
 
   if (nameInput.value.length < 4) {
@@ -143,6 +145,18 @@ button.addEventListener('click', function (e) {
       'error',
     );
     isValid = false;
+  }
+
+  if (positionInput.value === '') {
+    showNotification('Error,position required!', 'error');
+    isValid = false;
+  }
+
+  if (salaryInput.value === '') {
+    showNotification('Error,salary required!', 'error');
+    isValid = false;
+  } else if (salaryInput.value < 0) {
+    showNotification('Error,salary can`t be negative', 'error');
   }
 
   if (!isValid) {
@@ -206,13 +220,13 @@ document.querySelectorAll('td').forEach((td) => {
     input.focus();
 
     input.addEventListener('blur', () => {
-      td.textContent = input.value.trim() || input.defaultValue;
+      td.textContent = input.value || input.defaultValue;
       input.remove();
     });
 
-    input.addEventListener('keypress', (e) => {
+    input.addEventListener('keypress', function (e) {
       if (e.key === 'Enter') {
-        td.textContent = input.value.trim() || input.defaultValue;
+        td.textContent = input.value || input.defaultValue;
         input.remove();
       }
     });
