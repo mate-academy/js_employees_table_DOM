@@ -119,6 +119,61 @@
         </tr>
       </tfoot>
     </table>
+
+    <form class="new-employee-form">
+      <label>
+        Name:
+        <input
+          name="name"
+          data-qa="name"
+          type="text"
+        />
+      </label>
+
+      <label>
+        Position:
+        <input
+          name="position"
+          data-qa="position"
+          type="text"
+        />
+      </label>
+
+      <label>
+        Office:
+        <select
+          name="office"
+          data-qa="office"
+        >
+          <option>Tokyo</option>
+          <option>Singapore</option>
+          <option>London</option>
+          <option>New York</option>
+          <option>Edinburgh</option>
+          <option>San Francisco</option>
+        </select>
+      </label>
+
+      <label>
+        Age:
+        <input
+          name="age"
+          data-qa="age"
+          type="number"
+        />
+      </label>
+
+      <label>
+        Salary:
+        <input
+          name="salary"
+          data-qa="salary"
+          type="number"
+        />
+      </label>
+
+      <button type="submit">Save to table</button>
+    </form>
     <script src="scripts/main.js"></script>
   </body>
 </html>
