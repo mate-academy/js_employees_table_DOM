@@ -279,6 +279,12 @@ const replaceEdited = (input, td, content) => {
   if (!input.value || !validateEditing(input.value, index)) {
     td.innerHTML = content;
 
+    showNotification(
+      'error',
+      'Field written incorrectly!',
+      'Check your answer',
+    );
+
     return;
   }
 
