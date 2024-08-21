@@ -100,9 +100,9 @@ body.addEventListener('dblclick', e => {
       return;
     }
 
-    if (target.cellIndex === 2) {
+    /* if (target.cellIndex === 2) {
       e.target.insertAdjacentHTML('beforeend', `
-       
+
           <select name="office" data-qa="office">
             <option value="Tokyo">Tokyo</option>
             <option value="Singapore">Singapore</option>
@@ -111,13 +111,13 @@ body.addEventListener('dblclick', e => {
             <option value="Edinburgh">Edinburgh</option>
             <option value="San Francisco">San Francisco</option>
           </select>
-        
+
     `);
 
       input.remove();
 
       return;
-    }
+    } */
     saveData(input.value);
   }
 
