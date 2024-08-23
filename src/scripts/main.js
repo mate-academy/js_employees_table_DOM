@@ -70,12 +70,11 @@ function sortTable(tableNode, target) {
   target.dataset.sort = sortDirection;
 
   const columnIndex = target.cellIndex;
-  const isDataInteger = isColumnDataInteger(tableNode, columnIndex);
   const tableArray = Array.from(table.querySelector('tbody').rows);
 
   let sortedTableData;
 
-  if (isDataInteger) {
+  if ([3, 4].includes(columnIndex)) {
     sortedTableData = tableArray.sort((a, b) => {
       const valueA = integerCleaner(a.cells[columnIndex].innerHTML);
       const valueB = integerCleaner(b.cells[columnIndex].innerHTML);
@@ -126,12 +125,6 @@ function sortTable(tableNode, target) {
     }
     tbody.append(row);
   }
-}
-
-function isColumnDataInteger(tableNode, columnIndex) {
-  const cellValue = tableNode.rows[1].cells[columnIndex].innerHTML;
-
-  return isFinite(integerCleaner(cellValue));
 }
 
 function integerCleaner(value) {
@@ -223,7 +216,7 @@ function addNewEmployee(e) {
       case 'name':
         td.innerHTML = value;
 
-        if (value.length < 4) {
+        if (value.trim().length < 4) {
           errors.push('Name should be at least 4 letters.');
         }
         break;
@@ -231,7 +224,7 @@ function addNewEmployee(e) {
       case 'position':
         td.innerHTML = value;
 
-        if (!value) {
+        if (!value.trim()) {
           errors.push('Position is Empty');
         }
         break;
@@ -306,13 +299,6 @@ function createModal() {
 
   notification.appendChild(closeNotification);
   notification.appendChild(title);
-
-  // When the user clicks anywhere outside of the modal, close it
-  window.onclick = function (e) {
-    if (e.target === notification) {
-      notification.style.display = 'none';
-    }
-  };
 
   return notification;
 }
