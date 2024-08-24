@@ -161,12 +161,36 @@ submitBtn.addEventListener('click', (e) => {
     return;
   }
 
+  if (inputAge.value.trim().length === 0) {
+    const errorMessage = createNotification(
+      'Error',
+      "Please enter the employee's age",
+      'error',
+    );
+
+    pushNotification(errorMessage);
+
+    return;
+  }
+
   const age = parseInt(inputAge.value);
 
   if (age < 18 || age > 90) {
     const errorMessage = createNotification(
       'Error',
-      'We hire employee who are between 18 and 90 years old',
+      'The employee must be between 18 and 90 years old',
+      'error',
+    );
+
+    pushNotification(errorMessage);
+
+    return;
+  }
+
+  if (inputSalary.value.trim().length === 0) {
+    const errorMessage = createNotification(
+      'Error',
+      "Please enter the employee's salary",
       'error',
     );
 
