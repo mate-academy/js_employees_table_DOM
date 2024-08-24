@@ -97,11 +97,11 @@ const formHtml = `
     </label>
     <label>
       Age:
-      <input type="number" data-qa="age" min="1" required>
+      <input type="number" data-qa="age" min="0" required>
     </label>
     <label>
       Salary:
-      <input type="number" data-qa="salary" min="1" required>
+      <input type="number" data-qa="salary" min="0" required>
     </label>
     <button type="submit">Save to table</button>
   </form>
@@ -132,9 +132,8 @@ const inputPos = newEmployeeForm.querySelector('input[data-qa="position"]');
 const selectCity = newEmployeeForm.querySelector('select[data-qa="office"]');
 const inputAge = newEmployeeForm.querySelector('input[data-qa="age"]');
 const inputSalary = newEmployeeForm.querySelector('input[data-qa="salary"]');
-const submitBtn = newEmployeeForm.querySelector('button');
 
-submitBtn.addEventListener('click', (e) => {
+newEmployeeForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
   if (inputName.value.length < 4) {
