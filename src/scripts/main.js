@@ -137,7 +137,7 @@ const submitBtn = newEmployeeForm.querySelector('button');
 submitBtn.addEventListener('click', (e) => {
   e.preventDefault();
 
-  if (inputName.value.length < 4) {
+  if (inputName.value.trim().length < 4) {
     const errorMessage = createNotification(
       'Error',
       'Name must be at least 4 letters long',
