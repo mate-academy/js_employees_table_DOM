@@ -226,7 +226,9 @@ sendButon.addEventListener('click', (e) => {
   ) {
     notice('error', 'Age should be between 18 and 90');
     preventSubmit = true;
-  } else if (document.querySelector('input[name="salary"]').value) {
+  } else if (
+    document.querySelector('input[name="salary"]').value.includes('-')
+  ) {
     notice('error', `Salary can't be negative`);
   } else {
     notice('success', 'Employee was added successfully');
