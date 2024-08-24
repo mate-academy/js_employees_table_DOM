@@ -312,6 +312,7 @@ function salary() {
   let sum = document.querySelector('input[name="salary"]').value;
 
   sum = sum.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  sum = sum.replace('-', '');
 
   return `$${sum}`;
 }
@@ -353,6 +354,7 @@ document.querySelectorAll('td').forEach((iter) => {
           let replaced = inp.value.replace(/[^0-9.-]+/g, '');
 
           replaced = replaced.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          replaced = replaced.replace('-', '');
           inp.value = `$${replaced}`;
         }
         iter.innerText = inp.value || prevText;
