@@ -132,8 +132,9 @@ const inputPos = newEmployeeForm.querySelector('input[data-qa="position"]');
 const selectCity = newEmployeeForm.querySelector('select[data-qa="office"]');
 const inputAge = newEmployeeForm.querySelector('input[data-qa="age"]');
 const inputSalary = newEmployeeForm.querySelector('input[data-qa="salary"]');
+const submitBtn = newEmployeeForm.querySelector('button');
 
-newEmployeeForm.addEventListener('submit', (e) => {
+submitBtn.addEventListener('click', (e) => {
   e.preventDefault();
 
   if (inputName.value.length < 4) {
@@ -166,6 +167,20 @@ newEmployeeForm.addEventListener('submit', (e) => {
     const errorMessage = createNotification(
       'Error',
       'We hire employee who are between 18 and 90 years old',
+      'error',
+    );
+
+    pushNotification(errorMessage);
+
+    return;
+  }
+
+  const salary = parseInt(inputSalary.value);
+
+  if (salary < 0) {
+    const errorMessage = createNotification(
+      'Error',
+      'Salary cannot be a negative number',
       'error',
     );
 
