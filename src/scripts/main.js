@@ -226,6 +226,8 @@ sendButon.addEventListener('click', (e) => {
   ) {
     notice('error', 'Age should be between 18 and 90');
     preventSubmit = true;
+  } else if (document.querySelector('input[name="salary"]').value) {
+    notice('error', `Salary can't be negative`);
   } else {
     notice('success', 'Employee was added successfully');
     addEmplToPage();
@@ -312,7 +314,6 @@ function salary() {
   let sum = document.querySelector('input[name="salary"]').value;
 
   sum = sum.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  sum = sum.replace('-', '');
 
   return `$${sum}`;
 }
@@ -354,7 +355,6 @@ document.querySelectorAll('td').forEach((iter) => {
           let replaced = inp.value.replace(/[^0-9.-]+/g, '');
 
           replaced = replaced.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          replaced = replaced.replace('-', '');
           inp.value = `$${replaced}`;
         }
         iter.innerText = inp.value || prevText;
