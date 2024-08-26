@@ -134,11 +134,20 @@ function showNotification(message, isError = false) {
 
   notification.setAttribute('data-qa', 'notification');
   notification.className = isError ? 'error' : 'success';
-  notification.textContent = message;
+  notification.classList.add('notification');
+
+  const title = document.createElement('h2');
+  const description = document.createElement('p');
+
+  title.classList.add('title');
+  title.textContent = isError ? 'Error' : 'Success';
+  description.textContent = message;
+  notification.append(title, description);
   document.body.append(notification);
 
   setTimeout(() => {
-    notification.remove();
+    notification.style.display = 'none';
+    // notification.remove();
   }, 5000);
 }
 
