@@ -147,7 +147,6 @@ function showNotification(message, isError = false) {
 
   setTimeout(() => {
     notification.style.display = 'none';
-    // notification.remove();
   }, 5000);
 }
 
@@ -160,7 +159,7 @@ function formatCurrency(value) {
   }).format(value);
 }
 
-form.addEventListener('submit', (e) => {
+submitButton.addEventListener('click', (e) => {
   e.preventDefault();
 
   const nameEmployee = form.name.value;
