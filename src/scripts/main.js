@@ -1,6 +1,5 @@
 'use strict';
 
-// const table = document.querySelector('table');
 const theads = document.querySelectorAll('th');
 const tbody = document.querySelector('table tbody');
 const trArr = [...tbody.querySelectorAll('tr')];
@@ -125,7 +124,6 @@ fealds.forEach((feald) => {
 
   input.name = feald.name;
   input.setAttribute('data-qa', feald.qa);
-  input.required = true;
   label.appendChild(input);
   form.appendChild(label);
 });
