@@ -147,9 +147,9 @@ function form() {
       const newTd = document.createElement('td');
 
       if (
-        (key === 'name' && value.length < 4) ||
+        (key === 'name' && value.trim().length < 4) ||
         (key === 'age' && (value < 18 || value > 90)) ||
-        value.length === 0
+        value.trim().length === 0
       ) {
         notifTitleElem.innerText = 'Error';
         notifElem.setAttribute('class', 'notification error');
