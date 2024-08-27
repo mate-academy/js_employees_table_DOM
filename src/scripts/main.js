@@ -95,7 +95,6 @@ const form = document.createElement('form');
 form.classList.add('new-employee-form');
 body.appendChild(form);
 
-// Створення елементів форми
 const nameLabel = document.createElement('label');
 
 nameLabel.textContent = 'Name: ';
@@ -247,16 +246,7 @@ const showNotification = (title, message, type) => {
   const messageEl = document.createElement('p');
 
   messageEl.innerText = message;
-
-  switch (type) {
-    case 'success':
-      notificationEl.classList.add('success');
-      break;
-    case 'error':
-      notificationEl.classList.add('error');
-      break;
-  }
-
+  notificationEl.classList.add(type);
   notificationEl.append(titleEl, messageEl);
   document.body.append(notificationEl);
 
