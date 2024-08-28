@@ -1,14 +1,10 @@
 'use strict';
 
 // write code here
-// 1.Implement table sorting by clicking on the title (in two directions).+
-// #region
 
 const table = document.querySelector('table');
 const header = document.querySelector('thead');
 const currentSort = { column: null, ascending: true };
-
-// get array of persons from table
 
 function getPeople() {
   const keys = Array.from(table.querySelectorAll('thead th')).map((th) => {
@@ -31,8 +27,6 @@ function getPeople() {
   return people;
 }
 
-// method for sorting
-
 function sortByClick(field, arrayForSort, isAscending) {
   const newArray = [...arrayForSort].sort((a, b) => {
     if (
@@ -54,16 +48,12 @@ function sortByClick(field, arrayForSort, isAscending) {
   return newArray;
 }
 
-// method for adding data of objects to table
-
 function addingContent(textContent, rowToAppend) {
   const td = document.createElement('td');
 
   td.textContent = textContent;
   rowToAppend.appendChild(td);
 }
-
-// creating event for clicking
 
 header.addEventListener('click', (e) => {
   const fieldForSort = e.target.textContent.trim();
@@ -95,9 +85,6 @@ header.addEventListener('click', (e) => {
     tbody.appendChild(tr);
   });
 });
-// #endregion
-// 2.When user clicks on a row, it should become selected.
-// #region
 
 table.addEventListener('click', (e) => {
   const tr = e.target.closest('tr');
@@ -109,21 +96,6 @@ table.addEventListener('click', (e) => {
     tr.classList.add('active');
   }
 });
-
-// const rows = table.querySelectorAll('tr');
-
-// rows.forEach((row) => {
-//   row.addEventListener('click', (e) => {
-//     rows.forEach((r) => r.classList.remove('active'));
-//     row.classList.add('active');
-//   });
-// });
-// #endregion
-// 3.Write a script to add a form to the document.
-// Form allows users to add new employees to the spreadsheet.
-// #region
-
-// додає працівника в таблицю
 
 function addEmployeeToTable(employee) {
   // Find the table body
@@ -147,8 +119,6 @@ function addEmployeeToTable(employee) {
 
   return true;
 }
-
-// перевіряє довжину імені та вік
 
 function validateFormData(data) {
   if (
@@ -194,16 +164,12 @@ function validateFormData(data) {
   return true;
 }
 
-// створює форму
-
 function createEmployeeForm() {
-  // Create the form element
   const formOnCreate = document.createElement('form');
 
   formOnCreate.className = 'new-employee-form';
   formOnCreate.id = 'employeeForm';
 
-  // Create the label and input elements
   const fields = [
     {
       fieldType: 'input',
@@ -286,14 +252,12 @@ function createEmployeeForm() {
     }
   });
 
-  // Create the submit button
   const submitButton = document.createElement('button');
 
   submitButton.type = 'submit';
   submitButton.textContent = 'Save to table';
   formOnCreate.appendChild(submitButton);
 
-  // Append the form to the document body or any specific container
   document.body.appendChild(formOnCreate);
 }
 
@@ -332,11 +296,6 @@ document.addEventListener('DOMContentLoaded', function () {
     td.addEventListener('dblclick', () => editable.edit(td));
   }
 });
-// #endregion
-// 4.Show notification if form
-// data is invalid(use notification from the previous tasks).+
-// #region
-// відповідає за відправлення сповіщень
 
 const pushNotification = (posTop, posRight, title, description, type) => {
   const textContainer = document.createElement('div');
@@ -358,9 +317,6 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 
   setTimeout(() => (textContainer.style.visibility = 'hidden'), 2000);
 };
-// #endregion
-// 5.Implement editing of table cells by double-clicking on it. (optional)
-// #region
 
 const editable = {
   ccell: null,
@@ -399,4 +355,3 @@ const editable = {
     }
   },
 };
-// #endregion
