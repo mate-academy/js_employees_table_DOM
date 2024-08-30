@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   headers.forEach((header, index) => {
     header.addEventListener('click', () => {
-      const currentDirection = sortDirection[index] || 'asc';
+      const currentDirection = sortDirection[index] || 'desc';
       const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 
       sortDirection[index] = newDirection;
@@ -107,8 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (isNaN(salary) || salary <= 0) {
-      showNotification('Error', 'Salary must be a positive number', 'error');
+    if (!position || position.length < 3) {
+      showNotification('Error', 'Invalid position input!', 'error');
 
       return;
     }
@@ -121,9 +121,13 @@ document.addEventListener('DOMContentLoaded', () => {
     newRow.insertCell().textContent = position;
     newRow.insertCell().textContent = office;
     newRow.insertCell().textContent = age;
-    newRow.insertCell().textContent = `$${salary.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    newRow.insertCell().textContent = `$${Number(salary).toLocaleString('en-US')}`;
 
-    showNotification('Success', 'Employee added successfully', 'success');
+    showNotification(
+      'Success',
+      'New employee is successfully added to the table!',
+      'success',
+    );
     form.reset();
   });
 
@@ -134,7 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
     notification.dataset.qa = 'notification';
     notification.innerHTML = `<strong>${title}</strong>: ${message}`;
     document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 4000);
+
+    setTimeout(() => {
+      notification.remove();
+    }, 4000);
   }
 
   tbody.addEventListener('dblclick', (e) => {
