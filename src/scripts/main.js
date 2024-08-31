@@ -105,7 +105,6 @@ const nameInput = document.createElement('input');
 nameInput.setAttribute('name', 'name');
 nameInput.setAttribute('data-qa', 'name');
 nameInput.type = 'text';
-nameInput.required = true;
 nameLabel.append(nameInput);
 
 const positionLabel = document.createElement('label');
@@ -118,7 +117,6 @@ const positionInput = document.createElement('input');
 positionInput.setAttribute('name', 'position');
 positionInput.setAttribute('data-qa', 'position');
 positionInput.type = 'text';
-positionInput.required = true;
 positionLabel.append(positionInput);
 
 const officeLabel = document.createElement('label');
@@ -130,7 +128,6 @@ const officeInput = document.createElement('select');
 
 officeInput.setAttribute('name', 'office');
 officeInput.setAttribute('data-qa', 'office');
-officeInput.required = true;
 officeLabel.append(officeInput);
 
 const officeOptions = [
@@ -160,7 +157,6 @@ const ageInput = document.createElement('input');
 ageInput.setAttribute('name', 'age');
 ageInput.setAttribute('data-qa', 'age');
 ageInput.type = 'number';
-ageInput.required = true;
 ageLabel.append(ageInput);
 
 const salaryLabel = document.createElement('label');
@@ -173,7 +169,6 @@ const salaryInput = document.createElement('input');
 salaryInput.setAttribute('name', 'salary');
 salaryInput.setAttribute('data-qa', 'salary');
 salaryInput.type = 'number';
-salaryInput.required = true;
 salaryLabel.append(salaryInput);
 
 const button = document.createElement('button');
@@ -199,6 +194,12 @@ form.onsubmit = function (e) {
 
   if (ageValue < 18 || ageValue > 90) {
     showNotification('Error', 'Age must be between 18 and 90', 'error');
+
+    return;
+  }
+
+  if (!positionValue) {
+    showNotification('Error', 'Position undefrined', 'error');
 
     return;
   }
@@ -246,11 +247,12 @@ const showNotification = (title, message, type) => {
   const messageEl = document.createElement('p');
 
   messageEl.innerText = message;
+
   notificationEl.classList.add(type);
   notificationEl.append(titleEl, messageEl);
   document.body.append(notificationEl);
 
   setTimeout(() => {
     notificationEl.remove();
-  }, 10000);
+  }, 50000);
 };
