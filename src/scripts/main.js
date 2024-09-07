@@ -4,8 +4,10 @@
 
 const table = document.querySelector('table');
 const thead = table.tHead.rows[0];
+const tbody = table.tBodies[0].rows;
+const tbodyArr = [...tbody];
 
-// #region cells
+// #region thead cells
 
 const nameCell = thead.cells[0];
 const positionCell = thead.cells[1];
@@ -14,9 +16,6 @@ const ageCell = thead.cells[3];
 const salaryCell = thead.cells[4];
 
 // #endregion
-
-const tbody = table.tBodies[0].rows;
-const tbodyArr = [...tbody];
 
 // #region add 'active' class for tr
 
@@ -37,41 +36,41 @@ thead.addEventListener('click', (_event) => {
   switch (_event.target) {
     case nameCell:
       if (isClicked) {
-        sortByString(true, 0);
-      } else {
         sortByString(false, 0);
+      } else {
+        sortByString(true, 0);
       }
 
       break;
     case positionCell:
       if (isClicked) {
-        sortByString(true, 1);
-      } else {
         sortByString(false, 1);
+      } else {
+        sortByString(true, 1);
       }
 
       break;
     case officeCell:
       if (isClicked) {
-        sortByString(true, 2);
-      } else {
         sortByString(false, 2);
+      } else {
+        sortByString(true, 2);
       }
 
       break;
     case ageCell:
       if (isClicked) {
-        sortByAge(true);
-      } else {
         sortByAge(false);
+      } else {
+        sortByAge(true);
       }
 
       break;
     case salaryCell:
       if (isClicked) {
-        sortBySalary(true);
-      } else {
         sortBySalary(false);
+      } else {
+        sortBySalary(true);
       }
 
       break;
@@ -93,10 +92,10 @@ function sortByString(isReverse, i) {
   );
 
   if (!isReverse) {
-    return result.reverse();
+    return result;
   }
 
-  return result;
+  return result.reverse();
 }
 
 function sortByAge(isReverse) {
@@ -106,10 +105,10 @@ function sortByAge(isReverse) {
   );
 
   if (!isReverse) {
-    return result.reverse();
+    return result;
   }
 
-  return result;
+  return result.reverse();
 }
 
 function sortBySalary(isReverse) {
@@ -120,16 +119,20 @@ function sortBySalary(isReverse) {
   );
 
   if (!isReverse) {
-    return result.reverse();
+    return result;
   }
 
-  return result;
+  return result.reverse();
 }
 
 // #endregion
 // #region form
 
 const form = document.createElement('form');
+
+form.addEventListener('submit', (_event) => {
+  _event.preventDefault();
+});
 
 form.className = 'new-employee-form';
 
@@ -210,8 +213,6 @@ const notifyTitle = document.createElement('h1');
 const notifyDescr = document.createElement('div');
 
 button.addEventListener('click', (_event) => {
-  _event.preventDefault();
-
   const tr = document.createElement('tr');
 
   for (let i = 0; i < 5; i++) {
@@ -231,19 +232,20 @@ button.addEventListener('click', (_event) => {
   notification.setAttribute('data-qa', 'notification');
   form.append(notification);
 
-  const nameField = tr.children[0];
-  const ageField = tr.children[3];
+  const nameField = document.querySelector('input[data-qa="name"]');
+  const ageField = document.querySelector('input[data-qa="age"]');
 
   if (
-    nameField.innerHTML.length < 4 ||
-    ageField.innerHTML < 18 ||
-    ageField.innerHTML > 90
+    nameField.value.length < 4 ||
+    ageField.value < 18 ||
+    ageField.value > 90 ||
+    !form.checkValidity()
   ) {
     notification.className = 'error';
     notifyTitle.textContent = 'Error';
   }
 
-  if (nameField.innerHTML.length < 4) {
+  if (nameField.value.length < 4) {
     notifyDescr.innerHTML = `
       Sorry. The employee's name is less than 4 letters long.
     `;
@@ -251,24 +253,27 @@ button.addEventListener('click', (_event) => {
     return;
   }
 
-  if (ageField.innerHTML < 18) {
+  if (ageField.value < 18) {
     notifyDescr.innerHTML = `Sorry. Employee is too young for this`;
 
     return;
   }
 
-  if (ageField.innerHTML > 90) {
+  if (ageField.value > 90) {
     notifyDescr.innerHTML = `Sorry. Employee is too old for this`;
 
     return;
   }
 
-  notifyTitle.textContent = 'Success!';
-  notification.className = 'success';
-  notifyDescr.innerHTML = 'Employee is in the table now!';
+  if (form.checkValidity()) {
+    notifyTitle.textContent = 'Success!';
+    notification.className = 'success';
+    notifyDescr.innerHTML = 'Employee is in the table now!';
 
-  table.tBodies[0].append(tr);
-  form.reset();
+    table.tBodies[0].append(tr);
+    tbodyArr.push(tr);
+    form.reset();
+  }
 });
 
 // #endregion
