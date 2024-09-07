@@ -37,41 +37,41 @@ thead.addEventListener('click', (_event) => {
   switch (_event.target) {
     case nameCell:
       if (isClicked) {
-        sortByString(false, 0);
-      } else {
         sortByString(true, 0);
+      } else {
+        sortByString(false, 0);
       }
 
       break;
     case positionCell:
       if (isClicked) {
-        sortByString(false, 1);
-      } else {
         sortByString(true, 1);
+      } else {
+        sortByString(false, 1);
       }
 
       break;
     case officeCell:
       if (isClicked) {
-        sortByString(false, 2);
-      } else {
         sortByString(true, 2);
+      } else {
+        sortByString(false, 2);
       }
 
       break;
     case ageCell:
       if (isClicked) {
-        sortByAge(false);
-      } else {
         sortByAge(true);
+      } else {
+        sortByAge(false);
       }
 
       break;
     case salaryCell:
       if (isClicked) {
-        sortBySalary(false);
-      } else {
         sortBySalary(true);
+      } else {
+        sortBySalary(false);
       }
 
       break;
@@ -301,6 +301,8 @@ table.tBodies[0].addEventListener('dblclick', (_event) => {
 
         if (inputValue === '') {
           td.innerHTML = initialText;
+
+          return;
         }
 
         td.innerHTML = inputValue;
