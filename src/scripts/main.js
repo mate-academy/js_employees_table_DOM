@@ -71,12 +71,15 @@ tableBody.addEventListener('click', (eve) => {
 // Implement form
 
 const newForm = document.createElement('form');
+
 newForm.classList.add('new-employee-form');
 
 const nameLabel = document.createElement('label');
+
 nameLabel.textContent = 'Name: ';
 
 const nameInput = document.createElement('input');
+
 nameInput.setAttribute('type', 'text');
 nameInput.setAttribute('name', 'name');
 nameInput.setAttribute('data-qa', 'name');
@@ -84,9 +87,11 @@ nameLabel.appendChild(nameInput);
 newForm.appendChild(nameLabel);
 
 const positionLabel = document.createElement('label');
+
 positionLabel.textContent = 'Position: ';
 
 const positionInput = document.createElement('input');
+
 positionInput.setAttribute('type', 'text');
 positionInput.setAttribute('name', 'position');
 positionInput.setAttribute('data-qa', 'position');
@@ -94,9 +99,11 @@ positionLabel.appendChild(positionInput);
 newForm.appendChild(positionLabel);
 
 const officeLable = document.createElement('label');
+
 officeLable.textContent = 'Office: ';
 
 const officeSelest = document.createElement('select');
+
 officeSelest.setAttribute('name', 'office');
 officeSelest.setAttribute('data-qa', 'office');
 
@@ -121,9 +128,11 @@ officeLable.appendChild(officeSelest);
 newForm.appendChild(officeLable);
 
 const ageLabel = document.createElement('label');
+
 ageLabel.textContent = 'Age: ';
 
 const ageInput = document.createElement('input');
+
 ageInput.setAttribute('type', 'number');
 ageInput.setAttribute('name', 'age');
 ageInput.setAttribute('data-qa', 'age');
@@ -131,9 +140,11 @@ ageLabel.appendChild(ageInput);
 newForm.appendChild(ageLabel);
 
 const salaryLabel = document.createElement('label');
+
 salaryLabel.textContent = 'Salary: ';
 
 const salaryInput = document.createElement('input');
+
 salaryInput.setAttribute('type', 'number');
 salaryInput.setAttribute('name', 'salary');
 salaryInput.setAttribute('data-qa', 'salary');
@@ -143,6 +154,7 @@ newForm.appendChild(salaryLabel);
 // Create button save
 
 const button = document.createElement('button');
+
 button.textContent = 'Save to table';
 button.setAttribute('type', 'submit');
 
@@ -181,22 +193,27 @@ newForm.addEventListener('submit', (eve) => {
 
   const tr = document.createElement('tr');
   const rowName = document.createElement('td');
+
   rowName.textContent = nameValue;
   tr.appendChild(rowName);
 
   const rowPosition = document.createElement('td');
+
   rowPosition.textContent = positionValue;
   tr.appendChild(rowPosition);
 
   const rowOffice = document.createElement('td');
+
   rowOffice.textContent = officeValue;
   tr.appendChild(rowOffice);
 
   const rowAge = document.createElement('td');
+
   rowAge.textContent = ageValue;
   tr.appendChild(rowAge);
 
   const rowSalary = document.createElement('td');
+
   rowSalary.textContent = `${formattedSalary}`;
   tr.appendChild(rowSalary);
 
@@ -213,15 +230,18 @@ newForm.addEventListener('submit', (eve) => {
 
 function PushNotification(type, message, reason) {
   const block = document.createElement('div');
+
   block.classList.add('notification', type);
   block.setAttribute('data-qa', 'notification');
 
   const blockTitle = document.createElement('h2');
+
   blockTitle.classList.add('title');
   blockTitle.textContent = reason;
   block.appendChild(blockTitle);
 
   const text = document.createElement('p');
+
   text.textContent = message;
   block.appendChild(text);
 
@@ -250,9 +270,11 @@ tableBody.addEventListener('dblclick', (even) => {
   }
 
   const initialText = target.textContent;
+
   target.textContent = '';
 
   const input = document.createElement('input');
+
   input.classList.add('cell-input');
   input.value = initialText;
   target.appendChild(input);
