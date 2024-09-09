@@ -139,62 +139,12 @@ function updateTable() {
         input.value = ctdCopy;
 
         input.addEventListener('blur', () => {
-          const newValue =
-            input.value.trim().length === 0 ? ctdCopy : input.value;
-
-          td.textContent = newValue;
-
-          switch (cellIndex) {
-            case 0:
-              person.name = newValue;
-              break;
-
-            case 1:
-              person.position = newValue;
-              break;
-
-            case 2:
-              person.office = newValue;
-              break;
-
-            case 3:
-              person.age = +newValue;
-              break;
-
-            case 4:
-              person.salary = parseInt(newValue.replace(/[$,]/g, ''));
-              break;
-          }
+          checkCellIndex(person, input.value, td, cellIndex, ctdCopy);
         });
 
         input.addEventListener('keypress', (e) => {
           if (e.key === 'Enter') {
-            const newValue =
-              input.value.trim().length === 0 ? ctdCopy : input.value;
-
-            td.textContent = newValue;
-
-            switch (cellIndex) {
-              case 0:
-                person.name = newValue;
-                break;
-
-              case 1:
-                person.position = newValue;
-                break;
-
-              case 2:
-                person.office = newValue;
-                break;
-
-              case 3:
-                person.age = +newValue;
-                break;
-
-              case 4:
-                person.salary = parseInt(newValue.replace(/[$,]/g, ''));
-                break;
-            }
+            checkCellIndex(person, input.value, td, cellIndex, ctdCopy);
           }
         });
 
@@ -205,6 +155,34 @@ function updateTable() {
 
     tbody.appendChild(newTr);
   });
+}
+
+function checkCellIndex(person, input, td, cellIndex, ctdCopy) {
+  const newValue = input.value.trim().length === 0 ? ctdCopy : input.value;
+
+  td.textContent = newValue;
+
+  switch (cellIndex) {
+    case 0:
+      person.name = newValue;
+      break;
+
+    case 1:
+      person.position = newValue;
+      break;
+
+    case 2:
+      person.office = newValue;
+      break;
+
+    case 3:
+      person.age = +newValue;
+      break;
+
+    case 4:
+      person.salary = parseInt(newValue.replace(/[$,]/g, ''));
+      break;
+  }
 }
 
 updateTable();
@@ -284,6 +262,92 @@ button.setAttribute('type', 'submit');
 
 button.textContent = 'Save to table';
 
+const pushNotification = (title, description, type) => {
+  const div = document.createElement('div');
+  const titleOfMessage = document.createElement('h2');
+  const p = document.createElement('p');
+
+  div.className = `notification ${type}`;
+  titleOfMessage.classList.add('title');
+  div.setAttribute('data-qa', 'notification');
+
+  titleOfMessage.textContent = title;
+  p.textContent = description;
+
+  body.appendChild(div);
+  div.appendChild(titleOfMessage);
+  div.appendChild(p);
+
+  setTimeout(() => {
+    div.style.visibility = 'hidden';
+  }, 2000);
+};
+
+button.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  const nameValue = inputName.value.trim();
+  const positionValue = inputPosition.value.trim();
+  const ageValue = +inputAge.value;
+
+  if (nameValue.length < 4) {
+    pushNotification(
+      'Name error',
+      'Name should be more than 3 letters',
+      'error',
+    );
+
+    return;
+  }
+
+  if (!positionValue) {
+    pushNotification(
+      'Position error',
+      'Possition should contain only letters',
+      'error',
+    );
+
+    return;
+  }
+
+  if (isNaN(ageValue) || ageValue < 18 || ageValue > 90) {
+    pushNotification(
+      'Age error',
+      'Employee age must be between 18 and 90',
+      'error',
+    );
+
+    return;
+  }
+
+  pushNotification(
+    'Employee added',
+    'Congratulations new employee was added',
+    'success',
+  );
+
+  const person = {
+    name: inputName.value.trim(),
+    position: inputPosition.value.trim(),
+    office: select.value,
+    age: +inputAge.value,
+    salary: +inputSalary.value,
+  };
+
+  people.push(person);
+  updateTable();
+
+  clear();
+});
+
+function clear() {
+  inputName.value = '';
+  inputPosition.value = '';
+  select.value = 'Tokyo';
+  inputAge.value = '';
+  inputSalary.value = '';
+}
+
 body.appendChild(form);
 
 form.appendChild(labelName);
@@ -305,98 +369,3 @@ select.appendChild(optionLondon);
 select.appendChild(optionNewYork);
 select.appendChild(optionEdinburgh);
 select.appendChild(optionSanFrancisco);
-
-function clear() {
-  inputName.value = '';
-  inputPosition.value = '';
-  select.value = 'Tokyo';
-  inputAge.value = '';
-  inputSalary.value = '';
-}
-
-const pushNotification = (posTop, posRight, title, description, type) => {
-  const div = document.createElement('div');
-  const titleOfMessage = document.createElement('h2');
-  const p = document.createElement('p');
-
-  div.classList.add('notification', `${type}`);
-  titleOfMessage.classList.add('title');
-  div.setAttribute('data-qa', 'notification');
-
-  titleOfMessage.textContent = title;
-  p.textContent = description;
-
-  div.style.top = `${posTop}px`;
-  div.style.right = `${posRight}px`;
-
-  body.appendChild(div);
-  div.appendChild(titleOfMessage);
-  div.appendChild(p);
-
-  setTimeout(() => {
-    div.style.visibility = 'hidden';
-  }, 2000);
-};
-
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  const nameValue = inputName.value.trim();
-  const positionValue = inputPosition.value.trim();
-  const ageValue = +inputAge.value;
-
-  if (nameValue.length < 4) {
-    pushNotification(
-      10,
-      10,
-      'Name error',
-      'Name should be more than 3 letters',
-      'error',
-    );
-  } else if (positionValue.length === 0) {
-    pushNotification(
-      10,
-      10,
-      'Position error',
-      'You enter wrong position',
-      'error',
-    );
-  } else if (ageValue < 18) {
-    pushNotification(
-      10,
-      10,
-      'Age error',
-      'Employee is still young for this job',
-      'error',
-    );
-  } else if (ageValue > 90) {
-    pushNotification(
-      10,
-      10,
-      'Age error',
-      'Employee is obsolete for this job',
-      'error',
-    );
-  } else {
-    pushNotification(
-      10,
-      10,
-      'Employee added',
-      'Congratulations new employee was added',
-      'success',
-    );
-
-    const person = {
-      name: inputName.value.trim(),
-      position: inputPosition.value.trim(),
-      office: select.value,
-      age: +inputAge.value,
-      salary: +inputSalary.value,
-    };
-
-    people.push(person);
-    updateTable();
-
-    clear();
-  }
-});
