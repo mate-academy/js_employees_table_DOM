@@ -100,7 +100,12 @@ form.appendChild(submitButton);
 table.insertAdjacentElement('afterend', form);
 
 function checkValidation(nameValue, position, age) {
-  if (nameValue.length < 4 || position.length < 1 || age < 18 || age > 90) {
+  if (
+    nameValue.trim().length < 4 ||
+    position.trim().length < 1 ||
+    age < 18 ||
+    age > 90
+  ) {
     return false;
   }
 
