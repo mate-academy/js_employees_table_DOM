@@ -39,12 +39,12 @@ function sortTable(tableElement, index, direction = 'up') {
 
       if (!isNaN(convertToNumber(colunmOne))) {
         return direction === 'up'
-          ? convertToNumber(colunmOne) - convertToNumber(colunmTwo)
-          : convertToNumber(colunmTwo) - convertToNumber(colunmOne);
+          ? convertToNumber(colunmTwo) - convertToNumber(colunmOne)
+          : convertToNumber(colunmOne) - convertToNumber(colunmTwo);
       } else {
         return direction === 'up'
-          ? colunmOne.localeCompare(colunmTwo)
-          : colunmTwo.localeCompare(colunmOne);
+          ? colunmTwo.localeCompare(colunmOne)
+          : colunmOne.localeCompare(colunmTwo);
       }
     });
   }
