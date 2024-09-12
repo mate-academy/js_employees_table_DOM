@@ -29,7 +29,7 @@ const directions = Array.from(headers).map(function (header) {
 });
 
 const sortColumn = function (index) {
-  const newRows = Array.from(rows);
+  const newRows = [...tableBody.children];
   const direction = directions[index] || 'asc';
   const multiplier = direction === 'asc' ? 1 : -1;
 
@@ -64,7 +64,7 @@ tableBody.addEventListener('click', (e) => {
   const aciveRow = e.target.closest('tr');
 
   if (aciveRow) {
-    rows.forEach((row) => {
+    [...tableBody.children].forEach((row) => {
       row.classList.remove('active');
     });
 
