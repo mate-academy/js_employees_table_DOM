@@ -18,6 +18,28 @@ const secondTimeHeppendSorting = (objTitle, type, objSwitcher) =>
 
 form.addEventListener('submit', (e) => {
   const tr = document.createElement('tr');
+  const showNotification = (typeError, color, selectedErrMess, topPx) => {
+    const notification = document.createElement('p');
+    const warningMes = [
+      'The should be consist of at list 4 letters',
+      'The should be consist of at list 2 letters',
+      'The Age should be not less than 18 and not bigger than 90',
+      'Success',
+    ];
+
+    notification.setAttribute('data-qa', 'notification');
+    notification.setAttribute('class', typeError);
+
+    notification.textContent = warningMes[selectedErrMess];
+    notification.style.position = 'absolute';
+    notification.style.top = topPx + 'px';
+    notification.style.right = 20 + 'px';
+    notification.style.backgroundColor = color;
+
+    body.append(notification);
+  };
+
+  body.querySelectorAll('p').forEach((el) => el.remove());
 
   e.preventDefault();
 
@@ -26,70 +48,15 @@ form.addEventListener('submit', (e) => {
   const [userNameValue, position, ageValue] = clearInputsFields;
 
   if (!/[a-zA-Z]{4,}/.test(userNameValue.value)) {
-    const notification = document.createElement('p');
-    const success = document.querySelector('.success');
-
-    if (success) {
-      success.remove();
-    }
-
-    notification.textContent = '';
-
-    notification.setAttribute('data-qa', 'notification');
-    notification.setAttribute('class', 'error');
-
-    notification.textContent = 'The should be consist of at list 4 letters';
-    notification.style.position = 'absolute';
-    notification.style.top = 20 + 'px';
-    notification.style.right = 20 + 'px';
-    notification.style.backgroundColor = 'red';
-
-    body.append(notification);
+    showNotification('error', 'red', 0, 20);
   }
 
-  if (!/[a-zA-Z]{4,}/.test(position.value)) {
-    const notification = document.createElement('p');
-    const success = document.querySelector('.success');
-
-    if (success) {
-      success.remove();
-    }
-
-    notification.textContent = '';
-
-    notification.setAttribute('data-qa', 'notification');
-    notification.setAttribute('class', 'error');
-
-    notification.textContent = 'The should be consist of at list 2 letters';
-    notification.style.position = 'absolute';
-    notification.style.top = 40 + 'px';
-    notification.style.right = 20 + 'px';
-    notification.style.backgroundColor = 'red';
-
-    body.append(notification);
+  if (!/^[a-zA-Z\s]{2,}$/.test(position.value)) {
+    showNotification('error', 'red', 1, 40);
   }
 
   if (ageValue.value < 18 || ageValue.value > 90) {
-    const notification = document.createElement('p');
-    const success = document.querySelector('.success');
-
-    if (success) {
-      success.remove();
-    }
-
-    notification.textContent = '';
-
-    notification.setAttribute('data-qa', 'notification');
-    notification.setAttribute('class', 'error');
-
-    notification.textContent =
-      'The Age should be not less than 18 and not bigger than 90';
-    notification.style.position = 'absolute';
-    notification.style.top = 60 + 'px';
-    notification.style.right = 20 + 'px';
-    notification.style.backgroundColor = 'red';
-
-    body.append(notification);
+    showNotification('error', 'red', 2, 60);
   }
 
   if (
@@ -98,15 +65,6 @@ form.addEventListener('submit', (e) => {
     Number(ageValue.value) <= 90 &&
     /[a-zA-Z]{4,}/.test(position.value)
   ) {
-    const notification = document.createElement('p');
-    const removeErorClass = document.querySelectorAll('.error');
-
-    if (removeErorClass) {
-      removeErorClass.forEach((el) => el.remove());
-    }
-
-    notification.setAttribute('data-qa', 'notification');
-
     for (const [typeName, value] of formData.entries()) {
       const td = document.createElement('td');
 
@@ -119,17 +77,11 @@ form.addEventListener('submit', (e) => {
       tr.append(td);
     }
 
-    notification.setAttribute('class', 'success');
-    notification.textContent = 'Success';
-    notification.style.position = 'absolute';
-    notification.style.top = 20 + 'px';
-    notification.style.right = 20 + 'px';
-    notification.style.color = 'green';
-    body.append(notification);
+    showNotification('success', 'green', 3, 20);
   }
 
   tBody.append(tr);
-  clearInputsFields.forEach((el) => (el.value = ''));
+  form.reset();
 });
 
 trHead.addEventListener('click', (e) => {
@@ -241,9 +193,6 @@ tBody.addEventListener('click', (e) => {
   });
 });
 
-form.method = 'POST';
-form.action = '#';
-
 button.textContent = 'Save to table';
 button.setAttribute('type', 'submit');
 
@@ -324,6 +273,8 @@ const inputPattern = (data) => {
 
 inputPattern(inputData);
 
+form.method = 'POST';
+form.action = '#';
 form.setAttribute('class', 'new-employee-form');
 form.append(button);
 
