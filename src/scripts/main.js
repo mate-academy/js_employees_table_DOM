@@ -63,7 +63,7 @@ form.addEventListener('submit', (e) => {
     /[a-zA-Z]{4,}/.test(userNameValue.value) &&
     Number(ageValue.value) >= 18 &&
     Number(ageValue.value) <= 90 &&
-    /[a-zA-Z]{4,}/.test(position.value)
+    /^[a-zA-Z\s]{2,}$/.test(position.value)
   ) {
     for (const [typeName, value] of formData.entries()) {
       const td = document.createElement('td');
