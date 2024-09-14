@@ -23,7 +23,7 @@ form.addEventListener('submit', (e) => {
 
   const formData = new FormData(form);
   const clearInputsFields = [...e.target.querySelectorAll('input')];
-  const [userNameValue, , ageValue] = clearInputsFields;
+  const [userNameValue, position, ageValue] = clearInputsFields;
 
   if (!/[a-zA-Z]{4,}/.test(userNameValue.value)) {
     const notification = document.createElement('p');
@@ -45,7 +45,28 @@ form.addEventListener('submit', (e) => {
     notification.style.backgroundColor = 'red';
 
     body.append(notification);
-    clearInputsFields.forEach((el) => (el.value = ''));
+  }
+
+  if (!/[a-zA-Z]{4,}/.test(position.value)) {
+    const notification = document.createElement('p');
+    const success = document.querySelector('.success');
+
+    if (success) {
+      success.remove();
+    }
+
+    notification.textContent = '';
+
+    notification.setAttribute('data-qa', 'notification');
+    notification.setAttribute('class', 'error');
+
+    notification.textContent = 'The should be consist of at list 2 letters';
+    notification.style.position = 'absolute';
+    notification.style.top = 40 + 'px';
+    notification.style.right = 20 + 'px';
+    notification.style.backgroundColor = 'red';
+
+    body.append(notification);
   }
 
   if (ageValue.value < 18 || ageValue.value > 90) {
@@ -64,17 +85,18 @@ form.addEventListener('submit', (e) => {
     notification.textContent =
       'The Age should be not less than 18 and not bigger than 90';
     notification.style.position = 'absolute';
-    notification.style.top = 40 + 'px';
+    notification.style.top = 60 + 'px';
     notification.style.right = 20 + 'px';
     notification.style.backgroundColor = 'red';
 
     body.append(notification);
-    clearInputsFields.forEach((el) => (el.value = ''));
   }
 
   if (
-    (/[a-zA-Z]{4,}/.test(userNameValue.value) && ageValue.value >= 18) ||
-    (/[a-zA-Z]{4,}/.test(userNameValue.value) && ageValue.value <= 90)
+    /[a-zA-Z]{4,}/.test(userNameValue.value) &&
+    Number(ageValue.value) >= 18 &&
+    Number(ageValue.value) <= 90 &&
+    /[a-zA-Z]{4,}/.test(position.value)
   ) {
     const notification = document.createElement('p');
     const removeErorClass = document.querySelectorAll('.error');
@@ -230,8 +252,8 @@ const options = [
   { value: 'Singapore', text: 'Singapore' },
   { value: 'London', text: 'London' },
   { value: 'New York', text: 'New York' },
-  { value: 'Edinbirgh', text: 'EdinBurgh' },
-  { value: 'San Francisko', text: 'San Francisko' },
+  { value: 'Edinburgh', text: 'EdinBurgh' },
+  { value: 'San Francisco', text: 'San Francisco' },
 ];
 
 const inputData = [
