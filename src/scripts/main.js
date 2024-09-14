@@ -236,3 +236,44 @@ pageTable.addEventListener('click', (e) => {
     });
   }
 });
+
+function saveChanges(input, initialValue) {
+  const newValue = input.value.trim() || initialValue;
+  const cell = input.parentElement;
+
+  cell.textContent = newValue;
+  input.remove();
+}
+
+pageTable.addEventListener('dblclick', (e) => {
+  const cell = e.target.closest('td');
+
+  if (!cell || !cell.closest('tbody')) {
+    return;
+  }
+
+  if (document.querySelector('.cell-input')) {
+    saveChanges(document.querySelector('.cell-input'));
+  }
+
+  const initialValue = cell.textContent.trim();
+  const input = document.createElement('input');
+
+  input.type = 'text';
+  input.classList.add('cell-input');
+  input.value = initialValue;
+
+  cell.textContent = '';
+  cell.appendChild(input);
+  input.focus();
+
+  input.addEventListener('blur', () => {
+    saveChanges(input, initialValue);
+  });
+
+  input.addEventListener('keydown', (keypressEvent) => {
+    if (keypressEvent.key === 'Enter') {
+      saveChanges(input, initialValue);
+    }
+  });
+});
