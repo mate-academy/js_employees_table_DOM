@@ -75,12 +75,12 @@ form.addEventListener('submit', (e) => {
       }
 
       tr.append(td);
+      tBody.append(tr);
     }
 
     showNotification('success', 'green', 3, 20);
   }
 
-  tBody.append(tr);
   form.reset();
 });
 
