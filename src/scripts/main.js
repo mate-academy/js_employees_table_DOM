@@ -27,15 +27,15 @@ const pushNotification = (posTop, posRight, title, type) => {
 let currentSortColumn = -1;
 let currentSortOrder = 'ASC';
 
-function sortBy(sortByWhat, sortCount) {
+function sort(sortBy, columnIndex) {
   const list = document.querySelectorAll('tbody tr');
   const arrOfList = [...list];
 
   arrOfList.sort((employee1, employee2) => {
-    const employee1Text = employee1.cells[sortCount].textContent;
-    const employee2Text = employee2.cells[sortCount].textContent;
+    const employee1Text = employee1.cells[columnIndex].textContent;
+    const employee2Text = employee2.cells[columnIndex].textContent;
 
-    switch (sortByWhat) {
+    switch (sortBy) {
       case 'Name':
       case 'Position':
       case 'Office':
@@ -52,11 +52,11 @@ function sortBy(sortByWhat, sortCount) {
     }
   });
 
-  if (currentSortColumn === sortCount) {
+  if (currentSortColumn === columnIndex) {
     currentSortOrder = currentSortOrder === 'ASC' ? 'DESC' : 'ASC';
   } else {
     currentSortOrder = 'ASC';
-    currentSortColumn = sortCount;
+    currentSortColumn = columnIndex;
   }
 
   if (currentSortOrder === 'DESC') {
@@ -72,7 +72,7 @@ const thead = document.querySelector('thead tr');
 
 thead.addEventListener('click', (e) => {
   if (e.target.tagName === 'TH') {
-    sortBy(e.target.textContent, e.target.cellIndex);
+    sort(e.target.textContent, e.target.cellIndex);
   }
 });
 
@@ -103,12 +103,12 @@ theaders.map((theader) => {
   label.innerText = `${theader}: `;
 
   if (theader === 'Office') {
-    const selec = document.createElement('select');
+    const selectInput = document.createElement('select');
 
-    selec.setAttribute('name', `${theader.toLowerCase()}`);
-    selec.setAttribute('data-qa', `${theader.toLowerCase()}`);
-    selec.setAttribute('required', '');
-    label.insertAdjacentElement('beforeend', selec);
+    selectInput.setAttribute('name', `${theader.toLowerCase()}`);
+    selectInput.setAttribute('data-qa', `${theader.toLowerCase()}`);
+    selectInput.setAttribute('required', '');
+    label.insertAdjacentElement('beforeend', selectInput);
   } else {
     input.setAttribute('name', `${theader.toLowerCase()}`);
     input.setAttribute('data-qa', `${theader.toLowerCase()}`);
@@ -242,7 +242,7 @@ tbody.addEventListener('dblclick', (e) => {
     td.textContent = newInput.value;
     newInput.remove();
 
-    if (td.textContent === '') {
+    if (td.textContent === '' || td.textContent === '$0') {
       td.textContent = oldText;
     }
   });
