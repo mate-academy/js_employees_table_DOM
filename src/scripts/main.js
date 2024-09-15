@@ -64,11 +64,7 @@ function showNotification(type, message) {
 
   title.classList.add('title');
 
-  if (type === 'warning') {
-    title.innerText = message;
-  } else {
-    title.innerText = message;
-  }
+  title.innerText = message;
 
   notification.append(title);
   document.body.append(notification);
