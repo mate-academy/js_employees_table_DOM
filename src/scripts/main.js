@@ -49,7 +49,7 @@ function notificationMessage(text, type) {
 
   setTimeout(() => {
     document.body.querySelector('.notification').remove();
-  }, 10000);
+  }, 2000);
 }
 // #endregion
 
@@ -114,69 +114,83 @@ function newForm(atributes, cities) {
 
 // #region form submit event
 employee.querySelector('button').addEventListener('click', (e) => {
-  const inputName = employee.querySelector('[data-qa="name"]');
-  const inputPosition = employee.querySelector('[data-qa="position"]');
-  const inputOffice = employee.querySelector('[data-qa="office"]');
-  const inputAge = employee.querySelector('[data-qa="age"]');
-  const inputSalary = employee.querySelector('[data-qa="salary"]');
+  const valuesOfInputs = {
+    name: employee.querySelector('[data-qa="name"]').value,
+    position: employee.querySelector('[data-qa="position"]').value,
+    office: employee.querySelector('[data-qa="office"]').value,
+    age: employee.querySelector('[data-qa="age"]').value,
+    salary: employee.querySelector('[data-qa="salary"]').value,
+  };
 
-  const valuesOfInputs = [
-    inputName,
-    inputPosition,
-    inputOffice,
-    inputAge,
-    inputSalary,
-  ];
+  function checkInputParameters(inputs) {
+    let emptyItem = '';
 
-  if (
-    inputName.value.trim() !== '' &&
-    inputName.value.length >= 4 &&
-    inputAge.value.trim() !== '' &&
-    parseInt(inputAge.value) >= 18 &&
-    parseInt(inputAge.value) <= 90 &&
-    inputPosition.value !== '' &&
-    inputSalary.value !== ''
-  ) {
+    for (const [key, value] of Object.entries(inputs)) {
+      if (key === 'position') {
+        if (!value.trim()) {
+          notificationMessage('Please indicate your position', 'error');
+
+          return false;
+        }
+      }
+
+      if (!value.trim()) {
+        emptyItem = `${key}`;
+
+        notificationMessage(
+          `${emptyItem.toUpperCase()} is empty, fill it in`,
+          'warning',
+        );
+
+        return false;
+      }
+
+      if (key === 'name') {
+        if (value.trim().length < 4) {
+          notificationMessage('Your name is less than 4 characters', 'error');
+
+          return false;
+        }
+      }
+
+      if (key === 'age') {
+        if (parseInt(value) < 18 || parseInt(value) > 90) {
+          notificationMessage('Allowed age is between 18 and 90', 'error');
+
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  if (checkInputParameters(valuesOfInputs)) {
     const row = document.createElement('tr');
 
-    valuesOfInputs.forEach((input) => {
+    for (const [key, value] of Object.entries(valuesOfInputs)) {
       const cell = document.createElement('td');
 
-      if (input.getAttribute('data-qa') === 'salary') {
-        cell.textContent = formatCurrency(input.value);
+      if (key === 'salary') {
+        cell.textContent = formatCurrency(value);
       } else {
-        cell.textContent = input.value;
+        cell.textContent = value;
       }
 
       row.appendChild(cell);
-    });
+    }
 
     tbody.appendChild(row);
 
     notificationMessage('Adding successfully', 'success');
 
+    e.preventDefault();
+
     employee.reset();
-  } else {
-    if (inputName.value.length < 4) {
-      notificationMessage('Name length is less than 4 characters', 'error');
-    }
-
-    if (parseInt(inputAge.value) < 18) {
-      notificationMessage('Your age is too young :(', 'error');
-    }
-
-    if (parseInt(inputAge.value) > 90) {
-      notificationMessage('Your age is too old :(', 'error');
-    }
-
-    if (inputPosition.value.trim() === '') {
-      notificationMessage('Indicate position :(', 'error');
-    }
   }
 
   e.preventDefault();
 });
-
 // #endregion
 
 // #region sorting rows
