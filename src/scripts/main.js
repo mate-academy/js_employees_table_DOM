@@ -247,7 +247,6 @@ const inputPattern = (data) => {
     if (el.tag) {
       selectTag.setAttribute('name', el.name);
       selectTag.setAttribute('data-qa', el.data__qa);
-      selectTag.setAttribute('required', true);
       label.textContent = `${el.label}:`;
       label.append(selectTag);
 
@@ -262,7 +261,6 @@ const inputPattern = (data) => {
       input.setAttribute('type', el.type);
       input.setAttribute('name', el.name);
       input.setAttribute('data-qa', el.data__qa);
-      input.setAttribute('required', true);
       label.textContent = `${el.label}:`;
       label.append(input);
     }
