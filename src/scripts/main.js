@@ -210,48 +210,54 @@ officeLabel.innerHTML = 'Office:';
 officeLabel.setAttribute('for', 'office');
 form.append(officeLabel);
 
-const officeInput = document.createElement('input');
+const officeInput = document.createElement('select');
 
-officeInput.setAttribute('list', 'cities');
 officeInput.setAttribute('data-qa', 'office');
 officeInput.setAttribute('id', 'office');
 officeInput.setAttribute('required', '');
 officeLabel.append(officeInput);
 
-const datalist = document.createElement('datalist');
+const optionMakeChoise = document.createElement('option');
 
-datalist.setAttribute('id', 'cities');
-officeLabel.append(datalist);
+optionMakeChoise.setAttribute('value', '');
+optionMakeChoise.innerHTML = '-- Choose a city --';
+officeInput.append(optionMakeChoise);
 
 const optionTokyo = document.createElement('option');
 
 optionTokyo.setAttribute('value', 'Tokyo');
-datalist.append(optionTokyo);
+optionTokyo.innerHTML = 'Tokyo';
+officeInput.append(optionTokyo);
 
 const optionSingapore = document.createElement('option');
 
 optionSingapore.setAttribute('value', 'Singapore');
-datalist.append(optionSingapore);
+optionSingapore.innerHTML = 'Singapore';
+officeInput.append(optionSingapore);
 
 const optionLondon = document.createElement('option');
 
 optionLondon.setAttribute('value', 'London');
-datalist.append(optionLondon);
+optionLondon.innerHTML = 'London';
+officeInput.append(optionLondon);
 
 const optionNewYork = document.createElement('option');
 
 optionNewYork.setAttribute('value', 'New York');
-datalist.append(optionNewYork);
+optionNewYork.innerHTML = 'New York';
+officeInput.append(optionNewYork);
 
 const optionEdinburgh = document.createElement('option');
 
 optionEdinburgh.setAttribute('value', 'Edinburgh');
-datalist.append(optionEdinburgh);
+optionEdinburgh.innerHTML = 'Edinburgh';
+officeInput.append(optionEdinburgh);
 
 const optionSanFrancisco = document.createElement('option');
 
 optionSanFrancisco.setAttribute('value', 'San Francisco');
-datalist.append(optionSanFrancisco);
+optionSanFrancisco.innerHTML = 'San Francisco';
+officeInput.append(optionSanFrancisco);
 
 const ageLabel = document.createElement('label');
 
@@ -309,15 +315,24 @@ button.addEventListener('click', function (ev) {
   ev.preventDefault();
   notification.removeAttribute('style');
 
-  const unvalidName = nameInput.value.length < 4;
-  const unvalidAge = ageInput.value < 18 || ageInput.value > 90;
-  const unvalidPosition = positionInput.value.length < 1;
+  const err1 = nameInput.value.length < 4;
+  const err2 = nameInput.value.trim().length === 0;
 
-  if (unvalidName || unvalidAge || unvalidPosition) {
+  const err3 = positionInput.value.length < 1;
+  const err4 = positionInput.value.trim().length === 0;
+
+  const err5 = officeInput.value.trim().length === 0;
+
+  const err6 = ageInput.value < 18 || ageInput.value > 90; //
+  const err7 = ageInput.value.trim().length === 0;
+
+  const err8 = salaryInput.value.trim().length === 0;
+
+  if (err1 || err2 || err3 || err4 || err5 || err6 || err7 || err8) {
     notification.classList.remove('success');
     notification.classList.add('error');
     notifTitle.innerHTML = 'Error!';
-    notifDescription.innerHTML = 'Too short name, position or incorrect age!';
+    notifDescription.innerHTML = 'Too short value, only spaces or wrong age!';
 
     return;
   }
@@ -371,4 +386,43 @@ button.addEventListener('click', function (ev) {
   }
 
   tbody.append(newEmployeeRow);
+});
+
+tbody.addEventListener('dblclick', function (ev) {
+  if (ev.target.tagName === 'TD') {
+    const td = ev.target;
+
+    td.innerHTML = '';
+    td.classList.add('changedTd');
+
+    const formChanges = document.createElement('form');
+
+    formChanges.setAttribute('style', 'position: absolute;');
+
+    const inputForChanges = document.createElement('input');
+
+    inputForChanges.classList.add('changesInput');
+    inputForChanges.setAttribute('placeholder', 'Enter a new value');
+    formChanges.append(inputForChanges);
+
+    const buttonForChanges = document.createElement('input');
+
+    buttonForChanges.classList.add('changesButton');
+    buttonForChanges.setAttribute('type', 'button');
+    buttonForChanges.setAttribute('value', 'OK');
+    formChanges.append(buttonForChanges);
+
+    const pageX = ev.pageX;
+    const pageY = ev.pageY;
+
+    formChanges.style.left = `${pageX}px`;
+    formChanges.style.top = `${pageY}px`;
+
+    document.body.append(formChanges);
+
+    buttonForChanges.addEventListener('click', function () {
+      td.innerHTML = inputForChanges.value;
+      document.body.removeChild(formChanges);
+    });
+  }
 });
