@@ -99,59 +99,75 @@ function descSortSalary(index) {
 thead.addEventListener('click', function (ev) {
   let index;
 
-  if (ev.target.innerHTML === 'Name') {
-    index = 0;
+  switch (ev.target.innerHTML) {
+    case 'Name':
+      index = 0;
+      break;
+    case 'Position':
+      index = 1;
+      break;
+    case 'Office':
+      index = 2;
+      break;
+    case 'Age':
+      index = 3;
+      break;
+    case 'Salary':
+      index = 4;
+      break;
   }
 
-  if (ev.target.innerHTML === 'Position') {
-    index = 1;
-  }
+  switch (index) {
+    case 3:
+      switch (ev.target.dataset.state) {
+        case 'unsorted':
+          ev.target.setAttribute('data-state', 'ascending');
+          ascSortAge(index);
+          break;
+        case 'ascending':
+          ev.target.setAttribute('data-state', 'descending');
+          descSortAge(index);
+          break;
+        case 'descending':
+          ev.target.setAttribute('data-state', 'ascending');
+          ascSortAge(index);
+          break;
+      }
+      break;
 
-  if (ev.target.innerHTML === 'Office') {
-    index = 2;
-  }
+    case 4:
+      switch (ev.target.dataset.state) {
+        case 'unsorted':
+          ev.target.setAttribute('data-state', 'ascending');
+          ascSortSalary(index);
+          break;
+        case 'ascending':
+          ev.target.setAttribute('data-state', 'descending');
+          descSortSalary(index);
+          break;
+        case 'descending':
+          ev.target.setAttribute('data-state', 'ascending');
+          ascSortSalary(index);
+          break;
+      }
+      break;
 
-  if (ev.target.innerHTML === 'Age') {
-    index = 3;
-  }
-
-  if (ev.target.innerHTML === 'Salary') {
-    index = 4;
-  }
-
-  if (index === 3) {
-    if (ev.target.dataset.state === 'unsorted') {
-      ev.target.setAttribute('data-state', 'ascending');
-      ascSortAge(index);
-    } else if (ev.target.dataset.state === 'ascending') {
-      ev.target.setAttribute('data-state', 'descending');
-      descSortAge(index);
-    } else if (ev.target.dataset.state === 'descending') {
-      ev.target.setAttribute('data-state', 'ascending');
-      ascSortAge(index);
-    }
-  } else if (index === 4) {
-    if (ev.target.dataset.state === 'unsorted') {
-      ev.target.setAttribute('data-state', 'ascending');
-      ascSortSalary(index);
-    } else if (ev.target.dataset.state === 'ascending') {
-      ev.target.setAttribute('data-state', 'descending');
-      descSortSalary(index);
-    } else if (ev.target.dataset.state === 'descending') {
-      ev.target.setAttribute('data-state', 'ascending');
-      ascSortSalary(index);
-    }
-  } else {
-    if (ev.target.dataset.state === 'unsorted') {
-      ev.target.setAttribute('data-state', 'ascending');
-      ascSortStringlocaleCompare(index);
-    } else if (ev.target.dataset.state === 'ascending') {
-      ev.target.setAttribute('data-state', 'descending');
-      descSortStringlocaleCompare(index);
-    } else if (ev.target.dataset.state === 'descending') {
-      ev.target.setAttribute('data-state', 'ascending');
-      ascSortStringlocaleCompare(index);
-    }
+    default:
+      switch (ev.target.dataset.state) {
+        case 'unsorted':
+          ev.target.setAttribute('data-state', 'ascending');
+          ascSortStringlocaleCompare(index);
+          break;
+        case 'ascending':
+          ev.target.setAttribute('data-state', 'descending');
+          descSortStringlocaleCompare(index);
+          break;
+        case 'descending':
+          ev.target.setAttribute('data-state', 'ascending');
+          ascSortStringlocaleCompare(index);
+          break;
+      }
+      break;
   }
 });
 
@@ -315,20 +331,29 @@ button.addEventListener('click', function (ev) {
   ev.preventDefault();
   notification.removeAttribute('style');
 
-  const err1 = nameInput.value.length < 4;
-  const err2 = nameInput.value.trim().length === 0;
+  const nameLengthError = nameInput.value.length < 4;
+  const nameSpacesError = nameInput.value.trim().length === 0;
 
-  const err3 = positionInput.value.length < 1;
-  const err4 = positionInput.value.trim().length === 0;
+  const positionLengthError = positionInput.value.length < 1;
+  const positionSpacesError = positionInput.value.trim().length === 0;
 
-  const err5 = officeInput.value.trim().length === 0;
+  const officeSpacesError = officeInput.value.trim().length === 0;
 
-  const err6 = ageInput.value < 18 || ageInput.value > 90; //
-  const err7 = ageInput.value.trim().length === 0;
+  const ageLimitsError = ageInput.value < 18 || ageInput.value > 90;
+  const ageSpacesError = ageInput.value.trim().length === 0;
 
-  const err8 = salaryInput.value.trim().length === 0;
+  const salarySpacesError = salaryInput.value.trim().length === 0;
 
-  if (err1 || err2 || err3 || err4 || err5 || err6 || err7 || err8) {
+  if (
+    nameLengthError ||
+    nameSpacesError ||
+    positionLengthError ||
+    positionSpacesError ||
+    officeSpacesError ||
+    ageLimitsError ||
+    ageSpacesError ||
+    salarySpacesError
+  ) {
     notification.classList.remove('success');
     notification.classList.add('error');
     notifTitle.innerHTML = 'Error!';
@@ -392,6 +417,8 @@ tbody.addEventListener('dblclick', function (ev) {
   if (ev.target.tagName === 'TD') {
     const td = ev.target;
 
+    const previousValue = td.innerHTML;
+
     td.innerHTML = '';
     td.classList.add('changedTd');
 
@@ -421,6 +448,13 @@ tbody.addEventListener('dblclick', function (ev) {
     document.body.append(formChanges);
 
     buttonForChanges.addEventListener('click', function () {
+      if (inputForChanges.value.length === 0) {
+        td.innerHTML = previousValue;
+        document.body.removeChild(formChanges);
+
+        return;
+      }
+
       td.innerHTML = inputForChanges.value;
       document.body.removeChild(formChanges);
     });
