@@ -79,8 +79,21 @@ function AddForm() {
       ];
 
       cells.forEach((el, i) => {
-        el.innerText = inps[i].children[0].value;
+        if (i !== 4) {
+          el.innerText = inps[i].children[0].value;
+        } else {
+          el.innerText = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0, // No decimal places
+            maximumFractionDigits: 0, // No decimal places
+          }).format(inps[i].children[0].value);
+        }
       });
+
+      SortByColumn();
+      SelectableRows();
+      EditableCells();
     }
   }
 
@@ -160,8 +173,16 @@ function EditableCells() {
       cell.innerHTML = '';
       cell.appendChild(input);
 
+      input.focus();
+
       input.addEventListener('blur', (ev) => {
         cell.innerText = ev.target.value;
+      });
+
+      input.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') {
+          input.blur();
+        }
       });
     });
   });
@@ -176,8 +197,10 @@ function SortByColumn() {
       ) {
         tBody.sort(
           (a, b) =>
-            parseFloat(a.cells[id].innerText.replace('$', '')) -
-            parseFloat(b.cells[id].innerText.replace('$', '')),
+            parseFloat(
+              a.cells[id].innerText.replace('$', '').replace(',', ''),
+            ) -
+            parseFloat(b.cells[id].innerText.replace('$', '').replace(',', '')),
         );
 
         tBody.forEach(
@@ -204,8 +227,10 @@ function SortByColumn() {
       ) {
         tBody.sort(
           (a, b) =>
-            parseFloat(b.cells[id].innerText.replace('$', '')) -
-            parseFloat(a.cells[id].innerText.replace('$', '')),
+            parseFloat(
+              b.cells[id].innerText.replace('$', '').replace(',', ''),
+            ) -
+            parseFloat(a.cells[id].innerText.replace('$', '').replace(',', '')),
         );
 
         tBody.forEach(
@@ -243,7 +268,7 @@ function SortByColumn() {
   });
 }
 
+AddForm();
 SortByColumn();
 SelectableRows();
 EditableCells();
-AddForm();
