@@ -155,10 +155,10 @@ tr.active {
 
 .notification {
   position: absolute;
-  width: 300px;
-  min-height: 100px;
-  padding: 0 16px;
+  margin-top: 90px;
+  padding: 25px 15px;
   box-sizing: border-box;
+  color: #fff;
 
   border-radius: 10px;
   background: rgba(132, 132, 132, 0.3);
@@ -173,7 +173,7 @@ tr.active {
   }
 
   &.warning {
-    background: rgba(255, 212, 39, 0.3);
+    background: rgba(184, 65, 95, 0.6);
   }
 
   &.success {
