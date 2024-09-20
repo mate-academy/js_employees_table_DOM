@@ -45,18 +45,15 @@ table.querySelector('tbody').addEventListener('click', (e) => {
 const validateInput = (field, value) => {
   const lettersOnlyRegex = /^[A-Za-z\s'`]+$/;
 
-  if (field === 'name' && (!lettersOnlyRegex.test(value) || value.length < 4)) {
-    displayNotification(
-      'Name must contain only letters and be at least 4 characters long',
-      'error',
-    );
+  if (!value || value.trim().length === 0) {
+    return false;
+  }
 
+  if (field === 'name' && (!lettersOnlyRegex.test(value) || value.length < 4)) {
     return false;
   }
 
   if (field === 'position' && !lettersOnlyRegex.test(value)) {
-    displayNotification('Position must contain only letters', 'error');
-
     return false;
   }
 
@@ -64,8 +61,6 @@ const validateInput = (field, value) => {
     const age = +value;
 
     if (age < 18 || age > 90) {
-      displayNotification('Age must be between 18 and 90', 'error');
-
       return false;
     }
   }
@@ -252,14 +247,23 @@ form.addEventListener('submit', (e) => {
 
   const lettersOnlyRegex = /^[A-Za-z\s'`]+$/;
 
-  if (!lettersOnlyRegex.test(employeeName)) {
+  if (!employeeName || employeeName.trim().length === 0) {
+    displayNotification('Name cannot be empty or only spaces', 'error');
+    isValid = false;
+  } else if (!lettersOnlyRegex.test(employeeName)) {
     displayNotification('Name must contain only letters', 'error');
+    isValid = false;
+  } else if (employeeName.length < 4) {
+    displayNotification('Name must be at least 4 characters long', 'error');
+    isValid = false;
+  } else if (!position || position.trim().length === 0) {
+    displayNotification('Position cannot be empty or only spaces', 'error');
     isValid = false;
   } else if (!lettersOnlyRegex.test(position)) {
     displayNotification('Position must contain only letters', 'error');
     isValid = false;
-  } else if (employeeName.length < 4) {
-    displayNotification('Name must be at least 4 characters long', 'error');
+  } else if (position.length < 4) {
+    displayNotification('Position must be at least 4 characters long', 'error');
     isValid = false;
   } else if (age < 18 || age > 90) {
     displayNotification('Age must be between 18 and 90', 'error');
