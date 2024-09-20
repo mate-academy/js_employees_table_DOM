@@ -142,6 +142,8 @@ const sortTable = (columnIndex, direction) => {
 
 const form = document.createElement('form');
 
+form.setAttribute('novalidate', true);
+
 form.classList.add('new-employee-form');
 
 const createInput = (labelText, inputName, qaValue, type = 'text') => {
@@ -244,6 +246,8 @@ form.addEventListener('submit', (e) => {
   const employeeName = formData.get('name');
   const position = formData.get('position');
   const age = +formData.get('age');
+  const office = formData.get('office');
+  const salary = formData.get('salary');
 
   const lettersOnlyRegex = /^[A-Za-z\s'`]+$/;
 
@@ -256,7 +260,13 @@ form.addEventListener('submit', (e) => {
   } else if (employeeName.length < 4) {
     displayNotification('Name must be at least 4 characters long', 'error');
     isValid = false;
-  } else if (!position || position.trim().length === 0) {
+  }
+
+  if (!isValid) {
+    return;
+  }
+
+  if (!position || position.trim().length === 0) {
     displayNotification('Position cannot be empty or only spaces', 'error');
     isValid = false;
   } else if (!lettersOnlyRegex.test(position)) {
@@ -265,8 +275,28 @@ form.addEventListener('submit', (e) => {
   } else if (position.length < 4) {
     displayNotification('Position must be at least 4 characters long', 'error');
     isValid = false;
-  } else if (age < 18 || age > 90) {
+  }
+
+  if (!isValid) {
+    return;
+  }
+
+  if (age < 18 || age > 90) {
     displayNotification('Age must be between 18 and 90', 'error');
+    isValid = false;
+  }
+
+  if (!office) {
+    displayNotification('Office must be selected', 'error');
+    isValid = false;
+  }
+
+  if (!isValid) {
+    return;
+  }
+
+  if (!salary || isNaN(salary) || salary <= 0) {
+    displayNotification('Salary must be a positive number', 'error');
     isValid = false;
   }
 
