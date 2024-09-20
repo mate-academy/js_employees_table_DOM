@@ -42,8 +42,40 @@ table.querySelector('tbody').addEventListener('click', (e) => {
   }
 });
 
+const validateInput = (field, value) => {
+  const lettersOnlyRegex = /^[A-Za-z\s'`]+$/;
+
+  if (field === 'name' && (!lettersOnlyRegex.test(value) || value.length < 4)) {
+    displayNotification(
+      'Name must contain only letters and be at least 4 characters long',
+      'error',
+    );
+
+    return false;
+  }
+
+  if (field === 'position' && !lettersOnlyRegex.test(value)) {
+    displayNotification('Position must contain only letters', 'error');
+
+    return false;
+  }
+
+  if (field === 'age') {
+    const age = +value;
+
+    if (age < 18 || age > 90) {
+      displayNotification('Age must be between 18 and 90', 'error');
+
+      return false;
+    }
+  }
+
+  return true;
+};
+
 const createEditableCell = (cell) => {
   const originalContent = cell.textContent.trim();
+  const field = cell.getAttribute('data-qa');
 
   removeActiveInput();
 
@@ -59,21 +91,24 @@ const createEditableCell = (cell) => {
   cell.appendChild(input);
   input.focus();
 
-  input.addEventListener('blur', () => {
-    if (input.value.trim() === '') {
+  const saveOrCancelInput = () => {
+    const newValue = input.value.trim();
+
+    if (!validateInput(field, newValue)) {
       cell.textContent = originalContent;
+      displayNotification(`Invalid value for ${field}`, 'error');
     } else {
-      cell.textContent = input.value;
+      cell.textContent = newValue || originalContent;
+
+      displayNotification(`Value for ${field} successfully updated`, 'success');
     }
-  });
+  };
+
+  input.addEventListener('blur', saveOrCancelInput);
 
   input.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
-      if (input.value.trim() === '') {
-        cell.textContent = originalContent;
-      } else {
-        cell.textContent = input.value;
-      }
+      saveOrCancelInput();
     }
   });
 };
@@ -214,24 +249,20 @@ form.addEventListener('submit', (e) => {
   const employeeName = formData.get('name');
   const position = formData.get('position');
   const age = +formData.get('age');
-  const salary = parseFloat(formData.get('salary'));
 
-  const lettersOnlyRegex = /^[A-Za-z\s]+$/;
+  const lettersOnlyRegex = /^[A-Za-z\s'`]+$/;
 
   if (!lettersOnlyRegex.test(employeeName)) {
-    displayNotification('Name must contain only letters', 'warning');
+    displayNotification('Name must contain only letters', 'error');
     isValid = false;
   } else if (!lettersOnlyRegex.test(position)) {
-    displayNotification('Position must contain only letters', 'warning');
+    displayNotification('Position must contain only letters', 'error');
     isValid = false;
   } else if (employeeName.length < 4) {
-    displayNotification('Name must be at least 4 characters long', 'warning');
+    displayNotification('Name must be at least 4 characters long', 'error');
     isValid = false;
   } else if (age < 18 || age > 90) {
-    displayNotification('Age must be between 18 and 90', 'warning');
-    isValid = false;
-  } else if (isNaN(salary)) {
-    displayNotification('Salary must be a valid number', 'warning');
+    displayNotification('Age must be between 18 and 90', 'error');
     isValid = false;
   }
 
@@ -254,6 +285,7 @@ form.addEventListener('submit', (e) => {
     }
 
     cell.textContent = value;
+    cell.setAttribute('data-qa', field);
 
     attachEditableEvent(cell);
 
