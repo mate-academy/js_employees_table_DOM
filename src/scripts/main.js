@@ -1,13 +1,4 @@
 'use strict';
-
-// write code here
-
-// * Add Form
-// * Valid Notification
-// * Edit Cells
-// * Sort By Cols up\down
-// * Select Row
-
 const pushNotification = (posTop, posRight, title, description, type) => {
   const mess = document.createElement('div');
 
@@ -214,28 +205,6 @@ function EditableCells() {
 
     return true;
   }
-  // const cells = Array.from(document.querySelector('table').rows)
-  //   .filter((el, id, arr) => id !== 0 && id !== arr.length - 1)
-  //   .reduce((acc, el) => acc.concat(Array.from(el.cells)), []);
-  // cells.forEach((cell) => {
-  //   cell.addEventListener('dblclick', (e) => {
-  //     const input = document.createElement('input');
-  //     input.type = 'text';
-  //     input.value = cell.innerText;
-  //     cell.innerHTML = '';
-  //     cell.appendChild(input);
-  //     input.focus();
-  //     input.addEventListener('blur', (ev) => {
-  //       cell.innerText = ev.target.value;
-  //     });
-  //     input.addEventListener('keydown', (ev) => {
-  //       if (ev.key === 'Enter') {
-  //         input.blur();
-  //       }
-  //     });
-  //   });
-  // });
-
   const rows = Array.from(document.querySelector('table').rows).filter(
     (el, id, arr) => id !== 0 && id !== arr.length - 1,
   );
@@ -326,8 +295,8 @@ function EditableCells() {
                 cell.innerText = `${new Intl.NumberFormat('en-US', {
                   style: 'currency',
                   currency: 'USD',
-                  minimumFractionDigits: 0, // No decimal places
-                  maximumFractionDigits: 0, // No decimal places
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
                 }).format(ev.target.value)}`;
               }
             }
