@@ -42,14 +42,11 @@ submit.addEventListener('click', (evnt) => {
   const age = Number(document.getElementById('age').value);
   const position = document.getElementById('position').value;
 
-  if (inputName.length < 4) {
-    return createNotification(
-      'error',
-      'Name should contain at least 4 characters',
-    );
+  if (inputName.trim().length < 4) {
+    return createNotification('error', 'Name should be at least 4 characters');
   }
 
-  if (position.length < 1) {
+  if (position.trim().length < 1) {
     return createNotification(
       'error',
       'The name of the position should be provided',
