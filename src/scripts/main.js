@@ -41,7 +41,8 @@ function AddForm() {
 
     if (
       parseInt(inps[3].children[0].value) < 18 ||
-      parseInt(inps[3].children[0].value) > 90
+      parseInt(inps[3].children[0].value) > 90 ||
+      inps[3].children[0].value === ''
     ) {
       pushNotification(
         20,
@@ -50,6 +51,15 @@ function AddForm() {
         'Age must be between 18 and 90',
         'error',
       );
+
+      return false;
+    }
+
+    if (
+      parseInt(inps[4].children[0].value) <= 0 ||
+      inps[4].children[0].value === ''
+    ) {
+      pushNotification(20, 20, 'Error', 'Salary must be positive', 'error');
 
       return false;
     }
@@ -121,8 +131,8 @@ function AddForm() {
   <option value="San Francisco">San Francisco</option>
   </select>`;
 
-  inputs[3].innerHTML = `Age: <input required important name="age" type="text" data-qa="age">`;
-  inputs[4].innerHTML = `Salary: <input required name="salary" type="text" data-qa="salary">`;
+  inputs[3].innerHTML = `Age: <input important important name="age" type="number" data-qa="age">`;
+  inputs[4].innerHTML = `Salary: <input important name="salary" type="number" data-qa="salary">`;
 
   inputs.forEach((el) => {
     form.appendChild(el);
