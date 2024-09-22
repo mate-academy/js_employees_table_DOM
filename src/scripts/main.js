@@ -169,29 +169,175 @@ function SelectableRows() {
 }
 
 function EditableCells() {
-  const cells = Array.from(document.querySelector('table').rows)
-    .filter((el, id, arr) => id !== 0 && id !== arr.length - 1)
-    .reduce((acc, el) => acc.concat(Array.from(el.cells)), []);
+  function ValidateCell(val, index) {
+    if (index === 0 && val.length < 4) {
+      pushNotification(
+        20,
+        20,
+        'Error',
+        'Name must be at least 4 characters long.',
+        'error',
+      );
 
-  cells.forEach((cell) => {
-    cell.addEventListener('dblclick', (e) => {
-      const input = document.createElement('input');
+      return false;
+    }
 
-      input.type = 'text';
-      input.value = cell.innerText;
+    if (index === 1 && val === '') {
+      pushNotification(20, 20, 'Error', 'Position must be entered', 'error');
 
-      cell.innerHTML = '';
-      cell.appendChild(input);
+      return false;
+    }
 
-      input.focus();
+    if (index === 2 && val === '') {
+      pushNotification(20, 20, 'Error', 'Office must be selected', 'error');
 
-      input.addEventListener('blur', (ev) => {
-        cell.innerText = ev.target.value;
-      });
+      return false;
+    }
 
-      input.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter') {
-          input.blur();
+    if (index === 3 && (val < 18 || val > 90 || val === '')) {
+      pushNotification(
+        20,
+        20,
+        'Error',
+        'Age must be between 18 and 90',
+        'error',
+      );
+
+      return false;
+    }
+
+    if (index === 4 && (val <= 0 || val === '')) {
+      pushNotification(20, 20, 'Error', 'Salary must be positive', 'error');
+
+      return false;
+    }
+
+    return true;
+  }
+  // const cells = Array.from(document.querySelector('table').rows)
+  //   .filter((el, id, arr) => id !== 0 && id !== arr.length - 1)
+  //   .reduce((acc, el) => acc.concat(Array.from(el.cells)), []);
+  // cells.forEach((cell) => {
+  //   cell.addEventListener('dblclick', (e) => {
+  //     const input = document.createElement('input');
+  //     input.type = 'text';
+  //     input.value = cell.innerText;
+  //     cell.innerHTML = '';
+  //     cell.appendChild(input);
+  //     input.focus();
+  //     input.addEventListener('blur', (ev) => {
+  //       cell.innerText = ev.target.value;
+  //     });
+  //     input.addEventListener('keydown', (ev) => {
+  //       if (ev.key === 'Enter') {
+  //         input.blur();
+  //       }
+  //     });
+  //   });
+  // });
+
+  const rows = Array.from(document.querySelector('table').rows).filter(
+    (el, id, arr) => id !== 0 && id !== arr.length - 1,
+  );
+
+  rows.forEach((row) => {
+    const cells = Array.from(row.cells);
+
+    cells.forEach((cell, index) => {
+      cell.addEventListener('dblclick', (e) => {
+        if (index < 2) {
+          const input = document.createElement('input');
+
+          input.type = 'text';
+          input.value = cell.innerText;
+
+          cell.innerHTML = '';
+          cell.appendChild(input);
+
+          input.focus();
+
+          input.addEventListener('blur', (ev) => {
+            if (ValidateCell(ev.target.value, index)) {
+              cell.innerText = ev.target.value;
+            }
+          });
+
+          input.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+              input.blur();
+            }
+          });
+        }
+
+        if (index === 2) {
+          const select = document.createElement('select');
+
+          select.name = 'office';
+
+          select.innerHTML = `<option value="Tokyo">Tokyo</option>
+  <option value="Singapore">Singapore</option>
+  <option value="London">London</option>
+  <option value="New York">New York</option>
+  <option value="Edinburgh">Edinburgh</option>
+  <option value="San Francisco">San Francisco</option>`;
+
+          select.children[
+            Array.from(select.children).findIndex(
+              (el) => el.value === cell.innerText,
+            )
+          ].selected = true;
+
+          cell.innerHTML = '';
+          cell.appendChild(select);
+
+          select.focus();
+
+          select.addEventListener('blur', (ev) => {
+            if (ValidateCell(ev.target.value, index)) {
+              cell.innerText = ev.target.value;
+            }
+          });
+
+          select.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+              select.blur();
+            }
+          });
+        }
+
+        if (index === 3 || index === 4) {
+          const input = document.createElement('input');
+
+          input.type = 'number';
+          input.value = cell.innerText.replace('$', '').replace(',', '');
+
+          cell.innerHTML = '';
+          cell.appendChild(input);
+
+          input.focus();
+
+          input.addEventListener('blur', (ev) => {
+            if (ValidateCell(ev.target.value, index)) {
+              if (index === 3) {
+                cell.innerText = input.value;
+              }
+
+              if (index === 4) {
+                cell.innerText = `${new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                  minimumFractionDigits: 0, // No decimal places
+                  maximumFractionDigits: 0, // No decimal places
+                }).format(ev.target.value)}`;
+              }
+            }
+          });
+
+          input.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+              input.blur();
+            }
+          });
         }
       });
     });
