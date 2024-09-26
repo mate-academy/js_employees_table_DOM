@@ -18,7 +18,6 @@ headers.forEach((header, index) => {
       let valB = b.children[index].textContent;
 
       if (!isNaN(valA) && !isNaN(valB)) {
-        // Convert to numbers if applicable
         valA = parseFloat(valA.replace(/[^\d.-]/g, ''));
         valB = parseFloat(valB.replace(/[^\d.-]/g, ''));
       }
