@@ -16,14 +16,14 @@
     <table>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Position</th>
-          <th>Office</th>
-          <th>Age</th>
-          <th>Salary</th>
+          <th data-qa="name-header">Name</th>
+          <th data-qa="position-header">Position</th>
+          <th data-qa="office-header">Office</th>
+          <th data-qa="age-header">Age</th>
+          <th data-qa="salary-header">Salary</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="employee-table-body">
         <tr>
           <td>Airi Satou</td>
           <td>Accountant</td>
@@ -46,7 +46,7 @@
           <td>$198,500</td>
         </tr>
         <tr>
-          <td>Prescott Bartlett</td>
+          <td>Prescott Barlett</td>
           <td>Technical Author</td>
           <td>London</td>
           <td>27</td>
@@ -99,7 +99,7 @@
           <td>Software Engineer</td>
           <td>San Francisco</td>
           <td>56</td>
-          <td>$115,000</td>
+          <td>$115,500</td>
         </tr>
         <tr>
           <td>Colleen Hurst</td>
@@ -119,6 +119,70 @@
         </tr>
       </tfoot>
     </table>
+
+    <form
+      class="new-employee-form"
+      id="employee-form"
+    >
+      <label>
+        Name:
+        <input
+          name="name"
+          type="text"
+          data-qa="name"
+        />
+      </label>
+      <label>
+        Position:
+        <input
+          name="position"
+          type="text"
+          data-qa="position"
+        />
+      </label>
+      <label>
+        Office:
+        <select
+          name="office"
+          data-qa="office"
+        >
+          <option value="Tokyo">Tokyo</option>
+          <option value="Singapore">Singapore</option>
+          <option value="London">London</option>
+          <option value="New York">New York</option>
+          <option value="Edinburgh">Edinburgh</option>
+          <option value="San Francisco">San Francisco</option>
+        </select>
+      </label>
+      <label>
+        Age:
+        <input
+          name="age"
+          type="number"
+          data-qa="age"
+        />
+      </label>
+      <label>
+        Salary:
+        <input
+          name="salary"
+          type="number"
+          data-qa="salary"
+        />
+      </label>
+      <button
+        type="submit"
+        data-qa="submit-button"
+      >
+        Save to table
+      </button>
+    </form>
+
+    <div
+      class="notification"
+      data-qa="notification"
+      id="notification"
+    ></div>
     <script src="scripts/main.js"></script>
   </body>
 </html>
