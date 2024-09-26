@@ -1,118 +1,118 @@
 'use strict';
 
-const tableBody = document.getElementById('employee-table-body');
-const headers = document.querySelectorAll('th');
-const sortOrder = {};
-let selectedRow = null;
+document.addEventListener('DOMContentLoaded', () => {
+  const table = document.querySelector('table tbody');
+  const form = document.querySelector('.new-employee-form');
+  const notification = document.querySelector('.notification');
+  let currentSortColumn = null;
+  let sortDirection = 'asc';
 
-headers.forEach((header, index) => {
-  header.addEventListener('click', () => {
-    const key = header.textContent.toLowerCase();
+  document.querySelectorAll('thead th').forEach((header, index) => {
+    header.addEventListener('click', () => {
+      const rows = Array.from(table.querySelectorAll('tr')).slice();
+      const isAsc = currentSortColumn === index && sortDirection === 'asc';
 
-    sortOrder[key] = !sortOrder[key];
+      rows.sort((a, b) => {
+        const aText = a.children[index].textContent.trim();
+        const bText = b.children[index].textContent.trim();
 
-    const rows = Array.from(tableBody.querySelectorAll('tr'));
+        return isAsc ? aText.localeCompare(bText) : bText.localeCompare(aText);
+      });
 
-    rows.sort((a, b) => {
-      let valA = a.children[index].textContent;
-      let valB = b.children[index].textContent;
-
-      if (!isNaN(valA) && !isNaN(valB)) {
-        valA = parseFloat(valA.replace(/[^\d.-]/g, ''));
-        valB = parseFloat(valB.replace(/[^\d.-]/g, ''));
-      }
-
-      return sortOrder[key]
-        ? valA.localeCompare(valB)
-        : valB.localeCompare(valA);
+      currentSortColumn = index;
+      sortDirection = isAsc ? 'desc' : 'asc';
+      rows.forEach((row) => table.appendChild(row));
     });
-
-    rows.forEach((row) => tableBody.appendChild(row)); // Re-append sorted rows
   });
-});
 
-tableBody.addEventListener('click', (e) => {
-  const row = e.target.closest('tr');
+  table.addEventListener('click', (e) => {
+    if (e.target.tagName === 'TD') {
+      table
+        .querySelectorAll('tr')
+        .forEach((row) => row.classList.remove('active'));
+      e.target.parentElement.classList.add('active');
+    }
+  });
 
-  if (row && selectedRow !== row) {
-    if (selectedRow) {
-      selectedRow.classList.remove('active');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const nameVal = form.name.value.trim();
+    const position = form.position.value.trim();
+    const office = form.office.value;
+    const age = parseInt(form.age.value, 10);
+    const salary = parseFloat(form.salary.value).toFixed(3);
+
+    if (nameVal.length < 4) {
+      showNotification(
+        'Error',
+        'Name must be at least 4 letters long.',
+        'error',
+      );
+
+      return;
     }
 
-    row.classList.add('active');
-    selectedRow = row;
+    if (age < 18 || age > 90) {
+      showNotification('Error', 'Age must be between 18 and 90.', 'error');
+
+      return;
+    }
+
+    const newRow = document.createElement('tr');
+
+    newRow.innerHTML = `
+            <td>${nameVal}</td>
+            <td>${position}</td>
+            <td>${office}</td>
+            <td>${age}</td>
+            <td>$${salary.toLocaleString()}</td>
+        `;
+    table.appendChild(newRow);
+    showNotification('Success', 'New employee added successfully!', 'success');
+
+    form.reset();
+  });
+
+  table.addEventListener('dblclick', (e) => {
+    if (e.target.tagName === 'TD') {
+      const cell = e.target;
+      const input = document.createElement('input');
+
+      input.value = cell.textContent.trim();
+      input.classList.add('cell-input');
+
+      cell.innerHTML = '';
+      cell.appendChild(input);
+      input.focus();
+
+      input.addEventListener('blur', () => saveEdit(cell, input));
+
+      input.addEventListener('keypress', (evt) => {
+        if (evt.key === 'Enter') {
+          saveEdit(cell, input);
+        }
+      });
+    }
+  });
+
+  function saveEdit(cell, input) {
+    const newValue = input.value.trim();
+
+    if (newValue) {
+      cell.textContent = newValue;
+    } else {
+      cell.textContent = input.defaultValue;
+    }
   }
-});
 
-const form = document.getElementById('employee-form');
-const notification = document.getElementById('notification');
+  function showNotification(title, message, type) {
+    notification.innerHTML = `<div class="${type} title">${title}</div><div>${message}</div>`;
+    notification.classList.add(type);
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  const nameVal = form.elements.name.value;
-  const position = form.elements.position.value;
-  const office = form.elements.office.value;
-  const age = parseInt(form.elements.age.value);
-  const salary = parseFloat(form.elements.salary.value).toFixed(3);
-
-  if (nameVal.length < 4) {
-    showNotification('error', 'Name must be at least 4 characters long.');
-
-    return;
-  }
-
-  if (age < 18 || age > 90) {
-    showNotification('error', 'Age must be between 18 and 90.');
-
-    return;
-  }
-
-  if (!salary || salary <= 0) {
-    showNotification('error', 'Invalid salary value.');
-
-    return;
-  }
-
-  const newRow = document.createElement('tr');
-
-  newRow.innerHTML = `<td>${nameVal}</td><td>${position}</td><td>${office}</td><td>${age}</td><td>$${salary}</td>`;
-  tableBody.appendChild(newRow);
-
-  showNotification('success', 'Employee added successfully.');
-  form.reset();
-});
-
-function showNotification(type, message) {
-  notification.className = `notification ${type}`;
-  notification.textContent = message;
-  setTimeout(() => (notification.className = 'notification'), 3000);
-}
-
-tableBody.addEventListener('dblclick', (e) => {
-  const cell = e.target.closest('td');
-
-  if (cell) {
-    const input = document.createElement('input');
-
-    input.className = 'cell-input';
-    input.value = cell.textContent;
-    cell.textContent = '';
-    cell.appendChild(input);
-    input.focus();
-
-    input.addEventListener('blur', () => {
-      if (input.value.trim()) {
-        cell.textContent = input.value;
-      } else {
-        cell.textContent = input.defaultValue;
-      }
-    });
-
-    input.addEventListener('keydown', () => {
-      if (e.key === 'Enter') {
-        input.blur();
-      }
-    });
+    setTimeout(() => {
+      notification.innerHTML = '';
+      notification.classList.remove(type);
+    }, 3000);
   }
 });
