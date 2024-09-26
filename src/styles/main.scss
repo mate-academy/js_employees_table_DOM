@@ -173,14 +173,14 @@ tr.active {
   }
 
   &.warning {
-    background: rgba(255, 212, 39, 0.3);
+    background: rgba(255, 212, 39, 0.9);
   }
 
   &.success {
-    background: rgba(10, 189, 0, 0.3);
+    background: rgba(10, 189, 0, 0.9);
   }
 
   &.error {
-    background: rgba(253, 0, 0, 0.3);
+    background: rgba(253, 0, 0, 0.9);
   }
 }
