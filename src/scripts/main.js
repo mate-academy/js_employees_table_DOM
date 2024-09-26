@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const position = form.position.value.trim();
     const office = form.office.value;
     const age = parseInt(form.age.value, 10);
-    const salary = parseFloat(form.salary.value).toFixed(3);
+    const salary = parseFloat(form.salary.value);
 
     if (nameVal.length < 4) {
       showNotification(
@@ -59,6 +59,19 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (isNaN(salary) || salary < 0) {
+      showNotification('Error', 'Invalid salary value.', 'error');
+
+      return;
+    }
+
+    // Format salary with commas and 2 decimal places
+    const formattedSalary = salary.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+    });
+
     const newRow = document.createElement('tr');
 
     newRow.innerHTML = `
@@ -66,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${position}</td>
             <td>${office}</td>
             <td>${age}</td>
-            <td>$${salary.toLocaleString()}</td>
+            <td>${formattedSalary}</td>
         `;
     table.appendChild(newRow);
     showNotification('Success', 'New employee added successfully!', 'success');
@@ -99,8 +112,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveEdit(cell, input) {
     const newValue = input.value.trim();
 
-    if (newValue) {
-      cell.textContent = newValue;
+    if (newValue && !isNaN(parseFloat(newValue))) {
+      // Format salary if it's a salary cell
+      if (cell.cellIndex === 4) {
+        const formattedValue = parseFloat(newValue).toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+        });
+
+        cell.textContent = formattedValue;
+      } else {
+        cell.textContent = newValue;
+      }
     } else {
       cell.textContent = input.defaultValue;
     }
