@@ -12,11 +12,47 @@ tableBody.addEventListener('click', (e) => {
     rows.forEach((row) => row.classList.remove('active'));
 
     const isClickedRow = e.target.parentElement;
+
     isClickedRow.classList.add('active');
   }
 });
 
-//#region notification
+tableBody.addEventListener('dblclick', (e) => {
+  if (e.target && e.target.nodeName === 'TD') {
+    const td = e.target;
+    const oldValue = td.textContent;
+    const input = document.createElement('input');
+    input.className = 'cell-input';
+    input.setAttribute('type', 'text');
+    input.setAttribute('value', oldValue);
+
+    td.textContent = '';
+    td.appendChild(input);
+
+    input.addEventListener('blur', () => {
+      const newValue = input.value.trim();
+      if (newValue === '') {
+        td.textContent = oldValue;
+      } else {
+        td.textContent = newValue;
+      }
+    });
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        const newValue = input.value.trim();
+        if (newValue === '') {
+          td.textContent = oldValue;
+        } else {
+          td.textContent = newValue;
+        }
+      }
+    });
+    input.focus();
+  }
+});
+
+// #region notification
 
 const pushNotification = (posTop, posRight, title, description, type) => {
   const notification = document.createElement('div');
@@ -42,17 +78,18 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 
   document.body.appendChild(notification);
 
-  setTimeout(
-    () => ((notification.style.display = 'none'), notification.remove()),
-    2000,
-  );
+  setTimeout(() => {
+    notification.style.display = 'none';
+    notification.remove();
+  }, 2000);
 };
 
-//#endregion
+// #endregion
 
-//#region form
+// #region form
 
 const employeeForm = document.createElement('form');
+
 employeeForm.className = 'new-employee-form';
 
 const selectOption = [
@@ -68,6 +105,7 @@ const inputName = ['name', 'position', 'office', 'age', 'salary'];
 
 labelName.forEach((lName, index) => {
   const label = document.createElement('label');
+
   label.innerText = lName;
 
   if (lName === 'Office:') {
@@ -75,6 +113,7 @@ labelName.forEach((lName, index) => {
 
     selectOption.forEach((i) => {
       const option = document.createElement('option');
+
       option.innerHTML = i;
       select.setAttribute('data-qa', 'office');
 
@@ -84,6 +123,7 @@ labelName.forEach((lName, index) => {
     label.appendChild(select);
   } else {
     const input = document.createElement('input');
+
     input.setAttribute('name', inputName[index]);
     input.setAttribute('type', 'text');
 
@@ -109,29 +149,36 @@ labelName.forEach((lName, index) => {
 });
 
 const button = document.createElement('button');
+
 button.textContent = 'Save to table';
 employeeForm.appendChild(button);
 
 button.addEventListener('click', (e) => {
   e.preventDefault();
 
-  const name = document.querySelector('input[data-qa="name"]').value;
-  const position = document.querySelector('input[data-qa="position"]').value;
-  const office = document.querySelector('select[data-qa="office"]').value;
-  const age = parseInt(document.querySelector('input[data-qa="age"]').value);
-  const salary = document.querySelector('input[data-qa="salary"]').value;
+  const nameCell = document.querySelector('input[data-qa="name"]').value;
+  const positionCell = document.querySelector(
+    'input[data-qa="position"]',
+  ).value;
+  const officeCell = document.querySelector('select[data-qa="office"]').value;
+  const ageCell = parseInt(
+    document.querySelector('input[data-qa="age"]').value,
+  );
+  const salaryCell = document.querySelector('input[data-qa="salary"]').value;
 
-  if (!name || !position || !office || !age || !salary) {
+  if (!nameCell || !positionCell || !officeCell || !ageCell || !salaryCell) {
     pushNotification(150, 10, 'Error', 'Please fill in all fields!', 'error');
+
     return;
   }
 
-  if (name.trim().length < 4) {
+  if (nameCell.trim().length < 4) {
     pushNotification(150, 10, 'Error', 'Please fill walid name', 'error');
+
     return;
   }
 
-  if (age < 18 || age > 90) {
+  if (ageCell < 18 || ageCell > 90) {
     pushNotification(
       150,
       10,
@@ -139,17 +186,18 @@ button.addEventListener('click', (e) => {
       'Please enter a valid age (18-90)',
       'error',
     );
+
     return;
   }
 
-  const formattedSalary = '$' + parseInt(salary).toLocaleString('en-US');
-  const table = document.querySelector('table tbody');
-  const newRow = table.insertRow();
+  const formattedSalary = '$' + parseInt(salaryCell).toLocaleString('en-US');
+  const tableTBody = document.querySelector('table tbody');
+  const newRow = tableTBody.insertRow();
 
-  newRow.insertCell(0).innerHTML = name;
-  newRow.insertCell(1).innerHTML = position;
-  newRow.insertCell(2).innerHTML = office;
-  newRow.insertCell(3).innerHTML = age;
+  newRow.insertCell(0).innerHTML = nameCell;
+  newRow.insertCell(1).innerHTML = positionCell;
+  newRow.insertCell(2).innerHTML = officeCell;
+  newRow.insertCell(3).innerHTML = ageCell;
   newRow.insertCell(4).innerHTML = formattedSalary;
 
   pushNotification(10, 10, 'Success', 'Employee added to table!', 'success');
@@ -158,9 +206,9 @@ button.addEventListener('click', (e) => {
 
 body.appendChild(employeeForm);
 
-//#endregion
+// #endregion
 
-//#region sortedForm
+// #region sortedForm
 
 const directions = Array.from(headers).map(() => {
   return '';
@@ -197,48 +245,4 @@ const sortColumn = (index) => {
   directions[index] = direction === 'asc' ? 'desc' : 'asc';
 };
 
-//#endregion
-
-//#region changeCellContent
-
-const tbodyCell = table.querySelector('tbody').querySelectorAll('td');
-
-const arrTbodyCell = Array.from(tbodyCell);
-
-arrTbodyCell.forEach((td) => {
-  td.addEventListener('dblclick', (e) => {
-    const oldValue = e.target.textContent.trim();
-    const input = document.createElement('input');
-    input.className = 'cell-input';
-    input.setAttribute('type', 'text');
-    input.value = oldValue;
-
-    e.target.innerHTML = '';
-    e.target.appendChild(input);
-    input.focus();
-
-    input.addEventListener('blur', () => {
-      const newValue = input.value.trim();
-
-      if (newValue === '') {
-        td.textContent = oldValue;
-      } else {
-        td.textContent = newValue;
-      }
-      input.remove(); 
-    });
-
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        if (input.value.trim() === '') {
-          e.target.textContent = oldValue;
-        } else {
-          e.target.textContent = input.value;
-        }
-        input.remove();
-      }
-    });
-  });
-});
-
-//#endregion
+// #endregion
