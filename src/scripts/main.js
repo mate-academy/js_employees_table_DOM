@@ -22,6 +22,7 @@ tableBody.addEventListener('dblclick', (e) => {
     const td = e.target;
     const oldValue = td.textContent;
     const input = document.createElement('input');
+
     input.className = 'cell-input';
     input.setAttribute('type', 'text');
     input.setAttribute('value', oldValue);
@@ -31,6 +32,7 @@ tableBody.addEventListener('dblclick', (e) => {
 
     input.addEventListener('blur', () => {
       const newValue = input.value.trim();
+
       if (newValue === '') {
         td.textContent = oldValue;
       } else {
@@ -38,9 +40,10 @@ tableBody.addEventListener('dblclick', (e) => {
       }
     });
 
-    input.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
+    input.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
         const newValue = input.value.trim();
+
         if (newValue === '') {
           td.textContent = oldValue;
         } else {
@@ -173,7 +176,7 @@ button.addEventListener('click', (e) => {
   }
 
   if (nameCell.trim().length < 4) {
-    pushNotification(150, 10, 'Error', 'Please fill walid name', 'error');
+    pushNotification(150, 10, 'Error', 'Please fill valid name', 'error');
 
     return;
   }
@@ -190,6 +193,12 @@ button.addEventListener('click', (e) => {
     return;
   }
 
+  if (+salaryCell < 0) {
+    pushNotification(150, 10, 'Error', 'Please fill valid number', 'error');
+
+    return;
+  }
+
   const formattedSalary = '$' + parseInt(salaryCell).toLocaleString('en-US');
   const tableTBody = document.querySelector('table tbody');
   const newRow = tableTBody.insertRow();
@@ -199,7 +208,7 @@ button.addEventListener('click', (e) => {
   newRow.insertCell(2).innerHTML = officeCell;
   newRow.insertCell(3).innerHTML = ageCell;
   newRow.insertCell(4).innerHTML = formattedSalary;
-
+  
   pushNotification(10, 10, 'Success', 'Employee added to table!', 'success');
   employeeForm.reset();
 });
