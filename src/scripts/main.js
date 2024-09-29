@@ -208,7 +208,7 @@ button.addEventListener('click', (e) => {
   newRow.insertCell(2).innerHTML = officeCell;
   newRow.insertCell(3).innerHTML = ageCell;
   newRow.insertCell(4).innerHTML = formattedSalary;
-  
+
   pushNotification(10, 10, 'Success', 'Employee added to table!', 'success');
   employeeForm.reset();
 });
