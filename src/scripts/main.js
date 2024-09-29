@@ -17,45 +17,7 @@ tableBody.addEventListener('click', (e) => {
   }
 });
 
-tableBody.addEventListener('dblclick', (e) => {
-  if (e.target && e.target.nodeName === 'TD') {
-    const td = e.target;
-    const oldValue = td.textContent;
-    const input = document.createElement('input');
-
-    input.className = 'cell-input';
-    input.setAttribute('type', 'text');
-    input.setAttribute('value', oldValue);
-
-    td.textContent = '';
-    td.appendChild(input);
-
-    input.addEventListener('blur', () => {
-      const newValue = input.value.trim();
-
-      if (newValue === '') {
-        td.textContent = oldValue;
-      } else {
-        td.textContent = newValue;
-      }
-    });
-
-    input.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Enter') {
-        const newValue = input.value.trim();
-
-        if (newValue === '') {
-          td.textContent = oldValue;
-        } else {
-          td.textContent = newValue;
-        }
-      }
-    });
-    input.focus();
-  }
-});
-
-// #region notification
+//#region notification
 
 const pushNotification = (posTop, posRight, title, description, type) => {
   const notification = document.createElement('div');
@@ -175,9 +137,8 @@ button.addEventListener('click', (e) => {
     return;
   }
 
-  if (nameCell.trim().length < 4) {
-    pushNotification(150, 10, 'Error', 'Please fill valid name', 'error');
-
+  if (name.trim().length < 4) {
+    pushNotification(150, 10, 'Error', 'Please fill walid name', 'error');
     return;
   }
 
@@ -189,13 +150,6 @@ button.addEventListener('click', (e) => {
       'Please enter a valid age (18-90)',
       'error',
     );
-
-    return;
-  }
-
-  if (+salaryCell < 0) {
-    pushNotification(150, 10, 'Error', 'Please fill valid number', 'error');
-
     return;
   }
 
