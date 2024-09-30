@@ -61,7 +61,7 @@ Start table:
 - Notification titles and descriptions are up to you.
 - Add qa attribute for notification: `data-qa="notification"` and class `error`/`success` depending on the result.
 
-##### Implement editing of table cells by double-clicking on it (optional).
+##### Implement editing of table cells by double-clicking on it (optional). 
 - Double click on the cell of the table, should remove text, and append input with `cell-input` class.
 - The input value should contain replaced by input text.
 - Only one cell can be edited at the time.
