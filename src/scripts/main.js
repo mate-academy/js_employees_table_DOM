@@ -32,7 +32,7 @@ tbody.addEventListener('dblclick', (e) => {
   input.focus();
 
   input.addEventListener('blur', () => {
-    if (input.value.length === 0) {
+    if (input.value.length === 0 || input.value !== new RegExp('^a-zA-Z0-9')) {
       cell.textContent = prevValue;
     } else {
       cell.textContent = input.value;
@@ -41,7 +41,10 @@ tbody.addEventListener('dblclick', (e) => {
 
   input.addEventListener('keydown', (k) => {
     if (k.key === 'Enter') {
-      if (input.value.length === 0) {
+      if (
+        input.value.length === 0 ||
+        input.value !== new RegExp('^a-zA-Z0-9')
+      ) {
         cell.textContent = prevValue;
       } else {
         cell.textContent = input.value;
