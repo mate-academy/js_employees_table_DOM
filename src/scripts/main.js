@@ -1,3 +1,4 @@
+/* eslint-disable */
 'use strict';
 
 const headerTitle = document.querySelectorAll('th');
