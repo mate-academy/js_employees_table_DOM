@@ -70,18 +70,22 @@ form.addEventListener('submit', (e) => {
   }
 });
 
-function validating(dName, age) {
+function validating(dName, position, age) {
   let valid = true;
   let type = 'success';
   let message = 'The new employee was successfully added to the table';
 
-  if (dName.length < 4) {
+  if (dName.length < 4 || !/^[a-zA-Z0-9]+$/.test(dName)) {
     type = 'error';
-    message = 'Name value has less than 4 letters';
+    message = 'Name is too short or has invalid characters';
     valid = false;
   } else if (age < 18 || age > 99) {
     type = 'error';
-    message = 'Age value is less than 18 or more than 90';
+    message = 'Age value is less than 18 or more than 99';
+    valid = false;
+  } else if (!/^[a-zA-Z0-9]+$/.test(position)) {
+    type = 'error';
+    message = 'Position contains invalid characters';
     valid = false;
   }
 
