@@ -60,6 +60,7 @@ rows.forEach((row) => {
 
 // notification
 const pushNotification = (posTop, posRight, title, description, type) => {
+  // Створюємо нове повідомлення
   const notification = document.createElement('div');
 
   document.body.append(notification);
@@ -81,6 +82,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 
   setTimeout(() => {
     notification.style.visibility = 'hidden';
+    notification.remove(); // Після зникнення видаляємо повідомлення з DOM
   }, 2000);
 };
 
@@ -96,57 +98,46 @@ const addButton = document.querySelector('form>button');
 addButton.addEventListener('click', (e) => {
   e.preventDefault();
 
-  let isValid = true;
-
   if (nameInput.value.length < 4) {
-    pushNotification(
+    return pushNotification(
       150,
       10,
       'Error message',
       'Name value is too short',
       'error',
     );
-    isValid = false;
   }
 
-  if (+ageInput.value < 18 || +ageInput.value > 90) {
-    pushNotification(
-      150,
-      10,
-      'Error message',
-      'Age value is not valid',
-      'error',
-    );
-    isValid = false;
-  }
-
-  if (positionInput.value.length < 3) {
-    pushNotification(
+  if (positionInput.value.length < 3 || positionInput.value === 0) {
+    return pushNotification(
       150,
       10,
       'Error message',
       'Position value is too short',
       'error',
     );
-    isValid = false;
+  }
+
+  if (+ageInput.value < 18 || +ageInput.value > 90) {
+    return pushNotification(
+      150,
+      10,
+      'Error message',
+      'Age value is not valid',
+      'error',
+    );
   }
 
   const salaryValue = parseFloat(salaryInput.value);
 
   if (isNaN(salaryValue) || salaryValue <= 0) {
-    pushNotification(
+    return pushNotification(
       150,
       10,
       'Error message',
       'Salary must be a valid number greater than 0',
       'error',
     );
-    isValid = false;
-  }
-
-  // Якщо є помилки, не додаємо новий рядок
-  if (!isValid) {
-    return;
   }
 
   // Якщо всі дані валідні, додаємо новий рядок
