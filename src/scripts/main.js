@@ -286,7 +286,9 @@ newEmployeeForm.addEventListener('submit', (event) => {
   newTr.append(tdCreator(newEmployee.salary));
 
   tbody.append(newTr);
+
   updateEmployeeTable();
+
   selectElement.value = 'Tokyo';
   resetAllFields();
 
