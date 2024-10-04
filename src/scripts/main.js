@@ -111,7 +111,8 @@ saveButton.addEventListener('click', (saving) => {
   const inputOffice = document.querySelector('[data-qa="office"]').value;
   const inputAge = document.querySelector('[data-qa="age"]').value;
   const inputSal = document.querySelector('[data-qa="salary"]').value;
-  const trueSalary = `$${parseFloat(inputSal).toLocaleString('en-US')}`;
+  const parsedSalary = parseFloat(inputSal);
+  const trueSalary = `$${parseFloat(parsedSalary).toLocaleString('en-US')}`;
   const newRow = document.createElement('tr');
   const newData = [inputName, inputPosition, inputOffice, inputAge, trueSalary];
 
@@ -125,6 +126,9 @@ saveButton.addEventListener('click', (saving) => {
     notificationType = 'error';
     notificationMessage = 'The age is invalid';
   } else if (newData.some((data) => data === '')) {
+    notificationType = 'error';
+    notificationMessage = 'Fill all inputs';
+  } else if (isNaN(parsedSalary)) {
     notificationType = 'error';
     notificationMessage = 'Fill all inputs';
   } else {
