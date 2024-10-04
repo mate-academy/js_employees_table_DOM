@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Додавання форми
   const formHTML = `
-    <form class="new-employee-form">
+    <form class="new-employee-form" novalidate>
       <label>Name:
         <input name="emp-name" type="text" data-qa="name" required></label><br>
       <label>Position:
@@ -149,8 +149,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const notification = document.createElement('div');
 
     notification.textContent = message;
-    notification.className = type;
+    notification.className = `notification ${type}`;
     notification.setAttribute('data-qa', 'notification');
+
+    notification.style.display = 'flex';
+    notification.style.justifyContent = 'center';
+    notification.style.alignItems = 'center';
+    notification.style.textAlign = 'center';
+
     document.body.appendChild(notification);
 
     setTimeout(() => {
