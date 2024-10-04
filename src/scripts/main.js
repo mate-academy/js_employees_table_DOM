@@ -1,7 +1,7 @@
 /* eslint-disable no-shadow */
 'use strict';
 
-const employeeTable = [...document.querySelectorAll('tbody > tr')];
+let employeeTable = [...document.querySelectorAll('tbody > tr')];
 const headers = [...document.querySelectorAll('thead > tr > th')];
 const tbody = document.querySelector('tbody');
 
@@ -146,6 +146,10 @@ const optionsCreator = (optionName) => {
   return newOption;
 };
 
+const updateEmployeeTable = () => {
+  employeeTable = [...document.querySelectorAll('tbody > tr')];
+};
+
 const body = document.querySelector('body');
 const newEmployeeForm = document.createElement('form');
 
@@ -282,6 +286,7 @@ newEmployeeForm.addEventListener('submit', (event) => {
   newTr.append(tdCreator(newEmployee.salary));
 
   tbody.append(newTr);
+  updateEmployeeTable();
   selectElement.value = 'Tokyo';
   resetAllFields();
 
