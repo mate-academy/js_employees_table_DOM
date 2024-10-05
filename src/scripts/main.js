@@ -71,10 +71,7 @@ function checkFields(formData) {
     cheksArr.push(false);
   }
 
-  if (
-    !/^[a-zA-Z -]*$/.test(formData.get('position')) ||
-    formData.get('position').trim() === ''
-  ) {
+  if (!formData.get('position').trim().length) {
     pushNotification(
       430,
       10,
@@ -193,7 +190,7 @@ function createForm() {
     </label>
     <label>
       Position:
-      <input name="position" type="text" data-qa="position" required>
+      <input name="position" type="text" data-qa="position">
     </label>
     <label>
       Office:
