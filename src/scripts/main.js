@@ -42,6 +42,8 @@ function submitForm(e) {
     'The employee successfully added to the table.',
     'success',
   );
+
+  employeeForm.reset();
 }
 
 function checkFields(formData) {
@@ -181,6 +183,7 @@ function createForm() {
   form.classList.add('new-employee-form');
   form.setAttribute('method', 'get');
   form.setAttribute('action', '/');
+  form.setAttribute('novalidate', '');
   form.setAttribute('name', 'New employee');
 
   form.innerHTML = `
