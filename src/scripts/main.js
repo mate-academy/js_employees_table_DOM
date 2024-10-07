@@ -92,17 +92,40 @@ function checkFields(formData) {
 function editCell(e) {
   const cell = e.target.closest('td');
   const curValue = cell.innerText;
-  const cellInput = document.createElement('input');
+  let cellInput;
 
   if (!cell || e.target.tagName === 'INPUT') {
     return;
   }
 
-  cellInput.classList.add('cell-input');
-  cellInput.setAttribute('type', 'text');
-  cellInput.setAttribute('value', curValue);
-  cellInput.setAttribute('autofocus', true);
-  cellInput.setSelectionRange(cellInput.value.length, cellInput.value.length);
+  if (cell.cellIndex !== 2) {
+    cellInput = document.createElement('input');
+
+    cellInput.classList.add('cell-input');
+    cellInput.setAttribute('type', 'text');
+    cellInput.setAttribute('value', curValue);
+    cellInput.setAttribute('autofocus', true);
+    cellInput.setSelectionRange(cellInput.value.length, cellInput.value.length);
+  } else {
+    cellInput = document.createElement('select');
+
+    cellInput.innerHTML = `
+    <option value="Tokyo">Tokyo</option>
+    <option value="Singapore">Singapore</option>
+    <option value="London">London</option>
+    <option value="New York">New York</option>
+    <option value="Edinburgh">Edinburgh</option>
+    <option value="San Francisco">San Francisco</option>
+    `;
+    cellInput.setAttribute('autofocus', true);
+
+    [...cellInput.children].forEach((element) => {
+      if (element.value === curValue) {
+        element.setAttribute('selected', true);
+      }
+    });
+  }
+
   cell.innerText = '';
   cell.append(cellInput);
   cellInput.focus();
