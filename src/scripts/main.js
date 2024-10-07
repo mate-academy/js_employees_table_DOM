@@ -47,6 +47,21 @@ function submitForm(e) {
   employeeForm.reset();
 }
 
+function checkTableValues(value, headValue) {
+  switch (headValue) {
+    case 'Name':
+      return !(value.length < 4);
+    case 'Age':
+      return !isNaN(+value) && !(+value < 18) && !(+value > 90);
+    case 'Salary':
+      return !isNaN(salaryToNumber(value));
+    case 'Position':
+      return !(value.length === 0);
+    case 'Office':
+      return true;
+  }
+}
+
 function checkFields(formData) {
   const cheksArr = [];
 
@@ -92,6 +107,7 @@ function checkFields(formData) {
 function editCell(e) {
   const cell = e.target.closest('td');
   const curValue = cell.innerText;
+  const theadValue = thead.rows[0].cells[cell.cellIndex].innerText;
   let cellInput;
 
   if (!cell || e.target.tagName === 'INPUT') {
@@ -101,7 +117,17 @@ function editCell(e) {
   if (cell.cellIndex !== 2) {
     cellInput = document.createElement('input');
 
-    cellInput.classList.add('cell-input');
+    switch (theadValue) {
+      case 'Name':
+      case 'Position':
+        cellInput.setAttribute('type', 'text');
+        break;
+      case 'Salary':
+      case 'Age':
+        cellInput.setAttribute('type', 'number');
+        break;
+    }
+
     cellInput.setAttribute('type', 'text');
     cellInput.setAttribute('value', curValue);
     cellInput.setAttribute('autofocus', true);
@@ -126,6 +152,7 @@ function editCell(e) {
     });
   }
 
+  cellInput.classList.add('cell-input');
   cell.innerText = '';
   cell.append(cellInput);
   cellInput.focus();
@@ -138,13 +165,26 @@ function editCell(e) {
   });
 
   function changeValue(evt) {
+    const tdCell = evt.target.parentNode;
     let newValue = cellInput.value;
 
-    if (curValue.includes('$') && !newValue.includes('$')) {
-      newValue = '$' + (+newValue).toLocaleString();
+    if (curValue.includes('$')) {
+      newValue = '$' + salaryToNumber(newValue).toLocaleString();
     }
 
-    cell.innerHTML = newValue;
+    if (checkTableValues(newValue, theadValue)) {
+      tdCell.innerHTML = newValue;
+    } else {
+      pushNotification(
+        10,
+        10,
+        `Wrong ${theadValue} value`,
+        `Please, enter the correct value for the ${theadValue} field.`,
+        'error',
+      );
+      cellInput.value = curValue;
+      cellInput.focus();
+    }
   }
 }
 
@@ -221,7 +261,11 @@ function sortTable(e) {
 }
 
 function salaryToNumber(str) {
-  return +str.slice(1).split(',').join('');
+  if (str.includes('$') && str.indexOf('$') === 0) {
+    return +str.slice(1).split(',').join('');
+  }
+
+  return +str;
 }
 
 const pushNotification = (posTop, posRight, title, description, type) => {
