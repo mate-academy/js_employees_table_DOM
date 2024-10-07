@@ -8,6 +8,7 @@ const employeeForm = createForm();
 
 thead.addEventListener('click', sortTable);
 tbody.addEventListener('click', sellectRow);
+tbody.addEventListener('dblclick', editCell);
 employeeForm.addEventListener('submit', submitForm);
 
 function submitForm(e) {
@@ -86,6 +87,42 @@ function checkFields(formData) {
   }
 
   return cheksArr.includes(false);
+}
+
+function editCell(e) {
+  const cell = e.target.closest('td');
+  const curValue = cell.innerText;
+  const cellInput = document.createElement('input');
+
+  if (!cell || e.target.tagName === 'INPUT') {
+    return;
+  }
+
+  cellInput.classList.add('cell-input');
+  cellInput.setAttribute('type', 'text');
+  cellInput.setAttribute('value', curValue);
+  cellInput.setAttribute('autofocus', true);
+  cellInput.setSelectionRange(cellInput.value.length, cellInput.value.length);
+  cell.innerText = '';
+  cell.append(cellInput);
+  cellInput.focus();
+  cellInput.addEventListener('blur', changeValue);
+
+  window.addEventListener('keypress', (evt) => {
+    if (evt.code === 'Enter') {
+      cellInput.blur();
+    }
+  });
+
+  function changeValue(evt) {
+    let newValue = cellInput.value;
+
+    if (curValue.includes('$') && !newValue.includes('$')) {
+      newValue = '$' + (+newValue).toLocaleString();
+    }
+
+    cell.innerHTML = newValue;
+  }
 }
 
 function sellectRow(e) {
