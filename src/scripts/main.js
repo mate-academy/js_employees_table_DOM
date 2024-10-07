@@ -77,6 +77,7 @@ const handleAddInput = () => {
     const input = document.createElement('input');
 
     label.textContent = capitalizeFirstLetter(`${attribute}:`);
+    input.required = true;
 
     if (attribute === 'office') {
       const select = document.createElement('select');
