@@ -77,7 +77,6 @@ const handleAddInput = () => {
     const input = document.createElement('input');
 
     label.textContent = capitalizeFirstLetter(`${attribute}:`);
-    input.required = true;
 
     if (attribute === 'office') {
       const select = document.createElement('select');
@@ -148,16 +147,12 @@ const handleAddEmployee = (e) => {
     warnings.push('Name must be at least 4 characters long.');
   }
 
-  if (positionInput.value.trim() !== positionInput.value) {
-    warnings.push('Position field should not contain only spaces.');
+  if (!position) {
+    warnings.push('Position is required.');
   }
 
-  if (positionInput.value.trim() === '') {
-    warnings.push('Position field cannot be empty.');
-  }
-
-  if (age < 18 || age > 90) {
-    warnings.push('Age must be between 18 and 90.');
+  if (age < 18 || age > 90 || isNaN(age)) {
+    warnings.push('Age must be a number between 18 and 90.');
   }
 
   if (isNaN(salary) || salary <= 0) {
