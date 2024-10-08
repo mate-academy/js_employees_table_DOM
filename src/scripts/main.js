@@ -5,6 +5,11 @@ const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 const tbodyRows = tbody.children;
 const employeeForm = createForm();
+const theadName = 'Name';
+const theadAge = 'Age';
+const theadPosition = 'Position';
+const theadOffice = 'Office';
+const theadSalary = 'Salary';
 
 thead.addEventListener('click', sortTable);
 tbody.addEventListener('click', sellectRow);
@@ -49,15 +54,15 @@ function submitForm(e) {
 
 function checkTableValues(value, headValue) {
   switch (headValue) {
-    case 'Name':
+    case theadName:
       return !(value.length < 4);
-    case 'Age':
+    case theadAge:
       return !isNaN(+value) && !(+value < 18) && !(+value > 90);
-    case 'Salary':
+    case theadSalary:
       return !isNaN(salaryToNumber(value));
-    case 'Position':
+    case theadPosition:
       return !(value.length === 0);
-    case 'Office':
+    case theadOffice:
       return true;
   }
 }
@@ -118,12 +123,12 @@ function editCell(e) {
     cellInput = document.createElement('input');
 
     switch (theadValue) {
-      case 'Name':
-      case 'Position':
+      case theadName:
+      case theadPosition:
         cellInput.setAttribute('type', 'text');
         break;
-      case 'Salary':
-      case 'Age':
+      case theadSalary:
+      case theadAge:
         cellInput.setAttribute('type', 'number');
         break;
     }
@@ -136,12 +141,12 @@ function editCell(e) {
     cellInput = document.createElement('select');
 
     cellInput.innerHTML = `
-    <option value="Tokyo">Tokyo</option>
-    <option value="Singapore">Singapore</option>
-    <option value="London">London</option>
-    <option value="New York">New York</option>
-    <option value="Edinburgh">Edinburgh</option>
-    <option value="San Francisco">San Francisco</option>
+      <option value="Tokyo">Tokyo</option>
+      <option value="Singapore">Singapore</option>
+      <option value="London">London</option>
+      <option value="New York">New York</option>
+      <option value="Edinburgh">Edinburgh</option>
+      <option value="San Francisco">San Francisco</option>
     `;
     cellInput.setAttribute('autofocus', true);
 
@@ -214,15 +219,15 @@ function sortTable(e) {
   ) {
     rowsArr.sort((a, b) => {
       switch (targetText) {
-        case 'Name':
+        case theadName:
           return a.children[0].innerText.localeCompare(b.children[0].innerText);
-        case 'Position':
+        case theadPosition:
           return a.children[1].innerText.localeCompare(b.children[1].innerText);
-        case 'Office':
+        case theadOffice:
           return a.children[2].innerText.localeCompare(b.children[2].innerText);
-        case 'Age':
+        case theadAge:
           return +a.children[3].innerText - +b.children[3].innerText;
-        case 'Salary':
+        case theadSalary:
           return (
             salaryToNumber(a.children[4].innerText) -
             salaryToNumber(b.children[4].innerText)
@@ -234,15 +239,15 @@ function sortTable(e) {
   } else {
     rowsArr.sort((a, b) => {
       switch (targetText) {
-        case 'Name':
+        case theadName:
           return b.children[0].innerText.localeCompare(a.children[0].innerText);
-        case 'Position':
+        case theadPosition:
           return b.children[1].innerText.localeCompare(a.children[1].innerText);
-        case 'Office':
+        case theadOffice:
           return b.children[2].innerText.localeCompare(a.children[2].innerText);
-        case 'Age':
+        case theadAge:
           return +b.children[3].innerText - +a.children[3].innerText;
-        case 'Salary':
+        case theadSalary:
           return (
             salaryToNumber(b.children[4].innerText) -
             salaryToNumber(a.children[4].innerText)
