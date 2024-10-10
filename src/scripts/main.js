@@ -2,7 +2,6 @@
 
 const table = document.querySelector('table');
 let sortDirection = true;
-let activeRow = null;
 
 // 1. Implement table sorting by clicking on the title (in two directions).
 function sortTable(columnIndex) {
@@ -38,9 +37,14 @@ table.querySelectorAll('th').forEach((header, index) => {
 });
 
 // 2. When user clicks on a row, it should become selected.
+let activeRow = null;
+
 table.querySelectorAll('tbody tr').forEach((row) => {
   row.addEventListener('click', () => {
-    activeRow?.classList.remove('active');
+    if (activeRow) {
+      activeRow.classList.remove('active');
+    }
+
     row.classList.add('active');
     activeRow = row;
   });
@@ -49,72 +53,130 @@ table.querySelectorAll('tbody tr').forEach((row) => {
 // 3. Write a script to add a form to the document.
 // Form allows users to add new employees to the spreadsheet.
 const formHtml = `
-<form class="new-employee-form">
-  <label>Name: <input name="name" type="text" data-qa="name"></label>
-  <label>Position: <input name="position" type="text" data-qa="position"></label>
-  <label>Office:
-    <select name="office" data-qa="office">
-      <option value="Tokyo">Tokyo</option>
-      <option value="Singapore">Singapore</option>
-      <option value="London">London</option>
-      <option value="New York">New York</option>
-      <option value="Edinburgh">Edinburgh</option>
-      <option value="San Francisco">San Francisco</option>
-    </select>
-  </label>
-  <label>Age: <input name="age" type="number" data-qa="age"></label>
-  <label>Salary: <input name="salary" type="number" data-qa="salary"></label>
-  <button type="button" id="save-button">Save to table</button>
-</form>
-`;
+  <form class="new-employee-form">
+    <label>
+      Name:
+      <input
+        name="name"
+        type="text"
+        data-qa="name"
+      />
+    </label>
+    <label>
+      Position:
+      <input
+        name="position"
+        type="text"
+        data-qa="position"
+      />
+    </label>
+    <label>
+      Office:
+      <select
+        name="office"
+        data-qa="office"
+      >
+        <option value="Tokyo">Tokyo</option>
+        <option value="Singapore">Singapore</option>
+        <option value="London">London</option>
+        <option value="New York">New York</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="San Francisco">San Francisco</option>
+      </select>
+    </label>
+    <label>
+      Age:
+      <input
+        name="age"
+        type="number"
+        data-qa="age"
+      />
+    </label>
+    <label>
+      Salary:
+      <input
+        name="salary"
+        type="number"
+        data-qa="salary"
+      />
+    </label>
+    <button
+      type="button"
+      id="save-button"
+    >
+      Save to table
+    </button>
+  </form>
+  `;
 
-document.body.insertAdjacentHTML('beforeend', formHtml);
-
-const form = document.querySelector('.new-employee-form');
+table.insertAdjacentHTML('afterend', formHtml);
 
 // 4. Show notification if form data is invalid
-// (use notification from the previous tasks).
-const notification = document.createElement('div');
 
-notification.className = 'notification';
-notification.setAttribute('data-qa', 'notification');
-document.body.appendChild(notification);
+function pushNotification(message, type) {
+  const notification = document.createElement('div');
+  const titleSpan = document.createElement('span');
 
-const showNotification = (message, type) => {
-  notification.innerHTML = `<span class="title">${type.toUpperCase()}</span> ${message}`;
   notification.className = `notification ${type}`;
+  notification.setAttribute('data-qa', 'notification');
 
-  setTimeout(() => (notification.className = 'notification'), 2000);
-};
+  titleSpan.className = 'title';
+  titleSpan.textContent = type.toUpperCase();
 
-document.getElementById('save-button').addEventListener('click', () => {
-  const formData = [...form.elements].reduce(
-    (acc, input) => ({ ...acc, [input.name]: input.value }),
-    {},
-  );
-  let isValid = true;
+  notification.appendChild(titleSpan);
+  notification.innerHTML += ` <span>${message}</span>`;
+  document.body.appendChild(notification);
 
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, 2000);
+}
+
+function validateFormData(formData) {
   if (formData.name.length < 4) {
-    showNotification('Name must be at least 4 characters long.', 'error');
-    isValid = false;
+    pushNotification('Name must be at least 4 characters long.', 'error');
+
+    return false;
   }
 
   if (formData.age < 18 || formData.age > 90) {
-    showNotification('Age must be between 18 and 90.', 'error');
-    isValid = false;
+    pushNotification('Age must be between 18 and 90.', 'error');
+
+    return false;
   }
 
   if (!formData.position || !formData.office || !formData.salary) {
-    showNotification('All fields are required.', 'error');
-    isValid = false;
+    pushNotification('All fields are required.', 'error');
+
+    return false;
   }
 
-  if (isValid) {
+  return true;
+}
+
+const form = document.querySelector('.new-employee-form');
+
+document.getElementById('save-button').addEventListener('click', () => {
+  const formData = [...form.elements].reduce((acc, input) => {
+    if (input.name) {
+      acc[input.name] = input.value;
+    }
+
+    return acc;
+  }, {});
+
+  if (validateFormData(formData)) {
     const newRow = document.createElement('tr');
 
-    newRow.innerHTML = `<td>${formData.name}</td><td>${formData.position}</td><td>${formData.office}</td><td>${formData.age}</td><td>$${parseInt(formData.salary).toLocaleString('en-US')}</td>`;
+    newRow.innerHTML = `
+      <td>${formData.name}</td>
+      <td>${formData.position}</td>
+      <td>${formData.office}</td>
+      <td>${formData.age}</td>
+      <td>$${parseInt(formData.salary).toLocaleString('en-US')}</td>`;
+
     table.querySelector('tbody').appendChild(newRow);
-    showNotification('Employee added successfully!', 'success');
+    pushNotification('Employee added successfully!', 'success');
     form.reset();
   }
 });
