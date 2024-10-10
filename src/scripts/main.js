@@ -1,10 +1,10 @@
 'use strict';
 
+import { THEAD } from './constants/DomElements';
 import EmployeeView from './employeeView';
 import sortEmployees from './sortEmployees';
 
 class Employee extends EmployeeView {
-  thead = document.querySelector('thead tr');
   active = null;
 
   sortType = {
@@ -22,7 +22,7 @@ class Employee extends EmployeeView {
   }
 
   addListener() {
-    this.thead.addEventListener('click', (e) => {
+    THEAD.addEventListener('click', (e) => {
       const target = e.target;
       const type = target.textContent.toLowerCase();
 

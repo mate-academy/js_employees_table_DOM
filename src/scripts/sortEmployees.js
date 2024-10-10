@@ -1,21 +1,8 @@
 import {
   sorArrayOfObjecsByNumber,
   sorArrayOfObjectsByString,
+  sortBySalary,
 } from './utils/sort';
-
-const salaryToNumber = (salary) => salary.replace(/[$,]/g, '');
-
-const sortBySalary = (employees, type = 'asc') => {
-  if (type === 'asc') {
-    return [...employees].sort(
-      (a, b) => salaryToNumber(a.salary) - salaryToNumber(b.salary),
-    );
-  }
-
-  return [...employees].sort(
-    (a, b) => salaryToNumber(b.salary) - salaryToNumber(a.salary),
-  );
-};
 
 class SortEmployees {
   sortEmployees(employees, type, sortType) {

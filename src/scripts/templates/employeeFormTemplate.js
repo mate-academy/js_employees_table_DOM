@@ -6,8 +6,6 @@ const template = `
           type="text"
           name="name"
           id="name"
-          required
-          minlength="4"
         />
       </label>
 
@@ -18,13 +16,12 @@ const template = `
           type="text"
           name="position"
           id="position"
-          required
         />
       </label>
 
       <label for="office">
         Office:
-        <select name="office">
+        <select name="office" data-qa="office">
           <option
             value="Tokyo"
             selected
@@ -46,20 +43,16 @@ const template = `
           type="number"
           name="age"
           id="age"
-          required
-          minlength="18"
-          maxlength="90"
         />
       </label>
 
-      <label for="position">
+      <label for="salary">
         Salary:
         <input
           data-qa="salary"
           type="number"
-          name="position"
-          id="Salary"
-          required
+          name="salary"
+          id="salary"
         />
       </label>
 

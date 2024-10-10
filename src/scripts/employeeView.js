@@ -1,5 +1,6 @@
 import employeesTableTemplate from './templates/employeesTableTemplate';
 import employeeForm from './employeeForm';
+import { ROOT, TBODY } from './constants/DomElements';
 
 const enumEmployeeType = {
   0: 'name',
@@ -10,9 +11,6 @@ const enumEmployeeType = {
 };
 
 class EmployeeView {
-  root = document.querySelector('body');
-  tbody = document.querySelector('tbody');
-  rows = document.querySelectorAll('tbody tr');
   activeRow = null;
 
   employees = [];
@@ -21,7 +19,7 @@ class EmployeeView {
     this.employees = this.getEmployeesData();
     this.addRowListeners();
 
-    this.root.append(employeeForm.createForm());
+    ROOT.append(employeeForm.createForm());
   }
 
   createTemplate(employees) {
@@ -33,7 +31,7 @@ class EmployeeView {
   getEmployeesData() {
     const employees = [];
 
-    for (const row of this.tbody.rows) {
+    for (const row of TBODY.rows) {
       const employee = Array.from(row.cells).reduce((acc, next, i) => {
         acc[enumEmployeeType[i]] = next.textContent;
 
@@ -47,14 +45,16 @@ class EmployeeView {
   }
 
   drawEmployeeView = (employees) => {
-    this.tbody.innerHTML = this.createTemplate(employees);
+    TBODY.innerHTML = this.createTemplate(employees);
   };
 
   addRowListeners() {
-    this.rows.forEach((row) => {
-      row.addEventListener('click', () => {
+    TBODY.addEventListener('click', (e) => {
+      const row = e.target.closest('tr');
+
+      if (row) {
         this.changeActiveRow(row);
-      });
+      }
     });
   }
 
