@@ -1,44 +1,56 @@
 'use strict';
 
-// import drawEmployeeView from './employeeView';
-import employees from './getEmployeesData';
+import EmployeeView from './employeeView';
+import sortEmployees from './sortEmployees';
 
-import { sortBySalary } from './sortEmployees';
-import {
-  sorArrayOfObjecsByNumber,
-  sorArrayOfObjectsByString,
-} from './utils/sort';
+class Employee extends EmployeeView {
+  thead = document.querySelector('thead tr');
+  active = null;
 
-import employeeView from './employeeView';
+  sortType = {
+    name: 'asc',
+    position: 'asc',
+    office: 'asc',
+    age: 'asc',
+    salary: 'asc',
+  };
 
-const theads = document.querySelectorAll('thead tr');
+  constructor() {
+    super();
+    this.addListener();
+    this.sortEmployees = sortEmployees.sortEmployees;
+  }
 
-theads.forEach((thead) => {
-  thead.addEventListener('click', (e) => {
-    const type = e.target.textContent.toLowerCase();
+  addListener() {
+    this.thead.addEventListener('click', (e) => {
+      const target = e.target;
+      const type = target.textContent.toLowerCase();
 
-    switch (type) {
-      case 'name':
-        return employeeView.drawEmployeeView(
-          sorArrayOfObjectsByString(employees, type),
-        );
-      case 'position':
-        return employeeView.drawEmployeeView(
-          sorArrayOfObjectsByString(employees, type),
-        );
-      case 'office':
-        return employeeView.drawEmployeeView(
-          sorArrayOfObjectsByString(employees, type),
-        );
-      case 'age':
-        return employeeView.drawEmployeeView(
-          sorArrayOfObjecsByNumber(employees, type),
-        );
-      case 'salary':
-        return employeeView.drawEmployeeView(sortBySalary(employees));
+      this.setSortType(type);
 
-      default:
-        throw new Error('Wrong type!');
+      this.employees = this.sortEmployees(
+        this.employees,
+        type,
+        this.sortType[type],
+      );
+
+      this.drawEmployeeView(this.employees);
+    });
+  }
+
+  setSortType(type) {
+    if (type !== this.active) {
+      this.sortType[type] = 'asc';
+      this.active = type;
+
+      return;
     }
-  });
-});
+
+    this.sortType[type] = this.sortType[type] === 'asc' ? 'desc' : 'asc';
+    this.active = type;
+  }
+}
+
+const employee = new Employee();
+
+export default employee;

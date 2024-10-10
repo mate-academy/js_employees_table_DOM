@@ -1,4 +1,7 @@
-const enumEmployee = {
+import employeesTableTemplate from './templates/employeesTableTemplate';
+import employeeForm from './employeeForm';
+
+const enumEmployeeType = {
   0: 'name',
   1: 'position',
   2: 'office',
@@ -7,25 +10,23 @@ const enumEmployee = {
 };
 
 class EmployeeView {
+  root = document.querySelector('body');
   tbody = document.querySelector('tbody');
+  rows = document.querySelectorAll('tbody tr');
+  activeRow = null;
+
   employees = [];
 
   constructor() {
     this.employees = this.getEmployeesData();
+    this.addRowListeners();
+
+    this.root.append(employeeForm.createForm());
   }
 
   createTemplate(employees) {
     return employees
-      .map(
-        (employee) => `
-        <tr>
-          <td>${employee.name}</td>
-          <td>${employee.position}</td>
-          <td>${employee.office}</td>
-          <td>${employee.age}</td>
-          <td>${employee.salary}</td>
-        </tr>`,
-      )
+      .map((employee) => employeesTableTemplate(employee))
       .join('');
   }
 
@@ -34,7 +35,7 @@ class EmployeeView {
 
     for (const row of this.tbody.rows) {
       const employee = Array.from(row.cells).reduce((acc, next, i) => {
-        acc[enumEmployee[i]] = next.textContent;
+        acc[enumEmployeeType[i]] = next.textContent;
 
         return acc;
       }, {});
@@ -48,8 +49,23 @@ class EmployeeView {
   drawEmployeeView = (employees) => {
     this.tbody.innerHTML = this.createTemplate(employees);
   };
+
+  addRowListeners() {
+    this.rows.forEach((row) => {
+      row.addEventListener('click', () => {
+        this.changeActiveRow(row);
+      });
+    });
+  }
+
+  changeActiveRow(row) {
+    if (this.activeRow && this.activeRow !== row) {
+      this.activeRow.classList.remove('active');
+    }
+
+    this.activeRow = row;
+    this.activeRow.classList.add('active');
+  }
 }
 
-const employeeView = new EmployeeView();
-
-export default employeeView;
+export default EmployeeView;
