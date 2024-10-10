@@ -114,7 +114,6 @@ fields.forEach((field) => {
     input.setAttribute('name', field.name);
     input.setAttribute('type', field.type);
     input.setAttribute('data-qa', field.qa);
-    input.required = true;
 
     label.appendChild(input);
   }
@@ -174,6 +173,11 @@ form.addEventListener('submit', (e) => {
         'Error: Name must be at least 4 characters long.',
         'error',
       );
+      isValid = false;
+    }
+
+    if (!value) {
+      showNotification(20, 20, 'Error: All fields must be filled.', 'error');
       isValid = false;
     }
 
