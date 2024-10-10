@@ -1,66 +1,65 @@
 'use strict';
-// import { pushNotification } from './notification.js';
-
 // Sort table
 
-const sortButtons = document.querySelectorAll('thead tr th');
+const sortButtons = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
-const rows = Array.from(document.querySelectorAll('tbody tr'));
-
 const sortState = new Array(sortButtons.length).fill(false);
 
-sortButtons.forEach((button, index) => {
-  button.addEventListener('click', () => {
-    const isDescending = sortState[index];
+sortButtons.addEventListener('click', (e) => {
+  const currentRows = Array.from(document.querySelectorAll('tbody tr'));
 
-    const sortedRows = rows.sort((rowA, rowB) => {
-      const cellA = rowA.children[index].innerHTML;
-      const cellB = rowB.children[index].innerHTML;
+  const clickedButton = e.target;
+  const index = Array.from(clickedButton.parentNode.children).indexOf(
+    clickedButton,
+  );
 
-      if (
-        button.innerHTML === 'Name' ||
-        button.innerHTML === 'Position' ||
-        button.innerHTML === 'Office'
-      ) {
-        return isDescending
-          ? cellB.localeCompare(cellA)
-          : cellA.localeCompare(cellB);
-      } else if (button.innerHTML === 'Salary') {
-        const salaryA = parseFloat(cellA.replace(/[$,]/g, ''));
-        const salaryB = parseFloat(cellB.replace(/[$,]/g, ''));
+  const isDescending = sortState[index];
 
-        return isDescending ? salaryB - salaryA : salaryA - salaryB;
-      } else {
-        return isDescending
-          ? parseFloat(cellB) - parseFloat(cellA)
-          : parseFloat(cellA) - parseFloat(cellB);
-      }
-    });
+  const sortedRows = currentRows.sort((rowA, rowB) => {
+    const cellA = rowA.children[index].innerHTML;
+    const cellB = rowB.children[index].innerHTML;
 
-    tbody.innerHTML = '';
-    sortedRows.forEach((row) => tbody.appendChild(row));
+    if (
+      clickedButton.innerHTML === 'Name' ||
+      clickedButton.innerHTML === 'Position' ||
+      clickedButton.innerHTML === 'Office'
+    ) {
+      return isDescending
+        ? cellB.localeCompare(cellA)
+        : cellA.localeCompare(cellB);
+    } else if (clickedButton.innerHTML === 'Salary') {
+      const salaryA = parseFloat(cellA.replace(/[$,]/g, ''));
+      const salaryB = parseFloat(cellB.replace(/[$,]/g, ''));
 
-    sortState[index] = !sortState[index];
+      return isDescending ? salaryB - salaryA : salaryA - salaryB;
+    } else {
+      return isDescending
+        ? parseFloat(cellB) - parseFloat(cellA)
+        : parseFloat(cellA) - parseFloat(cellB);
+    }
   });
+
+  tbody.innerHTML = '';
+  sortedRows.forEach((row) => tbody.appendChild(row));
+
+  sortState[index] = !sortState[index];
 });
 
-// Selected row
+// Select row
 
-rows.forEach((row) => {
-  row.addEventListener('click', () => {
-    rows.forEach((r) => {
-      if (r !== row) {
-        r.classList.remove('active');
-      }
-    });
+tbody.addEventListener('click', (e) => {
+  const targetRow = e.target.closest('tr');
 
-    row.classList.toggle('active');
+  Array.from(tbody.querySelectorAll('tr')).forEach((row) => {
+    if (row !== targetRow) {
+      row.classList.remove('active');
+    }
   });
+  targetRow.classList.toggle('active');
 });
 
-// notification
+// Error notification
 const pushNotification = (posTop, posRight, title, description, type) => {
-  // Створюємо нове повідомлення
   const notification = document.createElement('div');
 
   document.body.append(notification);
@@ -82,7 +81,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 
   setTimeout(() => {
     notification.style.visibility = 'hidden';
-    notification.remove(); // Після зникнення видаляємо повідомлення з DOM
+    notification.remove();
   }, 2000);
 };
 
@@ -98,7 +97,7 @@ const addButton = document.querySelector('form>button');
 addButton.addEventListener('click', (e) => {
   e.preventDefault();
 
-  if (nameInput.value.length < 4) {
+  if (nameInput.value.trim().length < 4) {
     return pushNotification(
       150,
       10,
@@ -108,7 +107,7 @@ addButton.addEventListener('click', (e) => {
     );
   }
 
-  if (positionInput.value.length < 3 || positionInput.value === 0) {
+  if (positionInput.value.trim().length === 0) {
     return pushNotification(
       150,
       10,
@@ -140,7 +139,6 @@ addButton.addEventListener('click', (e) => {
     );
   }
 
-  // Якщо всі дані валідні, додаємо новий рядок
   const newRow = document.createElement('tr');
 
   newRow.innerHTML = `<td>${nameInput.value}</td>
@@ -159,7 +157,6 @@ addButton.addEventListener('click', (e) => {
     'success',
   );
 
-  // Очищення полів після додавання
   nameInput.value = '';
   positionInput.value = '';
   officeSelect.value = '';
