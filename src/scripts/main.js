@@ -166,12 +166,22 @@ form.addEventListener('submit', (e) => {
         ? form.querySelector(`select[name=${field.name}]`).value
         : form.querySelector(`input[name=${field.name}]`).value;
 
-    if (field.name === 'name' && value.length < 4) {
+    if (field.name === 'name' && value.length < 4 || value.trim() === ' '){
       showNotification(
         20,
         20,
         'Error: Name must be at least 4 characters long.',
         'error',
+      );
+      isValid = false;
+    }
+
+    if (field.name === 'position' && value.trim() === '') {
+      showNotification(
+        20,
+        20,
+        'Error: Position cannot be empty or only spaces.',
+        'error'
       );
       isValid = false;
     }
@@ -223,6 +233,7 @@ table.addEventListener('dblclick', (e) => {
     const originalText = target.textContent;
     const input = document.createElement('input');
 
+    target.textContent = '';
     input.value = originalText;
     input.classList.add('cell-input');
     target.appendChild(input);
