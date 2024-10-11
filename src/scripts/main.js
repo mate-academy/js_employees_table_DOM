@@ -2,10 +2,7 @@
 
 const body = document.querySelector('body');
 
-let table = document.querySelector('table');
-let headers = [...table.querySelectorAll('th')];
-let tbody = table.querySelector('tbody');
-let rows = [...tbody.querySelectorAll('tr')];
+let table, headers, tbody, rows;
 
 const init = () => {
   table = document.querySelector('table');
@@ -13,6 +10,8 @@ const init = () => {
   tbody = table.querySelector('tbody');
   rows = [...tbody.querySelectorAll('tr')];
 };
+
+init();
 
 const currencyFormat = (number) =>
   '$' + new Intl.NumberFormat('en-US').format(number);
@@ -43,10 +42,13 @@ headers.forEach((header, i) => {
       const cellA = a.querySelectorAll('td')[i].textContent;
       const cellB = b.querySelectorAll('td')[i].textContent;
 
-      if (Number(numberFormat(cellA))) {
+      const checkNumberCellA = numberFormat(cellA);
+      const checkNumberCellB = numberFormat(cellB);
+
+      if (Number(checkNumberCellA)) {
         return ASC
-          ? numberFormat(cellA) - numberFormat(cellB)
-          : numberFormat(cellB) - numberFormat(cellA);
+          ? checkNumberCellA - checkNumberCellB
+          : checkNumberCellB - checkNumberCellA;
       }
 
       return ASC ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
@@ -108,42 +110,46 @@ const numberFormat = (n) => Number(n.replace(/[^0-9.-]+/g, ''));
 
 // Add new employee form
 
-const form = document.createElement('form');
+const createForm = (fields) => {
+  const formEl = document.createElement('form');
 
-form.classList.add('new-employee-form');
+  formEl.classList.add('new-employee-form');
 
-for (const key in formFields) {
-  if (formFields[key]) {
-    const label = document.createElement('label');
+  for (const key in fields) {
+    if (fields[key]) {
+      const label = document.createElement('label');
 
-    label.textContent = `${formFields[key].label}: `;
+      label.textContent = `${fields[key].label}: `;
 
-    let field = document.createElement('input');
+      let field = document.createElement('input');
 
-    if (formFields[key].hasOwnProperty('options')) {
-      field = document.createElement('select');
+      if (fields[key].hasOwnProperty('options')) {
+        field = document.createElement('select');
 
-      for (const option of formFields[key].options) {
-        const optionEl = document.createElement('option');
+        for (const option of fields[key].options) {
+          const optionEl = document.createElement('option');
 
-        optionEl.value = option;
-        optionEl.textContent = option;
-        field.appendChild(optionEl);
+          optionEl.value = option;
+          optionEl.textContent = option;
+          field.appendChild(optionEl);
+        }
       }
+
+      label.appendChild(field);
+
+      field.setAttribute('name', fields[key].name);
+      field.setAttribute('type', fields[key].type);
+      field.setAttribute('data-qa', fields[key]['data-qa']);
+      field.setAttribute('min', fields[key].validation?.min);
+      field.setAttribute('max', fields[key].validation?.max);
+      field.setAttribute('minlength', fields[key].validation?.minLength);
+      field.setAttribute('required', true);
+      formEl.appendChild(label);
     }
-
-    label.appendChild(field);
-
-    field.setAttribute('name', formFields[key].name);
-    field.setAttribute('type', formFields[key].type);
-    field.setAttribute('data-qa', formFields[key]['data-qa']);
-    field.setAttribute('min', formFields[key].validation?.min);
-    field.setAttribute('max', formFields[key].validation?.max);
-    field.setAttribute('minlength', formFields[key].validation?.minLength);
-    field.setAttribute('required', true);
-    form.appendChild(label);
   }
-}
+
+  return formEl;
+};
 
 const showNotification = (type, message) => {
   const notification = document.createElement('div');
@@ -161,8 +167,6 @@ const showNotification = (type, message) => {
 };
 
 const submitHandler = (e) => {
-  e.preventDefault();
-
   if (!form.checkValidity()) {
     showNotification('error', 'Error: Form is not valid');
 
@@ -197,13 +201,22 @@ const submitHandler = (e) => {
   form.reset();
 };
 
-const submit = document.createElement('button');
+const createSubmitButton = () => {
+  const submit = document.createElement('button');
 
-submit.setAttribute('type', 'submit');
-submit.setAttribute('form', 'new-employee-form');
-submit.addEventListener('click', submitHandler);
+  submit.setAttribute('type', 'submit');
+  submit.setAttribute('form', 'new-employee-form');
+  submit.addEventListener('click', submitHandler);
 
-submit.textContent = 'Save to table';
-form.appendChild(submit);
+  submit.textContent = 'Save to table';
+
+  return submit;
+};
+
+const form = createForm(formFields);
+
+const submitBtn = createSubmitButton();
+
+form.appendChild(submitBtn);
 
 body.appendChild(form);
