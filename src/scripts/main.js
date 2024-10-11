@@ -11,58 +11,48 @@ const OFFICES = [
   'Edinburgh',
   'San Francisco',
 ];
+const DELAY_NOTIFICATION = 2000;
 
-const itemCollection = document.querySelectorAll('tbody tr');
-const tableHeader = document.querySelector('thead tr');
-const tableBody = document.querySelector('tbody');
+function mapTableRowsToObjects(collection) {
+  return [...collection].map((item) => {
+    const collection = item.querySelectorAll('td');
 
-const items = [...itemCollection].map((item) => {
-  const collection = item.querySelectorAll('td');
+    return HEADERS.reduce(
+      (prev, current, index) => ({
+        ...prev,
+        [current]: collection[index].innerText,
+      }),
+      {},
+    );
+  });
+}
 
-  return HEADERS.reduce(
-    (prev, current, index) => ({
-      ...prev,
-      [current]: collection[index].innerText,
-    }),
-    {},
-  );
-});
+function createRow(item) {
+  const row = document.createElement('tr');
+
+  for (const key in item) {
+    const rowData = document.createElement('td');
+
+    rowData.innerText = item[key];
+    row.appendChild(rowData);
+  }
+
+  return row;
+}
 
 function rebuildList(data) {
+  const tableBody = document.querySelector('tbody');
+
   tableBody.innerHTML = '';
 
   for (const item of data) {
-    const row = document.createElement('tr');
-
-    for (const key in item) {
-      const rowData = document.createElement('td');
-
-      rowData.innerText = item[key];
-      row.appendChild(rowData);
-    }
-
+    const row = createRow(item);
     tableBody.appendChild(row);
   }
 }
 
-tableHeader.addEventListener('click', (e) => {
-  const title = e.target.closest('th');
-
-  if (!title) {
-    return;
-  }
-
-  const targetValue = title.innerText.toLowerCase();
-
-  if (!title.hasAttribute('data-order') || title.dataset.order === DESC) {
-    title.setAttribute('data-order', ASC);
-  } else {
-    title.setAttribute('data-order', DESC);
-  }
-
+function sortItems(items, targetValue, order) {
   items.sort((a, b) => {
-    const order = title.dataset.order;
-
     if (targetValue === 'salary') {
       const aSalary = a[targetValue].slice(1).split(',').join('');
       const bSalary = b[targetValue].slice(1).split(',').join('');
@@ -80,23 +70,50 @@ tableHeader.addEventListener('click', (e) => {
       ? a[targetValue].localeCompare(b[targetValue])
       : b[targetValue].localeCompare(a[targetValue]);
   });
+}
 
-  rebuildList(items);
-});
+function createSelectBox(title) {
+  const selectBox = document.createElement('select');
 
-tableBody.addEventListener('click', (e) => {
-  const activeRow = e.target.closest('tr');
+  selectBox.name = title;
+  selectBox.setAttribute('data-qa', title);
+  selectBox.required = true;
 
-  if (!activeRow) {
-    return;
-  }
+  OFFICES.forEach((office) => {
+    const option = document.createElement('option');
 
-  itemCollection.forEach((item) => {
-    item.classList.remove('active');
+    option.value = office;
+    option.innerText = office;
+    selectBox.appendChild(option);
   });
 
-  activeRow.classList.add('active');
-});
+  return selectBox;
+}
+
+function createInput(title) {
+  const input = document.createElement('input');
+
+  input.name = title;
+  input.required = true;
+
+  if (title === 'age' || title === 'salary') {
+    input.type = 'number';
+    input.min = 0;
+  } else {
+    input.type = 'text';
+  }
+
+  return input;
+}
+
+function createButton() {
+  const button = document.createElement('button');
+
+  button.type = 'submit';
+  button.innerText = 'Save to table';
+
+  return button;
+}
 
 function addForm() {
   const body = document.body;
@@ -110,51 +127,18 @@ function addForm() {
     label.innerText = `${title[0].toUpperCase() + title.slice(1)}:`;
 
     if (title === 'office') {
-      const selectBox = document.createElement('select');
-
-      selectBox.name = title;
-      selectBox.setAttribute('data-qa', title);
-      selectBox.required = true;
-
-      OFFICES.forEach((office) => {
-        const option = document.createElement('option');
-
-        option.value = office;
-        option.innerText = office;
-        selectBox.appendChild(option);
-      });
-
-      label.appendChild(selectBox);
+      label.appendChild(createSelectBox(title));
       form.appendChild(label);
       continue;
     }
 
-    const input = document.createElement('input');
-
-    input.name = title;
-    input.required = true;
-
-    if (title === 'age' || title === 'salary') {
-      input.type = 'number';
-      input.min = 0;
-    } else {
-      input.type = 'text';
-    }
-
-    label.appendChild(input);
+    label.appendChild(createInput(title));
     form.appendChild(label);
   }
 
-  const button = document.createElement('button');
-
-  button.type = 'submit';
-  button.innerText = 'Save to table';
-
-  form.appendChild(button);
+  form.appendChild(createButton());
   body.appendChild(form);
 }
-
-addForm();
 
 const pushNotification = (title, description, type) => {
   const table = document.querySelector('table');
@@ -172,53 +156,101 @@ const pushNotification = (title, description, type) => {
 
   setTimeout(() => {
     notification.style.display = 'none';
-  }, 2000);
+  }, DELAY_NOTIFICATION);
 };
 
-if (document.querySelector('.new-employee-form')) {
-  const form = document.querySelector('.new-employee-form');
+function isValid(name, age) {
+  if (name.length < 4) {
+    pushNotification('Oops!', 'Value has less than 4 letters', 'error');
+    return false;
+  }
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
+  if (+age <= 18 || +age > 90) {
+    pushNotification(
+      'Oops!',
+      'Value is less than 18 or more than 90',
+      'error',
+    );
+    return false
+  }
 
-    const data = new FormData(form);
-    let isValid = true;
-    const newName = data.get('name');
-    const age = data.get('age');
-    const salary = parseInt(data.get('salary')).toLocaleString('en-US');
-
-    if (newName.length < 4) {
-      isValid = false;
-      pushNotification('Oops!', 'Value has less than 4 letters', 'error');
-    }
-
-    if (+age <= 18 || +age > 90) {
-      isValid = false;
-
-      pushNotification(
-        'Oops!',
-        'Value is less than 18 or more than 90',
-        'error',
-      );
-    }
-
-    if (isValid) {
-      const newEmployee = {
-        name: newName,
-        position: data.get('position'),
-        office: data.get('office'),
-        age,
-        salary: '$' + salary,
-      };
-
-      items.push(newEmployee);
-      rebuildList(items);
-
-      pushNotification(
-        'Success!',
-        'New employee has added to list.',
-        'success',
-      );
-    }
-  });
+  return true;
 }
+
+document.addEventListener('DOMContentLoaded', () =>{
+  const itemCollection = document.querySelectorAll('tbody tr');
+  const tableHeader = document.querySelector('thead tr');
+  const tableBody = document.querySelector('tbody');
+
+  const items = mapTableRowsToObjects(itemCollection)
+
+  tableHeader.addEventListener('click', (e) => {
+    const title = e.target.closest('th');
+
+    if (!title) {
+      return;
+    }
+
+    const targetValue = title.innerText.toLowerCase();
+
+    if (!title.hasAttribute('data-order') || title.dataset.order === DESC) {
+      title.setAttribute('data-order', ASC);
+    } else {
+      title.setAttribute('data-order', DESC);
+    }
+
+    const order = title.dataset.order;
+
+    sortItems(items, targetValue,order);
+    rebuildList(items);
+  });
+
+  tableBody.addEventListener('click', (e) => {
+    const activeRow = e.target.closest('tr');
+
+    if (!activeRow) {
+      return;
+    }
+
+    itemCollection.forEach((item) => {
+      item.classList.remove('active');
+    });
+
+    activeRow.classList.add('active');
+  });
+
+  addForm();
+
+  if (document.querySelector('.new-employee-form')) {
+    const form = document.querySelector('.new-employee-form');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const data = new FormData(form);
+      const newName = data.get('name');
+      const age = data.get('age');
+      const salary = parseInt(data.get('salary')).toLocaleString('en-US');
+
+      if (isValid(newName, age)) {
+        const newEmployee = {
+          name: newName,
+          position: data.get('position'),
+          office: data.get('office'),
+          age,
+          salary: '$' + salary,
+        };
+
+        items.push(newEmployee);
+        rebuildList(items);
+
+        pushNotification(
+          'Success!',
+          'New employee has added to list.',
+          'success',
+        );
+      }
+    });
+  }
+})
+
