@@ -15,12 +15,12 @@ const DELAY_NOTIFICATION = 2000;
 
 function mapTableRowsToObjects(collection) {
   return [...collection].map((item) => {
-    const collection = item.querySelectorAll('td');
+    const data = item.querySelectorAll('td');
 
     return HEADERS.reduce(
       (prev, current, index) => ({
         ...prev,
-        [current]: collection[index].innerText,
+        [current]: data[index].innerText,
       }),
       {},
     );
@@ -47,6 +47,7 @@ function rebuildList(data) {
 
   for (const item of data) {
     const row = createRow(item);
+
     tableBody.appendChild(row);
   }
 }
@@ -159,30 +160,28 @@ const pushNotification = (title, description, type) => {
   }, DELAY_NOTIFICATION);
 };
 
-function isValid(name, age) {
-  if (name.length < 4) {
-    pushNotification('Oops!', 'Value has less than 4 letters', 'error');
-    return false;
+function isEmployeeDataValid(newName, age) {
+  if (newName.length < 4) {
+    pushNotification('Oops!', 'Name has less than 4 letters', 'error');
+
+    throw new Error('Name has less than 4 letters');
   }
 
   if (+age <= 18 || +age > 90) {
-    pushNotification(
-      'Oops!',
-      'Value is less than 18 or more than 90',
-      'error',
-    );
-    return false
+    pushNotification('Oops!', 'Age is less than 18 or more than 90', 'error');
+
+    throw new Error('Age is less than 18 or more than 90')
   }
 
   return true;
 }
 
-document.addEventListener('DOMContentLoaded', () =>{
+document.addEventListener('DOMContentLoaded', () => {
   const itemCollection = document.querySelectorAll('tbody tr');
   const tableHeader = document.querySelector('thead tr');
   const tableBody = document.querySelector('tbody');
 
-  const items = mapTableRowsToObjects(itemCollection)
+  const items = mapTableRowsToObjects(itemCollection);
 
   tableHeader.addEventListener('click', (e) => {
     const title = e.target.closest('th');
@@ -201,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () =>{
 
     const order = title.dataset.order;
 
-    sortItems(items, targetValue,order);
+    sortItems(items, targetValue, order);
     rebuildList(items);
   });
 
@@ -230,9 +229,11 @@ document.addEventListener('DOMContentLoaded', () =>{
       const data = new FormData(form);
       const newName = data.get('name');
       const age = data.get('age');
+
+      // tranform salary into format '10,000,000,000'
       const salary = parseInt(data.get('salary')).toLocaleString('en-US');
 
-      if (isValid(newName, age)) {
+      if (isEmployeeDataValid(newName, age)) {
         const newEmployee = {
           name: newName,
           position: data.get('position'),
@@ -249,8 +250,9 @@ document.addEventListener('DOMContentLoaded', () =>{
           'New employee has added to list.',
           'success',
         );
+      } else {
+        throw new Error('You can\'n create new employee');
       }
     });
   }
-})
-
+});
