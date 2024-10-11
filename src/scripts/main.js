@@ -132,8 +132,13 @@ function pushNotification(message, type) {
 }
 
 function validateFormData(formData) {
-  if (formData.name.length < 4) {
-    pushNotification('Name must be at least 4 characters long.', 'error');
+  const nameRegex = /^[A-Za-z\s]+$/;
+
+  if (formData.name.length < 4 || !nameRegex.test(formData.name)) {
+    pushNotification(
+      'Name must be at least 4 characters long and contain only letters.',
+      'error',
+    );
 
     return false;
   }
@@ -144,8 +149,22 @@ function validateFormData(formData) {
     return false;
   }
 
-  if (!formData.position || !formData.office || !formData.salary) {
-    pushNotification('All fields are required.', 'error');
+  if (!formData.position.trim()) {
+    pushNotification('Position is required.', 'error');
+
+    return false;
+  }
+
+  if (!formData.office.trim()) {
+    pushNotification('Office is required.', 'error');
+
+    return false;
+  }
+
+  const salary = parseFloat(formData.salary);
+
+  if (isNaN(salary) || salary <= 0) {
+    pushNotification('Salary must be a valid positive number.', 'error');
 
     return false;
   }
