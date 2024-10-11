@@ -156,9 +156,9 @@ function validateFormData(formData) {
 const form = document.querySelector('.new-employee-form');
 
 document.getElementById('save-button').addEventListener('click', () => {
-  const formData = [...form.elements].reduce((acc, input) => {
-    if (input.name) {
-      acc[input.name] = input.value;
+  const formData = [...form.elements].reduce((acc, formInput) => {
+    if (formInput.name) {
+      acc[formInput.name] = formInput.value;
     }
 
     return acc;
@@ -181,26 +181,33 @@ document.getElementById('save-button').addEventListener('click', () => {
 });
 
 // 5. Implement editing of table cells by double-clicking on it. (optional)
-table.querySelectorAll('tbody td').forEach((cell) => {
+const input = document.createElement('input');
+
+input.className = 'cell-input';
+
+input.addEventListener('blur', () => {
+  const cell = input.parentElement;
+
+  cell.innerText = input.value || input.getAttribute('data-initial');
+});
+
+input.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    const cell = input.parentElement;
+
+    cell.innerText = input.value || input.getAttribute('data-initial');
+  }
+});
+
+document.querySelectorAll('tbody td').forEach((cell) => {
   cell.addEventListener('dblclick', () => {
     const initialValue = cell.innerText;
-    const input = document.createElement('input');
 
-    input.className = 'cell-input';
+    input.setAttribute('data-initial', initialValue);
     input.value = initialValue;
+
     cell.innerText = '';
     cell.appendChild(input);
     input.focus();
-
-    input.addEventListener(
-      'blur',
-      () => (cell.innerText = input.value || initialValue),
-    );
-
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        cell.innerText = input.value || initialValue;
-      }
-    });
   });
 });
