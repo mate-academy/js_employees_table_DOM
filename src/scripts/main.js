@@ -1,15 +1,39 @@
 'use strict';
 
+// 1. Implement table sorting by clicking on the title (in two directions).
 const table = document.querySelector('table');
 let sortDirection = true;
 
-// 1. Implement table sorting by clicking on the title (in two directions).
-function sortTable(columnIndex) {
-  const rows = [...table.querySelectorAll('tbody tr')];
+function getTableData() {
+  return [...table.querySelectorAll('tbody tr')].map((row) => {
+    return [...row.children].map((cell) => cell.innerText);
+  });
+}
 
-  rows.sort((rowA, rowB) => {
-    let cellA = rowA.children[columnIndex].innerText;
-    let cellB = rowB.children[columnIndex].innerText;
+function renderTableData(data) {
+  const tbody = table.querySelector('tbody');
+
+  tbody.innerHTML = '';
+
+  data.forEach((rowData) => {
+    const row = document.createElement('tr');
+
+    rowData.forEach((cellData) => {
+      const cell = document.createElement('td');
+
+      cell.innerText = cellData;
+      row.appendChild(cell);
+    });
+    tbody.appendChild(row);
+  });
+}
+
+function sortTable(columnIndex) {
+  const data = getTableData();
+
+  data.sort((rowA, rowB) => {
+    let cellA = rowA[columnIndex];
+    let cellB = rowB[columnIndex];
 
     if (columnIndex === 3) {
       cellA = parseInt(cellA);
@@ -28,7 +52,7 @@ function sortTable(columnIndex) {
     return cellA > cellB ? -1 : 1;
   });
 
-  rows.forEach((row) => table.querySelector('tbody').appendChild(row));
+  renderTableData(data);
   sortDirection = !sortDirection;
 }
 
