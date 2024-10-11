@@ -112,7 +112,6 @@ const formHtml = `
 table.insertAdjacentHTML('afterend', formHtml);
 
 // 4. Show notification if form data is invalid
-
 function pushNotification(message, type) {
   const notification = document.createElement('div');
   const titleSpan = document.createElement('span');
