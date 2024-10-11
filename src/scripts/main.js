@@ -166,7 +166,7 @@ form.addEventListener('submit', (e) => {
         ? form.querySelector(`select[name=${field.name}]`).value
         : form.querySelector(`input[name=${field.name}]`).value;
 
-    if (field.name === 'name' && value.length < 4 || value.trim() === ' '){
+    if ((field.name === 'name' && value.length < 4) || value.trim() === ' ') {
       showNotification(
         20,
         20,
@@ -181,7 +181,7 @@ form.addEventListener('submit', (e) => {
         20,
         20,
         'Error: Position cannot be empty or only spaces.',
-        'error'
+        'error',
       );
       isValid = false;
     }
