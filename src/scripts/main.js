@@ -2,12 +2,11 @@
 
 const body = document.querySelector('body');
 
-let table, headers, tbody, rows;
+let headers, tbody, rows;
 
 const init = () => {
-  table = document.querySelector('table');
-  headers = [...table.querySelectorAll('th')];
-  tbody = table.querySelector('tbody');
+  headers = [...body.querySelectorAll('th')];
+  tbody = body.querySelector('tbody');
   rows = [...tbody.querySelectorAll('tr')];
 };
 
@@ -42,8 +41,8 @@ headers.forEach((header, i) => {
       const cellA = a.querySelectorAll('td')[i].textContent;
       const cellB = b.querySelectorAll('td')[i].textContent;
 
-      const checkNumberCellA = numberFormat(cellA);
-      const checkNumberCellB = numberFormat(cellB);
+      const checkNumberCellA = strToNumber(cellA);
+      const checkNumberCellB = strToNumber(cellB);
 
       if (Number(checkNumberCellA)) {
         return ASC
@@ -106,7 +105,7 @@ const formFields = {
   startDate: '',
 };
 
-const numberFormat = (n) => Number(n.replace(/[^0-9.-]+/g, ''));
+const strToNumber = (n) => Number(n.replace(/[^0-9.-]+/g, ''));
 
 // Add new employee form
 
@@ -163,7 +162,20 @@ const showNotification = (type, message) => {
 
   setTimeout(() => {
     notification.remove();
-  }, 5000);
+  }, 2000);
+};
+
+const createRow = (employee) => {
+  const row = document.createElement('tr');
+
+  for (const key in employee) {
+    const cell = document.createElement('td');
+
+    cell.textContent = employee[key];
+    row.appendChild(cell);
+  }
+
+  tbody.appendChild(row);
 };
 
 const submitHandler = (e) => {
@@ -184,18 +196,10 @@ const submitHandler = (e) => {
     employee[key] = value;
   }
 
-  const row = document.createElement('tr');
-
-  for (const key in employee) {
-    const cell = document.createElement('td');
-
-    cell.textContent = employee[key];
-    row.appendChild(cell);
-  }
+  createRow(employee);
 
   showNotification('success', 'Employee added successfully');
 
-  tbody.appendChild(row);
   init();
 
   form.reset();
