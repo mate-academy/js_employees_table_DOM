@@ -108,6 +108,7 @@ const inputPosition = newEmployeeForm.querySelector('input[name="position"]');
 const inputAge = newEmployeeForm.querySelector('input[name="age"]');
 const inputSalary = newEmployeeForm.querySelector('input[name="salary"]');
 const selectOffice = newEmployeeForm.querySelector('select');
+const button = newEmployeeForm.querySelector('button');
 
 function clearForm() {
   inputName.value = '';
@@ -148,9 +149,13 @@ function addNotification(message, isSuccess) {
   text.textContent = message;
 
   notification.append(title, text);
+  button.setAttribute('disabled', true);
   document.body.append(notification);
 
-  setTimeout(() => notification.remove(), 2500);
+  setTimeout(() => {
+    notification.remove();
+    button.removeAttribute('disabled');
+  }, 2500);
 }
 
 function convertToSalary(num) {
