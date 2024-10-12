@@ -90,16 +90,21 @@ attachSortingListeners();
 
 // 2. When user clicks on a row, it should become selected.
 let activeRow = null;
+const tbody = table.querySelector('tbody');
 
-table.querySelectorAll('tbody tr').forEach((row) => {
-  row.addEventListener('click', () => {
-    if (activeRow) {
-      activeRow.classList.remove('active');
-    }
+tbody.addEventListener('click', (e) => {
+  const row = e.target.closest('tr');
 
-    row.classList.add('active');
-    activeRow = row;
-  });
+  if (!row) {
+    return;
+  }
+
+  if (activeRow) {
+    activeRow.classList.remove('active');
+  }
+
+  row.classList.add('active');
+  activeRow = row;
 });
 
 // 3. Write a script to add a form to the document.
@@ -183,10 +188,10 @@ function pushNotification(message, type) {
   }, 2000);
 }
 
-function validateFormData(formData) {
+function validateName(formName) {
   const nameRegex = /^[A-Za-z\s]+$/;
 
-  if (formData.name.length < 4 || !nameRegex.test(formData.name)) {
+  if (formName.length < 4 || !nameRegex.test(formName)) {
     pushNotification(
       'Name must be at least 4 characters long and contain only letters.',
       'error',
@@ -195,33 +200,59 @@ function validateFormData(formData) {
     return false;
   }
 
-  if (formData.age < 18 || formData.age > 90) {
+  return true;
+}
+
+function validateAge(age) {
+  if (age < 18 || age > 90) {
     pushNotification('Age must be between 18 and 90.', 'error');
 
     return false;
   }
 
-  if (!formData.position.trim()) {
+  return true;
+}
+
+function validatePosition(position) {
+  if (!position.trim()) {
     pushNotification('Position is required.', 'error');
 
     return false;
   }
 
-  if (!formData.office.trim()) {
+  return true;
+}
+
+function validateOffice(office) {
+  if (!office.trim()) {
     pushNotification('Office is required.', 'error');
 
     return false;
   }
 
-  const salary = parseFloat(formData.salary);
+  return true;
+}
 
-  if (isNaN(salary) || salary <= 0) {
+function validateSalary(salary) {
+  const parsedSalary = parseFloat(salary);
+
+  if (isNaN(parsedSalary) || parsedSalary <= 0) {
     pushNotification('Salary must be a valid positive number.', 'error');
 
     return false;
   }
 
   return true;
+}
+
+function validateFormData(formData) {
+  return (
+    validateName(formData.name) &&
+    validateAge(formData.age) &&
+    validatePosition(formData.position) &&
+    validateOffice(formData.office) &&
+    validateSalary(formData.salary)
+  );
 }
 
 const form = document.querySelector('.new-employee-form');
@@ -270,8 +301,10 @@ input.addEventListener('keypress', (e) => {
   }
 });
 
-document.querySelectorAll('tbody td').forEach((cell) => {
-  cell.addEventListener('dblclick', () => {
+document.querySelector('tbody').addEventListener('dblclick', (e) => {
+  const cell = e.target;
+
+  if (cell.tagName.toLowerCase() === 'td') {
     const initialValue = cell.innerText;
 
     input.setAttribute('data-initial', initialValue);
@@ -280,5 +313,5 @@ document.querySelectorAll('tbody td').forEach((cell) => {
     cell.innerText = '';
     cell.appendChild(input);
     input.focus();
-  });
+  }
 });
