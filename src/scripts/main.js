@@ -43,14 +43,14 @@ const orderByUtil = {
   ascOrder: undefined, // true -> asc, false -> desc
 
   clickIsMade: (target) => {
-    if (target === this.element) {
-      this.ascOrder = !this.ascOrder;
+    if (target === orderByUtil.element) {
+      orderByUtil.ascOrder = !orderByUtil.ascOrder;
     } else {
-      this.element = target;
-      this.ascOrder = true;
+      orderByUtil.element = target;
+      orderByUtil.ascOrder = true;
     }
   },
-  getValue: () => this.ascOrder,
+  getValue: () => orderByUtil.ascOrder,
 };
 
 // HANDLING ASC/DESC CLICK EVENT
@@ -162,26 +162,30 @@ formElements.forEach((element) => form.append(element));
 document.addEventListener('DOMContentLoaded', () => document.body.append(form));
 
 // FORM VALIDATION
-const formValidation = (value, key) => {
+const validateFormInputData = (value, key) => {
   const validators = {
-    position: () => (!value ? `Position is a required field!` : 'success'),
+    position: () =>
+      !value
+        ? { validated: false, message: `Position is a required field!` }
+        : { validated: true },
     name: () =>
       !value || value.length < 4
-        ? 'Name should be at least 4 characters long'
-        : 'success',
+        ? { validated: false, message: 'Name should be more than 4 chars long' }
+        : { validated: true },
     age: () =>
       value < 18 || value > 90
-        ? 'Age should be between 18 and 90 years old'
-        : 'success',
+        ? { validated: false, message: 'Age must be between 18 and 90' }
+        : { validated: true },
   };
 
-  return validators[key]?.() || 'success';
+  return validators[key]?.() || { validated: true };
 };
 
-const validateInputData = (data) => {
+const validateForm = (data) => {
   return Array.from(data)
-    .map(([key, value]) => formValidation(value, key))
-    .filter((result) => result !== 'success');
+    .map(([key, value]) => validateFormInputData(value, key))
+    .filter((result) => !result.validated)
+    .map((result) => result.message);
 };
 
 // NOTIFICATIONS ON SUCESS / ERROR
@@ -193,7 +197,7 @@ const displayErrorNotice = (errorArray) => {
   displayNotification('error', 'Error!', errorArray);
 };
 
-const displayNotification = (type, titleText, textArr) => {
+const displayNotification = (type, titleText, errorMessageArr) => {
   const notification = document.createElement('div');
 
   notification.classList.add('notification', type);
@@ -203,7 +207,7 @@ const displayNotification = (type, titleText, textArr) => {
     <h3 class="title">${titleText}</h3>
     <p>
       <ul>
-        ${textArr.map((message) => `<li>${message}</li>`).join('')}
+        ${errorMessageArr.map((message) => `<li>${message}</li>`).join('')}
       </ul>
     </p>
   `;
@@ -228,7 +232,7 @@ const handleSubmitFormEvent = (e) => {
 
   const target = e.target.closest('form');
   const formData = new FormData(target);
-  const errors = validateInputData(formData);
+  const errors = validateForm(formData);
 
   if (errors.length === 0) {
     const message = 'New employee has been added to the list!';
