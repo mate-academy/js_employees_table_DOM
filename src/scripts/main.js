@@ -2,63 +2,91 @@
 
 // 1. Implement table sorting by clicking on the title (in two directions).
 const table = document.querySelector('table');
-let sortDirection = true;
 
-function getTableData() {
-  return [...table.querySelectorAll('tbody tr')].map((row) => {
+function getTableRows() {
+  return [...table.querySelectorAll('tbody tr')];
+}
+
+function mapTableData(rows) {
+  return rows.map((row) => {
     return [...row.children].map((cell) => cell.innerText);
   });
 }
 
-function renderTableData(data) {
-  const tbody = table.querySelector('tbody');
+function getTableData() {
+  const rows = getTableRows();
 
-  tbody.innerHTML = '';
-
-  data.forEach((rowData) => {
-    const row = document.createElement('tr');
-
-    rowData.forEach((cellData) => {
-      const cell = document.createElement('td');
-
-      cell.innerText = cellData;
-      row.appendChild(cell);
-    });
-    tbody.appendChild(row);
-  });
+  return mapTableData(rows);
 }
 
+let sortDirection = true;
+
 function sortTable(columnIndex) {
+  const sortedData = sortTableData(columnIndex, sortDirection);
+
+  renderSortedTable(sortedData);
+  toggleSortDirection();
+}
+
+function sortTableData(columnIndex, direction) {
   const data = getTableData();
 
-  data.sort((rowA, rowB) => {
+  return data.sort((rowA, rowB) => {
     let cellA = rowA[columnIndex];
     let cellB = rowB[columnIndex];
 
-    if (columnIndex === 3) {
-      cellA = parseInt(cellA);
-      cellB = parseInt(cellB);
-    }
+    cellA = parseCellData(cellA, columnIndex);
+    cellB = parseCellData(cellB, columnIndex);
 
-    if (columnIndex === 4) {
-      cellA = parseFloat(cellA.slice(1).split(',').join(''));
-      cellB = parseFloat(cellB.slice(1).split(',').join(''));
-    }
-
-    if (sortDirection) {
+    if (direction) {
       return cellA > cellB ? 1 : -1;
     }
 
     return cellA > cellB ? -1 : 1;
   });
+}
 
-  renderTableData(data);
+function parseCellData(cell, columnIndex) {
+  if (columnIndex === 3) {
+    return parseInt(cell);
+  }
+
+  if (columnIndex === 4) {
+    return parseFloat(cell.slice(1).replace(/,/g, ''));
+  }
+
+  return cell;
+}
+
+function renderSortedTable(sortedData) {
+  const tableBody = table.querySelector('tbody');
+
+  tableBody.innerHTML = '';
+
+  sortedData.forEach((rowData) => {
+    const row = document.createElement('tr');
+
+    rowData.forEach((cellData) => {
+      const cell = document.createElement('td');
+
+      cell.textContent = cellData;
+      row.appendChild(cell);
+    });
+    tableBody.appendChild(row);
+  });
+}
+
+function toggleSortDirection() {
   sortDirection = !sortDirection;
 }
 
-table.querySelectorAll('th').forEach((header, index) => {
-  header.addEventListener('click', () => sortTable(index));
-});
+function attachSortingListeners() {
+  table.querySelectorAll('th').forEach((header, index) => {
+    header.addEventListener('click', () => sortTable(index));
+  });
+}
+
+attachSortingListeners();
 
 // 2. When user clicks on a row, it should become selected.
 let activeRow = null;
