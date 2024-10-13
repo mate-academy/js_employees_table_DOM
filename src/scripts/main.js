@@ -9,7 +9,7 @@ const tBody = table.tBodies[0];
 // SORTING FUNCTIONS
 const valueConversionFunctions = {
   age: parseInt,
-  salary: window.convertSalartyToNumber,
+  salary: window.convertSalaryToNumber,
 };
 
 const findSuitableSortingFunction = (
@@ -42,15 +42,23 @@ const ascDescOrderUtil = {
   element: undefined,
   ascOrder: undefined, // true -> asc, false -> desc
 
-  clickIsMade: (target) => {
-    if (target === ascDescOrderUtil.element) {
-      ascDescOrderUtil.ascOrder = !ascDescOrderUtil.ascOrder;
-    } else {
-      ascDescOrderUtil.element = target;
-      ascDescOrderUtil.ascOrder = true;
-    }
+  updateState(target) {
+    return {
+      element: target,
+      ascOrder: target === this.element ? !this.ascOrder : true,
+    };
   },
-  getValue: () => ascDescOrderUtil.ascOrder,
+
+  clickIsMade(target) {
+    const newState = this.updateState(target);
+
+    this.element = newState.element;
+    this.ascOrder = newState.ascOrder;
+  },
+
+  getValue() {
+    return this.ascOrder;
+  },
 };
 
 // HANDLING ASC/DESC CLICK EVENT
@@ -75,11 +83,16 @@ tHead.addEventListener('click', handleSortingEvent);
 
 // #region SELECT_ROW
 // HANDLING ROW SELECT EVENT
+let selectedRow = null;
+
 const deselectRows = () => {
-  for (const row of table.rows) {
-    if (row.classList.contains('active')) {
-      row.classList.remove('active');
-    }
+  // for (const row of table.rows) {
+  //   if (row.classList.contains('active')) {
+  //     row.classList.remove('active');
+  //   }
+  // }
+  if (selectedRow && selectedRow.classList.contains('active')) {
+    selectedRow.classList.remove('active');
   }
 };
 
@@ -89,6 +102,7 @@ tBody.addEventListener('click', (e) => {
   if (target) {
     deselectRows();
     target.classList.add('active');
+    selectedRow = target;
   }
 });
 // #endregion
@@ -110,13 +124,13 @@ const formatLabelText = (inputName) => {
 };
 
 const createInput = (inputName, inputType) => {
-  const input = Object.assign(document.createElement('input'), {
-    name: inputName,
-    type: inputType,
-  });
-  const label = document.createElement('label');
+  const input = document.createElement('input');
 
+  input.setAttribute('name', inputName);
+  input.setAttribute('type', inputType);
   input.setAttribute('data-qa', inputName);
+
+  const label = document.createElement('label');
 
   label.textContent = formatLabelText(inputName);
   label.append(input);
@@ -125,10 +139,9 @@ const createInput = (inputName, inputType) => {
 };
 
 const createSelect = (inputName, options) => {
-  const select = Object.assign(document.createElement('select'), {
-    name: inputName,
-  });
+  const select = document.createElement('select');
 
+  select.setAttribute('name', inputName);
   select.setAttribute('data-qa', inputName);
 
   Array.from(options)
@@ -262,12 +275,10 @@ form.addEventListener('submit', handleSubmitFormEvent);
 // #region CELL_EDITTING
 // EVENT HANDLERS TO SAVE EDITED DATA
 const saveCellInput = (cell, value) => {
-  if (cell instanceof HTMLTableCellElement) {
-    const index = cell.cellIndex;
-    const isSalary = table.rows[0].cells[index].innerHTML === 'Salary';
+  const index = cell.cellIndex;
+  const isSalary = table.rows[0].cells[index].innerHTML === 'Salary';
 
-    cell.innerHTML = isSalary ? window.convertNumberToSalary(value) : value;
-  }
+  cell.innerHTML = isSalary ? window.convertNumberToSalary(value) : value;
 };
 
 const handleSaveCellEvent = (e) => {
@@ -291,11 +302,9 @@ const handleSaveCellOnEnterEvent = (e) => {
 
 // CREATE CELL INPUT FIELD
 const createCellInputField = () => {
-  const input = Object.assign(document.createElement('input'), {
-    name: 'cellInput',
-    type: 'text',
-  });
+  const input = document.createElement('input');
 
+  input.setAttribute('type', 'text');
   input.classList.add('cell-input');
   input.addEventListener('blur', handleSaveCellEvent);
   input.addEventListener('keydown', handleSaveCellOnEnterEvent);

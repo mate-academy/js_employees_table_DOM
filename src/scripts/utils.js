@@ -4,7 +4,7 @@ window.convertNumberToSalary = (num) => {
   return `$${(+num).toLocaleString('en-US')}`;
 };
 
-window.convertSalartyToNumber = (a) => {
+window.convertSalaryToNumber = (a) => {
   return Number(a.substring(1).split(',').join(''));
 };
 
