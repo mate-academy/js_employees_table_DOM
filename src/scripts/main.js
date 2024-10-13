@@ -1,18 +1,25 @@
 'use strict';
 
-// TABLE VARIABLES
+// TABLE_VARIABLES
 const table = document.querySelector('table');
 const tHead = table.tHead;
 const tBody = table.tBodies[0];
 
-// SORTING FUNCTIONS AND RELATED OBJECTS
-const valueByIndex = (row, index) => row.cells[index].textContent;
-const salaryToNum = (a) => Number(a.substring(1).split(',').join(''));
+// #region SORTING
+// SORTING FUNCTIONS
+const valueConversionFunctions = {
+  age: parseInt,
+  salary: window.convertSalartyToNumber,
+};
 
-const getSortingFunction = (index, order, transformFunc = (x) => x) => {
+const findSuitableSortingFunction = (
+  index,
+  order,
+  transformFunc = (x) => x,
+) => {
   return (a, b) => {
-    const valueA = transformFunc(valueByIndex(a, index));
-    const valueB = transformFunc(valueByIndex(b, index));
+    const valueA = transformFunc(window.getValueByCellIndex(a, index));
+    const valueB = transformFunc(window.getValueByCellIndex(b, index));
 
     if (typeof valueA === 'string' && typeof valueB === 'string') {
       return order * valueA.localeCompare(valueB);
@@ -22,35 +29,28 @@ const getSortingFunction = (index, order, transformFunc = (x) => x) => {
   };
 };
 
-const sortingFunctions = {
-  transformFunctions: {
-    age: parseInt,
-    salary: salaryToNum,
-  },
+const getSortingFunction = (index, colHeader, ascOrder) => {
+  const transformFunc = valueConversionFunctions[colHeader];
 
-  get: function (index, colHeader, ascOrder) {
-    const transformFunc = this.transformFunctions[colHeader];
-
-    return ascOrder
-      ? getSortingFunction(index, 1, transformFunc)
-      : getSortingFunction(index, -1, transformFunc);
-  },
+  return ascOrder
+    ? findSuitableSortingFunction(index, 1, transformFunc)
+    : findSuitableSortingFunction(index, -1, transformFunc);
 };
 
-// OBJECT TO KEEP TRACK OF ASC/DESC ORDER
-const orderByUtil = {
+// TOGGLE ASC/DESC ORDER LOGIC
+const ascDescOrderUtil = {
   element: undefined,
   ascOrder: undefined, // true -> asc, false -> desc
 
   clickIsMade: (target) => {
-    if (target === orderByUtil.element) {
-      orderByUtil.ascOrder = !orderByUtil.ascOrder;
+    if (target === ascDescOrderUtil.element) {
+      ascDescOrderUtil.ascOrder = !ascDescOrderUtil.ascOrder;
     } else {
-      orderByUtil.element = target;
-      orderByUtil.ascOrder = true;
+      ascDescOrderUtil.element = target;
+      ascDescOrderUtil.ascOrder = true;
     }
   },
-  getValue: () => orderByUtil.ascOrder,
+  getValue: () => ascDescOrderUtil.ascOrder,
 };
 
 // HANDLING ASC/DESC CLICK EVENT
@@ -58,20 +58,22 @@ const handleSortingEvent = (e) => {
   const target = e.target.closest('th');
 
   if (target) {
-    orderByUtil.clickIsMade(target);
+    ascDescOrderUtil.clickIsMade(target);
 
     const index = target.cellIndex;
     const colHeader = target.textContent.toLowerCase();
-    const order = orderByUtil.getValue();
+    const orderDirection = ascDescOrderUtil.getValue();
 
     Array.from(tBody.rows)
-      .sort(sortingFunctions.get(index, colHeader, order))
+      .sort(getSortingFunction(index, colHeader, orderDirection))
       .forEach((row) => tBody.append(row));
   }
 };
 
 tHead.addEventListener('click', handleSortingEvent);
+// #endregion
 
+// #region SELECT_ROW
 // HANDLING ROW SELECT EVENT
 const deselectRows = () => {
   for (const row of table.rows) {
@@ -89,8 +91,20 @@ tBody.addEventListener('click', (e) => {
     target.classList.add('active');
   }
 });
+// #endregion
 
-// ADDING FORM TO THE DOCUMENT
+// #region FORM_NEW_EMPLOYEE
+// DATA FOR TJE FORM
+const offices = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
+
+// CREATING FORM ELEMENTS
 const formatLabelText = (inputName) => {
   return `${inputName.charAt(0).toUpperCase()}${inputName.substring(1)}: `;
 };
@@ -138,16 +152,6 @@ const createButton = (btnText, type) => {
   return button;
 };
 
-const form = document.createElement('form');
-const offices = [
-  'Tokyo',
-  'Singapore',
-  'London',
-  'New York',
-  'Edinburgh',
-  'San Francisco',
-];
-
 const formElements = [
   createInput('name', 'text'),
   createInput('position', 'text'),
@@ -157,33 +161,42 @@ const formElements = [
   createButton('Save to table', 'submit'),
 ];
 
+// CREATE FORM AND ADD ELEMENTS
+const form = document.createElement('form');
+
 form.classList.add('new-employee-form');
 formElements.forEach((element) => form.append(element));
 document.addEventListener('DOMContentLoaded', () => document.body.append(form));
 
 // FORM VALIDATION
-const validateFormInputData = (value, key) => {
+const positionValidatorFunction = (value) =>
+  !value
+    ? { validated: false, message: `Position is a required field!` }
+    : { validated: true };
+
+const nameValidatorFunction = (value) =>
+  !value || value.length < 4
+    ? { validated: false, message: 'Name should be more than 4 chars long' }
+    : { validated: true };
+
+const ageValidatorFunction = (value) =>
+  value < 18 || value > 90
+    ? { validated: false, message: 'Age must be between 18 and 90' }
+    : { validated: true };
+
+const getValidatorFunction = (value, key) => {
   const validators = {
-    position: () =>
-      !value
-        ? { validated: false, message: `Position is a required field!` }
-        : { validated: true },
-    name: () =>
-      !value || value.length < 4
-        ? { validated: false, message: 'Name should be more than 4 chars long' }
-        : { validated: true },
-    age: () =>
-      value < 18 || value > 90
-        ? { validated: false, message: 'Age must be between 18 and 90' }
-        : { validated: true },
+    position: positionValidatorFunction,
+    name: nameValidatorFunction,
+    age: ageValidatorFunction,
   };
 
-  return validators[key]?.() || { validated: true };
+  return validators[key]?.(value) || { validated: true };
 };
 
 const validateForm = (data) => {
   return Array.from(data)
-    .map(([key, value]) => validateFormInputData(value, key))
+    .map(([key, value]) => getValidatorFunction(value, key))
     .filter((result) => !result.validated)
     .map((result) => result.message);
 };
@@ -216,14 +229,13 @@ const displayNotification = (type, titleText, errorMessageArr) => {
   setTimeout(() => notification.remove(), 2000);
 };
 
-// HANDLE SUBMIT EVENT
-const numToSalary = (num) => `$${(+num).toLocaleString('en-US')}`;
+// HANDLE FORM SUBMIT EVENT
 const appendTableWithData = (data) => {
   const newRow = tBody.insertRow(-1);
 
   data.forEach((value, key) => {
     newRow.insertCell(-1).textContent =
-      key === 'salary' ? numToSalary(value) : value;
+      key === 'salary' ? window.convertNumberToSalary(value) : value;
   });
 };
 
@@ -245,39 +257,16 @@ const handleSubmitFormEvent = (e) => {
 };
 
 form.addEventListener('submit', handleSubmitFormEvent);
+// #endregion
 
-// CELL EDITING EVENTS AND HANDLERS
-const createCellInput = (cell) => {
-  const input = Object.assign(document.createElement('input'), {
-    name: 'cellInput',
-    type: 'text',
-  });
-
-  input.classList.add('cell-input');
-  cell.append(input);
-
-  input.addEventListener('blur', handleSaveCellEvent);
-  input.addEventListener('keydown', handleEnterCellEvent);
-  input.focus();
-};
-
-const handleDoubleClickEvent = (e) => {
-  const target = e.target.closest('td');
-
-  if (target) {
-    target.textContent = '';
-    createCellInput(target);
-  }
-};
-
-tBody.addEventListener('dblclick', handleDoubleClickEvent);
-
+// #region CELL_EDITTING
+// EVENT HANDLERS TO SAVE EDITED DATA
 const saveCellInput = (cell, value) => {
   if (cell instanceof HTMLTableCellElement) {
     const index = cell.cellIndex;
     const isSalary = table.rows[0].cells[index].innerHTML === 'Salary';
 
-    cell.innerHTML = isSalary ? numToSalary(value) : value;
+    cell.innerHTML = isSalary ? window.convertNumberToSalary(value) : value;
   }
 };
 
@@ -288,14 +277,48 @@ const handleSaveCellEvent = (e) => {
   if (target && td) {
     const value = target.value;
 
-    target.remove();
+    target.hidden = true;
     saveCellInput(td, value);
   }
 };
 
-const handleEnterCellEvent = (e) => {
+const handleSaveCellOnEnterEvent = (e) => {
   if (e.key === 'Enter') {
     e.preventDefault();
     handleSaveCellEvent(e);
   }
 };
+
+// CREATE CELL INPUT FIELD
+const createCellInputField = () => {
+  const input = Object.assign(document.createElement('input'), {
+    name: 'cellInput',
+    type: 'text',
+  });
+
+  input.classList.add('cell-input');
+  input.addEventListener('blur', handleSaveCellEvent);
+  input.addEventListener('keydown', handleSaveCellOnEnterEvent);
+
+  return input;
+};
+
+const cellInputField = createCellInputField();
+
+const insertInputIntoCell = (cell) => {
+  cell.append(cellInputField);
+  cellInputField.focus();
+};
+
+// ADDING INPUT FIELD EVENT/HANDLER
+const handleDoubleClickEvent = (e) => {
+  const target = e.target.closest('td');
+
+  if (target) {
+    target.textContent = '';
+    insertInputIntoCell(target);
+  }
+};
+
+tBody.addEventListener('dblclick', handleDoubleClickEvent);
+// #endregion
