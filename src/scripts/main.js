@@ -2,6 +2,17 @@
 
 // 1. Implement table sorting by clicking on the title (in two directions).
 const table = document.querySelector('table');
+let tableData = null;
+let sortDirection = true;
+
+const columnParsers = {
+  3: (cell) => parseInt(cell),
+  4: (cell) => parseFloat(cell.slice(1).replaceAll(',', '')),
+};
+
+function defaultParser(cell) {
+  return cell;
+}
 
 function getTableRows() {
   return [...table.querySelectorAll('tbody tr')];
@@ -19,19 +30,14 @@ function getTableData() {
   return mapTableData(rows);
 }
 
-let sortDirection = true;
+function parseCellData(cell, columnIndex) {
+  const parser = columnParsers[columnIndex] || defaultParser;
 
-function sortTable(columnIndex) {
-  const sortedData = sortTableData(columnIndex, sortDirection);
-
-  renderSortedTable(sortedData);
-  toggleSortDirection();
+  return parser(cell);
 }
 
 function sortTableData(columnIndex, direction) {
-  const data = getTableData();
-
-  return data.sort((rowA, rowB) => {
+  return tableData.sort((rowA, rowB) => {
     let cellA = rowA[columnIndex];
     let cellB = rowB[columnIndex];
 
@@ -44,18 +50,6 @@ function sortTableData(columnIndex, direction) {
 
     return cellA > cellB ? -1 : 1;
   });
-}
-
-function parseCellData(cell, columnIndex) {
-  if (columnIndex === 3) {
-    return parseInt(cell);
-  }
-
-  if (columnIndex === 4) {
-    return parseFloat(cell.slice(1).replace(/,/g, ''));
-  }
-
-  return cell;
 }
 
 function renderSortedTable(sortedData) {
@@ -72,6 +66,7 @@ function renderSortedTable(sortedData) {
       cell.textContent = cellData;
       row.appendChild(cell);
     });
+
     tableBody.appendChild(row);
   });
 }
@@ -80,17 +75,41 @@ function toggleSortDirection() {
   sortDirection = !sortDirection;
 }
 
+function sortTable(columnIndex) {
+  const sortedData = sortTableData(columnIndex, sortDirection);
+
+  renderSortedTable(sortedData);
+  toggleSortDirection();
+}
+
 function attachSortingListeners() {
   table.querySelectorAll('th').forEach((header, index) => {
     header.addEventListener('click', () => sortTable(index));
   });
 }
 
-attachSortingListeners();
+function initializeTable() {
+  if (!tableData) {
+    tableData = getTableData();
+  }
+  attachSortingListeners();
+}
+
+initializeTable();
 
 // 2. When user clicks on a row, it should become selected.
-let activeRow = null;
+let activeRowIndex = null;
 const tbody = table.querySelector('tbody');
+
+function updateActiveRow() {
+  tbody.querySelectorAll('tr').forEach((row, index) => {
+    if (index === activeRowIndex) {
+      row.classList.add('active');
+    } else {
+      row.classList.remove('active');
+    }
+  });
+}
 
 tbody.addEventListener('click', (e) => {
   const row = e.target.closest('tr');
@@ -99,12 +118,11 @@ tbody.addEventListener('click', (e) => {
     return;
   }
 
-  if (activeRow) {
-    activeRow.classList.remove('active');
-  }
+  const rowIndex = [...tbody.querySelectorAll('tr')].indexOf(row);
 
-  row.classList.add('active');
-  activeRow = row;
+  activeRowIndex = rowIndex;
+
+  updateActiveRow();
 });
 
 // 3. Write a script to add a form to the document.
@@ -169,7 +187,7 @@ const formHtml = `
 table.insertAdjacentHTML('afterend', formHtml);
 
 // 4. Show notification if form data is invalid
-function pushNotification(message, type) {
+function createNotification(message, type) {
   const notification = document.createElement('div');
   const titleSpan = document.createElement('span');
 
@@ -183,135 +201,169 @@ function pushNotification(message, type) {
   notification.innerHTML += ` <span>${message}</span>`;
   document.body.appendChild(notification);
 
+  return notification;
+}
+
+function dismissNotification(notification, delay = 2000) {
   setTimeout(() => {
-    notification.style.display = 'none';
-  }, 2000);
+    notification.remove();
+  }, delay);
+}
+
+function pushNotification(message, type) {
+  const notification = createNotification(message, type);
+
+  dismissNotification(notification);
 }
 
 function validateName(formName) {
   const nameRegex = /^[A-Za-z\s]+$/;
 
-  if (formName.length < 4 || !nameRegex.test(formName)) {
-    pushNotification(
-      'Name must be at least 4 characters long and contain only letters.',
-      'error',
-    );
-
-    return false;
-  }
-
-  return true;
+  return formName.length >= 4 && nameRegex.test(formName);
 }
 
 function validateAge(age) {
-  if (age < 18 || age > 90) {
-    pushNotification('Age must be between 18 and 90.', 'error');
-
-    return false;
-  }
-
-  return true;
+  return age >= 18 && age <= 90;
 }
 
 function validatePosition(position) {
-  if (!position.trim()) {
-    pushNotification('Position is required.', 'error');
-
-    return false;
-  }
-
-  return true;
+  return position.trim() !== '';
 }
 
 function validateOffice(office) {
-  if (!office.trim()) {
-    pushNotification('Office is required.', 'error');
-
-    return false;
-  }
-
-  return true;
+  return office.trim() !== '';
 }
 
 function validateSalary(salary) {
   const parsedSalary = parseFloat(salary);
 
-  if (isNaN(parsedSalary) || parsedSalary <= 0) {
-    pushNotification('Salary must be a valid positive number.', 'error');
+  return !isNaN(parsedSalary) && parsedSalary > 0;
+}
 
-    return false;
+function handleValidationErrors(formData) {
+  if (!validateName(formData.name)) {
+    pushNotification(
+      'Name must be at least 4 characters long and contain only letters.',
+      'error',
+    );
   }
 
-  return true;
+  if (!validateAge(formData.age)) {
+    pushNotification('Age must be between 18 and 90.', 'error');
+  }
+
+  if (!validatePosition(formData.position)) {
+    pushNotification('Position is required.', 'error');
+  }
+
+  if (!validateOffice(formData.office)) {
+    pushNotification('Office is required.', 'error');
+  }
+
+  if (!validateSalary(formData.salary)) {
+    pushNotification('Salary must be a valid positive number.', 'error');
+  }
 }
 
 function validateFormData(formData) {
-  return (
+  const isValid =
     validateName(formData.name) &&
     validateAge(formData.age) &&
     validatePosition(formData.position) &&
     validateOffice(formData.office) &&
-    validateSalary(formData.salary)
-  );
+    validateSalary(formData.salary);
+
+  if (!isValid) {
+    handleValidationErrors(formData);
+  }
+
+  return isValid;
 }
 
 const form = document.querySelector('.new-employee-form');
 
-document.getElementById('save-button').addEventListener('click', () => {
-  const formData = [...form.elements].reduce((acc, formInput) => {
+function getFormData(formData) {
+  return [...formData.elements].reduce((acc, formInput) => {
     if (formInput.name) {
       acc[formInput.name] = formInput.value;
     }
 
     return acc;
   }, {});
+}
+
+function createTableRow(formData) {
+  const newRow = document.createElement('tr');
+
+  newRow.innerHTML = `
+    <td>${formData.name}</td>
+    <td>${formData.position}</td>
+    <td>${formData.office}</td>
+    <td>${formData.age}</td>
+    <td>$${parseInt(formData.salary).toLocaleString('en-US')}</td>`;
+
+  return newRow;
+}
+
+function appendRowToTable(row) {
+  const tableBody = table.querySelector('tbody');
+
+  tableBody.appendChild(row);
+}
+
+function handleFormSubmission() {
+  const formData = getFormData(form);
 
   if (validateFormData(formData)) {
-    const newRow = document.createElement('tr');
+    const newRow = createTableRow(formData);
 
-    newRow.innerHTML = `
-      <td>${formData.name}</td>
-      <td>${formData.position}</td>
-      <td>${formData.office}</td>
-      <td>${formData.age}</td>
-      <td>$${parseInt(formData.salary).toLocaleString('en-US')}</td>`;
-
-    table.querySelector('tbody').appendChild(newRow);
+    appendRowToTable(newRow);
     pushNotification('Employee added successfully!', 'success');
     form.reset();
   }
-});
+}
+
+document
+  .getElementById('save-button')
+  .addEventListener('click', handleFormSubmission);
 
 // 5. Implement editing of table cells by double-clicking on it. (optional)
-const input = document.createElement('input');
+let editingCell = null;
 
-input.className = 'cell-input';
-
-input.addEventListener('blur', () => {
-  const cell = input.parentElement;
-
+function saveCellValue(cell, input) {
   cell.innerText = input.value || input.getAttribute('data-initial');
-});
+  editingCell = null;
+}
 
-input.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    const cell = input.parentElement;
+function startCellEditing(cell) {
+  const input = document.createElement('input');
 
-    cell.innerText = input.value || input.getAttribute('data-initial');
-  }
-});
+  input.className = 'cell-input';
+
+  const initialValue = cell.innerText;
+
+  input.setAttribute('data-initial', initialValue);
+  input.value = initialValue;
+
+  cell.innerText = '';
+  cell.appendChild(input);
+  input.focus();
+
+  editingCell = { cell, input };
+
+  input.addEventListener('blur', () => saveCellValue(cell, input));
+
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      saveCellValue(cell, input);
+    }
+  });
+}
 
 document.querySelector('tbody').addEventListener('dblclick', (e) => {
   const cell = e.target;
 
-  if (cell.tagName.toLowerCase() === 'td') {
-    const initialValue = cell.innerText;
-
-    input.setAttribute('data-initial', initialValue);
-    input.value = initialValue;
-
-    cell.innerText = '';
-    cell.appendChild(input);
-    input.focus();
+  if (cell.tagName.toLowerCase() === 'td' && editingCell === null) {
+    startCellEditing(cell);
   }
 });
