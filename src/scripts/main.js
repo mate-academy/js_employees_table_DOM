@@ -56,7 +56,7 @@ form.appendChild(nameLabel);
 const positionLabel = document.createElement('label');
 
 positionLabel.innerHTML =
-  'Position: <input name="position" type="text" data-qa="position" required>';
+  'Position: <input name="position" type="text" data-qa="position">';
 form.appendChild(positionLabel);
 
 const ageLabel = document.createElement('label');
@@ -112,21 +112,6 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
   validateForm();
 });
-
-// const allowedPositions = [
-//   'Accountant',
-//   'Javascript Developer',
-//   'Marketing Designer',
-//   'Technical Author',
-//   'Developer',
-//   'Integration Specialist',
-//   'Data Coordinator',
-//   'Regional Director',
-//   'Regional Marketing',
-//   'Financial Controller',
-//   'Software Engineer',
-//   'Javascript Developer',
-// ];
 
 function validateForm() {
   const nameEmployee = form.elements.name.value;
