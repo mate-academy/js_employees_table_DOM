@@ -113,20 +113,20 @@ form.addEventListener('submit', (e) => {
   validateForm();
 });
 
-const allowedPositions = [
-  'Accountant',
-  'Javascript Developer',
-  'Marketing Designer',
-  'Technical Author',
-  'Developer',
-  'Integration Specialist',
-  'Data Coordinator',
-  'Regional Director',
-  'Regional Marketing',
-  'Financial Controller',
-  'Software Engineer',
-  'Javascript Developer',
-];
+// const allowedPositions = [
+//   'Accountant',
+//   'Javascript Developer',
+//   'Marketing Designer',
+//   'Technical Author',
+//   'Developer',
+//   'Integration Specialist',
+//   'Data Coordinator',
+//   'Regional Director',
+//   'Regional Marketing',
+//   'Financial Controller',
+//   'Software Engineer',
+//   'Javascript Developer',
+// ];
 
 function validateForm() {
   const nameEmployee = form.elements.name.value;
@@ -145,7 +145,7 @@ function validateForm() {
     return;
   }
 
-  if (!allowedPositions.includes(position)) {
+  if (!position) {
     showNotification('Error', 'Please choose a valid position.', 'error');
 
     return;
