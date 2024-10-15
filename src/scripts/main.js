@@ -34,7 +34,7 @@ function updateTable(sortedRows) {
   sortedRows.forEach((row) => tbody.appendChild(row));
 }
 
-function handleSortAndUpdate(index, arraySort, directionSort) {
+function handleHeaderClick(index, arraySort, directionSort) {
   const isAscending = directionSort[index];
 
   const sortedRows = sortRows(index, isAscending, arraySort);
@@ -48,7 +48,7 @@ tableHeaders.forEach((header, index) => {
   sortDirection[index] = true;
 
   header.addEventListener('click', () => {
-    handleSortAndUpdate(index, rowsArray, sortDirection);
+    handleHeaderClick(index, rowsArray, sortDirection);
   });
 });
 
@@ -120,7 +120,7 @@ function validateForm() {
     return;
   }
 
-  addEmployeeAndResetForm(nameEmployee, position, office, age, salary);
+  addEmployeeToTable(nameEmployee, position, office, age, salary);
   showNotification('Success', 'Employee added successfully!', 'success');
 }
 
@@ -161,7 +161,7 @@ function showNotification(title, message, type) {
   }, 1000);
 }
 
-function addEmployeeAndResetForm(nameEmployee, position, office, age, salary) {
+function addEmployeeToTable(nameEmployee, position, office, age, salary) {
   const tbody = document.querySelector('tbody');
   const newRow = document.createElement('tr');
 
