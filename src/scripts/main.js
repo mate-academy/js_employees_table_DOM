@@ -104,7 +104,7 @@ employeeForm.addEventListener('submit', (e) => {
     return;
   }
 
-  pushNotification('success', 'Form submited successfully');
+  pushNotification('success', 'Form submitted successfully');
 
   addRowToTable(formData);
 });
