@@ -100,11 +100,11 @@ employeeForm.addEventListener('submit', (e) => {
     return data;
   }, {});
 
-  if (!validateFrom(formData)) {
+  if (!validateForm(formData)) {
     return;
   }
 
-  pushNotification('success', 'Form submited successfuly');
+  pushNotification('success', 'Form submited successfully');
 
   addRowToTable(formData);
 });
@@ -190,7 +190,7 @@ function pushNotification(type, message) {
   }, NOTIFICATION_TIMEOUT);
 }
 
-function validateFrom(formData) {
+function validateForm(formData) {
   if (
     !formData.name ||
     !formData.position ||
