@@ -164,14 +164,12 @@ function addNewEmployeeInTable(e) {
 
   const newRow = document.createElement('tr');
 
-  const salaryChange = `$${salary.value},000`;
-
   const listInfo = [
     fullName.value,
     position.value,
     office.value,
     age.value,
-    salaryChange,
+    `$${salary.value},000`,
   ];
 
   listInfo.forEach((elem) => {
