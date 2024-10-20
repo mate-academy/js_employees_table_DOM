@@ -57,7 +57,11 @@ function setAttr(elem) {
 function sort(elem) {
   // WE FIND THE COLUMN INDEX NUMBER
   const thead = [...table.rows[0].cells];
-  const currentPos = thead.indexOf(elem);
+  let currentPos = null;
+
+  if (thead.indexOf(elem) >= 0) {
+    currentPos = thead.indexOf(elem);
+  }
 
   const tableBody = [...table.rows].slice(1, -1).sort((a, b) => {
     let firstValue = a.cells[currentPos].innerHTML;
@@ -142,11 +146,11 @@ function createInput(value, type, typeInput, array = null) {
 }
 
 const form = document.querySelector('form');
-const fullName = form.querySelector('[data-qa="name"');
-const position = form.querySelector('[data-qa="position"');
-const office = form.querySelector('[data-qa="office"');
-const age = form.querySelector('[data-qa="age"');
-const salary = form.querySelector('[data-qa="salary"');
+const fullName = form.querySelector('[data-qa="name"]');
+const position = form.querySelector('[data-qa="position"]');
+const office = form.querySelector('[data-qa="office"]');
+const age = form.querySelector('[data-qa="age"]');
+const salary = form.querySelector('[data-qa="salary"]');
 
 // ADD NEW EMPLOYEE IN THE TABLE
 form.addEventListener('submit', addNewEmployeeInTable);
