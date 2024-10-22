@@ -1,6 +1,5 @@
 'use strict';
 
-// #region variables
 const body = document.body;
 const headings = [...document.querySelectorAll('thead th')].map(
   (elem) => elem.textContent,
@@ -11,10 +10,8 @@ let clickCounter = 0;
 let prevClicked = '';
 let prevRow;
 
-// #endregion
 const createOptionsSelect = () => {
   const select = document.querySelector('[data-qa=office]');
-
   const options = [
     'Tokyo',
     'Singapore',
@@ -39,30 +36,31 @@ const createForm = () => {
 
   form.classList.add('new-employee-form');
 
-  for (let i = 0; i < inputName.length; i++) {
+  inputName.forEach((input, i) => {
     const label = document.createElement('label');
     const elemToAdd =
       i === 2
         ? document.createElement('select')
         : document.createElement('input');
 
-    if (elemToAdd.tagName === 'INPUT') {
+    if (i === 3 || i === 4) {
+      elemToAdd.setAttribute('type', 'number');
+    } else if (elemToAdd.tagName === 'INPUT') {
       elemToAdd.setAttribute('type', 'text');
     }
 
-    elemToAdd.setAttribute('name', inputName[i]);
-    elemToAdd.setAttribute('data-qa', inputName[i]);
+    elemToAdd.setAttribute('name', input);
+    elemToAdd.setAttribute('data-qa', input);
 
-    const lblTextContent =
-      inputName[i].slice(0, 1).toUpperCase() + inputName[i].slice(1);
+    const lblTextContent = input.charAt(0).toUpperCase() + input.slice(1);
 
-    label.textContent = lblTextContent + ':';
+    label.textContent = `${lblTextContent}:`;
     label.append(elemToAdd);
     form.append(label);
-  }
+  });
+
   button.textContent = 'Save to table';
   form.append(button);
-
   body.append(form);
   createOptionsSelect();
 };
@@ -70,8 +68,8 @@ const createForm = () => {
 createForm();
 
 // #region listeners
+// Сортування таблиці
 thead.addEventListener('click', (e) => {
-  const actualBody = document.querySelector('tbody');
   const rows = [...document.querySelectorAll('tbody tr')];
   const headClicked = e.target.textContent;
   const indexHead = headings.indexOf(headClicked);
@@ -85,25 +83,22 @@ thead.addEventListener('click', (e) => {
   const sortedRow = rows.sort((elem1, elem2) => {
     const value1 = elem1.children[indexHead].textContent;
     const value2 = elem2.children[indexHead].textContent;
-    const howTowSort = clickCounter % 2 !== 0;
+    const howToSort = clickCounter % 2 !== 0;
 
     if (indexHead === 3 || indexHead === 4) {
       const num1 = indexHead === 4 ? +value1.replace(/[^0-9]+/g, '') : +value1;
       const num2 = indexHead === 4 ? +value2.replace(/[^0-9]+/g, '') : +value2;
 
-      return howTowSort ? num1 - num2 : num2 - num1;
+      return howToSort ? num1 - num2 : num2 - num1;
     }
 
-    return howTowSort
+    return howToSort
       ? value1.localeCompare(value2)
       : value2.localeCompare(value1);
   });
 
-  actualBody.innerHTML = '';
-
-  sortedRow.forEach((row) => {
-    actualBody.append(row);
-  });
+  tbody.innerHTML = '';
+  sortedRow.forEach((row) => tbody.append(row));
   prevClicked = headClicked;
 });
 
@@ -153,23 +148,20 @@ tbody.addEventListener('dblclick', (e) => {
     });
   }
 });
-// #endregion
 
 const buttonAdd = document.querySelector('form button');
 
 buttonAdd.addEventListener('click', (e) => {
   e.preventDefault();
 
-  let isValid = false;
   const valuesToAdd = [];
   const elemForm = document.querySelectorAll('[data-qa]');
 
   elemForm.forEach((elem) => {
-    valuesToAdd[valuesToAdd.length] = elem.value;
+    valuesToAdd.push(elem.value);
   });
 
   if (validData(valuesToAdd)) {
-    isValid = true;
     valuesToAdd[4] = '$' + Number(valuesToAdd[4]).toLocaleString('en-us');
 
     const newRow = document.createElement('tr');
@@ -181,46 +173,46 @@ buttonAdd.addEventListener('click', (e) => {
       newRow.append(column);
     });
     tbody.append(newRow);
-  }
-
-  const div = document.createElement('div');
-  const divTitle = document.createElement('h1');
-
-  divTitle.classList.add('title');
-  div.classList.add('notification');
-  div.setAttribute('data-qa', 'notification');
-
-  if (isValid) {
-    div.classList.add('success');
-    divTitle.textContent = 'Success!';
+    showNotification('Success!', 'Employee added successfully.', true);
   } else {
-    div.classList.add('error');
-    divTitle.textContent = 'Error!';
+    showNotification(
+      'Error!',
+      'Invalid data. Please check input fields.',
+      false,
+    );
   }
-  div.append(divTitle);
-  body.append(div);
-  setTimeout(() => div.remove(), 3000);
 });
 
 const validData = (array) => {
-  const [nameFromArray, position, office, age, salary] = array;
-  const div = document.createElement('div');
-
-  div.classList.add('notification');
-  div.setAttribute('data-qa', 'notification');
+  const [nameArray, , , age, salary] = array;
 
   if (
-    nameFromArray.length < 4 ||
+    nameArray.length < 4 ||
     +age < 18 ||
     +age > 90 ||
     isNaN(age) ||
-    position === '' ||
-    office === '' ||
-    salary === '' ||
     isNaN(salary)
   ) {
     return false;
   }
 
   return true;
+};
+
+const showNotification = (title, message, isSuccess) => {
+  const div = document.createElement('div');
+  const divTitle = document.createElement('h1');
+
+  divTitle.textContent = title;
+  div.classList.add('notification', isSuccess ? 'success' : 'error');
+  div.setAttribute('data-qa', 'notification');
+  div.append(divTitle);
+
+  const messageElem = document.createElement('p');
+
+  messageElem.textContent = message;
+  div.append(messageElem);
+
+  body.append(div);
+  setTimeout(() => div.remove(), 3000);
 };
