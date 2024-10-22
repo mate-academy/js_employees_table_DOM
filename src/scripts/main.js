@@ -17,6 +17,7 @@ const sortState = {
   age: 'desc',
   salary: 'desc',
 };
+let lastSortedColumn = null;
 let employees = tbody.querySelectorAll('tr');
 
 function sortByAlphabet([...list], n, direction) {
@@ -51,44 +52,60 @@ function sortByNumber([...list], n, direction) {
   });
 }
 
+function resetSortDirection() {
+  if (lastSortedColumn) {
+    sortState[lastSortedColumn] = 'desc';
+  }
+}
+
 nameTit.addEventListener('click', () => {
   const direction = sortState.names === 'asc' ? 'desc' : 'asc';
 
+  resetSortDirection();
   employees = tbody.querySelectorAll('tr');
   sortByAlphabet(employees, 0, direction);
   sortState.names = direction;
+  lastSortedColumn = 'names';
 });
 
 positionTit.addEventListener('click', () => {
   const direction = sortState.position === 'asc' ? 'desc' : 'asc';
 
+  resetSortDirection();
   employees = tbody.querySelectorAll('tr');
   sortByAlphabet(employees, 1, direction);
   sortState.position = direction;
+  lastSortedColumn = 'position';
 });
 
 officeTit.addEventListener('click', () => {
   const direction = sortState.office === 'asc' ? 'desc' : 'asc';
 
+  resetSortDirection();
   employees = tbody.querySelectorAll('tr');
   sortByAlphabet(employees, 2, direction);
   sortState.office = direction;
+  lastSortedColumn = 'office';
 });
 
 ageTit.addEventListener('click', () => {
   const direction = sortState.age === 'asc' ? 'desc' : 'asc';
 
+  resetSortDirection();
   employees = tbody.querySelectorAll('tr');
   sortByNumber(employees, 3, direction);
   sortState.age = direction;
+  lastSortedColumn = 'age';
 });
 
 salaryTit.addEventListener('click', () => {
   const direction = sortState.salary === 'asc' ? 'desc' : 'asc';
 
+  resetSortDirection();
   employees = tbody.querySelectorAll('tr');
   sortByNumber(employees, 4, direction);
   sortState.salary = direction;
+  lastSortedColumn = 'salary';
 });
 
 // #endregion
