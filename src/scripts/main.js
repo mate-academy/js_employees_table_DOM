@@ -1,7 +1,7 @@
 'use strict';
 
-const tableHeaders = [...document.querySelectorAll('thead th')];
-let tableRows = [...document.querySelectorAll('tbody tr')];
+const tableHeaders = document.querySelectorAll('thead th');
+let tableRows = document.querySelectorAll('tbody tr');
 const tbody = document.querySelector('tbody');
 let orderSort = true;
 let lastClickedHeader = null;
@@ -202,7 +202,7 @@ button.addEventListener('click', (e) => {
 });
 
 const updateTableRows = () => {
-  tableRows = [...document.querySelectorAll('tbody tr')];
+  tableRows = document.querySelectorAll('tbody tr');
 
   tableRows.forEach((row, i) => {
     row.addEventListener('click', () => {
