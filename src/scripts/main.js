@@ -103,7 +103,7 @@ const nameInput = document.createElement('input');
 
 nameInput.type = 'text';
 nameInput.setAttribute('data-qa', 'name');
-nameInput.required = 'true';
+nameInput.required = true;
 
 const position = document.createElement('label');
 
@@ -113,7 +113,7 @@ const positionInput = document.createElement('input');
 
 position.type = 'text';
 positionInput.setAttribute('data-qa', 'position');
-positionInput.required = 'true';
+positionInput.required = true;
 
 const office = document.createElement('label');
 
@@ -122,7 +122,7 @@ office.textContent = 'office: ';
 const officeInput = document.createElement('select');
 
 officeInput.setAttribute('data-qa', 'office');
-officeInput.required = 'true';
+officeInput.required = true;
 
 const optionTokyo = document.createElement('option');
 
@@ -168,7 +168,7 @@ const ageInput = document.createElement('input');
 
 ageInput.type = 'text';
 ageInput.setAttribute('data-qa', 'age');
-ageInput.required = 'true';
+ageInput.required = true;
 
 const salary = document.createElement('label');
 
@@ -178,7 +178,7 @@ const salaryInput = document.createElement('input');
 
 salaryInput.type = 'text';
 salaryInput.setAttribute('data-qa', 'salary');
-salaryInput.required = 'true';
+salaryInput.required = true;
 
 form.classList.add('new-employee-form');
 
@@ -233,7 +233,7 @@ form.addEventListener('submit', (e) => {
   newPosition.textContent = positionInput.value;
   newOffice.textContent = officeInput.value;
 
-  if (!isNaN(+ageInput.value) && +ageInput.value > 18 && +ageInput.value < 90) {
+  if (!isNaN(ageInput.value) && ageInput.value.trim() !== '' && +ageInput.value > 18 && +ageInput.value < 90) {
     newAge.textContent = ageInput.value;
   } else {
     pushNotification(
@@ -247,7 +247,7 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  if (!isNaN(+salaryInput.value)) {
+  if (!isNaN(salaryInput.value) && ageInput.value.trim() !== '') {
     newSalary.textContent = `$${Number(salaryInput.value).toLocaleString('en-US')}`;
   } else {
     pushNotification(
