@@ -44,11 +44,14 @@ headers.forEach((header, index) => {
 });
 
 tbody.addEventListener('click', (e) => {
-  const row = e.target.closest('tr');
+  const activeRow = e.target.closest('tr');
 
-  if (!row) {
-    return;
+  if (!activeRow) {
   }
 
-  // console.log(row);
+  rows.forEach((element) => {
+    element.classList.remove('active');
+  });
+
+  activeRow.classList.add('active');
 });
