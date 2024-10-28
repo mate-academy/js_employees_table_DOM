@@ -11,7 +11,9 @@ const form = document.createElement('form');
 const saveToTable = document.createElement('button');
 const minAge = 18;
 const maxAge = 90;
-const timeout = 2000;
+
+const names = array.map((el) => el.children[0].innerHTML);
+/* const positions = array.map((el) => el.children[1].innerHTML); */
 
 form.classList.add('new-employee-form');
 
@@ -47,30 +49,51 @@ const formFields = [
   },
 ];
 
+const pushNotification = (title, description, type) => {
+  const div = document.createElement('div');
+
+  div.setAttribute('data-qa', 'notification');
+  div.className = type;
+
+  const h2 = document.createElement('h2');
+  const p = document.createElement('p');
+
+  div.classList.add('notification', type);
+  h2.classList.add('title');
+
+  h2.textContent = title;
+  p.textContent = description;
+
+  div.append(h2, p);
+  document.body.append(div);
+
+  setTimeout(() => {
+    div.style.display = 'none';
+  }, 2000);
+};
+
 formFields.forEach((field) => {
   const fieldLabel = document.createElement('label');
 
-  fieldLabel.textContent = `${field.label}: `;
+  fieldLabel.innerHTML = `${field.label}: `;
 
   let input;
 
   if (field.type === 'select') {
     input = document.createElement('select');
 
-    field.options.forEach((optionValue) => {
+    field.options.forEach((value) => {
       const option = document.createElement('option');
 
-      option.value = optionValue;
-      option.textContent = optionValue;
+      option.value = value;
+      option.textContent = value;
 
       input.appendChild(option);
     });
   } else {
     input = document.createElement('input');
 
-    if (field.min !== undefined) {
-      input.setAttribute('min', field.min);
-    }
+    input.setAttribute('min', field.min);
   }
 
   input.setAttribute('name', field.name);
@@ -82,7 +105,7 @@ formFields.forEach((field) => {
   form.appendChild(fieldLabel);
 });
 
-saveToTable.textContent = 'Save to table';
+saveToTable.innerHTML = 'Save to table';
 
 form.appendChild(saveToTable);
 
@@ -91,23 +114,23 @@ document.body.appendChild(form);
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  const formData = Array.from(e.target.elements).reduce((data, element) => {
+  const formData = [...e.target.elements].reduce((data, element) => {
     if (element.tagName === 'INPUT' || element.tagName === 'SELECT') {
       data[element.name] = isNaN(element.value)
         ? element.value
-        : parseInt(element.value);
+        : parseFloat(element.value);
     }
 
     return data;
   }, {});
 
-  if (!validateForm(formData)) {
+  if (validateForm(formData) === false) {
     return;
   }
 
-  pushNotification('success', 'Form submitted successfully');
-
-  addRowToTable(formData);
+  pushNotification('Success!', 'Form submitted successfully', 'success');
+  names.push(formData.name);
+  addRow(formData);
 });
 
 headers.forEach((header) => {
@@ -153,23 +176,6 @@ function sortBy(arrayOf, index) {
         };
     }
     arrayOf.sort(compare);
-
-    /*    arrayOf.sort((td1, td2) => {
-      if (index === 0 || index === 1 || index === 2) {
-        return td1.children[index].innerHTML.localeCompare(
-          td2.children[index].innerHTML,
-        );
-      } else {
-        return (
-          Number(
-            td1.children[index].innerHTML.replace(',', '').replace('$', ''),
-          ) -
-          Number(
-            td2.children[index].innerHTML.replace(',', '').replace('$', ''),
-          )
-        );
-      }
-    }); */
     lastClickedIndex = index;
   } else {
     arrayOf.reverse();
@@ -194,25 +200,6 @@ tBody.addEventListener('click', (e) => {
   activeRow.classList.add('active');
 });
 
-function pushNotification(type, message) {
-  const notificationBlock = document.createElement('div');
-  const title = document.createElement('h1');
-  const phrase = document.createElement('p');
-
-  notificationBlock.setAttribute('data-qa', 'notification');
-  notificationBlock.className = `notification ${type}`;
-  title.textContent = type[0].toUpperCase() + type.slice(1);
-  phrase.textContent = message[0].toUpperCase() + message.slice(1);
-
-  notificationBlock.appendChild(title);
-  notificationBlock.appendChild(phrase);
-  document.body.appendChild(notificationBlock);
-
-  setTimeout(() => {
-    notificationBlock.style.visibility = 'hidden';
-  }, timeout);
-}
-
 function validateForm(formData) {
   if (
     !formData.name ||
@@ -220,19 +207,51 @@ function validateForm(formData) {
     !formData.age ||
     !formData.salary
   ) {
-    pushNotification('error', 'Each field must be filled in');
+    pushNotification('Warning!', 'Each field must be filled in!', 'error');
+
+    return false;
+  }
+
+  if (typeof formData.name !== 'string') {
+    pushNotification('Warning!', 'Name should be a string!', 'warning');
+
+    return false;
+  }
+
+  if (typeof formData.position !== 'string') {
+    pushNotification('Warning!', 'Position should be a string!', 'warning');
+
+    return false;
+  }
+
+  if (names.includes(formData.name)) {
+    pushNotification('Warning!', 'This name already exist!', 'warning');
 
     return false;
   }
 
   if (formData.name.length < 4) {
-    pushNotification('error', 'Name must be no shorter than 4');
+    pushNotification('Error!', 'Name must not to be shorter than 4!', 'error');
 
     return false;
   }
 
   if (formData.age < minAge || formData.age > maxAge) {
-    pushNotification('error', `Age must be between ${minAge} and ${maxAge}`);
+    pushNotification(
+      'Error!',
+      `Age have to be between ${minAge} and ${maxAge}!`,
+      'error',
+    );
+
+    return false;
+  }
+
+  if (formData.position.length < 5) {
+    pushNotification(
+      'Warning!',
+      'Position field have to have more then 5 characters!',
+      'error',
+    );
 
     return false;
   }
@@ -240,7 +259,7 @@ function validateForm(formData) {
   return true;
 }
 
-function addRowToTable(data) {
+function addRow(data) {
   const newRow = document.createElement('tr');
 
   Object.entries(data).forEach(([key, value]) => {
@@ -256,22 +275,26 @@ function addRowToTable(data) {
 }
 
 tBody.addEventListener('dblclick', (e) => {
-  const clickedCell = e.target.closest('td');
-  const originalValue = clickedCell.textContent;
+  const dblclickedCell = e.target.closest('td');
+  const lastValue = dblclickedCell.textContent;
+
+  dblclickedCell.textContent = '';
+
   const cellInput = document.createElement('input');
 
   cellInput.classList.add('cell-input');
-  clickedCell.textContent = '';
-  cellInput.value = originalValue;
-  clickedCell.appendChild(cellInput);
+  dblclickedCell.appendChild(cellInput);
   cellInput.focus();
 
-  cellInput.addEventListener('blur', (inputEvent) => {
-    clickedCell.textContent = cellInput.value;
+  cellInput.addEventListener('blur', (ee) => {
+    dblclickedCell.textContent = lastValue;
   });
 
   cellInput.addEventListener('keypress', (inputEvent) => {
     if (inputEvent.key === 'Enter') {
+      /* dblclickedCell.textContent = ''; */
+      dblclickedCell.textContent = cellInput.textContent;
+      dblclickedCell.appendChild(cellInput);
       cellInput.blur();
     }
   });
