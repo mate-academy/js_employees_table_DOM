@@ -174,7 +174,7 @@ formBtn.addEventListener('click', (e) => {
   }
 });
 
-function validateFormFields({ employeeName, position, age, salary }) {
+function validateFormFields({ employeeName, position, office, age, salary }) {
   const notifications = [];
 
   if (employeeName.length < 4) {
@@ -190,6 +190,12 @@ function validateFormFields({ employeeName, position, age, salary }) {
   if (!position.trim()) {
     notifications.push(
       new CustomNotification('Error', 'Position cannot be empty', 'error'),
+    );
+  }
+
+  if (!office.trim() || !offices.includes(office)) {
+    notifications.push(
+      new CustomNotification('Error', 'Office cannot be empty', 'error'),
     );
   }
 
@@ -227,8 +233,6 @@ function addRow(fields) {
     td.textContent = field;
     row.append(td);
   });
-
-  tbody.append(row);
 
   return row;
 }
