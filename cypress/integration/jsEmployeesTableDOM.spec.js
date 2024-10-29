@@ -135,11 +135,11 @@ describe('Employees table', () => {
    with invalid input`, () => {
     cy.fillNewEmployeeForm('Ada', 'QA Engineer', 'San Francisco', 18, 50000);
 
-    cy.get('[data-qa="notification"]').should('have.class', 'warning');
+    cy.get('[data-qa="notification"]').should('have.class', 'error');
     cy.checkDataDoesntExist('Ada', 50000);
   });
 
-  it(`should have warning notification on position
+  it(`should have warning notification on position 
   field with invalid input`, () => {
     cy.get('[data-qa="name"]').type('Adam');
     cy.get('[data-qa="office"]').select('San Francisco');
@@ -155,7 +155,7 @@ describe('Employees table', () => {
    if the age less than 18`, () => {
     cy.fillNewEmployeeForm('Adam', 'QA Engineer', 'San Francisco', 17, 50000);
 
-    cy.get('[data-qa="notification"]').should('have.class', 'warning');
+    cy.get('[data-qa="notification"]').should('have.class', 'error');
     cy.checkDataDoesntExist('Adam', 50000);
   });
 
@@ -163,7 +163,7 @@ describe('Employees table', () => {
    if the age bigger than 90`, () => {
     cy.fillNewEmployeeForm('Adam', 'QA Engineer', 'San Francisco', 91, 50000);
 
-    cy.get('[data-qa="notification"]').should('have.class', 'warning');
+    cy.get('[data-qa="notification"]').should('have.class', 'error');
     cy.checkDataDoesntExist('Adam', 50000);
   });
 });

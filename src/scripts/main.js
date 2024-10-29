@@ -18,12 +18,12 @@ function sortTableByColumn(columnIndex, sortParam, table) {
     return cellA.localeCompare(cellB);
   });
 
-  if (sortField === sortParam && !descending) {
-    descending = true;
+  if (sortField === sortParam && !isDescending) {
+    isDescending = true;
 
     tableCopy.reverse();
   } else {
-    descending = false;
+    isDescending = false;
     sortField = sortParam;
   }
 
@@ -90,7 +90,7 @@ function validateEmployeeData(employee) {
     case nameValue.length > 0 && nameValue.length < 4:
       document.getElementsByName('name')[0].focus();
 
-      return { text: 'Name has less than 4 letters', type: 'warning' };
+      return { text: 'Name has less than 4 letters' };
 
     case !position:
       document.getElementsByName('position')[0].focus();
@@ -105,7 +105,7 @@ function validateEmployeeData(employee) {
     case age < 18 || age > 90:
       document.getElementsByName('age')[0].focus();
 
-      return { text: 'Age must be between 18 and 90', type: 'warning' };
+      return { text: 'Age must be between 18 and 90' };
 
     case !salary:
       document.getElementsByName('salary')[0].focus();
@@ -269,7 +269,7 @@ const submitButton = document.createElement('button');
 const officeCities = getUniqueCities();
 
 let sortField = '';
-let descending = false;
+let isDescending = false;
 let activeRow = null;
 let edit = '';
 let editingCell = '';
