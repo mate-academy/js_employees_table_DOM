@@ -172,6 +172,8 @@ formBtn.addEventListener('click', (e) => {
 
     tbody.append(row);
   }
+
+  form.reset();
 });
 
 function validateFormFields({ employeeName, position, office, age, salary }) {
