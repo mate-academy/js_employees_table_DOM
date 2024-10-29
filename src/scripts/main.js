@@ -90,7 +90,7 @@ function validateEmployeeData(employee) {
     case nameValue.length > 0 && nameValue.length < 4:
       document.getElementsByName('name')[0].focus();
 
-      return { text: 'Name has less than 4 letters' };
+      return { text: 'Name has less than 4 letters', warning: 'warning' };
 
     case !position:
       document.getElementsByName('position')[0].focus();
@@ -105,7 +105,7 @@ function validateEmployeeData(employee) {
     case age < 18 || age > 90:
       document.getElementsByName('age')[0].focus();
 
-      return { text: 'Age must be between 18 and 90' };
+      return { text: 'Age must be between 18 and 90', warning: 'warning' };
 
     case !salary:
       document.getElementsByName('salary')[0].focus();
@@ -136,7 +136,7 @@ function createNewEmployee() {
   }
 }
 
-function getNotification({ text, type = 'error' }) {
+function getNotification({ text, type = 'error', warning = '' }) {
   const notification = document.createElement('div');
   const title = document.createElement('h1');
   const message = document.createElement('p');
@@ -145,8 +145,12 @@ function getNotification({ text, type = 'error' }) {
 
   notification.setAttribute('class', `notification ${type}`);
   notification.setAttribute('data-qa', 'notification');
-  title.textContent = type;
+  title.textContent = warning || type;
   message.textContent = text;
+
+  if (warning) {
+    notification.style.backgroundColor = 'rgba(255, 212, 39, 0.3)';
+  }
 
   notification.append(title);
   notification.append(message);
