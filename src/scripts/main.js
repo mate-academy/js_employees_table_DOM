@@ -195,7 +195,11 @@ function validateFormFields({ employeeName, position, office, age, salary }) {
 
   if (!office.trim() || !offices.includes(office)) {
     notifications.push(
-      new CustomNotification('Error', 'Office cannot be empty', 'error'),
+      new CustomNotification(
+        'Error',
+        'Office cannot be empty, and should contain one of the defined options',
+        'error',
+      ),
     );
   }
 
@@ -205,7 +209,7 @@ function validateFormFields({ employeeName, position, office, age, salary }) {
     );
   }
 
-  if (salary <= 0) {
+  if (salary <= 0 || isNaN(salary)) {
     notifications.push(
       new CustomNotification(
         'Error',
@@ -249,7 +253,7 @@ headers.forEach((header) => {
     headers.forEach((h) => delete h.dataset.sort);
     header.dataset.sort = newSortOrder;
 
-    let rows = [...table.querySelectorAll('tr:has(td')];
+    let rows = [...table.querySelectorAll('tr:has(td)')];
 
     rows = sortedRows(rows, header.textContent, index, newSortOrder);
 
