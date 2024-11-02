@@ -224,7 +224,6 @@ textContentLabel.forEach((item) => {
   }
 });
 
-console.log(createElementForm);
 
 // можна звертатись по індексу
 // console.log(arrForLabel[0].textContent);
@@ -240,15 +239,18 @@ button.addEventListener('click', function (e) {
   e.preventDefault(); // Запобігаємо стандартній поведінці кнопки
 
   const clickButton = e.target.closest('button');
-
-  // Перевіряємо, чи є активний рядок
   // eslint-disable-next-line max-len
   const activeRow = Array.from(getTBody).find(item => item.classList.contains('active'));
 
   if (clickButton && activeRow) {
     let allInputsValid = true; // Для перевірки всіх інпутів
+    // eslint-disable-next-line max-len
+    const existingErrorDiv = document.querySelector('[data-qa="notification.error"]');
 
-    // Збираємо дані з інпутів
+    if (existingErrorDiv) {
+      existingErrorDiv.remove();
+    }
+
     arrForLabel.forEach((label, index) => {
       const input = label.querySelector('input');
 
@@ -260,33 +262,25 @@ button.addEventListener('click', function (e) {
           valueToSet = `$${valueToSet}`;
         }
 
-        console.log(input.value); // Відразу тримаємо trimmed значення
-
-        // Перевірка довжини введеного значенн
         if (input.name === 'name' || input.name === 'position') {
-          // Для name та position: перевірка на довжину
           if (valueToSet.length < 4) {
-            if (allInputsValid) { // Виводимо попередження лише один раз
-              allInputsValid = false;
-              alert('Uncorrect data for name or position');
-            }
+            allInputsValid = false;
+            showError('Name and position must be at least 4 characters long.');
 
-            return; // Вихід з циклу, якщо дані некоректні
-          }
-        } else if (input.name === 'age') {
-          // Для age: перевірка на числове значення та діапазон
-          const numericValue = parseFloat(valueToSet);
-
-          if (isNaN(numericValue) || numericValue < 18 || numericValue > 90) {
-            if (allInputsValid) { // Виводимо попередження лише один раз
-              allInputsValid = false;
-              alert('Enter correct data for age!');
-            }
-
-            return; // Вихід з циклу, якщо дані некоректні
+            return;
           }
         }
 
+        if (input.name === 'age') {
+          const number = parseInt(input.value);
+
+          if (number < 18 || number > 90) {
+            allInputsValid = false;
+            showError('Age must be between 18 and 90.');
+
+            return;
+          }
+        }
 
         // Оновлюємо текст в активному рядку таблиці лише якщо дані валідні
         if (allInputsValid) {
@@ -297,13 +291,37 @@ button.addEventListener('click', function (e) {
 
     // Якщо всі дані валідні, показуємо повідомлення
     if (allInputsValid) {
-      alert('Employee added successfully!');
+      showSuccessuf('Employee added successufl!');
     }
   }
 });
 
+// Функція для відображення повідомлень про помилки
+function showError(message) {
+  const createElementDiv = document.createElement('div');
 
+  createElementDiv.setAttribute('data-qa', 'notification.error');
+  createElementDiv.classList.add('notification', 'error');
+  createElementDiv.textContent = message;
+  document.body.append(createElementDiv);
 
+  setTimeout(() => {
+    createElementDiv.remove();
+  }, 2000);
+}
+
+function showSuccessuf(message) {
+  const createElementDiv = document.createElement('div');
+
+  createElementDiv.setAttribute('data-qa', 'notification.success');
+  createElementDiv.classList.add('notification', 'success');
+  createElementDiv.textContent = message;
+  document.body.append(createElementDiv);
+
+  setTimeout(() => {
+    createElementDiv.remove();
+  }, 2000);
+}
 
 document.body.append(createElementForm);
 
@@ -315,5 +333,23 @@ getTFooter.forEach((item) => {
     getTFooter.forEach((itemTfooter) => itemTfooter.classList.remove('active'));
 
     item.classList.add('active');
+  });
+});
+
+
+getTBody.forEach((item) => {
+  item.addEventListener('dblclick', function(e) {
+    const dblClickTr = e.target.closest('tr');
+
+
+    if (dblClickTr) {
+      item.textContent = '';
+
+      const createInputCell = document.createElement('input');
+
+      createInputCell.classList.add('cell-input');
+
+      document.body.append(createInputCell);
+    }
   });
 });
