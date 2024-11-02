@@ -2,6 +2,7 @@
 'use strict';
 
 const getTableHeader = document.querySelectorAll('table th');
+const tableBody = document.querySelector('tbody');
 const getTHead = document.querySelectorAll('thead tr');
 const getTBody = document.querySelectorAll('tbody tr');
 const getTFooter = document.querySelectorAll('tfoot tr');
@@ -171,10 +172,9 @@ const arrForLabel = [];
 textContentLabel.forEach((item) => {
   const createElementLabel = document.createElement('label');
   const createElementInput = document.createElement('input');
-  const cleanText = item.replace(': ', '');
+  const cleanText = item.replace(': ', '').toLowerCase();
 
   createElementLabel.textContent = cleanText;
-
   createElementLabel.textContent = item;
   arrForLabel.push(createElementLabel);
   createElementInput.setAttribute('name', cleanText.toLowerCase());
@@ -198,7 +198,7 @@ textContentLabel.forEach((item) => {
   if (createElementInput.name === 'office') {
     const select = document.createElement('select');
 
-    select.name = item.toLowerCase();
+    select.setAttribute('name', cleanText.toLowerCase());
 
     const cities = [
       'Tokyo',
@@ -215,7 +215,6 @@ textContentLabel.forEach((item) => {
       option.textContent = city;
       select.append(option);
     });
-
     createElementLabel.append(select);
   }
 
@@ -223,6 +222,7 @@ textContentLabel.forEach((item) => {
     createElementLabel.append(createElementInput);
   }
 });
+
 
 
 // можна звертатись по індексу
@@ -238,63 +238,50 @@ createElementForm.append(button);
 button.addEventListener('click', function (e) {
   e.preventDefault(); // Запобігаємо стандартній поведінці кнопки
 
-  const clickButton = e.target.closest('button');
-  // eslint-disable-next-line max-len
-  const activeRow = Array.from(getTBody).find(item => item.classList.contains('active'));
+  const data = new FormData(createElementForm);
+  const namePerson = data.get('name');
+  const age = data.get('age');
+  const position = data.get('position');
+  const salary = data.get('salary');
 
-  if (clickButton && activeRow) {
-    let allInputsValid = true; // Для перевірки всіх інпутів
-    // eslint-disable-next-line max-len
-    const existingErrorDiv = document.querySelector('[data-qa="notification.error"]');
+  if (namePerson.trim().length < 4) {
+    showError('Name value has less than 4 letters');
+  } else if (position.trim().length === 0) {
+    showError('Position field cannot be empty');
+  } else if (+age < 18 || +age >= 90 || isNaN(age)) {
+    showError('Age value is less than 18 or more than 90');
+  } else if (+salary <= 0) {
+    showError('Add salary');
+  } else {
+    showSuccessuf('Employee successfully added');
 
-    if (existingErrorDiv) {
-      existingErrorDiv.remove();
-    }
+    const newPerson = [
+      namePerson,
+      position,
+      data.get('office'),
+      age,
+      `$${(+(salary / 1000)).toFixed(3).replace('.', ',')}`,
+    ];
 
-    arrForLabel.forEach((label, index) => {
-      const input = label.querySelector('input');
+    const newRow = tableBody.insertRow(-1);
 
-      if (input) {
-        let valueToSet = input.value.trim();
+    newPerson.forEach((item, index) => {
+      const cell = newRow.insertCell(index);
 
-        // Якщо це зарплата, додаємо символ '$'
-        if (index === 4) {
-          valueToSet = `$${valueToSet}`;
-        }
-
-        if (input.name === 'name' || input.name === 'position') {
-          if (valueToSet.length < 4) {
-            allInputsValid = false;
-            showError('Name and position must be at least 4 characters long.');
-
-            return;
-          }
-        }
-
-        if (input.name === 'age') {
-          const number = parseInt(input.value);
-
-          if (number < 18 || number > 90) {
-            allInputsValid = false;
-            showError('Age must be between 18 and 90.');
-
-            return;
-          }
-        }
-
-        // Оновлюємо текст в активному рядку таблиці лише якщо дані валідні
-        if (allInputsValid) {
-          activeRow.cells[index].textContent = valueToSet;
-        }
-      }
+      cell.innerText = item;
     });
-
-    // Якщо всі дані валідні, показуємо повідомлення
-    if (allInputsValid) {
-      showSuccessuf('Employee added successufl!');
-    }
+    createElementForm.reset();
   }
+
+  setTimeout(() => {
+    const notifications = document.querySelectorAll('.notification');
+
+    notifications.forEach((notification) => {
+      notification.parentNode.removeChild(notification);
+    });
+  }, 3000);
 });
+
 
 // Функція для відображення повідомлень про помилки
 function showError(message) {
@@ -339,17 +326,43 @@ getTFooter.forEach((item) => {
 
 getTBody.forEach((item) => {
   item.addEventListener('dblclick', function(e) {
-    const dblClickTr = e.target.closest('tr');
+    const clickedCell = e.target; // Отримуємо клікаючу комірку
 
+    if (clickedCell.tagName === 'TD') {
+      const originalValue = clickedCell.textContent;
 
-    if (dblClickTr) {
-      item.textContent = '';
+      clickedCell.textContent = '';
 
       const createInputCell = document.createElement('input');
 
       createInputCell.classList.add('cell-input');
+      createInputCell.type = 'text';
 
-      document.body.append(createInputCell);
+
+      createInputCell.value = originalValue;
+
+
+      clickedCell.append(createInputCell);
+
+
+      createInputCell.addEventListener('blur', function () {
+        const newValue = createInputCell.value.trim();
+
+        // eslint-disable-next-line max-len
+        clickedCell.textContent = newValue.length > 0 ? newValue : originalValue;
+        createInputCell.remove(); // Видаляємо input
+      });
+
+
+      createInputCell.addEventListener('keydown', function (e2) {
+        if (e2.key === 'Enter') {
+          const newValue = createInputCell.value.trim(); // Обрізаємо пробіли
+
+          // eslint-disable-next-line max-len
+          clickedCell.textContent = newValue.length > 0 ? newValue : originalValue;
+          createInputCell.remove(); // Видаляємо input
+        }
+      });
     }
   });
 });
