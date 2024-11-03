@@ -182,10 +182,10 @@ button.addEventListener('click', (e) => {
     body.appendChild(notification);
 
     setTimeout(() => {
-      notification.style.visibility = 'hidden';
+      notification.remove();
       notification.classList.remove('success');
       notification.classList.remove('error');
-    }, 4500);
+    }, 2000);
   } else if (!isValidInputs(userName, userAge)) {
     notification.classList.add('error');
     notificationTitle.textContent = 'Sorry :(';
@@ -193,10 +193,10 @@ button.addEventListener('click', (e) => {
     body.appendChild(notification);
 
     setTimeout(() => {
-      notification.style.visibility = 'hidden';
+      notification.remove();
       notification.classList.remove('error');
       notification.classList.remove('success');
-    }, 4500);
+    }, 2000);
   }
 });
 
