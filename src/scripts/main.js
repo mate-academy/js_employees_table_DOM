@@ -97,6 +97,8 @@ function validateEmployeeData(employee) {
 
     return false;
   }
+
+  return true;
 }
 
 function showNotification(message, type) {
@@ -108,7 +110,7 @@ function showNotification(message, type) {
 
   document.body.appendChild(notification);
 
-  setImmediate(() => notification.remove(), 3000);
+  setTimeout(() => notification.remove(), 3000);
 }
 
 function addEmployeeToTable(employee) {
