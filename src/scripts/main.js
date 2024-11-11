@@ -27,7 +27,7 @@ const setSortTable = (columnIndex) => {
     const aValue = a.cells[columnIndex].textContent.trim();
     const bValue = b.cells[columnIndex].textContent.trim();
 
-    if (!isNaN(aValue) && !isNaN(aValue)) {
+    if (!isNaN(aValue) && !isNaN(bValue)) {
       return sortOrder[columnIndex] ? aValue - bValue : bValue - aValue;
     }
 
@@ -189,16 +189,17 @@ function checkFormFields() {
 }
 
 cells.forEach((cell) => {
-  const td = document.createElement('td');
   const editCell = document.createElement('input');
-
+  
   editCell.classList.add('cell-input');
-
+  
   cell.addEventListener('dblclick', () => {
     cell.replaceWith(editCell);
   });
-
+  
   editCell.addEventListener('blur', (e) => {
+    const td = document.createElement('td');
+
     if (editCell.value !== '') {
       editCell.replaceWith(td);
       td.textContent = editCell.value;
@@ -206,8 +207,10 @@ cells.forEach((cell) => {
       editCell.replaceWith(cell);
     }
   });
-
+  
   editCell.addEventListener('keypress', (e) => {
+    const td = document.createElement('td');
+
     if (e.key === 'Enter') {
       editCell.replaceWith(td);
       td.textContent = editCell.value;
