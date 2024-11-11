@@ -142,7 +142,7 @@ function showNotification(title, message, type) {
   const notification = document.createElement('div');
 
   notification.className = `notification ${type}`;
-  notification.setAttribute('data-ga', 'notification');
+  notification.setAttribute('data-qa', 'notification');
 
   notification.innerHTML = `
     <h2 class="title">${title}</h2>
