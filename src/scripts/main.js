@@ -141,7 +141,7 @@ button.innerText = 'Save to table';
 form.append(button);
 
 // button submit
-const formData = document.querySelector('.new-employee-form');
+const formData = document.querySelector('form');
 
 formData.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -204,7 +204,7 @@ formData.addEventListener('submit', (e) => {
 });
 
 const validName = (dataName) => {
-  const namePattern = /^[a-zA-Z]{4,}$/;
+  const namePattern = /^[a-zA-Z\s'-]{4,}$/;
 
   return namePattern.test(dataName);
 };
