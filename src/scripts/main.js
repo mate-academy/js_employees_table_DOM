@@ -28,14 +28,11 @@ thead.addEventListener('click', (e) => {
     const cellB = getCellValue(rowB, idx);
 
     const a = isNaN(cellA) ? cellA : parseFloat(cellA.replace(/[^0-9.]/g, ''));
-
     const b = isNaN(cellB) ? cellB : parseFloat(cellB.replace(/[^0-9.]/g, ''));
 
-    if (!isNaN(a) && !isNaN(b)) {
-      return (a - b) * direction;
-    } else {
-      return cellA.localeCompare(cellB) * direction;
-    }
+    return isNaN(a) && isNaN(b)
+      ? new Intl.Collator().compare(cellA, cellB) * direction
+      : (a - b) * direction;
   });
 
   tbody.append(...rowArray);
@@ -156,19 +153,123 @@ formData.addEventListener('submit', (e) => {
     position: data.get('position'),
     office: data.get('office'),
     age: data.get('age'),
-    salary: data.get('salary'),
+    salary: new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(data.get('salary')),
   };
 
-  const tr = document.createElement('tr');
+  // validator
+  if (!validName(fData.name)) {
+    pushNotification(
+      10,
+      10,
+      'Wrong Name',
+      'Error.\n ' +
+        'The name must consist of letters and be longer than 4 characters',
+      'error',
+    );
+  } else if (!validAge(fData.age)) {
+    pushNotification(
+      10,
+      10,
+      'Wrong Age',
+      'Error.\n ' + 'Аge must be between 18 and 90.',
+      'error',
+    );
+  } else {
+    const tr = document.createElement('tr');
 
-  [...thead.querySelectorAll('th')].forEach((header) => {
-    const key = header.innerText.toLocaleLowerCase()
-    const td = document.createElement('td');
+    [...thead.querySelectorAll('th')].forEach((header) => {
+      const key = header.innerText.toLocaleLowerCase();
+      const td = document.createElement('td');
 
-    td.innerText = fData[key];
-    tr.append(td);
-  });
-  tbody.append(tr);
+      td.innerText = fData[key];
+      tr.append(td);
+    });
 
-  form.reset();
+    tbody.append(tr);
+    form.reset();
+
+    pushNotification(
+      10,
+      10,
+      'Successful addition',
+      'Success.\n ' + 'Record successfully added to the table.',
+      'success',
+    );
+  }
+});
+
+const validName = (dataName) => {
+  const namePattern = /^[a-zA-Z]{4,}$/;
+
+  return namePattern.test(dataName);
+};
+
+const validAge = (dataAge) => {
+  return dataAge >= 18 && dataAge <= 90;
+};
+
+// validation
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const container = document.createElement('div');
+  const h2 = document.createElement('h2');
+  const p = document.createElement('p');
+
+  container.className = `notification ${type}`;
+  container.setAttribute('data-qa', 'notification');
+  container.style.top = `${posTop}px`;
+  container.style.right = `${posRight}px`;
+  body.appendChild(container);
+
+  h2.className = 'title';
+  h2.style.whiteSpace = 'nowrap';
+  h2.innerText = `${title}`;
+  container.appendChild(h2);
+
+  p.innerText = `${description}`;
+  container.appendChild(p);
+
+  setTimeout(() => {
+    container.style.visibility = 'hidden';
+  }, 2000);
+};
+
+tbody.addEventListener('dblclick', (e) => {
+  const cell = e.target;
+
+  if (cell.tagName === 'TD') {
+    const originalText = cell.innerText;
+    const input = document.createElement('input');
+
+    input.classList.add('cell-input');
+    input.value = originalText;
+
+    cell.innerText = '';
+    cell.appendChild(input);
+    input.focus();
+
+    const saveChanges = () => {
+      const newText = input.value.trim();
+
+      if (newText) {
+        cell.innerText = newText;
+      } else {
+        cell.innerText = originalText;
+      }
+
+      cell.removeChild(input);
+    };
+
+    input.addEventListener('blur', saveChanges);
+
+    input.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        saveChanges();
+      }
+    });
+  }
 });
