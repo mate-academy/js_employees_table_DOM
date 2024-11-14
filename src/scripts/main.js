@@ -6,13 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   formContainer.classList.add('new-employee-form-container');
 
-  // Создание формы
   const form = document.createElement('form');
 
   form.classList.add('new-employee-form');
   form.id = 'newEmployeeForm';
 
-  // Создание полей формы
   const fields = [
     {
       label: 'Name',
@@ -51,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     },
   ];
 
-  // Заполнение полей формы
   fields.forEach((field) => {
     const label = document.createElement('label');
 
@@ -95,32 +92,27 @@ document.addEventListener('DOMContentLoaded', () => {
     form.appendChild(label);
   });
 
-  // Кнопка для отправки формы
   const submitButton = document.createElement('button');
 
   submitButton.type = 'submit';
   submitButton.textContent = 'Save to table';
   form.appendChild(submitButton);
 
-  // Добавляем форму в контейнер
   formContainer.appendChild(form);
   tableContainer.appendChild(formContainer);
 
-  // Обработчик события для добавления нового сотрудника
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    // Получаем данные из формы
     const nam = document.getElementById('name').value.trim();
     const position = document.getElementById('position').value.trim();
     const office = document.getElementById('office').value;
     const age = parseInt(document.getElementById('age').value);
     const salary = parseInt(document.getElementById('salary').value);
 
-    // Валидация данных
     let isValid = true;
 
-    clearNotifications(); // Очистка предыдущих уведомлений
+    clearNotifications();
 
     if (nam.length < 4) {
       showNotification('error', 'Name must have at least 4 characters.');
@@ -140,14 +132,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isNaN(age)) {
       showNotification('Age is not a valid number');
       isValid = false;
-      // здесь можно отобразить уведомление об ошибке
     } else if (age < 18 || age > 90) {
       showNotification('Age must be between 18 and 90');
       isValid = false;
-      // здесь можно отобразить уведомление об ошибке
     } else {
       showNotification('Age is valid:', age);
-      // дальнейшие действия с корректным значением возраста
     }
 
     if (isNaN(salary)) {
@@ -159,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Создаем строку таблицы для нового сотрудника
     const row = document.createElement('tr');
 
     row.innerHTML = `
@@ -170,15 +158,12 @@ document.addEventListener('DOMContentLoaded', () => {
       <td>$${salary.toLocaleString()}</td>
     `;
 
-    // Добавляем строку в таблицу
     document.querySelector('tbody').appendChild(row);
 
-    // Очищаем форму после добавления сотрудника
     document.getElementById('newEmployeeForm').reset();
     showNotification('success', 'New employee added successfully');
   });
 
-  // Функция для показа уведомлений
   function showNotification(type, message) {
     const notification = document.createElement('div');
 
@@ -189,14 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => notification.remove(), 3000);
   }
 
-  // Функция для очистки уведомлений
   function clearNotifications() {
     const notifications = document.querySelectorAll('[data-qa="notification"]');
 
     notifications.forEach((notification) => notification.remove());
   }
 
-  // Сортировка таблицы при клике на заголовки
   const table = document.querySelector('table');
   const headers = table.querySelectorAll('thead th');
   let sortOrder = 'asc';
@@ -233,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
     sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
   }
 
-  // Добавление класса 'active' при клике на строку
   table.addEventListener('click', (ev) => {
     if (ev.target.tagName === 'TD') {
       const rows = table.querySelectorAll('tbody tr');
