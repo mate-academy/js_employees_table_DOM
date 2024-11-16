@@ -6,7 +6,6 @@ const wrapperForm = document.createElement('div');
 
 wrapperForm.style.cssText = `display: flex; flex-direction: column; row-gap: 20px; position: relative`;
 
-// --------------------SORTING OF TABLE
 table.addEventListener('click', (e) => {
   const target = e.target.closest('thead th');
 
@@ -19,7 +18,6 @@ table.addEventListener('click', (e) => {
   sort(target);
 });
 
-// CHANGE STYLES FOR CURRENT ROW
 table.addEventListener('click', (e) => {
   const target = e.target.closest('tbody tr');
 
@@ -34,7 +32,6 @@ table.addEventListener('click', (e) => {
   target.classList.add('active');
 });
 
-// ---------------------ATTRIBUTE SETTING TO CONTROL SORTING
 function setAttr(elem) {
   let currentAttr = null;
 
@@ -53,9 +50,7 @@ function setAttr(elem) {
   elem.setAttribute('data-sort', currentAttr);
 }
 
-//  -------------------------SORTING ELEMENTS
 function sort(elem) {
-  // WE FIND THE COLUMN INDEX NUMBER
   const thead = [...table.rows[0].cells];
   let currentPos = null;
 
@@ -67,7 +62,6 @@ function sort(elem) {
     let firstValue = a.cells[currentPos].innerHTML;
     let secondValue = b.cells[currentPos].innerHTML;
 
-    // WE CHECK WHETHER THESE ARE NUMBERS
     if (!isNaN(parseFloat(firstValue)) || firstValue.includes('$')) {
       if (firstValue.includes('$')) {
         firstValue = firstValue.slice(1).replace(',', '.');
@@ -152,7 +146,6 @@ const office = form.querySelector('[data-qa="office"]');
 const age = form.querySelector('[data-qa="age"]');
 const salary = form.querySelector('[data-qa="salary"]');
 
-// ADD NEW EMPLOYEE IN THE TABLE
 form.addEventListener('submit', addNewEmployeeInTable);
 
 function addNewEmployeeInTable(e) {
