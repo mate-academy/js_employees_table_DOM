@@ -3,6 +3,14 @@
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 
+const newForm = document.createElement('form');
+const body = document.querySelector('body');
+
+body.appendChild(newForm);
+newForm.setAttribute('class', 'new-employee-form');
+
+const button = document.createElement('button');
+
 thead.addEventListener('click', (e) => {
   const target = e.target;
 
@@ -38,12 +46,6 @@ function sortTable(indexColumn) {
   rows.forEach((row) => tbody.appendChild(row));
 }
 
-const newForm = document.createElement('form');
-const body = document.querySelector('body');
-
-body.appendChild(newForm);
-newForm.setAttribute('class', 'new-employee-form');
-
 function makeLabel(newName) {
   const label = document.createElement('label');
   const input = document.createElement('input');
@@ -66,7 +68,6 @@ function makeLabel(newName) {
       select.appendChild(option);
     });
 
-    newForm.appendChild(label);
     label.textContent = `${newName}:`;
     label.append(select);
     select.setAttribute('name', 'name');
@@ -83,7 +84,6 @@ function makeLabel(newName) {
 
     newForm.appendChild(label);
   } else {
-    newForm.appendChild(label);
     label.textContent = `${newName}:`;
     label.append(input);
     input.setAttribute('name', 'name');
@@ -95,13 +95,38 @@ function makeLabel(newName) {
 }
 
 function createButton() {
-  const button = document.createElement('button');
-
   button.setAttribute('type', 'button');
   button.textContent = 'Save to table';
 
   newForm.appendChild(button);
 }
+
+const pushNotification = (
+  posTop = 10,
+  posRight = 10,
+  title,
+  description,
+  type,
+) => {
+  const notification = document.createElement('div');
+  const notificationTitle = document.createElement('h2');
+  const notificationDescription = document.createElement('p');
+
+  notification.setAttribute('data-qa', 'notification');
+  notification.classList.add('notification', type);
+  notification.style.top = `${posTop}px`;
+  notification.style.right = `${posRight}px`;
+  notificationTitle.classList.add('title');
+  notificationTitle.textContent = title;
+  notificationDescription.innerHTML = description.replace('\n', '</br>');
+  notification.append(notificationTitle);
+  notification.append(notificationDescription);
+  document.body.append(notification);
+
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, 2000);
+};
 
 makeLabel('Name');
 makeLabel('Position');
@@ -110,54 +135,28 @@ makeLabel('Age');
 makeLabel('Salary');
 createButton();
 
-const pushNotification = (posTop, posRight, title, description, type) => {
-  const notification = document.createElement('div');
+button.addEventListener('click', () => {
+  const DataName = document.querySelector('[data-qa="name"]').value;
+  const DataPosition = document.querySelector('[data-qa="position"]').value;
+  const DataOffice = document.querySelector('[data-qa="office"]').value;
+  const DataAge = document.querySelector('[data-qa="age"]').value;
+  const DataSalary = document.querySelector('[data-qa="salary"]').value;
 
-  notification.classList.add('notification', type);
-  notification.style.top = `${posTop}px`;
-  notification.style.right = `${posRight}px`;
+  if (!DataName || !DataPosition || !DataOffice || !DataAge || !DataSalary) {
+    pushNotification('Error', 'All fields are required', 'error');
 
-  const h2Element = document.createElement('h2');
+    return;
+  }
 
-  h2Element.classList.add('title');
-  h2Element.textContent = title;
+  if (DataName.length < 4) {
+    pushNotification(
+      'Error',
+      'Name must be at least 4 characters long',
+      'error',
+    );
+  }
 
-  const pElement = document.createElement('p');
-
-  pElement.innerText = description;
-  notification.appendChild(h2Element);
-  notification.appendChild(pElement);
-  document.body.appendChild(notification);
-
-  setTimeout(() => {
-    notification.style.visibility = 'hidden';
-
-    setTimeout(() => {
-      notification.remove();
-    }, 500);
-  }, 2000);
-};
-
-pushNotification(
-  10,
-  10,
-  'Title of Success message',
-  'Message example.\n ' + 'Notification should contain title and description.',
-  'success',
-);
-
-pushNotification(
-  150,
-  10,
-  'Title of Error message',
-  'Message example.\n ' + 'Notification should contain title and description.',
-  'error',
-);
-
-pushNotification(
-  290,
-  10,
-  'Title of Warning message',
-  'Message example.\n ' + 'Notification should contain title and description.',
-  'warning',
-);
+  if (DataAge < 18 || DataAge > 90) {
+    pushNotification('Error', 'Age must be between 18 and 90', 'error');
+  }
+});
