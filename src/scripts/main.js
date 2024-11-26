@@ -16,7 +16,7 @@ const fields = [
     label: 'Position: ',
     name: 'position',
     type: 'text',
-    qa: 'postion',
+    qa: 'position',
   },
   {
     label: 'Office: ',
@@ -198,41 +198,43 @@ document.querySelectorAll('th').forEach((header, index) => {
   });
 });
 
-const table = document.querySelector('table');
-let activeInput = null;
+document.addEventListener('DOMContentLoaded', () => {
+  const table = document.querySelector('table');
+  let activeInput = null;
 
-table.addEventListener('dblclick', (e) => {
-  const target = e.target;
+  table.addEventListener('dblclick', (e) => {
+    const target = e.target;
 
-  if (target.tagName === 'TD' && !activeInput) {
-    const initialValue = target.textContent;
+    if (target.tagName === 'TD' && !activeInput) {
+      const initialValue = target.textContent;
 
-    target.textContent = '';
+      target.textContent = '';
 
-    const input = document.createElement('input');
+      const input = document.createElement('input');
 
-    input.type = 'text';
-    input.className = 'cell-input';
-    input.value = initialValue;
+      input.type = 'text';
+      input.className = 'cell-input';
+      input.value = initialValue;
 
-    target.textContent = '';
-    target.appendChild(input);
-    input.focus();
-    activeInput = input;
+      target.textContent = '';
+      target.appendChild(input);
+      input.focus();
+      activeInput = input;
 
-    const saveChanges = () => {
-      const newValue = input.value.trim();
+      const saveChanges = () => {
+        const newValue = input.value.trim();
 
-      target.textContent = newValue || initialValue;
-      activeInput = null;
-    };
+        target.textContent = newValue || initialValue;
+        activeInput = null;
+      };
 
-    input.addEventListener('blur', saveChanges);
+      input.addEventListener('blur', saveChanges);
 
-    input.addEventListener('keydown', (evt) => {
-      if (evt.key === 'Enter') {
-        saveChanges();
-      }
-    });
-  }
+      input.addEventListener('keydown', (evt) => {
+        if (evt.key === 'Enter') {
+          saveChanges();
+        }
+      });
+    }
+  });
 });
