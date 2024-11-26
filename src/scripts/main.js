@@ -38,8 +38,8 @@ headerCells[1].addEventListener('click', () => {
   }
 
   const sortedRows = rows.sort((rowA, rowB) => {
-    const positionA = rowA.querySelector('td:nth-child(1)').textContent.trim();
-    const positionB = rowB.querySelector('td:nth-child(1)').textContent.trim();
+    const positionA = rowA.querySelector('td:nth-child(2)').textContent.trim();
+    const positionB = rowB.querySelector('td:nth-child(2)').textContent.trim();
 
     return isAscending
       ? positionA.localeCompare(positionB)
@@ -60,8 +60,8 @@ headerCells[2].addEventListener('click', () => {
   }
 
   const sortedRows = rows.sort((rowA, rowB) => {
-    const officeA = rowA.querySelector('td:nth-child(1)').textContent.trim();
-    const officeB = rowB.querySelector('td:nth-child(1)').textContent.trim();
+    const officeA = rowA.querySelector('td:nth-child(3)').textContent.trim();
+    const officeB = rowB.querySelector('td:nth-child(3)').textContent.trim();
 
     return isAscending
       ? officeA.localeCompare(officeB)
@@ -256,7 +256,8 @@ form.addEventListener('submit', function (e) {
     !formOffice ||
     !formPosition ||
     isNaN(formAge) ||
-    isNaN(formSalary)
+    isNaN(formSalary) ||
+    formSalary === ''
   ) {
     createNotification('All fields are required.', 'error');
 
@@ -271,6 +272,12 @@ form.addEventListener('submit', function (e) {
 
   if (formAge < 18 || formAge > 90) {
     createNotification('Age must be between 18 and 90.', 'error');
+
+    return;
+  }
+
+  if (formSalary <= 0) {
+    createNotification('Salary must be a positive number.', 'error');
 
     return;
   }
