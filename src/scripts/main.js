@@ -73,11 +73,10 @@ button.addEventListener('click', (e) => {
   e.preventDefault();
 
   const notification = document.createElement('div');
-  const notificationTitle = document.createElement('title');
+  const notificationTitle = document.createElement('span');
 
   notification.classList.add('notification');
-  notification.dataset.qa = 'notification';
-  notificationTitle.classList.add('title');
+  notificationTitle.classList.add('span');
   notification.setAttribute('data-qa', 'notification');
   notification.appendChild(notificationTitle);
 
@@ -91,10 +90,10 @@ button.addEventListener('click', (e) => {
 
   if (addWorker[0].length < 4 || addWorker[3] < 18 || addWorker[3] > 90) {
     notificationTitle.textContent = 'error data';
-    notification.classList.add(addWorker);
+    notification.classList.add('error');
   } else {
-    notificationTitle.textContent = 'success';
-    notification.classList.add('success!');
+    notificationTitle.textContent = 'success!';
+    notification.classList.add('success');
 
     const newRow = tbody.insertRow();
 
