@@ -93,10 +93,10 @@ nameInput.type = 'text';
 
 nameInput.name = 'name';
 nameInput.required = true;
-// nameInput.setAttribute('data-qa="name"');
+nameInput.setAttribute('data-qa', 'name');
 
+nameLabel.appendChild(nameInput);
 form.appendChild(nameLabel);
-form.appendChild(nameInput);
 
 // поле для 	Position
 const positionLabel = document.createElement('label');
@@ -109,9 +109,9 @@ positionInput.type = 'text';
 
 positionInput.name = 'position';
 positionInput.required = true;
-// positionInput.setAttribute('data-qa="position"');
+positionInput.setAttribute('data-qa', 'position');
 
-form.appendChild(positionInput);
+positionLabel.appendChild(positionInput);
 form.appendChild(positionLabel);
 
 // поле для 	Office
@@ -123,7 +123,8 @@ const officeSelect = document.createElement('select');
 
 officeSelect.name = 'office';
 officeSelect.required = true;
-// officeInput.setAttribute('data-qa="office"');
+
+officeSelect.setAttribute('data-qa', 'office');
 
 // створюю масив міст
 const offices = [
@@ -143,7 +144,7 @@ offices.forEach((office) => {
   officeSelect.appendChild(option);
 });
 
-form.appendChild(officeSelect);
+officeLabel.appendChild(officeSelect);
 form.appendChild(officeLabel);
 
 // поле для 	Age
@@ -158,10 +159,9 @@ ageInput.type = 'number';
 ageInput.name = 'age';
 ageInput.required = true;
 ageInput.min = 0;
-ageInput.placeholder = 'Enter your age';
-// ageInput.setAttribute('data-qa="age"');
+ageInput.setAttribute('data-qa', 'age');
 
-form.appendChild(ageInput);
+ageLabel.appendChild(ageInput);
 form.appendChild(ageLabel);
 
 // поле для 	Salary
@@ -175,9 +175,9 @@ salaryInput.type = 'text';
 
 salaryInput.name = 'salary';
 salaryInput.required = true;
-// salaryInput.setAttribute('data-qa="salary"');
+salaryInput.setAttribute('data-qa', 'salary');
 
-form.appendChild(salaryInput);
+salaryLabel.appendChild(salaryInput);
 form.appendChild(salaryLabel);
 
 // обробляю введення зарплати
