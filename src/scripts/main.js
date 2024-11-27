@@ -213,7 +213,7 @@ tbody.addEventListener('dblclick', (event) => {
     const input = document.createElement('input');
 
     input.type = 'text';
-    input.value = initialValue.replace(/[$,]/g, '');
+    // input.value = initialValue.replace(/[$,]/g, '');
     input.classList.add('cell-input');
     cell.innerHTML = '';
     cell.appendChild(input);
