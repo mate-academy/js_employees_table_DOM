@@ -183,13 +183,12 @@ form.appendChild(salaryLabel);
 // обробляю введення зарплати
 salaryInput.addEventListener('blur', () => {
   const rawValue = salaryInput.value;
-  // видаляю $, коми і перевіряю числа
-  const numericValue = parseFloat(rawValue.replace(/[$,]/g, ''));
+  // видаляю всі символи окрім чисел і розділових крапок
+  const numericValue = parseFloat(rawValue.replace(/[^0-9.]/g, ''));
 
   if (!isNaN(numericValue)) {
-    salaryInput.value = numericValue.toFixed(2);
+    salaryInput.value = numericValue.toLocaleString();
   } else {
-    alert('Please enter a valid salary!');
     salaryInput.value = '';
   }
 });
@@ -203,7 +202,9 @@ button.textContent = 'Save to table';
 form.appendChild(button);
 
 // обробка натискання кнопки
-button.addEventListener('click', () => {
+button.addEventListener('click', (e) => {
+  e.preventDefault();
+
   const namee = nameInput.value.trim();
   const position = positionInput.value.trim();
   const office = officeSelect.value.trim();
@@ -211,7 +212,9 @@ button.addEventListener('click', () => {
   const salary = salaryInput.value.trim();
 
   if (!namee || !position || !office || !age || !salary) {
-    alert('Please fill in all fields!');
+    pushNotification();
+
+    return;
   }
 
   // перетворення зарплати
@@ -224,15 +227,42 @@ button.addEventListener('click', () => {
     salaryInput.value = '';
   }
 
+  // перевірка довжини іменні
+  if (namee.length < 4) {
+    pushNotification();
+
+    return;
+  }
+
+  //  перевірка віку
+  const parsedAge = parseInt(age, 10);
+
+  if (isNaN(parsedAge) || parsedAge < 18 || parsedAge > 90) {
+    pushNotification();
+    ageInput.value = '';
+
+    return;
+  }
+
+  // перевірка зарплати
+  const parsedSalary = parseFloat(salary.replace(/[^0-9.]/g, ''));
+
+  if (isNaN(parsedSalary) || parsedSalary < 0) {
+    pushNotification();
+
+    salaryInput.value = '';
+  }
+
   // додаю новий рядрк до таблиці
   const row = document.createElement('tr');
 
   row.innerHTML = `
   <td>${namee}</td>
   <td>${position}</td>
+  <td>${office}</td>
   <td>${age}</td>
-  <td>$${salary.toFixed(2)}</td>
-  <td>${office.replace(/-/g, ' ')}</td>
+  <td>$${salary}</td>
+
 `;
 
   tbody.appendChild(row);
@@ -243,4 +273,62 @@ button.addEventListener('click', () => {
   positionInput.value = '';
   officeSelect.value = officeSelect.options[0].value;
   salaryInput.value = '';
+
+  pushNotification();
+
+  // // Якщо нового співробітника успішно
+  // додано до таблиці, показати сповіщення про успіх.
+
+  function pushNotification(posTop, posRight, title, description, type) {
+    // створюю контейнер повідомлення
+    const notification = document.createElement('div');
+    // додаю клас notification і типу (success, error)
+
+    notification.classList.add('notification', type);
+    notification.setAttribute('data-qa', 'notification');
+
+    // встановлення координат
+    notification.style.position = 'absolute';
+    notification.style.top = `${posTop}px`;
+    notification.style.right = `${posRight}px`;
+
+    // додаю заголовок
+    const titleElement = document.createElement('h2');
+
+    titleElement.classList.add('title');
+    titleElement.textContent = title;
+    notification.appendChild(titleElement);
+
+    // додаю опис
+    const descriptionElement = document.createElement('p');
+
+    descriptionElement.textContent = description;
+    notification.appendChild(descriptionElement);
+
+    // додаю елемент до документа
+    document.body.appendChild(notification);
+
+    // видалення елемента через 2 с
+    setTimeout(() => {
+      notification.remove();
+    }, 20000);
+  }
+
+  pushNotification(
+    10,
+    10,
+    'Title of Success message',
+    'Message example.\n ' +
+      'Notification should contain title and description.',
+    'success',
+  );
+
+  pushNotification(
+    150,
+    10,
+    'Title of Error message',
+    'Message example.\n ' +
+      'Notification should contain title and description.',
+    'error',
+  );
 });
