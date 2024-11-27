@@ -63,9 +63,9 @@ const form = document.createElement('form');
 form.classList.add('new-employee-form');
 
 form.innerHTML = `
-<lable>Name: <input name='name' type='text' data-qa="name" required></lable>
-<lable>Position: <input name='position' type='text' data-qa="position" required></lable>
-<lable>Office:
+<label>Name: <input name='name' type='text' data-qa="name" required></label>
+<label>Position: <input name='position' type='text' data-qa="position" required></label>
+<label>Office:
   <select name="office" id="office" data-qa="office" required>
     <option value="tokyo">Tokyo</option>
     <option value="singapore">Singapore</option>
@@ -74,9 +74,9 @@ form.innerHTML = `
     <option value="edinburgh">Edinburgh</option>
     <option value="san francisco">San Francisco</option>
   </select>
-</lable>
-<lable>Age: <input name='age' type='number' data-qa="age" required> </lable>
-<lable>Salary: <input name='salary' type='number' data-qa="salary" required> </lable>
+</label>
+<label>Age: <input name='age' type='number' data-qa="age" required> </label>
+<label>Salary: <input name='salary' type='number' data-qa="salary" required> </label>
 <button type='submit'>Save to table</button>
 `;
 body.appendChild(form);
@@ -163,48 +163,6 @@ button.addEventListener('click', (e) => {
 // DBLCLICK
 
 // eslint-disable-next-line no-shadow
-// tbody.addEventListener('dblclick', (event) => {
-//   const cell = event.target.closest('td');
-
-//   if (cell) {
-//     const copyTextCell = cell.textContent;
-//     const input = document.createElement('input');
-//     const cellIndex = cell.cellIndex;
-//     const cellTextChange = (value) => {
-//       const checkInputValue = () => {
-//         if (value.length) {
-//           if (cellIndex === 4) {
-//             input.value = `$${toNumber(value).toLocaleString('en-US')}`;
-//           }
-//         } else {
-//           input.value = copyTextCell;
-//         }
-
-//         return input.value;
-//       };
-
-//       cell.innerText = checkInputValue(input.value);
-//       input.remove();
-//     };
-
-//     input.type = 'text';
-//     input.classList.add('cell-input');
-//     cell.innerText = '';
-//     cell.appendChild(input);
-
-//     input.addEventListener('blur', () => {
-//       cellTextChange(input.value);
-//     });
-
-//     // eslint-disable-next-line no-shadow
-//     window.addEventListener('keydown', (event) => {
-//       if (event.key === 'Enter') {
-//         cellTextChange(input.value);
-//       }
-//     });
-//   }
-// });
-// eslint-disable-next-line no-shadow
 tbody.addEventListener('dblclick', (event) => {
   const cell = event.target.closest('td');
 
@@ -222,16 +180,27 @@ tbody.addEventListener('dblclick', (event) => {
     const saveValue = () => {
       const newValue = input.value.trim();
 
-      if (cell.cellIndex === 4 && isNaN(+newValue)) {
-        cell.textContent = `$${(+initialValue.replace(/[$,]/g, '')).toLocaleString('en-US')}`;
+      if (cell.cellIndex === 4) {
+        // Перевіряємо чи введено коректне числове значення
+        const parsedValue = parseFloat(newValue.replace(/[$,]/g, ''));
+
+        if (isNaN(parsedValue) || parsedValue < 0) {
+          // Якщо некоректне значення, повертаємо попереднє
+          cell.textContent = `$${(+initialValue.replace(/[$,]/g, '')).toLocaleString('en-US')}`;
+        } else {
+          // Форматуємо число як зарплату
+          cell.textContent = `$${parsedValue.toLocaleString('en-US')}`;
+        }
       } else if (newValue) {
-        cell.textContent =
-          cell.cellIndex === 4
-            ? `$${(+newValue).toLocaleString('en-US')}`
-            : newValue;
+        // Для інших комірок просто оновлюємо значення
+        cell.textContent = newValue;
       } else {
+        // Якщо порожнє, повертаємо початкове значення
         cell.textContent = initialValue;
       }
+
+      // Видаляємо поле вводу після збереження
+      input.remove();
     };
 
     input.addEventListener('blur', saveValue);
