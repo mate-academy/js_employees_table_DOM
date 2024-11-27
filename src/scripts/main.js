@@ -1,5 +1,6 @@
 'use strict';
 
+// Вибір елементів таблиці
 const table = document.querySelector('table');
 const tbody = table.querySelector('tbody');
 const headers = table.querySelectorAll('th');
@@ -10,37 +11,37 @@ let currentSortIndex = -1;
 // сортування asc або desc
 let currentSortDirection = 'asc';
 
-// Реалізувати сортування таблиці клацанням по заголовку (в двох напрямках) //
+// Реалізувати сортування таблиці клацанням по заголовку (в двох напрямках)
 headers.forEach((th, index) => {
   th.addEventListener('click', () => {
-    // петеворюю рядки в масив
+    // перетворюю рядки в масив
     const rows = Array.from(tbody.querySelectorAll('tr'));
-    // перевіряю чи є поточні стопці числовими стопцями(3 і 4 є числовим)
+    // перевіряю чи є поточні стопці числовими стопцями (3 і 4 є числовим)
     const isNumberColumn = index === 3 || index === 4;
 
-    // Якщо клікаєм на той самий стовпець декілька разів сортування міняється
+    // Якщо клікаємо на той самий стовпець декілька разів сортування міняється
     if (index === currentSortIndex) {
       // переключаю напрямок сортування
       currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
     } else {
-      // якщо натиснути на новий стопчик посинати з asc
+      // якщо натиснути на новий стопчик починати з asc
       currentSortDirection = 'asc';
     }
     // оновлюю індекс стопця який зараз сортується
     currentSortIndex = index;
 
-    // суртую рядок
+    // сортування рядків
     rows.sort((a, b) => {
-      // отримую текст з змісту сопця
+      // отримую текст з вмісту стовпця
       const aText = a.cells[index].textContent.trim();
       const bText = b.cells[index].textContent.trim();
 
       if (isNumberColumn) {
-        // перетворюю на чистло з плаваючою комою
+        // перетворюю на число з плаваючою комою
         const aValue = parseFloat(aText.replace(/[$,]/g, ''));
         const bValue = parseFloat(bText.replace(/[$,]/g, ''));
 
-        // повертає за зростаням спаданням
+        // повертає за зростанням або спаданням
         return currentSortDirection === 'asc'
           ? aValue - bValue
           : bValue - aValue;
@@ -61,7 +62,7 @@ headers.forEach((th, index) => {
   });
 });
 
-//  Коли користувач клацає рядок, він має стати виділеним.
+// Коли користувач клацає рядок, він має стати виділеним
 rowtable.forEach((row) => {
   row.addEventListener('click', () => {
     rowtable.forEach((r) => r.classList.remove('active'));
@@ -70,7 +71,7 @@ rowtable.forEach((row) => {
   });
 });
 
-/* Напишіть сценарій, щоб додати форму до документа. */
+/* Напишіть сценарій, щоб додати форму до документа */
 
 // створення форми
 const form = document.createElement('form');
@@ -98,7 +99,7 @@ nameInput.setAttribute('data-qa', 'name');
 nameLabel.appendChild(nameInput);
 form.appendChild(nameLabel);
 
-// поле для 	Position
+// поле для Position
 const positionLabel = document.createElement('label');
 
 positionLabel.textContent = 'Position:';
@@ -114,7 +115,7 @@ positionInput.setAttribute('data-qa', 'position');
 positionLabel.appendChild(positionInput);
 form.appendChild(positionLabel);
 
-// поле для 	Office
+// поле для Office
 const officeLabel = document.createElement('label');
 
 officeLabel.textContent = 'Office:';
@@ -147,7 +148,7 @@ offices.forEach((office) => {
 officeLabel.appendChild(officeSelect);
 form.appendChild(officeLabel);
 
-// поле для 	Age
+// поле для Age
 const ageLabel = document.createElement('label');
 
 ageLabel.textContent = 'Age:';
@@ -164,7 +165,7 @@ ageInput.setAttribute('data-qa', 'age');
 ageLabel.appendChild(ageInput);
 form.appendChild(ageLabel);
 
-// поле для 	Salary
+// поле для Salary
 const salaryLabel = document.createElement('label');
 
 salaryLabel.textContent = 'Salary:';
@@ -193,7 +194,7 @@ salaryInput.addEventListener('blur', () => {
   }
 });
 
-// кнопкаа для фідправки форми
+// кнопка для відправки форми
 const button = document.createElement('button');
 
 button.type = 'submit';
@@ -211,49 +212,20 @@ button.addEventListener('click', (e) => {
   const age = ageInput.value.trim();
   const salary = salaryInput.value.trim();
 
-  if (!namee || !position || !office || !age || !salary) {
-    pushNotification();
-
+  // перевірка валідності
+  if (
+    !validateForm({
+      namee,
+      position,
+      office,
+      age,
+      salary,
+    })
+  ) {
     return;
   }
 
-  // перетворення зарплати
-  let salaryy = salaryInput.value.trim();
-
-  salaryy = parseFloat(salary.replace(/[$,]/g, ''));
-
-  if (isNaN(salaryy)) {
-    alert('Please enter a valid salary!');
-    salaryInput.value = '';
-  }
-
-  // перевірка довжини іменні
-  if (namee.length < 4) {
-    pushNotification();
-
-    return;
-  }
-
-  //  перевірка віку
-  const parsedAge = parseInt(age, 10);
-
-  if (isNaN(parsedAge) || parsedAge < 18 || parsedAge > 90) {
-    pushNotification();
-    ageInput.value = '';
-
-    return;
-  }
-
-  // перевірка зарплати
-  const parsedSalary = parseFloat(salary.replace(/[^0-9.]/g, ''));
-
-  if (isNaN(parsedSalary) || parsedSalary < 0) {
-    pushNotification();
-
-    salaryInput.value = '';
-  }
-
-  // додаю новий рядрк до таблиці
+  // додаю новий рядок до таблиці
   const row = document.createElement('tr');
 
   row.innerHTML = `
@@ -262,73 +234,92 @@ button.addEventListener('click', (e) => {
   <td>${office}</td>
   <td>${age}</td>
   <td>$${salary}</td>
-
-`;
+  `;
 
   tbody.appendChild(row);
 
-  // очищуюю ворму
+  // очищую форму
   nameInput.value = '';
   ageInput.value = '';
   positionInput.value = '';
   officeSelect.value = officeSelect.options[0].value;
   salaryInput.value = '';
 
-  pushNotification();
-
-  // // Якщо нового співробітника успішно
-  // додано до таблиці, показати сповіщення про успіх.
-
-  function pushNotification(posTop, posRight, title, description, type) {
-    // створюю контейнер повідомлення
-    const notification = document.createElement('div');
-    // додаю клас notification і типу (success, error)
-
-    notification.classList.add('notification', type);
-    notification.setAttribute('data-qa', 'notification');
-
-    // встановлення координат
-    notification.style.position = 'absolute';
-    notification.style.top = `${posTop}px`;
-    notification.style.right = `${posRight}px`;
-
-    // додаю заголовок
-    const titleElement = document.createElement('h2');
-
-    titleElement.classList.add('title');
-    titleElement.textContent = title;
-    notification.appendChild(titleElement);
-
-    // додаю опис
-    const descriptionElement = document.createElement('p');
-
-    descriptionElement.textContent = description;
-    notification.appendChild(descriptionElement);
-
-    // додаю елемент до документа
-    document.body.appendChild(notification);
-
-    // видалення елемента через 2 с
-    setTimeout(() => {
-      notification.remove();
-    }, 20000);
-  }
-
   pushNotification(
     10,
     10,
     'Title of Success message',
-    'Message example.\n ' +
-      'Notification should contain title and description.',
+    'Employee added successfully.',
     'success',
   );
-
-  pushNotification(
-    150,
-    10,
-    'Title of Error message',
-    'Message example.\n ' +
-      'Notification should contain title and description.',
-    'error',
-  );
 });
+
+// функція для валідації форми
+function validateForm({ namee, position, office, age, salary }) {
+  if (namee.length < 4) {
+    pushNotification(
+      10,
+      10,
+      'Validation Error',
+      'Name must be at least 4 characters long.',
+      'error',
+    );
+
+    return false;
+  }
+
+  const parsedAge = parseInt(age, 10);
+
+  if (isNaN(parsedAge) || parsedAge < 18 || parsedAge > 90) {
+    pushNotification(
+      10,
+      10,
+      'Validation Error',
+      'Age must be between 18 and 90.',
+      'error',
+    );
+    ageInput.value = '';
+
+    return false;
+  }
+
+  const parsedSalary = parseFloat(salary.replace(/[^0-9.]/g, ''));
+
+  if (isNaN(parsedSalary) || parsedSalary < 0) {
+    pushNotification(
+      10,
+      10,
+      'Validation Error',
+      'Salary must be a valid positive number.',
+      'error',
+    );
+    salaryInput.value = '';
+
+    return false;
+  }
+
+  return true;
+}
+
+// функція для створення повідомлення
+function pushNotification(posTop, posRight, title, description, type) {
+  const notification = document.createElement('div');
+
+  notification.className = `notification ${type}`;
+  notification.setAttribute('data-qa', 'notification');
+
+  notification.style.cssText = `
+    position: absolute;
+    top: ${posTop}px;
+    right: ${posRight}px;
+  `;
+
+  notification.innerHTML = `
+    <h2 class="title">${title}</h2>
+    <p>${description}</p>
+  `;
+
+  document.body.appendChild(notification);
+
+  setTimeout(() => notification.remove(), 2000);
+}
