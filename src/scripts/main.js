@@ -268,6 +268,18 @@ function validateForm({ namee, position, office, age, salary }) {
     return false;
   }
 
+  if (!position) {
+    pushNotification(
+      10,
+      10,
+      'Validation Error',
+      'The position must be entered in the field.',
+      'error',
+    );
+
+    return false;
+  }
+
   const parsedAge = parseInt(age, 10);
 
   if (isNaN(parsedAge) || parsedAge < 18 || parsedAge > 90) {
@@ -322,4 +334,62 @@ function pushNotification(posTop, posRight, title, description, type) {
   document.body.appendChild(notification);
 
   setTimeout(() => notification.remove(), 2000);
+}
+
+// редагування комірки
+
+// зберігаю активну комірку для введення
+let activeInputCell = null;
+
+tbody.addEventListener('dblclick', (e) => {
+  const cellRow = e.target;
+
+  // перевірка чи натиснута комірка
+  if (cellRow.tagName !== 'TD' || cellRow.querySelector('input')) {
+    return;
+  }
+
+  // завершую редагування якщо є активне введення
+  if (activeInputCell) {
+    saveCellChanges(activeInputCell);
+  }
+
+  const origanalText = cellRow.textContent.trim(); // початковий  текст
+  const input = document.createElement('input');
+
+  input.type = 'text';
+  input.value = origanalText;
+  input.className = 'cell-input';
+
+  cellRow.textContent = '';
+  cellRow.appendChild(input);
+  input.focus(); // ставлю фокус
+  activeInputCell = { cellRow, input, origanalText };
+
+  // обробка поля введення
+  input.addEventListener('blur', () => {
+    saveCellChanges(activeInputCell);
+  });
+
+  // натискання enter
+  input.addEventListener('keydown', (even) => {
+    if (even.key === 'Enter') {
+      saveCellChanges(activeInputCell);
+    }
+  });
+});
+
+// функція ля збрерагання змін у комірці
+function saveCellChanges({ cellRow, input, origanalText }) {
+  const newValue = input.value.trim();
+
+  // якщо значення введене порожнє повертає початкове знаяення
+  if (!newValue) {
+    cellRow.textContent = origanalText;
+  } else {
+    cellRow.textContent = newValue;
+  }
+
+  // скидаю активний стан
+  activeInputCell = null;
 }
