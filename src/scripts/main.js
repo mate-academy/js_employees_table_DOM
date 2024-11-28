@@ -82,7 +82,7 @@ for (let i = 0; i <= 4; i++) {
   label.textContent = `${attr.charAt(0).toUpperCase() + attr.slice(1, attr.length)}:`;
 
   input.setAttribute('data-qa', attr);
-  input.setAttribute('required', 'true');
+  //   input.setAttribute('required', 'true');
   input.setAttribute('name', attr);
   input.setAttribute('type', 'text');
 
