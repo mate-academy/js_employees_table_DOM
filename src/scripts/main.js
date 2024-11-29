@@ -144,28 +144,32 @@ document.addEventListener('click', (e) => {
 
       modal.classList.remove('hidden');
 
-      modal.addEventListener('click', (answer) => {
-        if (answer.target.textContent === 'Yes') {
-          answer.stopPropagation();
-          modal.classList.add('hidden');
+      modal.addEventListener(
+        'click',
+        (answer) => {
+          if (answer.target.textContent === 'Yes') {
+            answer.stopPropagation();
+            modal.classList.add('hidden');
 
-          deleteIcon.style.zIndex = '-1';
-          deleteIcon.classList.remove('active');
+            deleteIcon.style.zIndex = '-1';
+            deleteIcon.classList.remove('active');
 
-          setTimeout(() => {
-            row.remove();
-            currentSelected = null;
-          }, 200);
+            setTimeout(() => {
+              row.remove();
+              currentSelected = null;
+            }, 200);
 
-          setTimeout(() => {
-            createNotification('success', 'Succesfully deleted employee!');
-          }, 200);
-        }
+            setTimeout(() => {
+              createNotification('success', 'Succesfully deleted employee!');
+            }, 200);
+          }
 
-        if (answer.target.textContent === 'No') {
-          modal.classList.add('hidden');
-        }
-      });
+          if (answer.target.textContent === 'No') {
+            modal.classList.add('hidden');
+          }
+        },
+        { once: true },
+      );
     });
 
     row.appendChild(deleteIcon);
@@ -284,7 +288,7 @@ function createFormInput(inputName, type) {
   form.appendChild(label);
 }
 
-// function for creating labels
+// function for creating big letters
 function createFirstBigLetter(input) {
   return input
     .split(' ')
