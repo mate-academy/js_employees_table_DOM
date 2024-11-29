@@ -3,6 +3,7 @@
 // write code here
 const headers = document.querySelectorAll('th');
 const table = document.querySelector('table');
+const body = document.querySelector('body');
 let sortOrder = 'asc';
 let currentColumn = null;
 const rows = Array.from(table.rows);
@@ -69,4 +70,44 @@ rowsToActive.forEach((row) => {
 
 headers.forEach((header, index) => {
   header.addEventListener('click', () => sortBy(index));
+});
+
+const form = document.createElement('form');
+
+form.classList.add('new-employee-form');
+
+form.innerHTML = `<label>Name: <input name='name' type='text' data-qa='name' required></input></label>
+  <label>Position: <input name='position' type='text' data-qa='position' required></input></label>
+  <label>Ofice: <select name='office' data-qa='office' required>
+  <option value='Tokyo'>Tokyo</option>
+  <option value='Singapore'>Singapore</option>
+  <option value='London'>London</option>
+  <option value='New York'>New York</option>
+  <option value='Edinburgh'>Edinburgh</option>
+  <option value='San Francisco'>San Francisco</option>
+  </select></label>
+  <label>Age: <input name='age' type='number' data-qa='age' required></input></label>
+  <label>Salary: <input name='salary' type='number' data-qa='salary' required></input></label>
+  <button type=submit>Save to table</button>`;
+
+body.append(form);
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const tr = document.createElement('tr');
+  const nameInput = form.elements['name'].value;
+  const positionInput = form.elements['position'].value;
+  const officeInput = form.elements['office'].value;
+  const ageInput = form.elements['age'].value;
+  const salaryInput = +form.elements['salary'].value;
+  const normSalary = `$${salaryInput.toLocaleString('en-US')}`;
+
+  tr.innerHTML = `<td>${nameInput}</td>
+  <td>${positionInput}</td>
+  <td>${officeInput}</td>
+  <td>${String(ageInput)}</td>
+  <td>${normSalary}</td>`;
+
+  tBody.append(tr);
 });
