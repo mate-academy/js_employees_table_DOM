@@ -1,18 +1,47 @@
 'use strict';
 
 // write code here
-const headers = document.querySelectorAll('th');
-const table = document.querySelector('table');
 const body = document.querySelector('body');
 let sortOrder = 'asc';
 let currentColumn = null;
-const rows = Array.from(table.rows);
-const rowsTo = rows.slice(1, rows.length - 1);
-const tBody = document.querySelector('tbody');
-const rowsToActive = tBody.querySelectorAll('tr');
+
+function addNewEmployee(eName, position, office, age, salary) {
+  const tBody = document.querySelector('tbody');
+  const rows = tBody.querySelectorAll('tr');
+
+  const newRow = document.createElement('tr');
+
+  newRow.innerHTML = `<td>${eName}</td>
+  <td>${position}</td>
+  <td>${office}</td>
+  <td>${age}</td>
+  <td>${salary}</td>`;
+
+  tBody.append(newRow);
+
+  newRow.addEventListener('click', () => {
+    rows.forEach((r) => {
+      r.classList.remove('active');
+    });
+
+    newRow.classList.add('active');
+  });
+
+  rows.forEach((row) => {
+    row.addEventListener('click', () => {
+      newRow.classList.remove('active');
+      row.classList.add('active');
+    });
+  });
+
+  editCell();
+}
 
 const sortBy = (columnIndex) => {
-  rowsTo.sort((rowA, rowB) => {
+  const tBody = document.querySelector('tbody');
+  const rows = Array.from(tBody.rows);
+
+  rows.sort((rowA, rowB) => {
     const cellA = rowA.cells[columnIndex].textContent;
     const cellB = rowB.cells[columnIndex].textContent;
 
@@ -56,21 +85,100 @@ const sortBy = (columnIndex) => {
     }
   });
 
-  rowsTo.forEach((row) => table.appendChild(row));
+  rows.forEach((row) => tBody.appendChild(row));
 
   sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
 };
 
-rowsToActive.forEach((row) => {
-  row.addEventListener('click', () => {
-    rows.forEach((r) => r.classList.remove('active'));
-    row.classList.add('active');
-  });
-});
+const pushNotification = (title, description, type) => {
+  const notafication = document.createElement('div');
+  const titleH2 = document.createElement('h2');
+  const descript = document.createElement('p');
 
-headers.forEach((header, index) => {
-  header.addEventListener('click', () => sortBy(index));
-});
+  notafication.setAttribute('data-qa', 'notification');
+  notafication.classList.add('notification', type);
+  descript.innerText = description;
+  titleH2.innerText = title;
+  titleH2.classList.add('title');
+
+  notafication.append(titleH2);
+  notafication.append(descript);
+
+  body.append(notafication);
+
+  setTimeout(() => (notafication.style.visibility = 'hidden'), 2000);
+};
+
+function validation(eName, age) {
+  let nameError = false;
+  let ageError = false;
+
+  if (eName.length < 4) {
+    nameError = true;
+
+    pushNotification(
+      'Name error',
+      'The name must be 4 or more characters long',
+      'error',
+    );
+  } else if (age < 18 || age > 90) {
+    ageError = true;
+
+    pushNotification('Age error', 'Age should be 18-90', 'error');
+  }
+
+  if (!nameError && !ageError) {
+    pushNotification('Success', 'New Employee Added Successfully', 'success');
+
+    return true;
+  }
+
+  return false;
+}
+
+function saveChanges(cell, input) {
+  const newValue = input.value.trim();
+
+  if (newValue.length > 0) {
+    cell.textContent = newValue;
+  } else {
+    cell.textContent = input.defaultValue;
+  }
+}
+
+function editCell() {
+  const tBody = document.querySelector('tbody');
+  const cells = tBody.querySelectorAll('td');
+
+  cells.forEach((cell) => {
+    cell.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+
+      const cellInput = document.createElement('input');
+      const inputValue = cell.textContent.trim();
+
+      cellInput.classList.add('cell-input');
+      cellInput.setAttribute('type', 'text');
+      cellInput.setAttribute('value', inputValue);
+
+      cell.innerHTML = '';
+      cell.appendChild(cellInput);
+
+      cellInput.focus();
+      cellInput.select();
+
+      cellInput.addEventListener('blur', () => {
+        saveChanges(cell, cellInput);
+      });
+
+      cellInput.addEventListener('keypress', (ev) => {
+        if (ev.key === 'Enter') {
+          saveChanges(cell, cellInput);
+        }
+      });
+    });
+  });
+}
 
 const form = document.createElement('form');
 
@@ -90,24 +198,49 @@ form.innerHTML = `<label>Name: <input name='name' type='text' data-qa='name' req
   <label>Salary: <input name='salary' type='number' data-qa='salary' required></input></label>
   <button type=submit>Save to table</button>`;
 
-body.append(form);
+body.appendChild(form);
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+  const tBody = document.querySelector('tbody');
+  const tHead = document.querySelector('thead');
+  const headers = tHead.querySelectorAll('th');
+  const rows = tBody.querySelectorAll('tr');
 
-  const tr = document.createElement('tr');
-  const nameInput = form.elements['name'].value;
-  const positionInput = form.elements['position'].value;
-  const officeInput = form.elements['office'].value;
-  const ageInput = form.elements['age'].value;
-  const salaryInput = +form.elements['salary'].value;
-  const normSalary = `$${salaryInput.toLocaleString('en-US')}`;
+  headers.forEach((header, index) => {
+    header.addEventListener('click', () => sortBy(index));
+  });
 
-  tr.innerHTML = `<td>${nameInput}</td>
-  <td>${positionInput}</td>
-  <td>${officeInput}</td>
-  <td>${String(ageInput)}</td>
-  <td>${normSalary}</td>`;
+  rows.forEach((row) => {
+    row.addEventListener('click', () => {
+      rows.forEach((r) => r.classList.remove('active'));
+      row.classList.add('active');
+    });
+  });
 
-  tBody.append(tr);
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const nameInput = form.elements['name'].value;
+    const positionInput = form.elements['position'].value;
+    const officeInput = form.elements['office'].value;
+    const ageInput = form.elements['age'].value;
+    const salaryInput = +form.elements['salary'].value;
+    const normSalary = `$${salaryInput.toLocaleString('en-US')}`;
+
+    const validationCheck = validation(nameInput, ageInput);
+
+    if (validationCheck) {
+      addNewEmployee(
+        nameInput,
+        positionInput,
+        officeInput,
+        ageInput,
+        normSalary,
+      );
+
+      form.reset();
+    }
+  });
+
+  editCell();
 });
