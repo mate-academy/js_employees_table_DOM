@@ -2,6 +2,7 @@
 
 const body = document.querySelector('body');
 const table = document.querySelector('table');
+const tBody = table.querySelector('tbody');
 const tHeadCols = Array.from(table.tHead.rows[0].cells);
 const tRows = Array.from(table.rows);
 const tFootCols = Array.from(table.tFoot.rows[0].cells);
@@ -291,4 +292,39 @@ form.addEventListener('submit', (e) => {
   // console.log(value);
 
   form.reset();
+});
+
+// -----------additional-----------
+
+tBody.addEventListener('dblclick', (e) => {
+  const td = e.target.closest('td');
+  const lastValue = td.textContent;
+  const input = document.createElement('input');
+
+  td.textContent = '';
+  input.className = 'cell-input';
+  td.append(input);
+  input.focus();
+
+  input.addEventListener('blur', (ev) => {
+    if (input.value === '') {
+      td.textContent = lastValue;
+      input.remove();
+    } else {
+      td.textContent = input.value;
+      input.remove();
+    }
+  });
+
+  input.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter') {
+      if (input.value === '') {
+        td.textContent = lastValue;
+        input.remove();
+      } else {
+        td.textContent = input.value;
+        input.remove();
+      }
+    }
+  });
 });
