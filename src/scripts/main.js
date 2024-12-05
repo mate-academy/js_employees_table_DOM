@@ -2,127 +2,57 @@
 
 // 1. Implement table sorting by clicking on the title (in two directions).
 const table = document.querySelector('table');
-let tableData = null;
-let sortDirection = true;
+const theads = document.querySelectorAll('th');
+const tbody = document.querySelector('tbody');
 
-const columnParsers = {
-  3: (cell) => parseInt(cell),
-  4: (cell) => parseFloat(cell.slice(1).replaceAll(',', '')),
-};
+let isAscendingOrder = true;
 
-function defaultParser(cell) {
-  return cell;
+function parseCellValue(row, columnIndex) {
+  const cellValue = row.cells[columnIndex].textContent.trim();
+
+  return cellValue.startsWith('$') ? parseFloat(cellValue.slice(1)) : cellValue;
 }
 
-function getTableRows() {
-  return [...table.querySelectorAll('tbody tr')];
-}
+theads.forEach((header, columnIndex) => {
+  header.addEventListener('click', () => {
+    const rows = [...tbody.rows];
 
-function mapTableData(rows) {
-  return rows.map((row) => {
-    return [...row.children].map((cell) => cell.innerText);
-  });
-}
+    rows.sort((rowA, rowB) => {
+      const valueA = parseCellValue(rowA, columnIndex);
+      const valueB = parseCellValue(rowB, columnIndex);
 
-function getTableData() {
-  const rows = getTableRows();
+      if (isNaN(valueA) || isNaN(valueB)) {
+        return isAscendingOrder
+          ? valueA.localeCompare(valueB)
+          : valueB.localeCompare(valueA);
+      }
 
-  return mapTableData(rows);
-}
-
-function parseCellData(cell, columnIndex) {
-  const parser = columnParsers[columnIndex] || defaultParser;
-
-  return parser(cell);
-}
-
-function sortTableData(columnIndex, direction) {
-  return tableData.sort((rowA, rowB) => {
-    let cellA = rowA[columnIndex];
-    let cellB = rowB[columnIndex];
-
-    cellA = parseCellData(cellA, columnIndex);
-    cellB = parseCellData(cellB, columnIndex);
-
-    if (direction) {
-      return cellA > cellB ? 1 : -1;
-    }
-
-    return cellA > cellB ? -1 : 1;
-  });
-}
-
-function renderSortedTable(sortedData) {
-  const tableBody = table.querySelector('tbody');
-
-  tableBody.innerHTML = '';
-
-  sortedData.forEach((rowData) => {
-    const row = document.createElement('tr');
-
-    rowData.forEach((cellData) => {
-      const cell = document.createElement('td');
-
-      cell.textContent = cellData;
-      row.appendChild(cell);
+      return isAscendingOrder ? valueA - valueB : valueB - valueA;
     });
 
-    tableBody.appendChild(row);
+    rows.forEach((row) => tbody.appendChild(row));
+
+    isAscendingOrder = !isAscendingOrder;
   });
-}
-
-function toggleSortDirection() {
-  sortDirection = !sortDirection;
-}
-
-function sortTable(columnIndex) {
-  const sortedData = sortTableData(columnIndex, sortDirection);
-
-  renderSortedTable(sortedData);
-  toggleSortDirection();
-}
-
-function attachSortingListeners() {
-  table.querySelectorAll('th').forEach((header, index) => {
-    header.addEventListener('click', () => sortTable(index));
-  });
-}
-
-function initializeTable() {
-  if (!tableData) {
-    tableData = getTableData();
-  }
-  attachSortingListeners();
-}
-
-initializeTable();
+});
 
 // 2. When user clicks on a row, it should become selected.
-let activeRowIndex = null;
-const tbody = table.querySelector('tbody');
+let activeRow = null;
 
-function updateActiveRow() {
-  tbody.querySelectorAll('tr').forEach((row, index) => {
-    if (index === activeRowIndex) {
-      row.classList.add('active');
-    } else {
-      row.classList.remove('active');
+tbody.querySelectorAll('tr').forEach((row) => {
+  const handleRowClick = () => {
+    const isActiveRowSelected = activeRow !== null;
+    const isSameRowClicked = activeRow === row;
+
+    if (isActiveRowSelected && !isSameRowClicked) {
+      activeRow.classList.remove('active');
     }
-  });
-}
 
-tbody.addEventListener('click', (e) => {
-  const row = e.target.closest('tr');
+    row.classList.add('active');
+    activeRow = row;
+  };
 
-  if (!row) {
-    return;
-  }
-
-  const rowIndex = [...tbody.querySelectorAll('tr')].indexOf(row);
-
-  activeRowIndex = rowIndex;
-
-  updateActiveRow();
+  row.addEventListener('click', handleRowClick);
 });
 
 // 3. Write a script to add a form to the document.
@@ -189,181 +119,109 @@ table.insertAdjacentHTML('afterend', formHtml);
 // 4. Show notification if form data is invalid
 function createNotification(message, type) {
   const notification = document.createElement('div');
-  const titleSpan = document.createElement('span');
 
   notification.className = `notification ${type}`;
   notification.setAttribute('data-qa', 'notification');
 
+  const titleSpan = document.createElement('span');
+
   titleSpan.className = 'title';
   titleSpan.textContent = type.toUpperCase();
 
+  const messageSpan = document.createElement('span');
+
+  messageSpan.textContent = message;
+
   notification.appendChild(titleSpan);
-  notification.innerHTML += ` <span>${message}</span>`;
+  notification.appendChild(messageSpan);
+
   document.body.appendChild(notification);
 
-  return notification;
-}
-
-function dismissNotification(notification, delay = 2000) {
   setTimeout(() => {
-    notification.remove();
-  }, delay);
-}
-
-function pushNotification(message, type) {
-  const notification = createNotification(message, type);
-
-  dismissNotification(notification);
-}
-
-function validateName(formName) {
-  const nameRegex = /^[A-Za-z\s]+$/;
-
-  return formName.length >= 4 && nameRegex.test(formName);
-}
-
-function validateAge(age) {
-  return age >= 18 && age <= 90;
-}
-
-function validatePosition(position) {
-  return position.trim() !== '';
-}
-
-function validateOffice(office) {
-  return office.trim() !== '';
-}
-
-function validateSalary(salary) {
-  const parsedSalary = parseFloat(salary);
-
-  return !isNaN(parsedSalary) && parsedSalary > 0;
-}
-
-function handleValidationErrors(formData) {
-  if (!validateName(formData.name)) {
-    pushNotification(
-      'Name must be at least 4 characters long and contain only letters.',
-      'error',
-    );
-  }
-
-  if (!validateAge(formData.age)) {
-    pushNotification('Age must be between 18 and 90.', 'error');
-  }
-
-  if (!validatePosition(formData.position)) {
-    pushNotification('Position is required.', 'error');
-  }
-
-  if (!validateOffice(formData.office)) {
-    pushNotification('Office is required.', 'error');
-  }
-
-  if (!validateSalary(formData.salary)) {
-    pushNotification('Salary must be a valid positive number.', 'error');
-  }
+    notification.style.display = 'none';
+  }, 2000);
 }
 
 function validateFormData(formData) {
-  const isValid =
-    validateName(formData.name) &&
-    validateAge(formData.age) &&
-    validatePosition(formData.position) &&
-    validateOffice(formData.office) &&
-    validateSalary(formData.salary);
+  if (formData.name.length < 4) {
+    createNotification('Name must be at least 4 characters long.', 'error');
 
-  if (!isValid) {
-    handleValidationErrors(formData);
+    return false;
   }
 
-  return isValid;
+  if (formData.age < 18 || formData.age > 90) {
+    createNotification('Age must be between 18 and 90.', 'error');
+
+    return false;
+  }
+
+  if (!formData.position || !formData.office || !formData.salary) {
+    createNotification('All fields are required.', 'error');
+
+    return false;
+  }
+
+  return true;
 }
 
 const form = document.querySelector('.new-employee-form');
+const saveButton = document.getElementById('save-button');
 
-function getFormData(formData) {
-  return [...formData.elements].reduce((acc, formInput) => {
-    if (formInput.name) {
-      acc[formInput.name] = formInput.value;
+saveButton.addEventListener('click', () => {
+  const formData = [...form.elements].reduce((acc, input) => {
+    if (input.name) {
+      acc[input.name] = input.value;
     }
 
     return acc;
   }, {});
-}
-
-function createTableRow(formData) {
-  const newRow = document.createElement('tr');
-
-  newRow.innerHTML = `
-    <td>${formData.name}</td>
-    <td>${formData.position}</td>
-    <td>${formData.office}</td>
-    <td>${formData.age}</td>
-    <td>$${parseInt(formData.salary).toLocaleString('en-US')}</td>`;
-
-  return newRow;
-}
-
-function appendRowToTable(row) {
-  const tableBody = table.querySelector('tbody');
-
-  tableBody.appendChild(row);
-}
-
-function handleFormSubmission() {
-  const formData = getFormData(form);
 
   if (validateFormData(formData)) {
-    const newRow = createTableRow(formData);
+    const newRow = document.createElement('tr');
+    const salaryFormatted = `$${parseInt(formData.salary).toLocaleString('en-US')}`;
 
-    appendRowToTable(newRow);
-    pushNotification('Employee added successfully!', 'success');
+    newRow.innerHTML = `
+      <td>${formData.name}</td>
+      <td>${formData.position}</td>
+      <td>${formData.office}</td>
+      <td>${formData.age}</td>
+      <td>${salaryFormatted}</td>
+    `;
+
+    tbody.appendChild(newRow);
+    createNotification('Employee added successfully!', 'success');
+
     form.reset();
   }
-}
-
-document
-  .getElementById('save-button')
-  .addEventListener('click', handleFormSubmission);
+});
 
 // 5. Implement editing of table cells by double-clicking on it. (optional)
-let editingCell = null;
+const cells = tbody.querySelectorAll('td');
 
-function saveCellValue(cell, input) {
-  cell.innerText = input.value || input.getAttribute('data-initial');
-  editingCell = null;
-}
+cells.forEach((cell) => {
+  cell.addEventListener('dblclick', () => {
+    const initialValue = cell.innerText;
 
-function startCellEditing(cell) {
-  const input = document.createElement('input');
+    const input = document.createElement('input');
 
-  input.className = 'cell-input';
+    input.className = 'cell-input';
+    input.value = initialValue;
 
-  const initialValue = cell.innerText;
+    cell.innerText = '';
+    cell.appendChild(input);
 
-  input.setAttribute('data-initial', initialValue);
-  input.value = initialValue;
+    input.focus();
 
-  cell.innerText = '';
-  cell.appendChild(input);
-  input.focus();
+    const revertOrSave = () => {
+      cell.innerText = input.value || initialValue;
+    };
 
-  editingCell = { cell, input };
+    input.addEventListener('blur', revertOrSave);
 
-  input.addEventListener('blur', () => saveCellValue(cell, input));
-
-  input.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      saveCellValue(cell, input);
-    }
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        revertOrSave();
+      }
+    });
   });
-}
-
-document.querySelector('tbody').addEventListener('dblclick', (e) => {
-  const cell = e.target;
-
-  if (cell.tagName.toLowerCase() === 'td' && editingCell === null) {
-    startCellEditing(cell);
-  }
 });
