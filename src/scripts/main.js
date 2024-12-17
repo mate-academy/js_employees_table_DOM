@@ -236,11 +236,11 @@ function addUser(e) {
     return;
   }
 
-  if (user.office === null) {
+  if (!user.office) {
     createNotification(
       'error',
       'Fix your office',
-      'Ofice field can not be empty.',
+      'Office field cannot be empty.',
     );
 
     return;
