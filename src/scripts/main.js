@@ -74,7 +74,8 @@ function addForm() {
   addLabel(newForm, 'Name: ', 'name', 'text', 'name');
   addLabel(newForm, 'Position: ', 'position', 'text', 'position');
 
-  const posInput = document.querySelector('input[name="position"]')
+  const posInput = document.querySelector('input[name="position"]');
+
   posInput.removeAttribute('required');
   // posInput.addEventListener('keypress', (e) => {
   //   console.log('qerwfdsvewrfrv');
@@ -189,15 +190,15 @@ function validateData(dataObj) {
     const key = pair[0];
     const value = pair[1];
 
-    if (key === 'name' & value.length < 4) {
+    if ((key === 'name') & (value.length < 4)) {
       return false;
     }
 
-    if (key === 'age' & (+value < 18 || +value > 90)) {
+    if ((key === 'age') & (+value < 18 || +value > 90)) {
       return false;
     }
 
-    if (key === 'position' & value.length === 0) {
+    if ((key === 'position') & (value.length === 0)) {
       return false;
     }
   }
@@ -207,8 +208,11 @@ function validateData(dataObj) {
 
 function showNotif(flag) {
   const notif = document.createElement('div');
+
   notif.classList.add('notification');
+
   const resultClass = flag ? 'success' : 'error';
+
   notif.classList.add(resultClass);
   notif.setAttribute('data-qa', 'notification');
   notif.textContent = 'notif';
@@ -216,6 +220,28 @@ function showNotif(flag) {
   document.querySelector('body').appendChild(notif);
 }
 
+function setUpCellEditing() {
+  const cells = document.querySelectorAll('td');
+
+  for (const cell of cells) {
+    cell.addEventListener('dblclick', (e) => {
+      const td = e.currentTarget;
+
+      td.textContent = '';
+
+      const tempInput = document.createElement('input');
+
+      tempInput.classList.add('cell-input');
+      td.appendChild(tempInput);
+
+      tempInput.addEventListener('enter', (ev) => {
+        td.textContent = ev.currentTarget.value;
+      });
+    });
+  }
+}
+
 setUpSorting();
 setUpRowSelection();
 addForm();
+setUpCellEditing();
