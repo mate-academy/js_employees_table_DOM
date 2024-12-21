@@ -202,7 +202,7 @@ form.addEventListener('submit', (e) => {
     newRow.append(cell);
   });
 
-  table.append(newRow);
+  tableBody.append(newRow);
 
   form.reset();
 
@@ -210,7 +210,7 @@ form.addEventListener('submit', (e) => {
 
   successMessage.dataset.qa = 'notification';
   successMessage.className = 'notification success';
-  successMessage.textContent = 'Employee added succesfull';
+  successMessage.textContent = 'Employee added succesfully';
 
   document.body.appendChild(successMessage);
 
