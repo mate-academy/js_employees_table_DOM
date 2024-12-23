@@ -1,7 +1,7 @@
 import { createElement } from './utils';
 
 export function pushNotification(posTop, posRight, title, description, type) {
-  const html = document.documentElement;
+  const body = document.body;
   const notification = document.createElement('div');
 
   const notificationTitle = createElement('h2', title);
@@ -18,7 +18,7 @@ export function pushNotification(posTop, posRight, title, description, type) {
   notification.style.top = `${posTop}px`;
   notification.style.right = `${posRight}px`;
 
-  html.append(notification);
+  body.append(notification);
 
   setTimeout(() => (notification.style.display = 'none'), 2000);
 }

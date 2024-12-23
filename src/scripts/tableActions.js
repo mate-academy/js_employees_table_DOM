@@ -14,8 +14,8 @@ export function sortTableBody() {
           : stringB.localeCompare(stringA);
       }
 
-      const numA = rowA.cells[column].textContent.replace(/[^0-9.-]+/g, '');
-      const numB = rowB.cells[column].textContent.replace(/[^0-9.-]+/g, '');
+      const numA = +rowA.cells[column].textContent.replace(/[^0-9.-]+/g, '');
+      const numB = +rowB.cells[column].textContent.replace(/[^0-9.-]+/g, '');
 
       return lastSortIndex !== column ? numA - numB : numB - numA;
     });

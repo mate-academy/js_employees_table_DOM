@@ -49,7 +49,7 @@ function createInput(labelText, inputName, inputType = 'text') {
 
   input.type = inputType;
   input.name = inputName;
-  input.autocomplete = false;
+  input.autocomplete = 'off';
   input.dataset.qa = inputName;
 
   label.append(input);
