@@ -65,12 +65,32 @@ function createSubmitButton(table, form, buttonText) {
 
     const data = new FormData(form);
 
+    if (data.get('name') === '') {
+      return pushNotification(
+        10,
+        10,
+        'Error',
+        'The name is required.',
+        'error',
+      );
+    }
+
     if (data.get('name').length < 4) {
       return pushNotification(
         10,
         10,
         'Error',
         'The length of the name should be more than 4 symbols.',
+        'error',
+      );
+    }
+
+    if (data.get('position') === '') {
+      return pushNotification(
+        10,
+        10,
+        'Error',
+        'The position is required.',
         'error',
       );
     }
