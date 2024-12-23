@@ -3,6 +3,7 @@ import { sortTableBody } from './tableActions';
 
 const sort = sortTableBody();
 const table = document.querySelector('table');
+const tBody = table.tBodies[0];
 
 [...table.tHead.rows[0].cells].forEach((cell, i) => {
   cell.addEventListener('click', () => {
@@ -49,4 +50,4 @@ document.body.addEventListener('dblclick', ({ target }) => {
   }
 });
 
-createForm(table);
+createForm(tBody);

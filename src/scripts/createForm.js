@@ -70,7 +70,7 @@ function createSubmitButton(table, form, buttonText) {
         10,
         10,
         'Error',
-        'The name is too short.',
+        'The length of the name should be more than 4 symbols.',
         'error',
       );
     }
@@ -80,9 +80,13 @@ function createSubmitButton(table, form, buttonText) {
         10,
         10,
         'Error',
-        'The position is too short.',
+        'The length of the position should be more than 4 symbols',
         'error',
       );
+    }
+
+    if (data.get('age') === '') {
+      return pushNotification(10, 10, 'Error', 'The age is required.', 'error');
     }
 
     if (data.get('age') < 18) {
@@ -90,13 +94,19 @@ function createSubmitButton(table, form, buttonText) {
         10,
         10,
         'Error',
-        'The age is too small.',
+        'The age should be 18 or older.',
         'error',
       );
     }
 
     if (data.get('age') > 90) {
-      return pushNotification(10, 10, 'Error', 'The age is too big.', 'error');
+      return pushNotification(
+        10,
+        10,
+        'Error',
+        'The age should be 90 or less.',
+        'error',
+      );
     }
 
     if (data.get('salary') === '') {
