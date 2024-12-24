@@ -29,7 +29,9 @@ thead.forEach((item) => {
         }
 
         return numA.localeCompare(numB);
-      } else {
+      }
+
+      if (sortStates[columnIndex] === 'desc') {
         if (!isNaN(numB) && !isNaN(numA)) {
           return numB - numA;
         }
@@ -40,5 +42,15 @@ thead.forEach((item) => {
 
     tbody.innerHTML = '';
     tbody.append(...tbodyArray);
+  });
+
+  tbodyArray.forEach((row) => {
+    row.addEventListener('click', () => {
+      tbodyArray.forEach((r) => {
+        r.classList.remove('active');
+      });
+
+      row.classList.add('active');
+    });
   });
 });
