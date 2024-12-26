@@ -2,7 +2,7 @@
 
 const thead = document.querySelectorAll('thead tr th');
 const tbody = document.querySelector('tbody');
-const tbodyArray = Array.from(tbody.querySelectorAll('tr'));
+let tbodyArray = Array.from(tbody.querySelectorAll('tr'));
 const sortStates = [];
 const buttonSubmit = document.querySelector('button');
 const inputName = document.querySelector('[data-qa="name"]');
@@ -49,60 +49,76 @@ thead.forEach((item) => {
     tbody.innerHTML = '';
     tbody.append(...tbodyArray);
   });
+});
 
-  tbodyArray.forEach((row) => {
-    row.addEventListener('click', () => {
-      tbodyArray.forEach((r) => {
-        r.classList.remove('active');
-      });
+tbody.addEventListener('click', (e) => {
+  const row = e.target.closest('tr'); // Знаходимо найближчий рядок
 
-      row.classList.add('active');
-    });
-  });
+  if (!row) {
+    return;
+  } // Якщо не клікнули на рядок, нічого не робимо
+
+  // eslint-disable-next-line max-len
+  tbodyArray.forEach((r) => r.classList.remove('active')); // Знімаємо клас active з усіх рядків
+
+  row.classList.add('active'); // Додаємо клас active на поточний рядок
 });
 
 buttonSubmit.addEventListener('click', (e) => {
   e.preventDefault();
 
-  const newRow = document.createElement('tr');
   const employeeName = inputName.value.trim();
   const position = inputPosition.value.trim();
   const office = inputOffice.value;
-  const age = inputAge.value;
-  const salary = inputSalary.value;
+  const age = Number(inputAge.value);
+  const salary = Number(inputSalary.value);
+
+  if (!employeeName || !position || !office || !age || !salary) {
+    pushNotification(
+      100,
+      10,
+      'Validation Error',
+      'All fields are required.',
+      'error',
+    );
+
+    return;
+  }
 
   if (employeeName.length < 4 || age < 18 || age > 90) {
     pushNotification(
       100,
       10,
-      'Title of Error message',
-      'Message example.\n ' +
-        'Notification should contain title and description.',
+      'Validation Error',
+      'Invalid name or age.',
       'error',
     );
+
+    return;
   }
+
+  const newRow = document.createElement('tr');
 
   newRow.innerHTML = `
     <td>${employeeName}</td>
     <td>${position}</td>
     <td>${office}</td>
     <td>${age}</td>
-    <td>${salary}</td>
+    <td>$${salary.toLocaleString('en-US')}</td>
   `;
 
   tbody.append(newRow);
   tbodyArray.push(newRow);
 
-  newRow.addEventListener('click', () => {
-    tbodyArray.forEach((r) => r.classList.remove('active'));
-    newRow.classList.add('active');
-  });
+  tbodyArray = Array.from(tbody.querySelectorAll('tr'));
 
   [inputName, inputPosition, inputOffice, inputAge, inputSalary].forEach(
     (input) => {
       input.value = '';
     },
   );
+
+  pushNotification(100, 10, 'Success', 'Employee added.', 'success');
 });
 
 // notification
@@ -110,6 +126,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   const messageBlock = document.createElement('div');
 
   messageBlock.classList.add('notification', type);
+  messageBlock.setAttribute('data-qa', 'notification');
 
   const header = document.createElement('h2');
 
