@@ -1,5 +1,6 @@
 'use strict';
 
+let sortBy = null;
 const mainTable = document.querySelector('table');
 const newForm = document.createElement('form');
 
@@ -37,7 +38,7 @@ function createInput(typeInput, nameInput) {
   newInput.name = nameInput.toLowerCase();
   newInput.type = typeInput.toLowerCase();
   newInput.dataset.qa = nameInput.toLowerCase();
-  newInput.required = 'true';
+  newInput.required = true;
   newLabel.append(newInput);
 
   return newLabel;
@@ -121,7 +122,7 @@ function validationSalary(value) {
 }
 
 mainTable.tHead.addEventListener('click', function (eventData) {
-  if (!eventData.target.tagName === 'TH') {
+  if (eventData.target.tagName !== 'TH') {
     return false;
   }
 
@@ -130,12 +131,12 @@ mainTable.tHead.addEventListener('click', function (eventData) {
     eventData.target.cellIndex,
   );
 
-  if (Event.sortBy !== eventData.target.textContent) {
-    Event.sortBy = eventData.target.textContent;
+  if (sortBy !== eventData.target.textContent) {
+    sortBy = eventData.target.textContent;
     this.nextElementSibling.append(...sortedElement);
-  } else if (Event.sortBy === eventData.target.textContent) {
+  } else if (sortBy === eventData.target.textContent) {
     this.nextElementSibling.append(...sortedElement.reverse());
-    Event.sortBy = null;
+    sortBy = null;
   }
 });
 
@@ -152,14 +153,14 @@ mainTable.tBodies[0].addEventListener('click', function (eventData) {
   }
 });
 
-newForm.addEventListener('submit', (evetntData) => {
-  evetntData.preventDefault();
+newForm.addEventListener('submit', (eventData) => {
+  eventData.preventDefault();
 
-  const inputName = evetntData.target.elements.name;
-  const inputPosition = evetntData.target.elements.position;
-  const inputOffice = evetntData.target.elements.office;
-  const inputAge = evetntData.target.elements.age;
-  const inputSalary = evetntData.target.elements.salary;
+  const inputName = eventData.target.elements.name;
+  const inputPosition = eventData.target.elements.position;
+  const inputOffice = eventData.target.elements.office;
+  const inputAge = eventData.target.elements.age;
+  const inputSalary = eventData.target.elements.salary;
   const testForTextInput = /^[A-Z][a-z]+-?\s?[A-Z]?[a-z]+$/;
 
   if (!testForTextInput.test(inputName.value) || inputName.value.length < 4) {
@@ -183,5 +184,5 @@ newForm.addEventListener('submit', (evetntData) => {
   newRow.insertCell().textContent = validationSalary(inputSalary.value);
 
   createMessage('success');
-  evetntData.target.reset();
+  eventData.target.reset();
 });
