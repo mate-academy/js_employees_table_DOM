@@ -75,7 +75,10 @@ function sortForTable(sortTable, column) {
     if (!/[0-9]/.test(value1)) {
       return value1.localeCompare(value2);
     } else if (/[0-9]/.test(value1)) {
-      return value1.replace(/\D/g, '') - value2.replace(/\D/g, '');
+      const num1 = value1.replace(/\D/g, '');
+      const num2 = value2.replace(/\D/g, '');
+
+      return parseFloat(num1) - parseFloat(num2);
     }
   });
 }
@@ -185,4 +188,45 @@ newForm.addEventListener('submit', (eventData) => {
 
   createMessage('success');
   eventData.target.reset();
+});
+
+mainTable.tBodies[0].addEventListener('dblclick', function (eventData) {
+  if (eventData.target.tagName !== 'TD') {
+    return true;
+  }
+
+  const newInput = document.createElement('input');
+  const saveData = eventData.target.replaceChild(
+    newInput,
+    eventData.target.firstChild,
+  );
+
+  newInput.classList.add('cell-input');
+  newInput.value = saveData.textContent;
+  newInput.focus();
+
+  if (eventData.target.cellIndex < 3) {
+    newInput.type = 'text';
+  } else if (eventData.target.cellIndex < 5) {
+    newInput.value = saveData.textContent.replace(/\D/g, '');
+    newInput.type = 'number';
+  }
+
+  newInput.addEventListener('blur', function () {
+    if (newInput.value.length <= 0) {
+      newInput.parentElement.append(saveData);
+    } else if (newInput.type === 'number' && newInput.value > 90) {
+      newInput.parentElement.innerText = validationSalary(newInput.value);
+    } else {
+      newInput.parentElement.append(newInput.value);
+    }
+
+    newInput.remove();
+  });
+
+  newInput.addEventListener('keyup', (e) => {
+    if (e.code === 'Enter') {
+      newInput.blur();
+    }
+  });
 });
