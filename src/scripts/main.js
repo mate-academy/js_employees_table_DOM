@@ -72,11 +72,14 @@ sortButtons.forEach((button) => {
 
 // Selection
 
+function selectRow(element) {
+  rows.forEach((row) => row.classList.remove('active'));
+  element.classList.add('active');
+}
+
 rows.forEach((row) => {
   row.addEventListener('click', () => {
-    row.classList.remove('active');
-
-    row.classList.add('active');
+    selectRow(row);
   });
 });
 
@@ -121,11 +124,11 @@ form.addEventListener('submit', (e) => {
   const age = form.querySelector('input[data-qa="age"]').value;
   const salary = form.querySelector('input[data-qa="salary"]').value;
 
-  if (employeeName.length > 4 && age > 18 && age < 90) {
+  if ((age > 18 && age < 90) || typeof (salary !== Number)) {
     valid = true;
   }
 
-  if (valid !== true) {
+  if (valid !== true || employeeName.length < 4) {
     pushNotification(
       150,
       10,
