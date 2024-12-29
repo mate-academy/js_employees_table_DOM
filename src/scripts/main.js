@@ -115,20 +115,15 @@ const form = document.querySelector('form');
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-
-  let valid = false;
-
   const employeeName = form.querySelector('input[data-qa="name"]').value;
   const position = form.querySelector('input[data-qa="position"]').value;
   const office = form.querySelector('select[data-qa="office"]').value;
   const age = form.querySelector('input[data-qa="age"]').value;
   const salary = form.querySelector('input[data-qa="salary"]').value;
 
-  if ((age > 18 && age < 90) || typeof (salary !== Number)) {
-    valid = true;
-  }
 
-  if (valid !== true || employeeName.length < 4) {
+
+  if (age > 18 && age < 90 || typeof (salary !== Number) || employeeName.length < 4) {
     pushNotification(
       150,
       10,
