@@ -102,7 +102,7 @@ form.addEventListener('submit', (event) => {
   }
 
   if (!names || !position || !office || !age || !salary) {
-    showNotification();
+    showNotification('Введіть дані співробітника!', 'error');
   }
 
   const newRow = document.createElement('tr');
@@ -147,7 +147,7 @@ tbody.addEventListener('dblclick', (event) => {
 
     input.type = 'text';
     input.classList.add('cell-input');
-    input.value = '';
+    input.value = initialValue;
 
     cell.textContent = '';
     cell.append(input);
