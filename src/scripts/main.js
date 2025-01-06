@@ -155,7 +155,6 @@ tbody.addEventListener('dblclick', (event) => {
 
     function saveChanges(input, cell, initialValue) {
       const newValue = input.value.trim();
-
       cell.textContent = newValue || initialValue;
     }
 
