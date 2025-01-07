@@ -48,28 +48,63 @@ function showNotification(message, type) {
 let isAscending = true;
 
 function sortTableBySalary(isAscending) {
-  tbody = document.querySelector('tbody');
+  thead.addEventListener('click', (event) => {
+    const sortedButton = event.target.closest('th');
+    let numberOfCells = 0;
 
-  [...tbody.rows]
-    .sort((rowA, rowB) => {
-      const salaryA = parseInt(
-        rowA.lastElementChild.textContent.replace(/[$,]/g, ''),
-      );
-      const salaryB = parseInt(
-        rowB.lastElementChild.textContent.replace(/[$,]/g, ''),
-      );
+    if (sortedButton.textContent === 'Name') {
+      numberOfCells = 0;
+    }
 
-      return isAscending ? salaryA - salaryB : salaryB - salaryA;
-    })
-    .forEach((row) => tbody.append(row));
-}
+    if (sortedButton.textContent === 'Position') {
+      numberOfCells = 1;
+    }
 
-for (let i = 0; i < collectionOfButton.length; i++) {
-  collectionOfButton[i].addEventListener('click', () => {
-    sortTableBySalary(isAscending);
-    isAscending = !isAscending;
+    if (sortedButton.textContent === 'Office') {
+      numberOfCells = 2;
+    }
+
+    if (sortedButton.textContent === 'Age') {
+      numberOfCells = 3;
+    }
+
+    if (sortedButton.textContent === 'Salary') {
+      numberOfCells = 4;
+    }
+
+    if (
+      sortedButton.textContent === 'Age' ||
+      sortedButton.textContent === 'Salary'
+    ) {
+      [...tbody.rows]
+        .sort((rowA, rowB) => {
+          const A = parseInt(
+            rowA.cells[numberOfCells].textContent.replace(/[$,]/g, ''),
+          );
+          const B = parseInt(
+            rowB.cells[numberOfCells].textContent.replace(/[$,]/g, ''),
+          );
+
+          return isAscending ? A - B : B - A;
+        })
+        .forEach((row) => tbody.append(row));
+
+      isAscending = !isAscending;
+    } else {
+      [...tbody.rows]
+        .sort((rowA, rowB) => {
+          const A = rowA.cells[numberOfCells].textContent.trim();
+          const B = rowB.cells[numberOfCells].textContent.trim();
+
+          return isAscending ? A.localeCompare(B) : B.localeCompare(A);
+        })
+        .forEach((row) => tbody.append(row));
+      isAscending = !isAscending;
+    }
   });
 }
+
+sortTableBySalary(isAscending);
 
 // add new line and sort
 form.addEventListener('submit', (event) => {
