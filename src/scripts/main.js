@@ -1,9 +1,13 @@
+/* eslint-disable padding-line-between-statements */
+/* eslint-disable no-inner-declarations */
+/* eslint-disable no-shadow */
+/* eslint-disable no-param-reassign */
+/* eslint-disable prefer-const */
 'use strict';
 
 const form = document.createElement('form');
 let tbody = document.querySelector('tbody');
 const thead = document.querySelector('thead');
-const collectionOfButton = [...thead.rows[0].cells];
 
 form.className = 'new-employee-form';
 
@@ -47,7 +51,7 @@ function showNotification(message, type) {
 // sort the table
 let isAscending = true;
 
-function sortTableBySalary(isAscending) {
+function sortTableBySalary(isAscending = true) {
   thead.addEventListener('click', (event) => {
     const sortedButton = event.target.closest('th');
     let numberOfCells = 0;
