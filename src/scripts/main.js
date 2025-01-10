@@ -151,40 +151,50 @@ const pushNotification = (type, title, description) => {
 };
 
 const validatorFormData = (formData) => {
+  let isValid = true; // Флаг для отслеживания состояния валидации
+
   const employeeName = formData.get('name');
+  const position = formData.get('position');
+  const office = formData.get('office');
   const age = Number(formData.get('age'));
 
-  if (!employeeName || !formData.get('age')) {
-    pushNotification(
-      'warning',
-      'Warning',
-      'Please fill in all required fields.',
-    );
-
-    return false;
-  }
-
-  if (employeeName.length < 4) {
+  // Проверка: длина имени
+  if (employeeName && employeeName.length < 4) {
     pushNotification(
       'error',
       'Validation Error',
       'Name must be at least 4 characters long.',
     );
-
-    return false;
+    isValid = false; // Обновляем флаг
   }
 
+  // Проверка: позиция (если позиция пустая)
+  if (!position) {
+    pushNotification(
+      'error',
+      'Validation Error',
+      'Position field is required.',
+    );
+    isValid = false;
+  }
+
+  // Проверка: офис (если офис не выбран)
+  if (!office) {
+    pushNotification('error', 'Validation Error', 'Office field is required.');
+    isValid = false;
+  }
+
+  // Проверка: возраст в пределах 18–90
   if (isNaN(age) || age < 18 || age > 90) {
     pushNotification(
       'error',
       'Validation Error',
       'Age must be between 18 and 90.',
     );
-
-    return false;
+    isValid = false;
   }
 
-  return true;
+  return isValid; // Возвращаем итоговое значение флага
 };
 
 const addEmployeeToTable = (formData) => {
@@ -216,12 +226,6 @@ const addEmployeeToTable = (formData) => {
   newRow.appendChild(salaryCell);
 
   tableBody.appendChild(newRow);
-
-  pushNotification(
-    'success',
-    'Employee Added',
-    'New employee has been successfully added to the table.',
-  );
 };
 
 saveButton.addEventListener('click', (e) => {
@@ -232,5 +236,11 @@ saveButton.addEventListener('click', (e) => {
   if (validatorFormData(formData)) {
     addEmployeeToTable(formData);
     form.reset();
+
+    pushNotification(
+      'success',
+      'Employee Added',
+      'New employee has been successfully added to the table.',
+    );
   }
 });
