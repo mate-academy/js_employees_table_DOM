@@ -33,7 +33,7 @@ function sortRows(rows, asc, column) {
     const textA = a.cells[column].textContent;
     const textB = b.cells[column].textContent;
 
-    return asc ? (textA < textB ? 1 : -1) : textA > textB ? 1 : -1;
+    return asc ? (textA < textB ? -1 : 1) : textA > textB ? 1 : -1;
   });
 }
 
@@ -42,7 +42,7 @@ function sortRowsBySalary(rows, asc) {
     const salaryA = parseFloat(a.cells[4].textContent.replace(/[$,]/g, ''));
     const salaryB = parseFloat(b.cells[4].textContent.replace(/[$,]/g, ''));
 
-    return asc ? salaryB - salaryA : salaryA - salaryB;
+    return asc ? salaryA - salaryB : salaryB - salaryA;
   });
 }
 
