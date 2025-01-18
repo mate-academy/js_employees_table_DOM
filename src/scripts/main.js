@@ -33,7 +33,7 @@ function sortRows(rows, asc, column) {
     const textA = a.cells[column].textContent;
     const textB = b.cells[column].textContent;
 
-    return !asc ? (textA > textB ? 1 : -1) : textA < textB ? 1 : -1;
+    return asc ? (textA < textB ? 1 : -1) : textA > textB ? 1 : -1;
   });
 }
 
@@ -42,7 +42,7 @@ function sortRowsBySalary(rows, asc) {
     const salaryA = parseFloat(a.cells[4].textContent.replace(/[$,]/g, ''));
     const salaryB = parseFloat(b.cells[4].textContent.replace(/[$,]/g, ''));
 
-    return !asc ? salaryA - salaryB : salaryB - salaryA;
+    return asc ? salaryB - salaryA : salaryA - salaryB;
   });
 }
 
@@ -244,6 +244,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function main() {
   const { tableBody, tableHead } = tableData;
 
+  enableCellEditing();
+
   const tableColumns = tableHead.rows[0].cells;
 
   tableData.columns = Array.from(tableColumns).map((column, index) => {
@@ -263,6 +265,7 @@ main();
 function enableCellEditing() {
   let currentInput = null;
 
+  // eslint-disable-next-line no-shadow
   tableData.tableBody.addEventListener('dblclick', (event) => {
     const cell = event.target;
 
@@ -301,7 +304,13 @@ function enableCellEditing() {
 
     cell.textContent = newValue || initialValue;
     currentInput = null;
+
+    updateTableData();
   }
 }
 
-enableCellEditing();
+function updateTableData() {
+  const { tableBody } = tableData;
+
+  tableData.rows = Array.from(tableBody.rows);
+}
