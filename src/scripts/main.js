@@ -259,3 +259,49 @@ function main() {
 }
 
 main();
+
+function enableCellEditing() {
+  let currentInput = null;
+
+  tableData.tableBody.addEventListener('dblclick', (event) => {
+    const cell = event.target;
+
+    if (cell.tagName !== 'TD' || cell.querySelector('input')) {
+      return;
+    }
+
+    if (currentInput) {
+      saveCell(currentInput);
+    }
+
+    const initialValue = cell.textContent;
+    const input = document.createElement('input');
+
+    input.type = 'text';
+    input.value = initialValue;
+    input.className = 'cell-input';
+    cell.textContent = '';
+    cell.appendChild(input);
+    input.focus();
+
+    input.addEventListener('blur', () => saveCell(input, initialValue));
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        saveCell(input, initialValue);
+      }
+    });
+
+    currentInput = input;
+  });
+
+  function saveCell(input, initialValue) {
+    const cell = input.parentElement;
+    const newValue = input.value.trim();
+
+    cell.textContent = newValue || initialValue;
+    currentInput = null;
+  }
+}
+
+enableCellEditing();
