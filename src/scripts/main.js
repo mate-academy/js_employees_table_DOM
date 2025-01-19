@@ -49,7 +49,6 @@ function sortTable(indexColumn) {
 
 function makeLabel(newName) {
   const label = document.createElement('label');
-  const input = document.createElement('input');
 
   if (newName === 'Office') {
     const select = document.createElement('select');
@@ -71,26 +70,22 @@ function makeLabel(newName) {
 
     label.textContent = `${newName}:`;
     label.append(select);
-    select.setAttribute('name', 'name');
+    select.setAttribute('name', newName.toLowerCase());
     select.setAttribute('data-qa', newName.toLowerCase());
-
-    newForm.appendChild(label);
-  } else if (newName === 'Salary' || newName === 'Age') {
-    newForm.appendChild(label);
-    label.textContent = `${newName}:`;
-    label.append(input);
-    input.setAttribute('name', 'name');
-    input.setAttribute('type', 'number');
-    input.setAttribute('data-qa', newName.toLowerCase());
-
     newForm.appendChild(label);
   } else {
+    const input = document.createElement('input');
+
     label.textContent = `${newName}:`;
     label.append(input);
-    input.setAttribute('name', 'name');
-    input.setAttribute('type', 'text');
-    input.setAttribute('data-qa', newName.toLowerCase());
+    input.setAttribute('name', newName.toLowerCase());
 
+    input.setAttribute(
+      'type',
+      newName === 'Salary' || newName === 'Age' ? 'number' : 'text',
+    );
+
+    input.setAttribute('data-qa', newName.toLowerCase());
     newForm.appendChild(label);
   }
 }
@@ -165,9 +160,26 @@ button.addEventListener('click', () => {
       'Name must be at least 4 characters long',
       'error',
     );
+
+    return;
   }
 
   if (DataAge < 18 || DataAge > 90) {
     pushNotification('Error', 'Age must be between 18 and 90', 'error');
+
+    return;
   }
+
+  const newRow = document.createElement('tr');
+
+  newRow.innerHTML = `
+    <td>${DataName}</td>
+    <td>${DataPosition}</td>
+    <td>${DataOffice}</td>
+    <td>${DataAge}</td>
+    <td>$${parseFloat(DataSalary).toFixed(2)}</td>
+  `;
+  tbody.appendChild(newRow);
+
+  pushNotification('Success', 'Employee added successfully!', 'success');
 });
