@@ -5,6 +5,7 @@ const tbody = document.querySelector('tbody');
 
 const newForm = document.createElement('form');
 const body = document.querySelector('body');
+let currentNotification = null;
 
 body.appendChild(newForm);
 newForm.setAttribute('class', 'new-employee-form');
@@ -102,21 +103,29 @@ function createButton() {
 }
 
 const pushNotification = (
-  posTop = 10,
-  posRight = 10,
   title,
   description,
   type,
+  posTop = 10,
+  posRight = 10,
 ) => {
+  if (currentNotification) {
+    currentNotification.remove();
+  }
+
   const notification = document.createElement('div');
   const notificationTitle = document.createElement('h2');
   const notificationDescription = document.createElement('p');
 
   notification.setAttribute('data-qa', 'notification');
   notification.classList.add('notification', type);
+
   notification.style.top = `${posTop}px`;
   notification.style.right = `${posRight}px`;
+
   notificationTitle.classList.add('title');
+
+  currentNotification = notification;
   notificationTitle.textContent = title;
   notificationDescription.innerHTML = description.replace('\n', '</br>');
   notification.append(notificationTitle);
@@ -125,6 +134,8 @@ const pushNotification = (
 
   setTimeout(() => {
     notification.style.display = 'none';
+    notification.remove();
+    currentNotification = null;
   }, 2000);
 };
 
