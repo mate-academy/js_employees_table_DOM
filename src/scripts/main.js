@@ -138,7 +138,9 @@ const pushNotification = (title, description, type) => {
   }, 5000);
 };
 
-form.addEventListener('click', (e) => {
+const button = document.querySelector('button');
+
+button.addEventListener('click', (e) => {
   e.preventDefault();
 
   if (
