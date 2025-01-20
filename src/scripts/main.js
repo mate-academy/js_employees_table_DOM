@@ -138,9 +138,7 @@ const pushNotification = (title, description, type) => {
   }, 5000);
 };
 
-const button = document.querySelector('button');
-
-button.addEventListener('click', (e) => {
+form.addEventListener('click', (e) => {
   e.preventDefault();
 
   if (
@@ -162,10 +160,9 @@ button.addEventListener('click', (e) => {
     return;
   }
 
-  if (
-    form.querySelector('input[name="age"]').value < 18 ||
-    form.querySelector('input[name="age"]').value > 90
-  ) {
+  const ageValue = Number(form.querySelector('input[name="age"]').value);
+
+  if (isNaN(ageValue) || ageValue < 18 || ageValue > 90) {
     pushNotification(
       'Error message',
       'Please enter an age between 18 and 90.',
@@ -175,16 +172,20 @@ button.addEventListener('click', (e) => {
     return;
   }
 
+  const salaryValue = Number(form.querySelector('input[name="salary"]').value);
+
+  if (isNaN(salaryValue)) {
+    pushNotification('Error message', 'Please enter a salary.', 'error');
+
+    return;
+  }
+
   const person = {
     Name: form.querySelector('input[name="name"]').value,
     Position: form.querySelector('input[name="position"]').value,
     Office: form.querySelector('select[name="office"]').value,
     Age: form.querySelector('input[name="age"]').value,
-    Salary:
-      '$' +
-      Number(form.querySelector('input[name="salary"]').value).toLocaleString(
-        'en-US',
-      ),
+    Salary: '$' + salaryValue.toLocaleString('en-US'),
   };
   const row = document.createElement('tr');
 
