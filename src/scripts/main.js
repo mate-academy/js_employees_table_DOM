@@ -23,6 +23,7 @@ function sort(e) {
     let val1 = value1[Object.keys(value1)[index]];
     let val2 = value2[Object.keys(value2)[index]];
 
+    // code worck correct and need less code with reassigning
     if (nextDirection !== 'asc') {
       val2 = value1[Object.keys(value1)[index]];
       val1 = value2[Object.keys(value2)[index]];
@@ -164,7 +165,7 @@ function saveToTable(e) {
   const inputName = inputs[0].value;
   const inputAge = inputs[2].value;
 
-  if (inputName.length < 4 || inputAge < 18 || inputAge > 91) {
+  if (inputName.length < 4 || inputAge <= 18 || inputAge >= 91) {
     const error = {
       type: 'error',
       title: 'ERROR',
@@ -177,7 +178,7 @@ function saveToTable(e) {
   } else {
     const success = {
       type: 'success',
-      title: 'SUCCES',
+      title: 'SUCCESS',
       description: 'New element added',
     };
 
