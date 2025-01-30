@@ -232,7 +232,11 @@ form.addEventListener('submit', (e) => {
   }
 
   // Перевірка для ageId
-  if (ageId < 18 || ageId > 90 || isNaN(ageId)) {
+  if (
+    isNaN(parseFloat(ageId)) ||
+    parseFloat(ageId) < 18 ||
+    parseFloat(ageId) > 90
+  ) {
     setTimeout(() => {
       pushNotification(
         600,
@@ -245,7 +249,7 @@ form.addEventListener('submit', (e) => {
   }
 
   // Перевірка для salaryId
-  if (!salaryId || isNaN(salaryId)) {
+  if (!parseFloat(salaryId) || isNaN(parseFloat(salaryId))) {
     setTimeout(() => {
       pushNotification(
         700,
