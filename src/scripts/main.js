@@ -27,7 +27,7 @@ thead.forEach((header, index) => {
           case 'ASC':
             return Number(cellA) - Number(cellB);
           case 'DESC':
-            return Number(cellB) - Number(cellB);
+            return Number(cellB) - Number(cellA);
         }
       } else if (index === 4) {
         switch (order) {
