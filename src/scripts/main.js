@@ -79,7 +79,7 @@ function addLastSortAttribute(header) {
 }
 
 function convertToNumber(string) {
-  return string.replace('$', '').replace(',', '');
+  return +string.replace('$', '').replace(',', '');
 }
 
 // select row
@@ -231,9 +231,9 @@ form.addEventListener('submit', (e) => {
 
 function formValidation() {
   if (
-    !inputName.value.trim() &&
-    !inputAge.value &&
-    !inputPosition.value.trim() &&
+    !inputName.value.trim() ||
+    !inputAge.value ||
+    !inputPosition.value.trim() ||
     !inputSalary.value
   ) {
     return false;
