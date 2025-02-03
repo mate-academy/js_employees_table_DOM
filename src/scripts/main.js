@@ -230,9 +230,7 @@ form.addEventListener('submit', (eve) => {
 
   tbody.appendChild(newRow);
 
-  if (tbody.appendChild(newRow)) {
-    createNotification('Great! You successfuly added a new employee!', 'green');
-  }
+  createNotification('Great! You successfuly added a new employee!', 'green');
 });
 
 function createNotification(message, bgColor) {
