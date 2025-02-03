@@ -3,7 +3,7 @@
 // write code here
 const headers = document.querySelectorAll('thead > tr > th');
 const table = document.querySelector('table');
-const tfoot = document.querySelector('tfoot');
+const tbody = document.querySelector('table > tbody');
 
 const headersList = [];
 
@@ -23,69 +23,64 @@ for (const header of headers) {
     const index = [...headers].indexOf(header);
 
     if (headersList.includes(header)) {
-      if (header.clicked === false){
+      if (header.clicked === false) {
         sortColumn(index, 'asc');
       } else {
         sortColumn(index, 'desc');
       }
-      
     }
     header.clicked = !header.clicked;
   });
 }
 
+const rows = Array.from(table.rows).slice(1);
+
 // function for sorting column
 function sortColumn(colIndex, direction) {
   let switching = true;
-  const table = document.querySelector('table');
 
+  // const table = document.querySelector('table');
   while (switching) {
     switching = false;
 
-    const rows = Array.from(table.rows).slice(1);
-
     for (let i = 0; i < rows.length - 1; i++) {
       let shouldSwitch = false;
-
       const x = rows[i].getElementsByTagName('td')[colIndex];
       const y = rows[i + 1].getElementsByTagName('td')[colIndex];
 
-      if (!x || !y) continue;
+      if (!x || !y) {
+        continue;
+      }
 
-      const numX = x.textContent.trim();
-      const numY = y.textContent.trim();
+      const textX = x.textContent.trim();
+      const textY = y.textContent.trim();
 
-      const dollarNumX = parseFloat(x.textContent.replace(/[$,]/g, ''));
-      const dollarNumY = parseFloat(y.textContent.replace(/[$,]/g, ''));
+      const isCurrencyX = textX.includes('$') || textX.includes(',');
+      const isCurrencyY = textY.includes('$') || textY.includes(',');
 
-      if (
-        typeof x.textContent === 'number' &&
-        typeof y.textContent === 'number'
-      ) {
+      if (isCurrencyX && isCurrencyY) {
+        const numX = parseFloat(textX.replace(/[$,]/g, ''));
+        const numY = parseFloat(textY.replace(/[$,]/g, ''));
+
         if (direction === 'asc') {
-          if (
-            numX > numY || dollarNumX > dollarNumY
-          ) {
+          if (numX > numY) {
             shouldSwitch = true;
           }
         } else if (direction === 'desc') {
-          if (
-            numX < numY || dollarNumX < dollarNumY
-          ) {
+          if (numX < numY) {
             shouldSwitch = true;
           }
         }
       } else {
         if (direction === 'asc') {
-          if (x.textContent.toLowerCase() > y.textContent.toLowerCase()) {
+          if (textX.toLowerCase() > textY.toLowerCase()) {
             shouldSwitch = true;
           }
         } else if (direction === 'desc') {
-          if (x.textContent.toLowerCase() < y.textContent.toLowerCase()) {
+          if (textX.toLowerCase() < textY.toLowerCase()) {
             shouldSwitch = true;
           }
         }
-        
       }
 
       if (shouldSwitch) {
@@ -97,37 +92,184 @@ function sortColumn(colIndex, direction) {
 }
 
 // selecting particular row
-const rows = Array.from(table.rows).slice(1, -1);
-const tr = document.querySelector('tbody > tr');
+// const rows = Array.from(table.rows).slice(1);
 
 for (const row of rows) {
   row.addEventListener('click', () => {
     for (const el of rows) {
       el.style.backgroundColor = '';
+
       for (const cell of el.children) {
         cell.style.color = '';
       }
     }
 
     row.style.backgroundColor = '#127bab';
+
     for (const child of row.children) {
       child.style.color = 'white';
     }
-  })
+  });
 }
 
 const body = document.querySelector('body');
-
-const div = document.createElement('div');
-div.style.display = "flex";
-div.style.justifyContent = "center";
-div.style.width = "150px";
-div.style.height = "50px";
-
+const form = document.createElement('form');
 const button = document.createElement('button');
-button.innerHTML = "ADD";
-button.style.width = "150px";
-button.style.borderRadius = "10px";
 
-div.appendChild(button);
-tfoot.appendChild(div);
+form.className = 'new-employee-form';
+
+const selectionList = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
+
+for (let i = 0; i < 5; i++) {
+  const label = document.createElement('label');
+  const input = document.createElement('input');
+
+  input.required = true;
+
+  switch (i) {
+    case 0:
+      label.textContent = 'Name: ';
+      input.name = 'name';
+      input.setAttribute('data-qa', 'name');
+      input.type = 'text';
+      label.appendChild(input);
+      break;
+    case 1:
+      label.textContent = 'Position: ';
+      input.name = 'position';
+      input.setAttribute('data-qa', 'position');
+      input.type = 'text';
+      label.appendChild(input);
+      break;
+    case 2:
+      label.textContent = 'Office: ';
+
+      const select = document.createElement('select');
+
+      for (const city of selectionList) {
+        const option = document.createElement('option');
+
+        option.textContent = city;
+        select.appendChild(option);
+      }
+      select.setAttribute('data-qa', 'office');
+      select.name = 'office';
+      label.appendChild(select);
+      break;
+    case 3:
+      label.textContent = 'Age: ';
+      input.name = 'age';
+      input.setAttribute('data-qa', 'age');
+      input.type = 'number';
+      label.appendChild(input);
+      break;
+    case 4:
+      label.textContent = 'Salary: ';
+      input.name = 'salary';
+      input.setAttribute('data-qa', 'salary');
+      input.type = 'number';
+      label.appendChild(input);
+      break;
+  }
+
+  form.appendChild(label);
+}
+
+button.textContent = 'Save to table';
+button.type = 'submit';
+form.appendChild(button);
+
+body.appendChild(form);
+
+form.addEventListener('submit', (eve) => {
+  eve.preventDefault();
+
+  const newRow = document.createElement('tr');
+
+  const nameInput = form.querySelector('[name="name"]').value;
+  const Name = nameInput.trim();
+  const position = form.querySelector('[name="position"]').value;
+  const office = form.querySelector('[name="office"]').value;
+  const age = form.querySelector('[name="age"]').value;
+  const salary = form.querySelector('[name="salary"]').value;
+
+  const formattedSalary = parseInt(salary).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+
+  const existingError = document.querySelector('.errorMessage');
+
+  if (existingError) {
+    existingError.remove();
+  }
+
+  if (Name.length < 4 || parseInt(age, 10) < 18 || parseInt(age, 10) > 90) {
+    createNotification('', 'red');
+
+    return;
+  }
+
+  for (const value of [Name, position, office, age, formattedSalary]) {
+    const td = document.createElement('td');
+
+    td.textContent = value;
+    newRow.appendChild(td);
+  }
+
+  form.reset();
+
+  tbody.appendChild(newRow);
+
+  if (tbody.appendChild(newRow)) {
+    createNotification('Great! You successfuly added a new employee!', 'green');
+  }
+});
+
+function createNotification(message, bgColor) {
+  const notification = document.createElement('div');
+
+  notification.className = 'errorMessage';
+
+  Object.assign(notification.style, {
+    backgroundColor: bgColor,
+    borderRadius: '10px',
+    display: 'flex',
+    flexDirection: 'column',
+    boxSizing: 'border-box',
+    alignSelf: 'flex-start',
+    marginLeft: '12px',
+    textAlign: 'center',
+    padding: '10px',
+  });
+
+  const title = document.createElement('h2');
+
+  if (bgColor === 'red') {
+    const nameInput = form.querySelector('[name="name"]').value;
+    const Name = nameInput.trim();
+    const age = form.querySelector('[name="age"]').value;
+
+    if (Name.length < 4) {
+      title.textContent = 'Name must be longer than 4 letters!';
+    } else if (parseInt(age, 10) < 18 || parseInt(age, 10) > 90) {
+      title.textContent = 'Age must be between 18 and 90!';
+    }
+  } else {
+    title.textContent = message;
+  }
+
+  title.style.color = '#fff';
+
+  notification.appendChild(title);
+  body.appendChild(notification);
+}
