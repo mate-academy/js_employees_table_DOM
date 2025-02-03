@@ -293,7 +293,7 @@ tbody.addEventListener('dblclick', (even) => {
 
   cell.textContent = '';
   cell.appendChild(input6);
-  input.focus();
+  input6.focus();
 
   activeInputCell = input6;
 
