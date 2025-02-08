@@ -1,7 +1,7 @@
 'use strict';
 
 const table = document.querySelector('table');
-const rows = document.querySelectorAll('table tbody tr');
+let rows = document.querySelectorAll('table tbody tr');
 const form = document.createElement('form');
 const arrOfHeaders = [...table.children[0].children[0].children];
 const people = [];
@@ -81,6 +81,8 @@ function sortTable(header, previous, target, array) {
         currentSortType = 'ASC';
       }
   }
+
+  rows = document.querySelectorAll('table tbody tr');
 }
 
 function arrPrinter(arr) {
@@ -148,7 +150,6 @@ function pushNotification(posTop, posRight, title, description, type) {
 
 buildPeople();
 addClass();
-sortTable();
 arrPrinter(people);
 
 arrOfHeaders.forEach((item) => {
@@ -248,6 +249,7 @@ form.addEventListener('submit', (e) => {
     people.push(newPerson);
     arrPrinter(people);
     form.reset();
+    rows = document.querySelectorAll('table tbody tr');
   }
 });
 
