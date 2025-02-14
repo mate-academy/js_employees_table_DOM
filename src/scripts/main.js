@@ -123,19 +123,19 @@ function createInputs(someform) {
   }
 }
 
+const offices = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
+
 function createSelect(someform) {
   const selectElem = document.createElement('select');
 
   selectElem.setAttribute('name', 'office');
-
-  const offices = [
-    'Tokyo',
-    'Singapore',
-    'London',
-    'New York',
-    'Edinburgh',
-    'San Francisco',
-  ];
 
   for (const office of offices) {
     const option = document.createElement('option');
@@ -183,6 +183,26 @@ createForm();
 const submitButton = document.querySelector('button');
 const form = document.querySelector('form');
 
+const notificationInfo = {
+  warning: {
+    title: 'Warning!',
+    description: 'There is some empty fields, please enter all info',
+    type: 'warning',
+  },
+  error: {
+    title: 'Error!',
+    description:
+      'Please check, if your name is not less than 4 letters ' +
+      'and your age is not less than 18 or more than 90',
+    type: 'error',
+  },
+  success: {
+    title: 'Good job!',
+    description: 'You have added info about employeer',
+    type: 'success',
+  },
+};
+
 submitButton.addEventListener('click', function (e) {
   e.preventDefault();
 
@@ -193,24 +213,22 @@ submitButton.addEventListener('click', function (e) {
   );
 
   if (!allFieldsFilled) {
-    const warningTitle = 'Warning!';
-    const warningDescription =
-      'There is some empty fields, please enter all info';
-    const warning = 'warning';
+    pushNotification(
+      notificationInfo.warning.title,
+      notificationInfo.warning.description,
+      notificationInfo.warning.type,
+    );
 
-    pushNotification(warningTitle, warningDescription, warning);
     return;
   }
 
   if (data.name.length < 4 || data.age < 18 || data.age > 90) {
-    const errorTitle = 'Error!';
-    const errorDescription =
-      // eslint-disable-next-line max-len
-      'Please check, if your name is not less than 4 letters and your age is not less than 18 or more than 90';
+    pushNotification(
+      notificationInfo.error.title,
+      notificationInfo.error.description,
+      notificationInfo.error.type,
+    );
 
-    const error = 'error';
-
-    pushNotification(errorTitle, errorDescription, error);
     return;
   }
 
@@ -221,20 +239,19 @@ submitButton.addEventListener('click', function (e) {
   tableBody.appendChild(newRowInfo);
 
   form.reset();
-  employees.push(data); // Добавляем нового сотрудника в массив
-  updateTable(); // Обновляем таблицу с учетом нового сотрудника
+  employees.push(data);
+  updateTable();
 
-  const succeessTitle = 'Good job!';
-  const successDescription = 'You have added info about employeer';
-  const success = 'success';
-
-  pushNotification(succeessTitle, successDescription, success);
+  pushNotification(
+    notificationInfo.success.title,
+    notificationInfo.success.description,
+    notificationInfo.success.type,
+  );
 });
 
 function getFormData(someform) {
   const formData = {};
 
-  // Проходимся по всем элементам формы
   Array.from(someform.elements).forEach((element) => {
     if (element.name) {
       formData[element.name] = element.value;
@@ -284,5 +301,58 @@ function pushNotification(title, description, type) {
     }, 500);
   }, 2000);
 }
+
+function changeInfo(cellInfo) {
+  const cellIndex = cellInfo.cellIndex;
+  const oldValue = cellInfo.textContent.trim();
+
+  let newElement;
+
+  if (cellIndex === 2) {
+    newElement = document.createElement('select');
+
+    offices.forEach((city) => {
+      const option = document.createElement('option');
+
+      option.value = city;
+      option.textContent = city;
+
+      if (city === oldValue) {
+        option.selected = true;
+      }
+
+      newElement.appendChild(option);
+    });
+  } else {
+    newElement = document.createElement('input');
+    newElement.type = cellIndex > 2 ? 'number' : 'text';
+    newElement.placeholder = oldValue;
+    newElement.value = oldValue;
+  }
+
+  cellInfo.textContent = '';
+  cellInfo.appendChild(newElement);
+  newElement.focus();
+
+  function saveChanges() {
+    const newValue = newElement.value.trim() || oldValue;
+
+    cellInfo.textContent = newValue;
+  }
+
+  newElement.addEventListener('blur', saveChanges);
+
+  newElement.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      saveChanges();
+    }
+  });
+}
+
+tableBody.addEventListener('dblclick', (e) => {
+  if (e.target.tagName === 'TD') {
+    changeInfo(e.target);
+  }
+});
 
 updateTable();
