@@ -63,7 +63,9 @@ function isOnlyLetters(str) {
 }
 
 function extractNumber(str) {
-  return parseFloat(str.replace(/\D/g, ''));
+  const num = parseFloat(str.replace(/[^\d.]/g, ''));
+
+  return isNaN(num) ? 0 : num;
 }
 
 // #endregion
@@ -211,7 +213,7 @@ form.addEventListener('submit', (ev) => {
     notification.setAttribute('data-qa', 'notification');
     notification.style.minHeight = '80px';
     title.setAttribute('class', 'title');
-    title.textContent = 'НА ВЕРАНДЕ ТЁЛОЧКУ ОУУУ ЕССС';
+    title.textContent = 'Employee added successfully!';
 
     notification.append(title);
     document.body.append(notification);
@@ -241,7 +243,7 @@ form.addEventListener('submit', (ev) => {
     notification.setAttribute('data-qa', 'notification');
     notification.style.minHeight = '80px';
     title.setAttribute('class', 'title');
-    title.textContent = 'ТЫ ЕБАНУТЫЙ? А НИЧЁ ТОТ ФАКТ ТО ЧТО...';
+    title.textContent = 'Invalid input: Position must contain only letters.';
 
     notification.append(title);
     document.body.append(notification);
