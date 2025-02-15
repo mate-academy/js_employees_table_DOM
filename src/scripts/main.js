@@ -32,7 +32,7 @@ function sortHelper(a, b, sortProperty, indexOfSortProp) {
     : aText.localeCompare(bText);
 }
 
-function sortFuction() {
+function sortFunction() {
   sortProps.forEach((sortProp) => {
     const indexOfSortProp = sortPropsArray.indexOf(sortProp);
 
@@ -132,7 +132,7 @@ function getFormData() {
 
   if (hasError) {
     showNotification('error');
-    sortFuction();
+    sortFunction();
     rowActivator();
 
     return;
@@ -142,7 +142,7 @@ function getFormData() {
   showNotification('success');
   sortPropsArray = Array.from(sortProps);
   sortProps = document.querySelectorAll('thead th');
-  sortFuction();
+  sortFunction();
   rowActivator();
 }
 
@@ -244,12 +244,12 @@ function formInitializer() {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     getFormData();
-    sortFuction();
+    sortFunction();
     rowActivator();
   });
 
   enableCellEditing();
-  sortFuction();
+  sortFunction();
   rowActivator();
 }
 
