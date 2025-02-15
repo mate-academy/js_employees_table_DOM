@@ -37,7 +37,7 @@ tbody.onclick = () => {
 
   inputPosition.dataset.dataqa = 'position';
   inputPosition.type = 'text';
-  inputPosition.position = 'position';
+  inputPosition.name = 'position';
   inputPosition.required = true;
 
   const labelOffice = document.createElement('label');
@@ -46,7 +46,7 @@ tbody.onclick = () => {
 
   const select = document.createElement('select');
 
-  select.office = 'office';
+  select.name = 'office';
 
   const option1 = document.createElement('option');
 
@@ -86,7 +86,7 @@ tbody.onclick = () => {
 
   inputAge.dataset.dataqa = 'age';
   inputAge.type = 'number';
-  inputAge.age = 'age';
+  inputAge.name = 'age';
   inputAge.required = true;
 
   const labelSalary = document.createElement('label');
@@ -97,7 +97,7 @@ tbody.onclick = () => {
 
   inputSalary.dataset.dataqa = 'salary';
   inputSalary.type = 'text';
-  inputSalary.Salary = 'salary';
+  inputSalary.name = 'salary';
   inputSalary.required = true;
 
   const button = document.createElement('button');
@@ -126,33 +126,66 @@ tbody.onclick = () => {
   form.appendChild(button);
 
   button.onclick = () => {
-    if (inputName.name.length < 4 || inputAge.age < 18 || inputAge.age > 90) {
+    if (
+      inputName.value.length < 4 ||
+      inputAge.value < 18 ||
+      inputAge.value > 90
+    ) {
       const notification = document.createElement('div');
-      const h2 = document.createElement('h2');
-
-      h2.textContent = 'Error';
 
       notification.classList.add('notification');
       notification.dataset.dataqa = 'notification';
 
+      const h2 = document.createElement('h2');
+
       h2.classList.add('title');
       h2.classList.toggle('error');
+      h2.textContent = 'Error';
 
       document.body.append(notification);
       notification.appendChild(h2);
     } else {
-      tbody.children[tbody.children.length] = [
-        inputName.name,
-        inputPosition.position,
-        select.office,
-        inputAge.age,
-        inputSalary.salary,
-      ];
+      const notification = document.createElement('div');
 
-      tbody.children[tbody.children.length - 1].replaceWith(
-        tbody.children[tbody.children.length - 1],
-        tbody.children[tbody.children.length],
-      );
+      notification.classList.add('notification');
+      notification.dataset.dataqa = 'notification';
+
+      const h2 = document.createElement('h2');
+
+      h2.classList.add('title');
+      h2.classList.toggle('success');
+      h2.textContent = 'Success';
+
+      document.body.append(notification);
+      notification.appendChild(h2);
+
+      const tr = document.createElement('tr');
+      const tdName = document.createElement('td');
+
+      tdName.textContent = inputName.value;
+
+      const tdPosition = document.createElement('td');
+
+      tdPosition.textContent = inputPosition.value;
+
+      const tdOffice = document.createElement('td');
+
+      tdOffice.textContent = select.value;
+
+      const tdAge = document.createElement('td');
+
+      tdAge.textContent = inputAge.value;
+
+      const tdSalary = document.createElement('td');
+
+      tdSalary.textContent = inputSalary.value;
+
+      tbody.appendChild(tr);
+      tr.appendChild(tdName);
+      tr.appendChild(tdPosition);
+      tr.appendChild(tdOffice);
+      tr.appendChild(tdAge);
+      tr.appendChild(tdSalary);
 
       l++;
     }
