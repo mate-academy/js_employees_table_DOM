@@ -164,11 +164,14 @@ form.addEventListener('submit', (e) => {
     if (e.target[i].type === 'number') {
       const num = e.target[i].value;
 
-      // if (num < 18 || num > 90) {
-
-      // }
-
       if (num.length === 2) {
+        if (Number(num) < 18 || Number(num) > 90) {
+          showNotification('error', 'Error', 'Wrong age. Please check.');
+          deleteNotification();
+
+          return;
+        }
+
         newCell.innerText = num;
         newRow.append(newCell);
 
@@ -182,9 +185,50 @@ form.addEventListener('submit', (e) => {
         continue;
       }
     }
+
+    if (e.target[i].name === 'name') {
+      if (e.target[i].value.length < 4) {
+        showNotification('error', 'Error', 'Wrong name length. Please check.');
+        deleteNotification();
+
+        return;
+      }
+    }
     newCell.innerText = e.target[i].value;
     newRow.append(newCell);
   }
 
   tableBody.append(newRow);
+
+  showNotification(
+    'success',
+    'Success',
+    'Everything ok! New employee was add.',
+  );
+  deleteNotification();
 });
+
+// notifications
+
+function showNotification(type, title, description) {
+  const message = document.createElement('div');
+  const messageTitle = document.createElement('h2');
+  const messageDescription = document.createElement('p');
+
+  message.classList.add('notification', type);
+  messageTitle.classList.add('title');
+  messageTitle.textContent = title;
+  messageDescription.textContent = description;
+  message.setAttribute('data-qa', 'notification');
+
+  message.append(messageTitle, messageDescription);
+  body.append(message);
+}
+
+function deleteNotification() {
+  setTimeout(() => {
+    const message = document.querySelector('.notification');
+
+    message.remove();
+  }, 5000);
+}
