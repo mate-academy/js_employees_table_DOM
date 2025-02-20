@@ -47,11 +47,12 @@ const employeesData = extractTableData(table);
  * Sorts an array of rows by the given column index.
  * Uses localeCompare for strings and numerical subtraction for numbers.
  */
-function sortDataByColumn(data, columnIndex) {
+function sortDataByColumn(data, columnIndex, order = 'asc') {
   if (!data.length) {
     return [];
   }
 
+  const factor = order === 'asc' ? 1 : -1;
   const sampleValue = data[0][columnIndex];
   const isNumeric = typeof sampleValue === 'number';
 
@@ -60,10 +61,10 @@ function sortDataByColumn(data, columnIndex) {
     const valB = b[columnIndex];
 
     if (isNumeric) {
-      return valA - valB;
+      return (valA - valB) * factor;
     }
 
-    return valA.localeCompare(valB);
+    return valA.localeCompare(valB) * factor;
   };
 
   return [...data].sort(comparator);
@@ -93,14 +94,33 @@ function createTableBodyFragment(data) {
 }
 
 /**
+ * Defines the next sorting order for a target header cell.
+ * If no order or descending is set, returns 'asc'; otherwise 'desc'.
+ */
+function getNextSortOrder(headerCell) {
+  const currentOrder = headerCell.dataset.sorting;
+
+  return !currentOrder || currentOrder === 'desc' ? 'asc' : 'desc';
+}
+
+/**
+ * Clears sorting state from all header cells.
+ */
+function clearSortingStates() {
+  table.querySelectorAll('th[data-sorting]').forEach((th) => {
+    th.removeAttribute('data-sorting');
+  });
+}
+
+/**
  * Updates the table: sorts the employee data by the column corresponding
  * to headerCell, then rebuilds the table body.
  */
-function updateTableSorting(headerCell) {
+function updateTableSorting(headerCell, order) {
   const columnIndex = Array.from(headerCell.parentNode.children).indexOf(
     headerCell,
   );
-  const sortedData = sortDataByColumn(employeesData, columnIndex);
+  const sortedData = sortDataByColumn(employeesData, columnIndex, order);
 
   tableBody.innerHTML = '';
   tableBody.appendChild(createTableBodyFragment(sortedData));
@@ -116,5 +136,9 @@ table.addEventListener('click', (e) => {
     return;
   }
 
-  updateTableSorting(headerCell);
+  const nextOrder = getNextSortOrder(headerCell);
+
+  clearSortingStates();
+  headerCell.dataset.sorting = nextOrder;
+  updateTableSorting(headerCell, nextOrder);
 });
