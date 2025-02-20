@@ -150,8 +150,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
       input.addEventListener('blur', saveChanges);
 
-      input.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
+      input.addEventListener('keypress', function(evt) {
+        if (evt.key === 'Enter') {
           saveChanges();
         }
       });
