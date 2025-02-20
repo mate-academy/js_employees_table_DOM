@@ -30,7 +30,7 @@ function setTHeadListener() {
     tbody.insertAdjacentHTML('beforeend', newTBodyHTML);
   }
 
-  function createTableData(e) {
+  function createTableData() {
     const trows = [...document.querySelector('tbody').children];
 
     return trows.map((tr) => {
@@ -174,7 +174,10 @@ function addNewEmployee(e) {
   };
 
   const invalid =
-    newEmployee.name.length < 4 || newEmployee.age < 18 || newEmployee.age > 90;
+    newEmployee.name.length < 4 ||
+    newEmployee.age < 18 ||
+    newEmployee.age > 90 ||
+    newEmployee.position < 2;
 
   if (invalid) {
     showNotification(false);
