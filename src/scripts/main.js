@@ -126,19 +126,36 @@ function updateTableSorting(headerCell, order) {
   tableBody.appendChild(createTableBodyFragment(sortedData));
 }
 
-/**
- * Handle header cell clicks to sort the table.
- */
-table.addEventListener('click', (e) => {
-  const headerCell = e.target.closest('th');
-
-  if (!headerCell || !headerCell.closest('thead')) {
-    return;
-  }
-
+// Handle sorting when a header cell is clicked
+function handleHeaderClick(headerCell) {
   const nextOrder = getNextSortOrder(headerCell);
 
   clearSortingStates();
   headerCell.dataset.sorting = nextOrder;
   updateTableSorting(headerCell, nextOrder);
+}
+
+// Handle making row 'active' when a row in the body is clicked
+function handleRowClick(row) {
+  document
+    .querySelectorAll('.active')
+    .forEach((element) => element.classList.remove('active'));
+  row.classList.add('active');
+}
+
+// Centralized click handler that delegates actions based on the clicked element
+table.addEventListener('click', (e) => {
+  const target = e.target;
+  const clickedHeaderCell = target.closest('th');
+  const clickedRow = target.closest('tr');
+
+  if (clickedHeaderCell && target.closest('thead')) {
+    handleHeaderClick(clickedHeaderCell);
+
+    return;
+  }
+
+  if (clickedRow && target.closest('tbody')) {
+    handleRowClick(clickedRow);
+  }
 });
