@@ -26,6 +26,11 @@ const officeOptions = [
   'Edinburgh',
   'San Francisco',
 ];
+const converter = (key, value) => {
+  const converterFunction = columnConverters[key] || ((text) => text);
+
+  return converterFunction(value);
+};
 
 const employeesData = extractTableData(table, columns);
 
@@ -63,9 +68,10 @@ function extractTableData(tableEl, columnNames) {
     const cells = Array.from(row.cells);
 
     return columnNames.reduce((acc, columnName, index) => {
-      const converter = columnConverters[columnName] || ((text) => text);
+      const key = columnName;
+      const value = cells[index].textContent;
 
-      acc[columnName] = converter(cells[index].textContent);
+      acc[key] = converter(key, value);
 
       return acc;
     }, {});
@@ -200,18 +206,23 @@ function clearSortingStates() {
 }
 
 /**
- * Updates the table: sorts the employee data by the column corresponding
- * to headerCell, then rebuilds the table body.
+ * Rebuilds the table body with the given employee data.
+ * If <thead> contains a cell with 'data-sorting' attribute, sorts the given
+ * employee data by the corresponding column.
  */
-function updateTableSorting(headerCell, order, columnNames) {
-  const columnIndex = Array.from(headerCell.parentNode.children).indexOf(
-    headerCell,
-  );
-  const columnName = columnNames[columnIndex];
-  const sortedData = sortDataByColumn(employeesData, columnName, order);
+function refreshTable(data) {
+  let dataToRender = [...data];
+  const sortingHeader = table.querySelector('th[data-sorting]');
+
+  if (sortingHeader) {
+    const columnName = sortingHeader.textContent.toLowerCase();
+    const order = sortingHeader.dataset.sorting;
+
+    dataToRender = sortDataByColumn(employeesData, columnName, order);
+  }
 
   tableBody.innerHTML = '';
-  tableBody.appendChild(createTableBodyFragment(sortedData, columns));
+  tableBody.appendChild(createTableBodyFragment(dataToRender, columns));
 }
 
 // Handle sorting when a header cell is clicked
@@ -220,7 +231,7 @@ function handleHeaderClick(headerCell) {
 
   clearSortingStates();
   headerCell.dataset.sorting = nextOrder;
-  updateTableSorting(headerCell, nextOrder, columns);
+  refreshTable(employeesData);
 }
 
 // Handle making row 'active' when a row in the body is clicked
