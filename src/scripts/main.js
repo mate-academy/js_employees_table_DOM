@@ -209,8 +209,8 @@ tbody.addEventListener('dblclick', (e) => {
       if (isFieldName) {
         if (newValue.length < 4) {
           getNotification(
-            'Wrong age',
-            'Age  must be between 18 and 90 years old',
+            'Short name',
+            'Name must be longer than 4 characters',
             'error',
           );
 
@@ -224,7 +224,7 @@ tbody.addEventListener('dblclick', (e) => {
 
       if (newValue) {
         e.target.textContent = isFieldSalary
-          ? convertSalary(newValue)
+          ? convertSalary(parseInt(newValue))
           : newValue;
       } else {
         e.target.textContent = oldValue;
