@@ -1,17 +1,38 @@
 'use strict';
 
+const body = document.querySelector('body');
 const table = document.querySelector('table');
 const tableBody = table.querySelector('tbody');
 const tableHead = table.querySelector('thead');
 const headers = Array.from(tableHead.querySelectorAll('th'));
 
-// --- Column definitions, converters ---
+// --- Column definitions, converters, form fields constraints ---
 const columns = extractColumnNames();
 const columnConverters = {
   age: (text) => parseInt(text, 10) || 0,
   salary: parseSalary,
 };
+const inputTypes = {
+  name: 'text',
+  position: 'text',
+  age: 'number',
+  salary: 'number',
+};
+const officeOptions = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
+
 const employeesData = extractTableData(table, columns);
+
+// --- Form Initialization ---
+const newEmployeeForm = createNewEmployeeForm(columns);
+
+body.appendChild(newEmployeeForm);
 
 // --- Data Extraction ---
 
@@ -49,6 +70,59 @@ function extractTableData(tableEl, columnNames) {
       return acc;
     }, {});
   });
+}
+
+// --- Form Creation ---
+
+/** Initializes form with a field for each table column. */
+function createNewEmployeeForm(columnNames) {
+  const form = document.createElement('form');
+  const button = document.createElement('button');
+
+  columnNames.forEach((columnName) => {
+    form.appendChild(createFormField(columnName));
+  });
+
+  form.classList.add('new-employee-form');
+  button.textContent = 'Save to table';
+  form.appendChild(button);
+
+  return form;
+}
+
+/**
+ * Creates field element consisting of the required <input>
+ * or <select> element wrapped with the <label> tag.
+ */
+function createFormField(fieldName) {
+  const fieldElement = document.createElement('label');
+  let inputArea;
+
+  fieldElement.textContent = `${fieldName.charAt(0).toUpperCase()}${fieldName.slice(1)}:`;
+
+  if (fieldName === 'office') {
+    inputArea = document.createElement('select');
+
+    officeOptions.forEach((city) => {
+      const option = document.createElement('option');
+
+      option.value = city;
+      option.textContent = city;
+      inputArea.appendChild(option);
+    });
+  } else {
+    inputArea = document.createElement('input');
+    inputArea.type = inputTypes[fieldName];
+    inputArea.placeholder = fieldName;
+  }
+
+  inputArea.name = fieldName;
+  inputArea.dataset.qa = fieldName;
+  inputArea.required = true;
+
+  fieldElement.appendChild(inputArea);
+
+  return fieldElement;
 }
 
 // --- Data Sorting and Table Regenerating ---
