@@ -34,10 +34,17 @@ const converter = (key, value) => {
 
 const employeesData = extractTableData(table, columns);
 
-// --- Form Initialization ---
+// --- Form Initialization and Handler Attaching---
 const newEmployeeForm = createNewEmployeeForm(columns);
+const formSubmitButton = newEmployeeForm.querySelector('button');
 
 body.appendChild(newEmployeeForm);
+
+formSubmitButton.addEventListener('click', (e) => {
+  const form = e.target.closest('form');
+
+  handleSubmitFormClick(e, form);
+});
 
 // --- Data Extraction ---
 
@@ -129,6 +136,34 @@ function createFormField(fieldName) {
   fieldElement.appendChild(inputArea);
 
   return fieldElement;
+}
+
+// --- Form Handling ---
+function handleSubmitFormClick(e, form) {
+  const fieldsArray = Array.from(form.querySelectorAll('input, select'));
+  const isValid = fieldsArray.every((field) => Boolean(field.value));
+
+  if (!isValid) {
+    return;
+  }
+
+  e.preventDefault();
+  addNewEmployee(fieldsArray);
+  refreshTable(employeesData);
+  form.reset();
+}
+
+/** Extracts data from the form fields into an object. */
+function addNewEmployee(fields) {
+  const newEmployee = Array.from(fields).reduce((employee, field) => {
+    const { name: fieldName, value } = field;
+
+    employee[fieldName] = converter(fieldName, value);
+
+    return employee;
+  }, {});
+
+  employeesData.push(newEmployee);
 }
 
 // --- Data Sorting and Table Regenerating ---
