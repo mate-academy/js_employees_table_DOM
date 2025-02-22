@@ -32,9 +32,7 @@ table.addEventListener('click', (e) => {
     const a = rowA.children[columnIndex].textContent.trim();
     const b = rowB.children[columnIndex].textContent.trim();
 
-    const type = th.dataset.type;
-
-    if (type === 'number') {
+    if (columnIndex === 3 || columnIndex === 4) {
       return (formatData(a) - formatData(b)) * sortDirection;
     }
 
@@ -129,28 +127,30 @@ button.textContent = 'Save to table';
 button.type = 'button';
 form.append(button);
 
+const pushNotification = (title, description, type) => {
+  const notification = document.createElement('div');
+
+  notification.setAttribute('data-qa', 'notification');
+  notification.classList.add('notification', type);
+
+  const notificationTitle = document.createElement('h2');
+
+  notificationTitle.className = 'title';
+  notificationTitle.textContent = title;
+
+  const notificationDescription = document.createElement('p');
+
+  notificationDescription.className = 'description';
+  notificationDescription.textContent = description;
+
+  notification.append(notificationTitle, notificationDescription);
+
+  document.body.append(notification);
+  setTimeout(() => notification.remove(), 2000);
+};
+
 button.addEventListener('click', () => {
-  const pushNotification = (title, description, type) => {
-    const notification = document.createElement('div');
-
-    notification.setAttribute('data-qa', 'notification');
-    notification.classList.add('notification', type);
-
-    const notificationTitle = document.createElement('h2');
-
-    notificationTitle.className = 'title';
-    notificationTitle.textContent = title;
-
-    const notificationDescription = document.createElement('p');
-
-    notificationDescription.className = 'description';
-    notificationDescription.textContent = description;
-
-    notification.append(notificationTitle, notificationDescription);
-
-    document.body.append(notification);
-    setTimeout(() => notification.remove(), 2000);
-  };
+  pushNotification();
 
   let isValid = true;
   const formData = {};
@@ -221,3 +221,93 @@ button.addEventListener('click', () => {
     form.reset();
   }
 });
+
+tbody.addEventListener('dblclick', (e) => {
+  const cell = e.target.closest('td');
+
+  const initialText = cell.textContent.trim();
+
+  if (!cell.querySelector('.cell-input')) {
+    const cellInput = document.createElement('input');
+
+    cellInput.className = 'cell-input';
+    cellInput.style.width = '100%';
+    cellInput.value = initialText;
+
+    cell.textContent = '';
+    cell.append(cellInput);
+
+    const columnIndex = cell.cellIndex;
+
+    if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2) {
+      cellInput.setAttribute('minlength', 4);
+    }
+
+    cellInput.addEventListener('blur', () => {
+      let newText = cellInput.value.trim() || initialText;
+
+      newText = validateAndNotify(columnIndex, newText, initialText);
+
+      cell.textContent = newText;
+      cellInput.remove();
+    });
+
+    cellInput.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        let newText = cellInput.value.trim() || initialText;
+
+        newText = validateAndNotify(columnIndex, newText, initialText);
+
+        cell.textContent = newText;
+        cellInput.remove();
+      }
+    });
+  }
+});
+
+function validateAndNotify(columnIndex, newText, initialText) {
+  if (
+    (columnIndex === 0 || columnIndex === 1 || columnIndex === 2) &&
+    newText.length < 4
+  ) {
+    pushNotification(
+      'Text must be at least 4 characters long',
+      'Please provide a valid value with at least 4 characters.',
+      'error',
+    );
+
+    return initialText;
+  }
+
+  if (columnIndex === 3) {
+    const numValue = parseInt(newText, 10);
+
+    if (isNaN(numValue) || numValue < 18 || numValue > 90) {
+      pushNotification(
+        'Age must be between 18 and 90',
+        'Please enter a valid age between 18 and 90.',
+        'error',
+      );
+
+      return initialText;
+    }
+  }
+
+  if (columnIndex === 4) {
+    const numValue = parseFloat(newText.replace(/[$,]/g, ''));
+
+    if (isNaN(numValue) || numValue < 0) {
+      pushNotification(
+        'Salary must be a positive number',
+        'Please enter a valid salary amount.',
+        'error',
+      );
+
+      return initialText;
+    } else {
+      return `$${numValue.toLocaleString('en-US')}`;
+    }
+  }
+
+  return newText;
+}
