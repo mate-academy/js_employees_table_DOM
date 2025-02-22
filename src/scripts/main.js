@@ -1,3 +1,313 @@
 'use strict';
 
-// write code here
+const table = document.querySelector('table');
+const tbody = table.querySelector('tbody');
+
+function formatData(data) {
+  return parseFloat(data.replace(/[$,]/g, ''));
+}
+
+let currentColumnIndex = null;
+let sortDirection = 1;
+
+table.addEventListener('click', (e) => {
+  const th = e.target.closest('th');
+
+  if (!th) {
+    return;
+  }
+
+  const rows = [...tbody.rows];
+  const columnIndex = th.cellIndex;
+
+  if (currentColumnIndex === columnIndex) {
+    sortDirection *= -1;
+  } else {
+    sortDirection = 1;
+  }
+
+  currentColumnIndex = columnIndex;
+
+  const sortedRows = rows.sort((rowA, rowB) => {
+    const a = rowA.children[columnIndex].textContent.trim();
+    const b = rowB.children[columnIndex].textContent.trim();
+
+    if (columnIndex === 3 || columnIndex === 4) {
+      return (formatData(a) - formatData(b)) * sortDirection;
+    }
+
+    return a.localeCompare(b) * sortDirection;
+  });
+
+  tbody.innerHTML = '';
+  sortedRows.forEach((row) => tbody.append(row));
+});
+
+let currentRow = null;
+
+tbody.addEventListener('click', (e) => {
+  const row = e.target.closest('tr');
+
+  if (!row) {
+    return;
+  }
+
+  if (currentRow) {
+    currentRow.classList.remove('active');
+  }
+
+  row.classList.add('active');
+
+  currentRow = row;
+});
+
+const form = document.createElement('form');
+
+form.classList.add('new-employee-form');
+
+const fields = {
+  name: 'text',
+  position: 'text',
+  age: 'number',
+  salary: 'number',
+};
+
+for (const [key, type] of Object.entries(fields)) {
+  const label = document.createElement('label');
+
+  label.textContent = key[0].toUpperCase() + key.slice(1) + ':';
+
+  const input = document.createElement('input');
+
+  input.name = key;
+  input.type = type;
+  input.setAttribute('data-qa', key);
+  input.required = true;
+
+  label.append(input);
+  form.append(label);
+}
+
+const selectLabel = document.createElement('label');
+
+selectLabel.textContent = 'Office:';
+
+const selectInput = document.createElement('select');
+
+selectInput.name = 'office';
+selectInput.setAttribute('data-qa', 'office');
+selectInput.required = true;
+
+const towns = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
+
+for (const town of towns) {
+  const option = document.createElement('option');
+
+  option.value = town;
+  option.textContent = town;
+
+  selectInput.append(option);
+}
+
+selectLabel.append(selectInput);
+form.children[1].after(selectLabel);
+
+document.body.appendChild(form);
+
+const button = document.createElement('button');
+
+button.textContent = 'Save to table';
+button.type = 'button';
+form.append(button);
+
+const pushNotification = (title, description, type) => {
+  const notification = document.createElement('div');
+
+  notification.setAttribute('data-qa', 'notification');
+  notification.classList.add('notification', type);
+
+  const notificationTitle = document.createElement('h2');
+
+  notificationTitle.className = 'title';
+  notificationTitle.textContent = title;
+
+  const notificationDescription = document.createElement('p');
+
+  notificationDescription.className = 'description';
+  notificationDescription.textContent = description;
+
+  notification.append(notificationTitle, notificationDescription);
+
+  document.body.append(notification);
+  setTimeout(() => notification.remove(), 2000);
+};
+
+button.addEventListener('click', () => {
+  pushNotification();
+
+  let isValid = true;
+  const formData = {};
+
+  for (const inp of form.elements) {
+    if (inp.name === 'name' && inp.value.length < 4) {
+      pushNotification(
+        'Name must have more than 4 letters',
+        'Please provide a valid name with at least 4 characters',
+        'error',
+      );
+
+      isValid = false;
+    }
+
+    if (inp.name === 'age' && (+inp.value < 18 || +inp.value > 90)) {
+      pushNotification(
+        'Age must be from 18 to 90',
+        'Please enter a valid age between 18 and 90',
+        'error',
+      );
+
+      isValid = false;
+    }
+  }
+
+  if (!isValid) {
+    return;
+  }
+
+  for (const inp of form.elements) {
+    if (inp.tagName === 'INPUT' || inp.tagName === 'SELECT') {
+      formData[inp.name] = inp.value;
+    }
+  }
+
+  if (isValid) {
+    const newRow = tbody.insertRow();
+
+    for (const key in formData) {
+      const newCell = newRow.insertCell();
+
+      if (key === 'salary') {
+        const salaryValue = +formData[key];
+
+        if (isNaN(salaryValue) || salaryValue < 0) {
+          pushNotification(
+            'Invalid salary',
+            'Salary must be a positive number',
+            'error',
+          );
+
+          return;
+        }
+
+        newCell.textContent = '$' + salaryValue.toLocaleString('en-US');
+      } else {
+        newCell.textContent = formData[key];
+      }
+    }
+
+    pushNotification(
+      'Employee added successfully!',
+      'The employee has been added to the table.',
+      'success',
+    );
+
+    form.reset();
+  }
+});
+
+tbody.addEventListener('dblclick', (e) => {
+  const cell = e.target.closest('td');
+
+  const initialText = cell.textContent.trim();
+
+  if (!cell.querySelector('.cell-input')) {
+    const cellInput = document.createElement('input');
+
+    cellInput.className = 'cell-input';
+    cellInput.style.width = '100%';
+    cellInput.value = initialText;
+
+    cell.textContent = '';
+    cell.append(cellInput);
+
+    const columnIndex = cell.cellIndex;
+
+    if (columnIndex === 0 || columnIndex === 1 || columnIndex === 2) {
+      cellInput.setAttribute('minlength', 4);
+    }
+
+    cellInput.addEventListener('blur', () => {
+      let newText = cellInput.value.trim() || initialText;
+
+      newText = validateAndNotify(columnIndex, newText, initialText);
+
+      cell.textContent = newText;
+      cellInput.remove();
+    });
+
+    cellInput.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        let newText = cellInput.value.trim() || initialText;
+
+        newText = validateAndNotify(columnIndex, newText, initialText);
+
+        cell.textContent = newText;
+        cellInput.remove();
+      }
+    });
+  }
+});
+
+function validateAndNotify(columnIndex, newText, initialText) {
+  if (
+    (columnIndex === 0 || columnIndex === 1 || columnIndex === 2) &&
+    newText.length < 4
+  ) {
+    pushNotification(
+      'Text must be at least 4 characters long',
+      'Please provide a valid value with at least 4 characters.',
+      'error',
+    );
+
+    return initialText;
+  }
+
+  if (columnIndex === 3) {
+    const numValue = parseInt(newText, 10);
+
+    if (isNaN(numValue) || numValue < 18 || numValue > 90) {
+      pushNotification(
+        'Age must be between 18 and 90',
+        'Please enter a valid age between 18 and 90.',
+        'error',
+      );
+
+      return initialText;
+    }
+  }
+
+  if (columnIndex === 4) {
+    const numValue = parseFloat(newText.replace(/[$,]/g, ''));
+
+    if (isNaN(numValue) || numValue < 0) {
+      pushNotification(
+        'Salary must be a positive number',
+        'Please enter a valid salary amount.',
+        'error',
+      );
+
+      return initialText;
+    } else {
+      return `$${numValue.toLocaleString('en-US')}`;
+    }
+  }
+
+  return newText;
+}
