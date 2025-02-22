@@ -194,7 +194,17 @@ button.addEventListener('click', () => {
       const newCell = newRow.insertCell();
 
       if (key === 'salary') {
-        const salaryValue = +formData[key] || 0;
+        const salaryValue = +formData[key];
+
+        if (isNaN(salaryValue) || salaryValue < 0) {
+          pushNotification(
+            'Invalid salary',
+            'Salary must be a positive number',
+            'error',
+          );
+
+          return;
+        }
 
         newCell.textContent = '$' + salaryValue.toLocaleString('en-US');
       } else {
