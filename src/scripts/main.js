@@ -151,10 +151,10 @@ function createForm() {
     'afterend',
     `
       <form class="new-employee-form">
-        <label>Name: <input name="name" type="text" data-qa="name" required></label>
-        <label>Position: <input name="position" type="text"  data-qa="position" required></label>
+        <label>Name: <input name="name" type="text" data-qa="name"></label>
+        <label>Position: <input name="position" type="text"  data-qa="position"></label>
         <label>Office:
-          <select name="office" data-qa="office" required>
+          <select name="office" data-qa="office">
             <option value="Tokyo">Tokyo</option>
             <option value="Singapore">Singapore</option>
             <option value="London">London</option>
@@ -163,8 +163,8 @@ function createForm() {
             <option value="San Francisco">San Francisco</option>
           </select>
         </label>
-        <label>Age: <input name="age" type="number" data-qa="age" required></label>
-        <label>Salary: <input name="salary" type="number" step="any" data-qa="salary" required></label>
+        <label>Age: <input name="age" type="number" data-qa="age"></label>
+        <label>Salary: <input name="salary" type="number" step="any" data-qa="salary"></label>
         <button name="submit" type="submit">Save to table</button>
 
       </form>
@@ -258,7 +258,7 @@ function checkForm() {
   if (form.position.value.length < 4) {
     return {
       type: 'error',
-      message: 'Position must be at least 2 characters',
+      message: 'Position must be at least 4 characters',
     };
   }
 
