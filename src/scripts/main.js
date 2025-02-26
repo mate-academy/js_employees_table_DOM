@@ -146,14 +146,18 @@ function handleSubmitFormClick(e, form) {
   const formErrors = getFormErrors(inputsArray);
 
   if (Object.values(formErrors).some((errorsGroup) => errorsGroup.length)) {
+    addErrorsNotification(formErrors);
+
     return;
   }
 
   const fieldsArray = Array.from(form.querySelectorAll('input, select'));
 
-  addNewEmployee(fieldsArray);
+  const newEmployee = addNewEmployee(fieldsArray);
+
   refreshTable(employeesData);
   form.reset();
+  addSuccessNotification(newEmployee);
 }
 
 /** Extracts data from the form fields into an object. */
@@ -167,6 +171,8 @@ function addNewEmployee(fields) {
   }, {});
 
   employeesData.push(newEmployee);
+
+  return newEmployee;
 }
 
 // --- Form validation ---
@@ -213,6 +219,75 @@ function validateAge(value) {
   }
 
   return null;
+}
+
+// --- Notifications ---
+function pushNotification(title, descriptionElement, type, timeout) {
+  const notificationElement = document.createElement('div');
+  const titleElement = document.createElement('h2');
+
+  notificationElement.classList.add('notification', type);
+  notificationElement.dataset.qa = `notification`;
+  titleElement.classList.add('title');
+
+  titleElement.textContent = title;
+
+  notificationElement.appendChild(titleElement);
+  notificationElement.appendChild(descriptionElement);
+  body.appendChild(notificationElement);
+
+  setTimeout(() => {
+    notificationElement.hidden = true;
+  }, timeout);
+}
+
+function addSuccessNotification(employeeData) {
+  const { name: employeeName, position, office } = employeeData;
+  const title = 'New employee added';
+  const description = `New employee '${employeeName} (${position}, ${office}) was added to the list.`;
+  const descriptionElement = document.createElement('p');
+
+  descriptionElement.textContent = description;
+
+  pushNotification(title, descriptionElement, 'success', 4500);
+}
+
+function addErrorsNotification(errors) {
+  const title = 'Form contains errors';
+  const descriptionElement = document.createElement('ul');
+
+  function appendErrorsMessage(errorsGroup, description, errorValueConverter) {
+    if (errors[errorsGroup].length) {
+      const errorGroupElement = document.createElement('li');
+      const nestedListElement = document.createElement('ul');
+
+      errorGroupElement.textContent = description;
+      errorGroupElement.appendChild(nestedListElement);
+
+      errors[errorsGroup].forEach((error) => {
+        const errorElement = document.createElement('li');
+
+        errorElement.textContent = errorValueConverter(error);
+        nestedListElement.appendChild(errorElement);
+      });
+
+      descriptionElement.appendChild(errorGroupElement);
+    }
+  }
+
+  appendErrorsMessage(
+    'emptyFields',
+    'These fields cannot be empty:',
+    (value) => value,
+  );
+
+  appendErrorsMessage(
+    'fieldsWithErrors',
+    'Errors:',
+    (value) => `${value.name}: ${value.error}`,
+  );
+
+  pushNotification(title, descriptionElement, 'error', 7500);
 }
 
 // --- Data Sorting and Table Regenerating ---
