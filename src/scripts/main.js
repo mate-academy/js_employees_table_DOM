@@ -377,7 +377,7 @@ function refreshTable(data) {
     const columnName = sortingHeader.textContent.toLowerCase();
     const order = sortingHeader.dataset.sorting;
 
-    dataToRender = sortDataByColumn(employeesData, columnName, order);
+    dataToRender = sortDataByColumn(data, columnName, order);
   }
 
   tableBody.innerHTML = '';
