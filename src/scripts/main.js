@@ -140,14 +140,17 @@ function createFormField(fieldName) {
 
 // --- Form Handling ---
 function handleSubmitFormClick(e, form) {
-  const fieldsArray = Array.from(form.querySelectorAll('input, select'));
-  const isValid = fieldsArray.every((field) => Boolean(field.value));
+  e.preventDefault();
 
-  if (!isValid) {
+  const inputsArray = Array.from(form.querySelectorAll('input'));
+  const formErrors = getFormErrors(inputsArray);
+
+  if (Object.values(formErrors).some((errorsGroup) => errorsGroup.length)) {
     return;
   }
 
-  e.preventDefault();
+  const fieldsArray = Array.from(form.querySelectorAll('input, select'));
+
   addNewEmployee(fieldsArray);
   refreshTable(employeesData);
   form.reset();
@@ -164,6 +167,52 @@ function addNewEmployee(fields) {
   }, {});
 
   employeesData.push(newEmployee);
+}
+
+// --- Form validation ---
+function getFormErrors(fieldsData) {
+  const errors = { emptyFields: [], fieldsWithErrors: [] };
+  const validators = {
+    name: validateName,
+    age: (value) => {
+      const ageValue = columnConverters.age(value);
+
+      return validateAge(ageValue);
+    },
+  };
+
+  fieldsData.forEach((field) => {
+    const fieldName = field.name;
+    const fieldValue = field.value;
+
+    if (!fieldValue) {
+      errors.emptyFields.push(fieldName);
+    } else {
+      if (fieldName in validators) {
+        const fieldError = validators[fieldName](fieldValue);
+
+        if (fieldError) {
+          errors.fieldsWithErrors.push({ name: fieldName, error: fieldError });
+        }
+      }
+    }
+  });
+
+  return errors;
+}
+
+function validateName(value) {
+  return value.length < 4 ? 'Must have 4 symbols or more.' : null;
+}
+
+function validateAge(value) {
+  if (value < 18) {
+    return 'Must be 18 or more.';
+  } else if (value > 90) {
+    return 'Must be less than 90.';
+  }
+
+  return null;
 }
 
 // --- Data Sorting and Table Regenerating ---
