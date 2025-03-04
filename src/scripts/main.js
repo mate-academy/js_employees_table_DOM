@@ -76,107 +76,116 @@ document.addEventListener('DOMContentLoaded', () => {
     `Edinburgh`,
     `San Francisco`,
   ];
-  const dataQaTitles = ['name', 'position', 'office', 'age', 'salary'];
-  const typesForInputs = ['text', 'text', 'text', 'number', 'number'];
 
   createdFormField.setAttribute('class', 'new-employee-form');
   createdButton.textContent = 'Save to table';
 
-  for (let i = 0; i < headers.length; i++) {
+  for (const header of headers) {
     const newLabel = document.createElement('label');
-    const newInput = document.createElement('input');
+    let newElement;
 
-    if (i === 2) {
-      const newSelect = document.createElement('select');
+    if (header.textContent !== 'Office') {
+      newElement = document.createElement('input');
+    } else {
+      newElement = document.createElement('select');
 
       for (const option of selectTagOptions) {
         const newOption = document.createElement('option');
 
         newOption.textContent = option;
-        newSelect.append(newOption);
+        newElement.append(newOption);
       }
-
-      newSelect.setAttribute('data-qa', dataQaTitles[i]);
-      newSelect.setAttribute('name', dataQaTitles[i]);
-      newSelect.setAttribute('type', typesForInputs[i]);
-      newLabel.textContent = headers[i].textContent + ':';
-      newLabel.append(newSelect);
-      createdFormField.append(newLabel);
-
-      continue;
     }
 
-    newInput.setAttribute('data-qa', dataQaTitles[i]);
-    newInput.setAttribute('name', dataQaTitles[i]);
-    newInput.setAttribute('type', typesForInputs[i]);
-    newInput.required = true;
-    newLabel.textContent = headers[i].textContent + ':';
-    newLabel.append(newInput);
+    if (header.textContent !== 'Age' && header.textContent !== 'Salary') {
+      newElement.setAttribute('type', 'text');
+    } else {
+      newElement.setAttribute('type', 'number');
+    }
+
+    newElement.setAttribute('data-qa', header.textContent.toLocaleLowerCase());
+    newElement.setAttribute('name', header.textContent.toLocaleLowerCase());
+
+    newElement.setAttribute(
+      'class',
+      `cell-input ${header.textContent.toLocaleLowerCase()}`,
+    );
+    newLabel.textContent = header.textContent + ':';
+    newLabel.append(newElement);
     createdFormField.append(newLabel);
   }
 
   createdButton.addEventListener('click', (e) => {
     e.preventDefault();
 
-    const allInputs = Array.from(document.querySelectorAll('label'));
+    const allLabels = Array.from(document.querySelectorAll('label'));
     let isValid = true;
 
-    const clientName = allInputs[0].lastChild.value.trim();
-    const position = allInputs[1].lastChild.value.trim();
-    const age = allInputs[3].lastChild.value.trim();
-    const salary = allInputs[4].lastChild.value.trim();
+    const inputNameValue = document.querySelector('.name').value.trim();
+    const inputPositionValue = document.querySelector('.position').value.trim();
+    const iputAgeValue = document.querySelector('.age').value.trim();
+    const inputSalaryValue = document.querySelector('.salary').value.trim();
 
-    if (clientName.length < 4) {
+    if (inputNameValue.length < 4) {
       pushNotification(
         'Please enter correct name',
         'Minimum length of name is 4',
-        'success',
+        'error',
       );
       isValid = false;
-    } else if (position.length === 0) {
+    } else if (inputPositionValue.length === 0) {
       pushNotification(
         'Please enter correct position',
         'Position is empty',
         'error',
       );
       isValid = false;
-    } else if (Number(age) < 18) {
+    } else if (Number(iputAgeValue) < 18 || Number(iputAgeValue) > 90) {
       pushNotification(
         'Age is lower than 18 or empty',
-        'Age should be more than 17',
+        'Age should be more than 17 and less than 90',
         'error',
       );
       isValid = false;
-    } else if (salary.length < 1) {
+    } else if (inputSalaryValue.length < 1) {
       pushNotification('Invalid data', 'Empty salary', 'error');
       isValid = false;
     }
 
-    const newTr = document.createElement('tr');
+    const newRow = document.createElement('tr');
 
-    for (let i = 0; i < headers.length; i++) {
+    for (const label of allLabels) {
       const newTd = document.createElement('td');
 
-      if (i === 4) {
+      if (label.textContent === 'Salary:') {
         newTd.textContent =
-          '$' + Number(allInputs[i].lastChild.value).toLocaleString('en-US');
-        newTr.append(newTd);
+          '$' + Number(label.lastChild.value).toLocaleString('en-US');
+        newRow.append(newTd);
         continue;
       }
 
-      newTd.textContent = allInputs[i].lastChild.value;
-      newTr.append(newTd);
+      newTd.textContent = label.lastChild.value;
+      newRow.append(newTd);
     }
 
     if (isValid) {
       pushNotification('New employee added', 'Correct data', 'success');
-      document.querySelector('tbody').append(newTr);
-      rows.push(newTr);
+      document.querySelector('tbody').append(newRow);
+      rows.push(newRow);
+
+      for (const item of allLabels) {
+        if (item.firstChild.textContent === 'Office:') {
+          document.querySelector('select').firstElementChild.selected = true;
+          continue;
+        }
+
+        item.lastChild.value = '';
+      }
     }
   });
 
-  createdFormField.append(createdButton);
   document.body.append(createdFormField);
+  createdFormField.append(createdButton);
 });
 
 const pushNotification = (title, description, type) => {
@@ -195,6 +204,6 @@ const pushNotification = (title, description, type) => {
   document.body.append(createdElement);
 
   setTimeout(() => {
-    createdElement.remove();
+    createdElement.style.display = 'none';
   }, 2000);
 };
