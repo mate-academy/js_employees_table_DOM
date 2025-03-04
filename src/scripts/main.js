@@ -6,13 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const rows = Array.from(table.querySelectorAll('tbody tr'));
   const sortDirection = {};
 
+  const isNumeric = (str) => {
+    const cleanedStr = str.replace(/[^0-9.-]/g, '').trim();
+
+    return !isNaN(parseFloat(cleanedStr)) && isFinite(cleanedStr);
+  };
+
   const sortTable = (columnIndex) => {
-    const isNumeric = (str) => {
-      const cleanedStr = str.replace(/[^0-9.-]/g, '').trim();
-
-      return !isNaN(parseFloat(cleanedStr)) && isFinite(cleanedStr);
-    };
-
     const compare = (a, b) => {
       const valA = a.children[columnIndex].textContent.trim();
       const valB = b.children[columnIndex].textContent.trim();
@@ -24,15 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return numA - numB;
       }
 
-      if (valA < valB) {
-        return -1;
-      }
-
-      if (valA > valB) {
-        return 1;
-      }
-
-      return 0;
+      return valA.localeCompare(valB);
     };
 
     const currentDirection = sortDirection[columnIndex] || 'ascending';
@@ -80,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
   createdFormField.setAttribute('class', 'new-employee-form');
   createdButton.textContent = 'Save to table';
 
-  for (const header of headers) {
+  headers.forEach((header) => {
     const newLabel = document.createElement('label');
     let newElement;
 
@@ -89,99 +81,97 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       newElement = document.createElement('select');
 
-      for (const option of selectTagOptions) {
+      selectTagOptions.forEach((option) => {
         const newOption = document.createElement('option');
 
         newOption.textContent = option;
         newElement.append(newOption);
-      }
+      });
     }
 
-    if (header.textContent !== 'Age' && header.textContent !== 'Salary') {
-      newElement.setAttribute('type', 'text');
-    } else {
-      newElement.setAttribute('type', 'number');
-    }
-
-    newElement.setAttribute('data-qa', header.textContent.toLocaleLowerCase());
-    newElement.setAttribute('name', header.textContent.toLocaleLowerCase());
+    newElement.setAttribute(
+      'type',
+      header.textContent === 'Age' || header.textContent === 'Salary'
+        ? 'number'
+        : 'text',
+    );
+    newElement.setAttribute('data-qa', header.textContent.toLowerCase());
+    newElement.setAttribute('name', header.textContent.toLowerCase());
 
     newElement.setAttribute(
       'class',
-      `cell-input ${header.textContent.toLocaleLowerCase()}`,
+      `cell-input ${header.textContent.toLowerCase()}`,
     );
-    newLabel.textContent = header.textContent + ':';
+
+    newLabel.textContent = `${header.textContent}:`;
     newLabel.append(newElement);
     createdFormField.append(newLabel);
-  }
+  });
 
-  createdButton.addEventListener('click', (e) => {
-    e.preventDefault();
-
-    const allLabels = Array.from(document.querySelectorAll('label'));
-    let isValid = true;
-
+  const validateForm = () => {
     const inputNameValue = document.querySelector('.name').value.trim();
     const inputPositionValue = document.querySelector('.position').value.trim();
-    const iputAgeValue = document.querySelector('.age').value.trim();
+    const inputAgeValue = document.querySelector('.age').value.trim();
     const inputSalaryValue = document.querySelector('.salary').value.trim();
 
     if (inputNameValue.length < 4) {
       pushNotification(
-        'Please enter correct name',
-        'Minimum length of name is 4',
+        'Invalid Input',
+        'Name must be at least 4 characters',
         'error',
       );
-      isValid = false;
+
+      return false;
     } else if (inputPositionValue.length === 0) {
-      pushNotification(
-        'Please enter correct position',
-        'Position is empty',
-        'error',
-      );
-      isValid = false;
-    } else if (Number(iputAgeValue) < 18 || Number(iputAgeValue) > 90) {
-      pushNotification(
-        'Age is lower than 18 or empty',
-        'Age should be more than 17 and less than 90',
-        'error',
-      );
-      isValid = false;
+      pushNotification('Invalid Input', 'Position cannot be empty', 'error');
+
+      return false;
+    } else if (Number(inputAgeValue) < 18 || Number(inputAgeValue) > 90) {
+      pushNotification('Invalid Age', 'Age must be between 18 and 90', 'error');
+
+      return false;
     } else if (inputSalaryValue.length < 1) {
-      pushNotification('Invalid data', 'Empty salary', 'error');
-      isValid = false;
+      pushNotification('Invalid Salary', 'Salary cannot be empty', 'error');
+
+      return false;
     }
 
+    return true;
+  };
+
+  createdButton.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    const allLabels = Array.from(document.querySelectorAll('label'));
     const newRow = document.createElement('tr');
 
-    for (const label of allLabels) {
+    allLabels.forEach((label) => {
       const newTd = document.createElement('td');
+      const value = label.lastChild.value;
 
       if (label.textContent === 'Salary:') {
-        newTd.textContent =
-          '$' + Number(label.lastChild.value).toLocaleString('en-US');
-        newRow.append(newTd);
-        continue;
+        newTd.textContent = `$${Number(value).toLocaleString('en-US')}`;
+      } else {
+        newTd.textContent = value;
       }
 
-      newTd.textContent = label.lastChild.value;
       newRow.append(newTd);
-    }
+    });
 
-    if (isValid) {
-      pushNotification('New employee added', 'Correct data', 'success');
-      document.querySelector('tbody').append(newRow);
-      rows.push(newRow);
+    pushNotification(
+      'Employee Added',
+      'New employee data saved successfully',
+      'success',
+    );
+    document.querySelector('tbody').append(newRow);
+    rows.push(newRow);
 
-      for (const item of allLabels) {
-        if (item.firstChild.textContent === 'Office:') {
-          document.querySelector('select').firstElementChild.selected = true;
-          continue;
-        }
-
-        item.lastChild.value = '';
-      }
-    }
+    allLabels.forEach((item) => (item.lastChild.value = ''));
+    document.querySelector('select').firstElementChild.selected = true;
   });
 
   document.body.append(createdFormField);
