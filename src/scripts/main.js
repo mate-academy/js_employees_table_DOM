@@ -15,7 +15,7 @@ function parseCellValue(row, columnIndex) {
 
 theads.forEach((header, columnIndex) => {
   header.addEventListener('click', () => {
-    const rows = [...tbody.rows];
+    const rows = Array.from(tbody.rows);
 
     rows.sort((rowA, rowB) => {
       const valueA = parseCellValue(rowA, columnIndex);
@@ -39,48 +39,28 @@ theads.forEach((header, columnIndex) => {
 // 2. When user clicks on a row, it should become selected.
 let activeRow = null;
 
-tbody.querySelectorAll('tr').forEach((row) => {
-  const handleRowClick = () => {
-    const isActiveRowSelected = activeRow !== null;
-    const isSameRowClicked = activeRow === row;
+tbody.addEventListener('click', (e) => {
+  const row = e.target.closest('tr');
 
-    if (isActiveRowSelected && !isSameRowClicked) {
-      activeRow.classList.remove('active');
-    }
+  if (!row) {
+    return;
+  }
 
-    row.classList.add('active');
-    activeRow = row;
-  };
+  if (activeRow && activeRow !== row) {
+    activeRow.classList.remove('active');
+  }
 
-  row.addEventListener('click', handleRowClick);
+  row.classList.add('active');
+  activeRow = row;
 });
 
 // 3. Write a script to add a form to the document.
-// Form allows users to add new employees to the spreadsheet.
 const formHtml = `
   <form class="new-employee-form">
-    <label>
-      Name:
-      <input
-        name="name"
-        type="text"
-        data-qa="name"
-      />
-    </label>
-    <label>
-      Position:
-      <input
-        name="position"
-        type="text"
-        data-qa="position"
-      />
-    </label>
-    <label>
-      Office:
-      <select
-        name="office"
-        data-qa="office"
-      >
+    <label>Name: <input name="name" type="text" data-qa="name" /></label>
+    <label>Position: <input name="position" type="text" data-qa="position" /></label>
+    <label>Office:
+      <select name="office" data-qa="office">
         <option value="Tokyo">Tokyo</option>
         <option value="Singapore">Singapore</option>
         <option value="London">London</option>
@@ -89,30 +69,11 @@ const formHtml = `
         <option value="San Francisco">San Francisco</option>
       </select>
     </label>
-    <label>
-      Age:
-      <input
-        name="age"
-        type="number"
-        data-qa="age"
-      />
-    </label>
-    <label>
-      Salary:
-      <input
-        name="salary"
-        type="number"
-        data-qa="salary"
-      />
-    </label>
-    <button
-      type="button"
-      id="save-button"
-    >
-      Save to table
-    </button>
+    <label>Age: <input name="age" type="number" data-qa="age" /></label>
+    <label>Salary: <input name="salary" type="number" data-qa="salary" /></label>
+    <button type="button" id="save-button">Save to table</button>
   </form>
-  `;
+`;
 
 table.insertAdjacentHTML('afterend', formHtml);
 
@@ -122,24 +83,9 @@ function createNotification(message, type) {
 
   notification.className = `notification ${type}`;
   notification.setAttribute('data-qa', 'notification');
-
-  const titleSpan = document.createElement('span');
-
-  titleSpan.className = 'title';
-  titleSpan.textContent = type.toUpperCase();
-
-  const messageSpan = document.createElement('span');
-
-  messageSpan.textContent = message;
-
-  notification.appendChild(titleSpan);
-  notification.appendChild(messageSpan);
-
+  notification.innerHTML = `<span class="title">${type.toUpperCase()}</span><span>${message}</span>`;
   document.body.appendChild(notification);
-
-  setTimeout(() => {
-    notification.style.display = 'none';
-  }, 2000);
+  setTimeout(() => notification.remove(), 2000);
 }
 
 function validateFormData(formData) {
@@ -168,7 +114,7 @@ const form = document.querySelector('.new-employee-form');
 const saveButton = document.getElementById('save-button');
 
 saveButton.addEventListener('click', () => {
-  const formData = [...form.elements].reduce((acc, input) => {
+  const formData = Array.from(form.elements).reduce((acc, input) => {
     if (input.name) {
       acc[input.name] = input.value;
     }
@@ -190,38 +136,39 @@ saveButton.addEventListener('click', () => {
 
     tbody.appendChild(newRow);
     createNotification('Employee added successfully!', 'success');
-
     form.reset();
   }
 });
 
 // 5. Implement editing of table cells by double-clicking on it. (optional)
-const cells = tbody.querySelectorAll('td');
+tbody.addEventListener('dblclick', (e) => {
+  const cell = e.target.closest('td');
 
-cells.forEach((cell) => {
-  cell.addEventListener('dblclick', () => {
-    const initialValue = cell.innerText;
+  if (!cell) {
+    return;
+  }
 
-    const input = document.createElement('input');
+  const initialValue = cell.innerText;
+  const input = document.createElement('input');
 
-    input.className = 'cell-input';
-    input.value = initialValue;
+  input.className = 'cell-input';
+  input.value = initialValue;
 
-    cell.innerText = '';
-    cell.appendChild(input);
+  cell.innerText = '';
+  cell.appendChild(input);
 
-    input.focus();
+  input.focus();
 
-    const revertOrSave = () => {
-      cell.innerText = input.value || initialValue;
-    };
+  const revertOrSave = () => {
+    cell.innerText = input.value || initialValue;
+  };
 
-    input.addEventListener('blur', revertOrSave);
+  input.addEventListener('blur', revertOrSave);
 
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        revertOrSave();
-      }
-    });
+  // eslint-disable-next-line no-shadow
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      revertOrSave();
+    }
   });
 });
