@@ -99,22 +99,20 @@ form.addEventListener('submit', (e) => {
     body.append(notification);
 
     setTimeout(() => {
-      notification.remove(); // Видаляємо повідомлення після декількох секунд
+      notification.remove();
     }, 5000);
   }
 
-  if (userName.length < 4) {
-    showNotification('Value shouldn`t be less than 4 letters', 'error');
-
+  if (!userName || !position || !office || !age || !salary) {
+    showNotification('All fields must be filled', 'error');
     return;
   }
 
-  // if (!Number(age) || !Number(salary)) {
-  //   showNotification('Type of data for age and salary should be number', 'warning');
+  if (userName.length < 4) {
+    showNotification('Value shouldnt be less than 4 letters', 'error');
 
-  //   return;
-  // }
-
+    return;
+  }
 
   if (age < 18 || age > 90) {
     showNotification('Value is less than 18 or more than 90', 'error');
@@ -123,14 +121,13 @@ form.addEventListener('submit', (e) => {
   }
 
 
-  row.innerHTML = `
+  row.innerHTML =`
     <td>${userName}</td>
     <td>${position}</td>
     <td>${office}</td>
     <td>${age}</td>
     <td>$${salary}</td>
   `;
-
   tbody.append(row);
 
   showNotification('Data successfuly added', 'success');
