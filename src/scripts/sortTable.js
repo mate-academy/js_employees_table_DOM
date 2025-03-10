@@ -9,8 +9,7 @@ function sortPeopleArray(category) {
     // by name
     case categories[0]: {
       fullPeopleData.sort((a, b) =>
-        a[categories[0]].localeCompare(b[categories[0]]),
-      );
+        a[categories[0]].localeCompare(b[categories[0]]),);
 
       break;
     }
@@ -18,16 +17,14 @@ function sortPeopleArray(category) {
     // by position
     case categories[1]: {
       fullPeopleData.sort((a, b) =>
-        a[categories[1]].localeCompare(b[categories[1]]),
-      );
+        a[categories[1]].localeCompare(b[categories[1]]),);
       break;
     }
 
     // by office
     case categories[2]: {
       fullPeopleData.sort((a, b) =>
-        a[categories[2]].localeCompare(b[categories[2]]),
-      );
+        a[categories[2]].localeCompare(b[categories[2]]),);
       break;
     }
 
@@ -99,8 +96,7 @@ const categories = Array.from(tableHead.cells).map((data) => data.textContent);
 // of every single row (rows represent here person data)
 for (const data of tableBodyRows) {
   const personFullData = Array.from(data.cells).map((cell) =>
-    cell.textContent.trim(),
-  );
+    cell.textContent.trim(),);
 
   const personObject = {};
 
