@@ -2,10 +2,26 @@
 
 const table = document.querySelector('table');
 let isACS = true;
+const tbody = table.querySelector('tbody');
+const rows = [...tbody.rows];
 
 table.querySelector('thead tr').addEventListener('click', (e) => {
-  const tbody = table.querySelector('tbody');
-  const rows = [...tbody.rows];
+  sort(e);
+});
+
+table.querySelectorAll('tbody tr').forEach((row) => {
+  row.addEventListener('click', (e) => {
+    if (!row) {
+      return;
+    }
+
+    rows.forEach((el) => el.classList.remove('active'));
+
+    row.classList.toggle('active');
+  });
+});
+
+function sort(e) {
   const title = e.target.textContent;
   const tHead = table.querySelector('thead');
   const headers = [...tHead.querySelectorAll('tr th')];
@@ -40,4 +56,4 @@ table.querySelector('thead tr').addEventListener('click', (e) => {
   });
 
   isACS = !isACS;
-});
+}
