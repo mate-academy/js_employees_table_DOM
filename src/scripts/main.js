@@ -1,9 +1,72 @@
 'use strict';
 
+const body = document.querySelector('body');
 const table = document.querySelector('table');
 let isACS = true;
 const tbody = table.querySelector('tbody');
 const rows = [...tbody.rows];
+
+function createForm() {
+  const form = document.createElement('form');
+  const nameInput = document.createElement('input');
+  const positionInput = document.createElement('input');
+  const ageInput = document.createElement('input');
+  const salaryInput = document.createElement('input');
+  const officeSelect = document.createElement('select');
+  const buttonSave = document.createElement('button');
+  const inputFields = ['name', 'position', 'office', 'age', 'salary'];
+  const offices = [
+    `Tokyo`,
+    `Singapore`,
+    `London`,
+    `New York`,
+    `Edinburgh`,
+    `San Francisco`,
+  ];
+
+  buttonSave.textContent = 'Save to table';
+
+  buttonSave.addEventListener('click', () => {
+    event.preventDefault();
+  });
+
+  ageInput.type = 'number';
+  salaryInput.type = 'number';
+
+  offices.forEach((office) => {
+    const officeOption = document.createElement('option');
+
+    officeOption.textContent = office;
+    officeSelect.append(officeOption);
+  });
+
+  form.classList.add('new-employee-form');
+
+  form.appendChild(nameInput);
+  form.appendChild(positionInput);
+  form.appendChild(officeSelect);
+  form.appendChild(ageInput);
+  form.appendChild(salaryInput);
+  form.appendChild(buttonSave);
+  body.appendChild(form);
+
+  const inputs = form.querySelectorAll('form > *');
+
+  inputs.forEach((input, i) => {
+    const label = document.createElement('label');
+
+    label.textContent =
+      inputFields[i].slice(0, 1).toUpperCase() + inputFields[i].slice(1);
+    input.replaceWith(label);
+    label.append(input);
+
+    input.setAttribute('data-qa', inputFields[i]);
+    input.setAttribute('name', inputFields[i]);
+    input.setAttribute('required', true);
+  });
+}
+
+createForm();
 
 table.querySelector('thead tr').addEventListener('click', (e) => {
   sort(e);
