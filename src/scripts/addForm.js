@@ -1,4 +1,5 @@
 import { pushNotification } from './notifications';
+import { fullPeopleData } from './sortTable';
 
 const newForm = document.createElement('form');
 
@@ -10,6 +11,8 @@ const ageInput = document.createElement('input');
 const salaryInput = document.createElement('input');
 const officeSelect = document.createElement('select');
 const submitButton = document.createElement('button');
+
+const salaryFormat = new Intl.NumberFormat('en-US');
 
 const OFFICES_ARRAY = [
   'Tokyo',
@@ -116,6 +119,13 @@ const validateNewEmployee = () => {
     salary,
   };
 
+  fullPeopleData.push({
+    ...newEmployee,
+    salary: `$${salaryFormat.format(salary)}`,
+  });
+
+  window.alert(`$${salaryFormat.format(salary)}`);
+
   nameInput.value = '';
   ageInput.value = '';
   positionInput.value = '';
@@ -144,8 +154,6 @@ const submitClickHandler = () => {
       const newCell = newRow.insertCell();
 
       if (data === 'salary') {
-        const salaryFormat = new Intl.NumberFormat('en-US');
-
         newCell.textContent = `$${salaryFormat.format(Number(newEmployee[data]))}`;
       } else {
         newCell.textContent = newEmployee[data];

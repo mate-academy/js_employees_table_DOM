@@ -89,7 +89,7 @@ const tableBody = document.querySelector('tbody');
 const tableBodyRows = Array.from(tableBody.rows);
 
 // preparing to create & fill an Array of people data (each person = object)
-const fullPeopleData = [];
+export const fullPeopleData = [];
 
 // getting all Categories from Table columns (Name, Position, Age, Salary)
 const categories = Array.from(tableHead.cells).map((data) => data.textContent);
