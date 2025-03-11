@@ -125,32 +125,68 @@ function addTAble(e) {
 
   if (+e.target.age.value < 18 || +e.target.age.value > 90) {
     messageError.className = 'error';
-    messageError.textContent += ' Age must be between 18 and 90';
+    messageError.textContent = ' Age must be between 18 and 90';
     form.append(messageError);
 
     return;
+  }
+
+  function salaryWithDollar(summ) {
+    const salArr = summ.split('');
+    const res = summ.length % 3;
+    let resSal = '$';
+
+    if (res === 1) {
+      for (let i = 0; i < salArr.length; i++) {
+        if (i > 0) {
+          if (i % 3 === 0) {
+            resSal += `${salArr[i]},`;
+          } else {
+            resSal += `${salArr[i]}`;
+          }
+        } else {
+          resSal += `${salArr[i]},`;
+        }
+      }
+    }
+
+    if (res === 2) {
+      for (let i = 0; i < salArr.length; i++) {
+        if (i > 1) {
+          if (i % 3 === 1) {
+            resSal += `${salArr[i]},`;
+          } else {
+            resSal += `${salArr[i]}`;
+          }
+        } else {
+          resSal += `${salArr[i]},`;
+        }
+      }
+    }
+
+    if (res === 3) {
+      for (let i = 0; i < salArr.length; i++) {
+        if (i > 2) {
+          if (i % 3 === 2) {
+            resSal += `${salArr[i]},`;
+          } else {
+            resSal += `${salArr[i]}`;
+          }
+        } else {
+          resSal += `${salArr[i]},`;
+        }
+      }
+    }
+
+    return resSal.slice(0, -1);
   }
 
   for (const add of addTD) {
     if (salaryCount === 4) {
       const td = document.createElement('td');
       const sal = add.childNodes[1].value.toString();
-      const salArr = sal.toString().split('');
-      const res = sal.length % 3;
-      let resSal = '';
 
-      if (res === 1) {
-        resSal = `$${salArr[0]},${salArr[1]}${salArr[2]}${salArr[3]}`;
-      }
-
-      if (res === 2) {
-        resSal = `$${salArr[0]}${salArr[1]},${salArr[2]}${salArr[3]}${salArr[4]}`;
-      }
-
-      if (res === 0) {
-        resSal = `$${salArr[0]}${salArr[1]}${salArr[2]},${salArr[3]}${salArr[4]}${salArr[5]}`;
-      }
-      td.textContent = resSal;
+      td.textContent = salaryWithDollar(sal);
       addTr.append(td);
       salaryCount = 0;
     } else {
