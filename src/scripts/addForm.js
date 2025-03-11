@@ -1,35 +1,35 @@
-const submitClickHandler = (e) => {};
+import { pushNotification } from './notifications';
+
+const newForm = document.createElement('form');
+
+newForm.classList.add('new-employee-form');
+
+const nameInput = document.createElement('input');
+const positionInput = document.createElement('input');
+const ageInput = document.createElement('input');
+const salaryInput = document.createElement('input');
+const officeSelect = document.createElement('select');
+const submitButton = document.createElement('button');
+
+const OFFICES_ARRAY = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+];
+
+for (const office of OFFICES_ARRAY) {
+  const option = document.createElement('option');
+
+  option.value = office;
+  option.textContent = office;
+
+  officeSelect.append(option);
+}
 
 export function createNewForm() {
-  const newForm = document.createElement('form');
-
-  newForm.classList.add('new-employee-form');
-
-  const nameInput = document.createElement('input');
-  const positionInput = document.createElement('input');
-  const ageInput = document.createElement('input');
-  const salaryInput = document.createElement('input');
-  const officeSelect = document.createElement('select');
-  const submitButton = document.createElement('button');
-
-  const OFFICES_ARRAY = [
-    'Tokyo',
-    'Singapore',
-    'London',
-    'New York',
-    'Edinburgh',
-    'San Francisco',
-  ];
-
-  for (const office of OFFICES_ARRAY) {
-    const option = document.createElement('option');
-
-    option.value = office;
-    option.textContent = office;
-
-    officeSelect.append(option);
-  }
-
   submitButton.type = 'button';
   submitButton.textContent = 'Save to table';
   submitButton.addEventListener('click', submitClickHandler);
@@ -80,3 +80,77 @@ export function createNewForm() {
 
   document.body.append(newForm);
 }
+
+const validateNewEmployee = () => {
+  const employeeName = nameInput.value;
+  const age = ageInput.value;
+  const position = positionInput.value;
+  const salary = salaryInput.value;
+  const office = officeSelect.value;
+
+  if (
+    employeeName.length < 4 ||
+    Number.isNaN(+age) ||
+    !Number.isInteger(+age) ||
+    position.trim().length < 1 ||
+    +age < 18 ||
+    +age > 90 ||
+    Number.isNaN(+salary)
+  ) {
+    pushNotification(
+      450,
+      10,
+      'Error while adding employee to the table',
+      'Please check all entered data!',
+      'error',
+    );
+
+    return null;
+  }
+
+  const newEmployee = {
+    name: employeeName,
+    position,
+    office,
+    age,
+    salary,
+  };
+
+  nameInput.value = '';
+  ageInput.value = '';
+  positionInput.value = '';
+  officeSelect.value = OFFICES_ARRAY[0];
+  salaryInput.value = '';
+
+  pushNotification(
+    450,
+    10,
+    'Successfully Added!',
+    'New Employee was just added to the Table',
+    'success',
+  );
+
+  return newEmployee;
+};
+
+const submitClickHandler = () => {
+  const newEmployee = validateNewEmployee();
+
+  if (newEmployee) {
+    const tableBody = document.querySelector('tbody');
+    const newRow = tableBody.insertRow();
+
+    for (const data in newEmployee) {
+      const newCell = newRow.insertCell();
+
+      if (data === 'salary') {
+        const salaryFormat = new Intl.NumberFormat('en-US');
+
+        window.alert(newEmployee[data]);
+        newCell.textContent = `$${salaryFormat.format(Number(newEmployee[data]))}`;
+      } else {
+        newCell.textContent = newEmployee[data];
+      }
+    }
+  }
+};

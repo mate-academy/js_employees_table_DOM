@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable comma-dangle */
 'use strict';
 
 let currentSortField = '';

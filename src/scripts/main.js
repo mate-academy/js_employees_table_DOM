@@ -1,6 +1,6 @@
 'use strict';
-import { sortClickHandler } from './sortTable';
 import { createNewForm } from './addForm';
+import { sortClickHandler } from './sortTable';
 
 const table = document.getElementsByTagName('table')[0];
 const headerTable = table.tHead;
