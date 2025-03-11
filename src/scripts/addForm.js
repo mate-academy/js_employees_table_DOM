@@ -124,8 +124,6 @@ const validateNewEmployee = () => {
     salary: `$${salaryFormat.format(salary)}`,
   });
 
-  window.alert(`$${salaryFormat.format(salary)}`);
-
   nameInput.value = '';
   ageInput.value = '';
   positionInput.value = '';
