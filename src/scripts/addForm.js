@@ -146,7 +146,6 @@ const submitClickHandler = () => {
       if (data === 'salary') {
         const salaryFormat = new Intl.NumberFormat('en-US');
 
-        window.alert(newEmployee[data]);
         newCell.textContent = `$${salaryFormat.format(Number(newEmployee[data]))}`;
       } else {
         newCell.textContent = newEmployee[data];
