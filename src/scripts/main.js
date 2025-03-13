@@ -69,11 +69,14 @@ function addNewEmployee(employeeName, position, office, age, salary) {
   newForm.reset();
 }
 
-function isNewEmployeeValid(employeeName, age) {
-  const isNameValid = employeeName.length >= 4;
+function isNewEmployeeValid(employeeName, position, age) {
+  const isNameLengthValid = employeeName.length >= 4;
+  const isNameContentValid = employeeName.trim().length > 0;
+  const isNameValid = isNameLengthValid && isNameContentValid;
+  const isPositionContentValid = position.trim().length > 0;
   const isAgeValid = +age >= 18 && +age <= 90;
 
-  return isNameValid && isAgeValid;
+  return isNameValid && isAgeValid && isPositionContentValid;
 }
 
 function pushNotification(posTop, posRight, title, description, type) {
@@ -116,7 +119,11 @@ function saveCellChanges(newInput, cell, cellInitialText) {
 
   newInput.remove();
 
-  cell.textContent = newCellText || cellInitialText;
+  if (newCellText.trim().length) {
+    cell.textContent = newCellText;
+  } else {
+    cell.textContent = cellInitialText;
+  }
 }
 
 tableHead.addEventListener('click', (e) => {
@@ -215,7 +222,7 @@ newForm.addEventListener('submit', (e) => {
 
   const salaryString = '$' + salary.toLocaleString('en-US');
 
-  if (isNewEmployeeValid(employeeName, ageString)) {
+  if (isNewEmployeeValid(employeeName, position, ageString)) {
     addNewEmployee(employeeName, position, office, ageString, salaryString);
 
     pushNotification(
@@ -231,7 +238,7 @@ newForm.addEventListener('submit', (e) => {
       NOTIFICATION_RIGHT,
       "Employee can't be added!",
       'Error!\n ' +
-        `Can't add employee <b>${employeeName}</b> to the table! Check employee name and age!`,
+        `Can't add employee <b>${employeeName}</b> to the table! Check employee details carefully and try again!`,
       'error',
     );
   }
