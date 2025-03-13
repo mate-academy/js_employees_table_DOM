@@ -4,6 +4,8 @@ const tableWrapper = document.querySelector('table');
 const tableHead = document.querySelector('thead');
 const tableBody = document.querySelector('tbody');
 
+const newForm = document.createElement('form');
+
 const NOTIFICATION_TOP = 10;
 const NOTIFICATION_RIGHT = 10;
 const NOTIFICATION_TIMEOUT = 2000;
@@ -174,8 +176,6 @@ tableWrapper.addEventListener('dblclick', (e) => {
     });
   }
 });
-
-const newForm = document.createElement('form');
 
 newForm.classList.add('new-employee-form');
 
