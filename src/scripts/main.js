@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const nameCell = document.createElement('td');
 
-    nameCell.textContent = name;
+    nameCell.textContent = fullName;
 
     const positionCell = document.createElement('td');
 
@@ -222,7 +222,10 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const pushNotification = (x, y, title, message, type) => {
-    alert(`${title}: ${message}`);
+    const notification = document.createElement('div');
+
+    notification.setAttribute('data-qa', 'notification');
+    notification.classList.add(type);
   };
 
   form.addEventListener('submit', (e) => {
