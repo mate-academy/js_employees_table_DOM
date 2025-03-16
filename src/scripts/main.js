@@ -28,6 +28,68 @@ function createForm() {
 
   buttonSave.addEventListener('click', () => {
     event.preventDefault();
+
+    let notificationDesc;
+    let typeStatus = 'error';
+
+    if (
+      nameInput.value === '' ||
+      positionInput.value === '' ||
+      ageInput.value === '' ||
+      salaryInput.value === ''
+    ) {
+      notificationDesc = 'All fields should be filled';
+      showNotification(typeStatus, 'Error', notificationDesc);
+
+      return;
+    }
+
+    if (nameInput.value.length < 4) {
+      notificationDesc = 'Name should contain more than 4 letters';
+      showNotification(typeStatus, 'Error', notificationDesc);
+
+      return;
+    }
+
+    if (ageInput.value < 18 || ageInput.value > 90) {
+      notificationDesc = 'Your age is not available';
+      showNotification(typeStatus, 'Error', notificationDesc);
+
+      return;
+    }
+
+    const newRow = document.createElement('tr');
+    const tdName = document.createElement('td');
+    const tdPosition = document.createElement('td');
+    const tdOffice = document.createElement('td');
+    const tdAge = document.createElement('td');
+    const tdSalary = document.createElement('td');
+
+    typeStatus = 'success';
+    notificationDesc = 'Congratulations! New employee is added';
+    showNotification(typeStatus, 'Success', notificationDesc);
+
+    tdName.textContent = nameInput.value.trim();
+    tdPosition.textContent = positionInput.value.trim();
+    tdOffice.textContent = officeSelect.value.trim();
+    tdAge.textContent = ageInput.value.trim();
+
+    tdSalary.textContent = `$${salaryInput.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+
+    newRow.appendChild(tdName);
+    newRow.appendChild(tdPosition);
+    newRow.appendChild(tdOffice);
+    newRow.appendChild(tdAge);
+    newRow.appendChild(tdSalary);
+
+    table.appendChild(newRow);
+
+    rows.push(newRow);
+
+    nameInput.value = '';
+    positionInput.value = '';
+    ageInput.value = '';
+    salaryInput.value = '';
   });
 
   ageInput.type = 'number';
@@ -55,6 +117,10 @@ function createForm() {
   inputs.forEach((input, i) => {
     const label = document.createElement('label');
 
+    if (!inputFields[i]) {
+      return;
+    }
+
     label.textContent =
       inputFields[i].slice(0, 1).toUpperCase() + inputFields[i].slice(1);
     input.replaceWith(label);
@@ -62,7 +128,7 @@ function createForm() {
 
     input.setAttribute('data-qa', inputFields[i]);
     input.setAttribute('name', inputFields[i]);
-    input.setAttribute('required', true);
+    input.setAttribute('required', 'true');
   });
 }
 
@@ -72,17 +138,21 @@ table.querySelector('thead tr').addEventListener('click', (e) => {
   sort(e);
 });
 
-table.querySelectorAll('tbody tr').forEach((row) => {
-  row.addEventListener('click', (e) => {
-    if (!row) {
-      return;
-    }
+function chooseRow() {
+  table.querySelectorAll('tbody tr').forEach((row) => {
+    row.addEventListener('click', () => {
+      if (!row) {
+        return;
+      }
 
-    rows.forEach((el) => el.classList.remove('active'));
+      rows.forEach((el) => el.classList.remove('active'));
 
-    row.classList.toggle('active');
+      row.classList.toggle('active');
+    });
   });
-});
+}
+
+chooseRow();
 
 function sort(e) {
   const title = e.target.textContent;
@@ -101,12 +171,8 @@ function sort(e) {
     const bEl = b.children[indexTitle].textContent;
 
     if (title === 'Salary') {
-      const aSalary = parseFloat(
-        a.children[indexTitle].textContent.split('$')[1],
-      );
-      const bSalary = parseFloat(
-        b.children[indexTitle].textContent.split('$')[1],
-      );
+      const aSalary = parseFloat(aEl.replace(/[$,]/g, ''));
+      const bSalary = parseFloat(bEl.replace(/[$,]/g, ''));
 
       return isACS ? aSalary - bSalary : bSalary - aSalary;
     }
@@ -120,3 +186,70 @@ function sort(e) {
 
   isACS = !isACS;
 }
+
+function showNotification(type, title, description) {
+  const notBlock = document.createElement('div');
+  const titleMessage = document.createElement('h2');
+  const descriptionMessage = document.createElement('p');
+
+  if (type === 'success') {
+    notBlock.classList.add('success');
+    titleMessage.innerText = title;
+    descriptionMessage.innerText = description;
+  }
+
+  if (type === 'error') {
+    notBlock.classList.add('error');
+    titleMessage.innerText = title;
+    descriptionMessage.innerText = description;
+  }
+
+  notBlock.classList.add('notification');
+  titleMessage.classList.add('title');
+  notBlock.setAttribute('data-qa', 'notification');
+
+  body.appendChild(notBlock);
+  notBlock.appendChild(titleMessage);
+  notBlock.appendChild(descriptionMessage);
+
+  setTimeout(() => {
+    notBlock.style.display = 'none';
+  }, 2000);
+}
+
+function changeCell() {
+  table.querySelectorAll('tr td').forEach((cell) => {
+    cell.addEventListener('dblclick', (e) => {
+      const input = document.createElement('input');
+      const innitialValue = e.target.textContent;
+
+      input.value = e.target.textContent;
+
+      e.target.replaceWith(input);
+      input.classList.add('cell-input');
+      input.focus();
+
+      input.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') {
+          save(ev);
+        }
+      });
+
+      input.addEventListener('blur', (ev) => {
+        save(ev);
+      });
+
+      function save(ev) {
+        ev.preventDefault();
+
+        const td = document.createElement('td');
+
+        td.textContent = input.value.trim() || innitialValue;
+        input.replaceWith(td);
+        changeCell();
+      }
+    });
+  });
+}
+
+changeCell();
