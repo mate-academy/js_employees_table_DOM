@@ -26,8 +26,10 @@ function createForm() {
 
   buttonSave.textContent = 'Save to table';
 
-  buttonSave.addEventListener('click', () => {
-    event.preventDefault();
+  buttonSave.addEventListener('click', (cklicker) => {
+    cklicker.preventDefault();
+
+    const ageValid = ageInput.value < 18 || ageInput.value > 90;
 
     let notificationDesc;
     let typeStatus = 'error';
@@ -51,45 +53,52 @@ function createForm() {
       return;
     }
 
-    if (ageInput.value < 18 || ageInput.value > 90) {
+    if (ageValid) {
       notificationDesc = 'Your age is not available';
       showNotification(typeStatus, 'Error', notificationDesc);
 
       return;
     }
 
-    const newRow = document.createElement('tr');
-    const tdName = document.createElement('td');
-    const tdPosition = document.createElement('td');
-    const tdOffice = document.createElement('td');
-    const tdAge = document.createElement('td');
-    const tdSalary = document.createElement('td');
+    if (
+      nameInput.value !== '' ||
+      positionInput.value !== '' ||
+      ageInput.value !== '' ||
+      salaryInput.value !== ''
+    ) {
+      const newRow = document.createElement('tr');
+      const tdName = document.createElement('td');
+      const tdPosition = document.createElement('td');
+      const tdOffice = document.createElement('td');
+      const tdAge = document.createElement('td');
+      const tdSalary = document.createElement('td');
 
-    typeStatus = 'success';
-    notificationDesc = 'Congratulations! New employee is added';
-    showNotification(typeStatus, 'Success', notificationDesc);
+      typeStatus = 'success';
+      notificationDesc = 'Congratulations! New employee is added';
+      showNotification(typeStatus, 'Success', notificationDesc);
 
-    tdName.textContent = nameInput.value.trim();
-    tdPosition.textContent = positionInput.value.trim();
-    tdOffice.textContent = officeSelect.value.trim();
-    tdAge.textContent = ageInput.value.trim();
+      tdName.textContent = nameInput.value.trim();
+      tdPosition.textContent = positionInput.value.trim();
+      tdOffice.textContent = officeSelect.value.trim();
+      tdAge.textContent = ageInput.value.trim();
 
-    tdSalary.textContent = `$${salaryInput.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+      tdSalary.textContent = `$${salaryInput.value.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 
-    newRow.appendChild(tdName);
-    newRow.appendChild(tdPosition);
-    newRow.appendChild(tdOffice);
-    newRow.appendChild(tdAge);
-    newRow.appendChild(tdSalary);
+      newRow.appendChild(tdName);
+      newRow.appendChild(tdPosition);
+      newRow.appendChild(tdOffice);
+      newRow.appendChild(tdAge);
+      newRow.appendChild(tdSalary);
 
-    table.appendChild(newRow);
+      tbody.appendChild(newRow);
 
-    rows.push(newRow);
+      rows.push(newRow);
 
-    nameInput.value = '';
-    positionInput.value = '';
-    ageInput.value = '';
-    salaryInput.value = '';
+      nameInput.value = '';
+      positionInput.value = '';
+      ageInput.value = '';
+      salaryInput.value = '';
+    }
   });
 
   ageInput.type = 'number';
@@ -141,11 +150,9 @@ table.querySelector('thead tr').addEventListener('click', (e) => {
 function chooseRow() {
   table.querySelectorAll('tbody tr').forEach((row) => {
     row.addEventListener('click', () => {
-      if (!row) {
-        return;
-      }
+      const activeRows = table.querySelectorAll('tbody tr.active');
 
-      rows.forEach((el) => el.classList.remove('active'));
+      activeRows.forEach((el) => el.classList.remove('active'));
 
       row.classList.toggle('active');
     });
@@ -221,7 +228,7 @@ function changeCell() {
   table.querySelectorAll('tr td').forEach((cell) => {
     cell.addEventListener('dblclick', (e) => {
       const input = document.createElement('input');
-      const innitialValue = e.target.textContent;
+      const initialValue = e.target.textContent;
 
       input.value = e.target.textContent;
 
@@ -244,7 +251,7 @@ function changeCell() {
 
         const td = document.createElement('td');
 
-        td.textContent = input.value.trim() || innitialValue;
+        td.textContent = input.value.trim() || initialValue;
         input.replaceWith(td);
         changeCell();
       }
