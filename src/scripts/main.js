@@ -12,19 +12,19 @@ document.addEventListener('DOMContentLoaded', () => {
       name: 'name',
       label: 'Name',
       type: 'text',
-      dataqa: 'name',
+      'data-qa': 'name',
     },
     {
       name: 'position',
       label: 'Position',
       type: 'text',
-      dataQa: 'position',
+      'data-qa': 'position',
     },
     {
       name: 'office',
       label: 'Office',
       type: 'select',
-      dataQa: 'office',
+      'data-qa': 'office',
       options: [
         'Tokyo',
         'Singapore',
@@ -38,13 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
       name: 'age',
       label: 'Age',
       type: 'number',
-      dataQa: 'age',
+      'data-qa': 'age',
     },
     {
       name: 'salary',
       label: 'Salary',
       type: 'number',
-      dataQa: 'salary',
+      'data-qa': 'salary',
     },
   ];
 
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     input.setAttribute('name', field.name);
-    input.setAttribute('data-qa', field.dataqa);
+    input.setAttribute('data-qa', field['data-qa']);
 
     if (field.type === 'select') {
       field.options.forEach((optionText) => {
@@ -143,7 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (isNaN(salary.value) || salary.value <= 0) {
+    if (
+      typeof salary.value !== 'number' ||
+      Number.isNaN(salary.value) ||
+      salary.value <= 0
+    ) {
       showNotification('Salary must be a positive number.', 'error');
 
       return;
@@ -177,9 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const bText = b.cells[column].textContent.trim();
 
       if (column === 3 || column === 4) {
-        return direction === 'asc'
-          ? parseFloat(aText) - parseFloat(bText)
-          : parseFloat(bText) - parseFloat(aText);
+        const numA = parseFloat(aText.replace(/[^\d.-]/g, '')) || 0;
+        const numB = parseFloat(bText.replace(/[^\d.-]/g, '')) || 0;
+
+        return direction === 'asc' ? numA - numB : numB - numA;
       }
 
       return direction === 'asc'
