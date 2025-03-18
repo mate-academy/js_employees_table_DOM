@@ -141,13 +141,16 @@ formContainer.addEventListener('submit', (ev) => {
   salary = `$${numericSalary.toLocaleString()}`;
 
   if (fname.length < 4) {
-    showNotification('Error: nameshould be at leat 4 characters long', 'error');
+    showNotification(
+      'Error: name should be at least 4 characters long',
+      'error',
+    );
 
     return;
   }
 
   if (age < 18 || age > 90) {
-    showNotification('Eror: age must be betwen 18 and 90', 'error');
+    showNotification('Error: age must be betwen 18 and 90', 'error');
 
     return;
   }
