@@ -75,17 +75,17 @@ form.addEventListener('submit', (e) => {
   const salary = e.target.salary.value;
 
   if (employeeName.length < 4) {
-    showNotification('Помилка!', "Ім'я занадто коротке.", 'error');
+    showNotification('Error!', 'The name is too short.', 'error');
 
     return;
   }
 
   if (age < 18) {
-    showNotification('Помилка!', 'Вам ще не виконалось 18 років.', 'error');
+    showNotification('Error!', 'You must be at least 18 years old.', 'error');
 
     return;
   } else if (age > 90) {
-    showNotification('Помилка!', 'Вік некоректний.', 'error');
+    showNotification('Error!', 'The age entered is not valid.', 'error');
 
     return;
   }
@@ -129,7 +129,11 @@ form.addEventListener('submit', (e) => {
 
   activeRowClickHandler();
 
-  showNotification('Успіх!', 'Працівник успішно доданий.', 'success');
+  showNotification(
+    'Success',
+    'The employee has been successfully added to the table.',
+    'success',
+  );
 });
 
 function showNotification(title, message, type) {
