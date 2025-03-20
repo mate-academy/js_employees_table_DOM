@@ -161,7 +161,7 @@ saveButton.addEventListener('click', (e) => {
   const isValid = formData.every(([inputName, value]) => {
     const inputTitle = inputName[0].toUpperCase() + inputName.slice(1);
 
-    if (!value) {
+    if (!value.trim()) {
       showNotification('error', `${inputTitle} field must be filled`);
 
       return false;
@@ -212,7 +212,7 @@ saveButton.addEventListener('click', (e) => {
         style: 'currency',
         currency: 'USD',
         minimumFractionDigits: 0,
-      }).format(cellValue);
+      }).format(+cellValue);
     }
 
     newCell.textContent = cellValue;
