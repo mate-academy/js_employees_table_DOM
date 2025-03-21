@@ -4,13 +4,16 @@ const thead = document.body.querySelector('thead');
 const tbody = document.body.querySelector('tbody');
 
 const tBodyTr = tbody.querySelectorAll('tr');
+const trArray = Array.from(tBodyTr);
 let ASCorDESC = 0;
 const memory = [];
 
 /* click thead childrens */
 
-thead.firstElementChild.addEventListener('click', (e) => {
-  const sortArray = Array.from(tBodyTr).sort((a, b) => {
+const arrayTh = Array.from(thead.querySelectorAll('th')).slice(0, 3);
+
+const sortOfTr = (e) => {
+  const sortArray = trArray.sort((a, b) => {
     const aFirtsChild = a.firstElementChild.textContent;
     const bFirtsChild = b.firstElementChild.textContent;
 
@@ -24,14 +27,47 @@ thead.firstElementChild.addEventListener('click', (e) => {
       : aFirtsChild.localeCompare(bFirtsChild);
   });
 
-  tbody.textContent = '';
+  tbody.replaceChildren(...sortArray);
+  ASCorDESC = 1 - ASCorDESC;
+};
 
-  sortArray.forEach((item) => {
-    tbody.append(item);
+arrayTh.forEach((item) => {
+  item.addEventListener('click', sortOfTr);
+});
+
+/* Sort salary and Age */
+
+const SalaryAgeThArray = Array.from(thead.querySelectorAll('th')).slice(-2);
+
+let ageSortEvent = 0;
+
+const ageSort = (ea) => {
+  const sortOfAge = trArray.sort((tr01, tr02) => {
+    return ageSortEvent
+      ? +tr02.children[3].textContent - +tr01.children[3].textContent
+      : +tr01.children[3].textContent - +tr02.children[3].textContent;
   });
 
-  ASCorDESC = 1 - ASCorDESC;
-});
+  ageSortEvent = 1 - ageSortEvent;
+  tbody.replaceChildren(...sortOfAge);
+};
+
+let ageSalaryEvent = 0;
+
+const salarySort = (ea) => {
+  const sortOfSalary = trArray.sort((tr01, tr02) => {
+    const numbe01 = +tr01.lastElementChild.textContent.replace(/[^\d.-]/g, '');
+    const numbe02 = +tr02.lastElementChild.textContent.replace(/[^\d.-]/g, '');
+
+    return ageSalaryEvent ? numbe02 - numbe01 : numbe01 - numbe02;
+  });
+
+  ageSalaryEvent = 1 - ageSalaryEvent;
+  tbody.replaceChildren(...sortOfSalary);
+};
+
+SalaryAgeThArray[0].addEventListener('click', ageSort);
+SalaryAgeThArray[1].addEventListener('click', salarySort);
 
 /* click tbody childrens */
 
@@ -161,7 +197,15 @@ form.addEventListener('submit', (e) => {
   /* If false */
 
   if (NOTIFICATION === false) {
-    if (document.querySelector('.error')) {
+    const errorMesagge = document.querySelector('.error');
+
+    if (errorMesagge) {
+      errorMesagge.style.background = 'red';
+
+      setTimeout(() => {
+        errorMesagge.style.background = '';
+      }, 500);
+
       return;
     }
 
@@ -172,6 +216,10 @@ form.addEventListener('submit', (e) => {
     mesageError.textContent = 'Errore';
 
     document.body.append(mesageError);
+
+    setTimeout(() => {
+      document.querySelector('.error').remove();
+    }, 4000);
   } else {
     const newTr = document.createElement('tr');
 
