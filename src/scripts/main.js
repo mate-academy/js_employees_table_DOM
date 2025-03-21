@@ -4,7 +4,6 @@
 const table = document.querySelector('table');
 const headers = table.querySelectorAll('thead th');
 const tbody = table.querySelector('tbody');
-const rows = table.querySelectorAll('tbody tr');
 let asc = true;
 
 const form = document.createElement('form');
@@ -52,10 +51,6 @@ fields.forEach((field) => {
     });
   } else {
     input = document.createElement('input');
-    input.type = field.type;
-  }
-
-  if (field.type !== 'select') {
     input.type = field.type;
   }
 
@@ -183,6 +178,8 @@ headers.forEach((header, index) => {
     rowsArray.forEach((row) => tbody.appendChild(row));
   });
 });
+
+const rows = table.querySelectorAll('tbody tr');
 
 rows.forEach((row) => {
   row.addEventListener('click', () => {
