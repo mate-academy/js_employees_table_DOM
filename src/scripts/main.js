@@ -214,7 +214,6 @@ form.addEventListener('submit', (e) => {
     mesageError.setAttribute('data-qa', 'notification');
     mesageError.classList.add('error');
     mesageError.textContent = 'Errore';
-
     document.body.append(mesageError);
 
     setTimeout(() => {
