@@ -1,18 +1,21 @@
-/* eslint-disable no-constant-condition */
 'use strict';
 
-// write code here
 const tbody = document.querySelector('tbody');
 const body = document.querySelector('body');
 const arr = ['Name', 'Position', 'Age', 'Salary'];
 
-// сортувааня таблиці
+const sortDirection = {};
+
+// Функція сортування таблиці
 document.addEventListener('click', (ev) => {
   if (ev.target.tagName === 'TH') {
     const columnIndex = ev.target.cellIndex;
     const table = ev.target.closest('table');
     const tBody = table.querySelector('tbody');
     const rows = Array.from(tBody.rows);
+
+    // eslint-disable-next-line max-len
+    sortDirection[columnIndex] = !sortDirection[columnIndex];
 
     rows.sort((a, b) => {
       let cellA = a.cells[columnIndex].textContent.trim();
@@ -24,9 +27,11 @@ document.addEventListener('click', (ev) => {
       }
 
       if (isNaN(cellA) || isNaN(cellB)) {
-        return cellA.localeCompare(cellB);
+        return sortDirection[columnIndex]
+          ? cellA.localeCompare(cellB)
+          : cellB.localeCompare(cellA);
       } else {
-        return Number(cellA) - Number(cellB);
+        return sortDirection[columnIndex] ? cellA - cellB : cellB - cellA;
       }
     });
 
@@ -34,23 +39,23 @@ document.addEventListener('click', (ev) => {
   }
 });
 
-// рядок статє виділеним
+// Виділення рядка
 tbody.addEventListener('click', (e) => {
-  const row = e.target.closest('tr');
-
+  // eslint-disable-next-line max-len
   document
     .querySelectorAll('tr')
     .forEach((tr) => tr.classList.remove('active'));
-  row.classList.add('active');
+  e.target.closest('tr').classList.add('active');
 });
 
-// додавання форми
+// Додавання форми
 const form = document.createElement('form');
-const label2 = document.createElement('label');
-const select = document.createElement('select');
 
 form.classList.add('new-employee-form');
 body.appendChild(form);
+
+const label2 = document.createElement('label');
+const select = document.createElement('select');
 
 select.setAttribute('data-qa', 'office');
 select.setAttribute('required', true);
@@ -58,7 +63,6 @@ label2.textContent = 'Office:';
 label2.append(select);
 
 arr.forEach((element) => {
-  // eslint-disable-next-line no-console
   const input = document.createElement('input');
   const label = document.createElement('label');
 
@@ -66,7 +70,7 @@ arr.forEach((element) => {
   input.setAttribute('data-qa', element.toLowerCase());
   input.setAttribute('required', true);
 
-  if (input.dataset.qa === 'age' || input.dataset.qa === 'salary') {
+  if (element === 'Age' || element === 'Salary') {
     input.type = 'number';
   } else {
     input.type = 'text';
@@ -84,93 +88,92 @@ const secondLabel = labels[1];
 
 form.insertBefore(lastLabel, secondLabel.nextSibling);
 
-const arr2 = [
+[
   'Tokyo',
   'Singapore',
   'London',
   'New York',
   'Edinburgh',
   'San Francisco',
-];
-
-arr2.forEach((el) => {
+].forEach((el) => {
   const option = document.createElement('option');
 
   option.textContent = el;
   option.setAttribute('value', el);
-
   select.appendChild(option);
 });
 
 const button = document.createElement('button');
 
 button.textContent = 'Save to table';
-
 form.appendChild(button);
 
-// повідомлення
-const pushNotification = (posTop, posRight, title, description, type) => {
+// Функція створення сповіщень
+const pushNotification = (title, description, type) => {
   const element = document.createElement('div');
-  const h2 = document.createElement('h2');
-  const p = document.createElement('p');
 
   element.classList.add('notification', type);
+  element.setAttribute('data-qa', 'notification');
 
-  element.style.top = `${posTop}px`;
-  element.style.right = `${posRight}px`;
+  const h2 = document.createElement('h2');
 
   h2.textContent = title;
   h2.classList.add('title');
 
+  const p = document.createElement('p');
+
   p.textContent = description;
 
-  element.appendChild(h2);
-  element.appendChild(p);
-
+  element.append(h2, p);
   body.appendChild(element);
 
   setTimeout(() => {
-    element.style.display = 'none';
+    element.remove();
   }, 2000);
 };
 
-// відправка форми
+// Відправка форми
 button.addEventListener('click', (e) => {
   e.preventDefault();
 
   const name1 = form.querySelector('[data-qa="name"]').value.trim();
-  const position1 = form.querySelector('[data-qa="position"]').value.trim();
-  const office1 = select.value;
-  const age1 = form.querySelector('[data-qa="age"]').value.trim();
+  const position = form.querySelector('[data-qa="position"]').value.trim();
+  const office = select.value;
+  const age = parseInt(form.querySelector('[data-qa="age"]').value.trim(), 10);
   const salary1 = form.querySelector('[data-qa="salary"]').value.trim();
 
-  const newRow = document.createElement('tr');
-
-  if (!name1 || !position1 || !office1 || !age1 || !salary1) {
-    pushNotification(
-      290,
-      10,
-      'Title of Warning message',
-      'Message example.\n ' + 'Please fill in all fields.',
-      'warning',
-    );
+  // Валідація полів
+  if (name1.length < 4) {
+    pushNotification('Error', 'Name must be at least 4 characters.', 'error');
 
     return;
   }
 
+  if (isNaN(age) || age < 18 || age > 90) {
+    pushNotification('Error', 'Age must be between 18 and 90.', 'error');
+
+    return;
+  }
+
+  if (!name1 || !position || !office || isNaN(salary1)) {
+    pushNotification('Error', 'Please fill in all fields.', 'error');
+
+    return;
+  }
+
+  // Додавання нового рядка
+  const newRow = document.createElement('tr');
+
   newRow.innerHTML = `
     <td>${name1}</td>
-    <td>${position1}</td>
-    <td>${office1}</td>
-    <td>${age1}</td>
-    <td>$${salary1}</td>
+    <td>${position}</td>
+    <td>${office}</td>
+    <td>${age}</td>
+    <td>$${salary1.toLocaleString()}</td>
   `;
 
   tbody.appendChild(newRow);
-
   form.reset();
+
+  pushNotification('Success', 'Employee added successfully!', 'success');
 });
-
-const tfoot = document.querySelector('tfoot tr');
-
-tfoot.style.cursor = 'pointer';
