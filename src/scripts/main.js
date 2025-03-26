@@ -105,7 +105,7 @@ document
     if (nameValue.length < 4) {
       e.preventDefault();
       showNotification('error', 'name is too short');
-      ageValidation = false;
+      nameValidation = false;
     }
 
     const ageValue = document.getElementsByName('age')[0].value;
@@ -113,12 +113,13 @@ document
     if (ageValue < 18 || ageValue > 90) {
       e.preventDefault();
       showNotification('error', 'age is not valid');
-      nameValidation = false;
+      ageValidation = false;
     }
 
     if (ageValidation && nameValidation) {
       e.preventDefault();
       saveDataToTable();
+      showNotification('success', 'age is not valid');
     }
   });
 
