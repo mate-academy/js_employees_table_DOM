@@ -105,17 +105,19 @@ table.addEventListener('click', (ev) => {
       case 'Age':
         if (sortedAge) {
           rows.sort(function (a, b) {
-            return b.children[3].textContent.localeCompare(
-              a.children[3].textContent,
-            );
+            const ageA = Number(a.children[3].textContent);
+            const ageB = Number(b.children[3].textContent);
+
+            return ageB - ageA;
           });
         }
 
         if (!sortedAge) {
           rows.sort(function (a, b) {
-            return a.children[3].textContent.localeCompare(
-              b.children[3].textContent,
-            );
+            const ageA = Number(a.children[3].textContent);
+            const ageB = Number(b.children[3].textContent);
+
+            return ageA - ageB;
           });
         }
 
@@ -174,7 +176,7 @@ const salaryValue = document.getElementById('salaryInp');
 salaryValue.addEventListener('input', (ev) => {
   const value = ev.target.value;
 
-  return parseFloat(value);
+  parseFloat(value);
 });
 
 // send the form
@@ -267,6 +269,7 @@ button.addEventListener('click', (ev) => {
 
 tbody.addEventListener('dblclick', (ev) => {
   const targetCell = ev.target.closest('td');
+  const lastValue = targetCell.textContent;
 
   if (!targetCell) {
     return;
@@ -276,10 +279,11 @@ tbody.addEventListener('dblclick', (ev) => {
 
   newInput.classList.add('cell-input');
   newInput.value = targetCell.textContent;
+  targetCell.textContent = '';
+  targetCell.append(newInput);
+  // targetCell.replaceWith(newInput);
 
-  targetCell.replaceWith(newInput);
-
-  const newTD = document.createElement('td');
+  // const newTD = document.createElement('td');
 
   let isEnterPressed = false;
 
@@ -298,11 +302,11 @@ tbody.addEventListener('dblclick', (ev) => {
 
   function replaceInput() {
     if (newInput.value.length !== 0) {
-      newTD.textContent = newInput.value;
-      newInput.replaceWith(newTD);
+      targetCell.textContent = newInput.value;
+      newInput.remove();
     } else {
-      newTD.textContent = targetCell.textContent;
-      newInput.replaceWith(newTD);
+      targetCell.textContent = lastValue;
+      newInput.remove();
     }
   }
 });
