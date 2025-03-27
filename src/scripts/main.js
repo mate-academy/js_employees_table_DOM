@@ -119,7 +119,7 @@ document
     if (ageValidation && nameValidation) {
       e.preventDefault();
       saveDataToTable();
-      showNotification('success', 'age is not valid');
+      showNotification('success', 'Data is saved');
     }
   });
 
