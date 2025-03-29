@@ -1,3 +1,4 @@
+/* eslint-disable padding-line-between-statements */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-shadow */
 'use strict';
@@ -6,6 +7,26 @@ const head = document.querySelector('thead');
 const rowHead = head.querySelector('tr');
 const body = document.querySelector('tbody');
 const rowsBody = [...body.querySelectorAll('tr')];
+
+// const labelInput = document.createElement('input');
+// labelInput.classList.add('input');
+
+// const labelSelect = document.createElement('span');
+// labelSelect.classList.add('select');
+
+const formLabel = document.createElement('label');
+formLabel.classList.add('label');
+// formLabel.append(labelInput);
+// formLabel.append(labelSelect);
+
+const formButton = document.createElement('button');
+formButton.classList.add('button');
+
+const form = document.createElement('form');
+form.classList.add('new-employee-form');
+form.append(formLabel);
+form.append(formButton);
+document.querySelector('body').append(form);
 
 document.prevColumn = null;
 document.prevRow = null;
