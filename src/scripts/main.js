@@ -3,33 +3,72 @@
 /* eslint-disable no-shadow */
 'use strict';
 
+const table = document.querySelector('table');
 const head = document.querySelector('thead');
 const rowHead = head.querySelector('tr');
 const body = document.querySelector('tbody');
 const rowsBody = [...body.querySelectorAll('tr')];
 
-// const labelInput = document.createElement('input');
-// labelInput.classList.add('input');
+table.prevColumn = null;
+table.prevRow = null;
 
-// const labelSelect = document.createElement('span');
-// labelSelect.classList.add('select');
+function formCreating() {
+  const form = document.createElement('form');
+  form.classList.add('new-employee-form');
 
-const formLabel = document.createElement('label');
-formLabel.classList.add('label');
-// formLabel.append(labelInput);
-// formLabel.append(labelSelect);
+  const labels = ['Name', 'Position', 'Office', 'Age', 'Salary'];
 
-const formButton = document.createElement('button');
-formButton.classList.add('button');
+  for (const labelName of labels) {
+    const label = document.createElement('label');
+    label.classList.add('label');
+    label.innerText = `${labelName}: `;
 
-const form = document.createElement('form');
-form.classList.add('new-employee-form');
-form.append(formLabel);
-form.append(formButton);
-document.querySelector('body').append(form);
+    if (labelName === 'Office') {
+      const options = [
+        'Tokyo',
+        'Singapore',
+        'London',
+        'New York',
+        'Edinburgh',
+        'San Francisco',
+      ];
+      const select = document.createElement('select');
+      select.classList.add('select');
+      select.setAttribute('data-qa', `${labelName.toLocaleLowerCase()}`);
+      select.setAttribute('name', `${labelName.toLocaleLowerCase()}`);
+      select.setAttribute('required', true);
 
-document.prevColumn = null;
-document.prevRow = null;
+      for (const place of options) {
+        const option = document.createElement('option');
+        option.innerText = place;
+        option.setAttribute('value', place);
+        select.append(option);
+      }
+
+      label.append(select);
+    } else {
+      const input = document.createElement('input');
+      input.classList.add('input');
+      input.setAttribute('data-qa', `${labelName.toLocaleLowerCase()}`);
+      input.setAttribute('name', `${labelName.toLocaleLowerCase()}`);
+      input.setAttribute('required', true);
+      label.append(input);
+    }
+
+    form.append(label);
+  }
+
+  const formLabel = document.createElement('label');
+  formLabel.classList.add('label');
+
+  const formButton = document.createElement('button');
+  formButton.classList.add('button');
+  formButton.innerText = 'Save to table';
+
+  form.append(formLabel);
+  form.append(formButton);
+  document.querySelector('body').append(form);
+}
 
 function compare(element1, element2, regime, orderAscending) {
   if (orderAscending) {
@@ -60,11 +99,11 @@ function compare(element1, element2, regime, orderAscending) {
 }
 
 function prevCheck(prevElem, curentElem) {
-  if (document[prevElem] !== curentElem) {
-    if (document[prevElem] !== null) {
-      document[prevElem].removeAttribute('class');
+  if (table[prevElem] !== curentElem) {
+    if (table[prevElem] !== null) {
+      table[prevElem].removeAttribute('class');
     }
-    document[prevElem] = curentElem;
+    table[prevElem] = curentElem;
   }
 }
 
@@ -107,5 +146,6 @@ function rowSelect(event) {
   row.classList.add('active');
 }
 
+formCreating();
 rowHead.addEventListener('click', tableSort);
 body.addEventListener('click', rowSelect);
