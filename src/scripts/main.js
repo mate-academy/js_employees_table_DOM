@@ -14,6 +14,10 @@ headers.forEach((header, index) => {
 
     const order = sortOrder[index] ? 1 : -1;
 
+    rows.forEach((row, i) => {
+      row.dataset.index = i;
+    });
+
     rows.sort((rowA, rowB) => {
       const cellA = rowA.children[index].textContent.trim();
       const cellB = rowB.children[index].textContent.trim();
@@ -22,10 +26,13 @@ headers.forEach((header, index) => {
       const numB = parseFloat(cellB.replace(/[$,]/g, ''));
 
       if (!isNaN(numA) && !isNaN(numB)) {
-        return (numA - numB) * order;
+        return (numA - numB) * order || rowA.dataset.index - rowB.dataset.index;
       }
 
-      return cellA.localeCompare(cellB) * order;
+      return (
+        cellA.localeCompare(cellB) * order ||
+        rowA.dataset.index - rowB.dataset.index
+      );
     });
 
     tbody.innerHTML = '';
@@ -185,11 +192,13 @@ form.addEventListener('submit', function (e) {
 tbody.addEventListener('dblclick', function (ev) {
   const cell = ev.target;
 
-  if (cell.tagName !== 'TD' || cell.querySelector('input')) {
+  if (
+    cell.tagName !== 'TD' ||
+    (cell.children.length > 0 && cell.children[0].tagName === 'INPUT')
+  ) {
     return;
   }
 
-  // Закрити попереднє редагування (якщо є)
   const existingInput = document.querySelector('.cell-input');
 
   if (existingInput) {
