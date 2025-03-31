@@ -13,11 +13,28 @@ table.prevColumn = null;
 table.prevRow = null;
 
 const notification = document.createElement('div');
-const notificationTitle = document.createElement('span');
 notification.classList.add('notification');
+const notificationTitle = document.createElement('div');
+notificationTitle.classList.add('title');
+const notificationText = document.createElement('span');
 notification.append(notificationTitle);
+notification.append(notificationText);
 notification.style.display = 'none';
+notification.style.zIndex = '1';
+notification.style.transition = 'all 3s';
 document.querySelector('body').prepend(notification);
+
+function showNotification(type, text) {
+  notification.style.display = 'unset';
+  notificationTitle.innerText = type + '!';
+  notificationText.innerText = text;
+  notification.classList.add(type.toLocaleLowerCase());
+
+  setTimeout(() => {
+    notification.style.display = 'none';
+    notification.classList.remove(type.toLocaleLowerCase());
+  }, 3000);
+}
 
 function formCreating() {
   const form = document.createElement('form');
@@ -84,21 +101,28 @@ function formCreating() {
   form.append(formButton);
   document.querySelector('body').append(form);
 
+  function addNewEmployee(data) {
+    return;
+  }
+
   function formValidation(event) {
     event.preventDefault();
 
-    // const form = event.target;
-    // const formData = new FormData(form);
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
 
-    // console.log(Object.fromEntries(formData.entries()));
-
-    //   if (!(target instanceof HTMLButtonElement)) {
-    //     return;
-    //   }
-
-    //   switch (true) {
-    //     case
-    //   }
+    switch (true) {
+      case data.name.length < 4:
+        showNotification('Error', 'Антон даун!');
+        return;
+      case data.age < 18 || data.age > 90:
+        // eslint-disable-next-line max-len, prettier/prettier
+        showNotification('Error', 'Age must be more then 18 and less then 90!');
+        return;
+      default:
+        addNewEmployee(data);
+    }
   }
 
   form.addEventListener('submit', formValidation);
