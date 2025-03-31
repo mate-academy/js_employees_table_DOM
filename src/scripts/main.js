@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </select>
     </label>
     <label>Age: <input name="age" type="number" data-qa="age" /></label>
-    <label>Salary: <input name="salary" type="number" data-qa="salary" /></label>
+    <label>Salary: <input name="salary" type="text" data-qa="salary" /></label>
     <button type="button">Save to table</button>
   `;
   document.body.appendChild(formContainer);
@@ -104,9 +104,9 @@ document.addEventListener('DOMContentLoaded', () => {
       formContainer.querySelector('[data-qa="age"]').value,
       10,
     );
-    const salary = parseFloat(
-      formContainer.querySelector('[data-qa="salary"]').value,
-    );
+
+    const salaryRaw = formContainer.querySelector('[data-qa="salary"]').value;
+    const salary = parseFloat(salaryRaw.replace(/[$,]/g, ''));
 
     if (nameInput.length < 4) {
       showNotification('error', 'Name must be at least 4 characters');
@@ -163,8 +163,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const save = () => {
       const newValue = input.value.trim();
+      const columnIndex = cell.cellIndex;
+      const isSalaryColumn =
+        table.rows[0].cells[columnIndex].textContent === 'Salary';
 
-      cell.textContent = newValue === '' ? oldValue : newValue;
+      if (newValue === '') {
+        cell.textContent = oldValue;
+      } else {
+        if (isSalaryColumn) {
+          const numeric = parseFloat(newValue.replace(/[$,]/g, ''));
+
+          if (!isNaN(numeric)) {
+            cell.textContent = `$${numeric.toLocaleString('en-US')}`;
+          } else {
+            cell.textContent = oldValue;
+          }
+        } else {
+          cell.textContent = newValue;
+        }
+      }
     };
 
     input.addEventListener('blur', save);
