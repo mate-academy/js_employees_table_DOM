@@ -12,6 +12,13 @@ const rowsBody = [...body.querySelectorAll('tr')];
 table.prevColumn = null;
 table.prevRow = null;
 
+const notification = document.createElement('div');
+const notificationTitle = document.createElement('span');
+notification.classList.add('notification');
+notification.append(notificationTitle);
+notification.style.display = 'none';
+document.querySelector('body').prepend(notification);
+
 function formCreating() {
   const form = document.createElement('form');
   form.classList.add('new-employee-form');
@@ -52,6 +59,13 @@ function formCreating() {
       input.setAttribute('data-qa', `${labelName.toLocaleLowerCase()}`);
       input.setAttribute('name', `${labelName.toLocaleLowerCase()}`);
       input.setAttribute('required', true);
+      if (labelName === 'Age' || labelName === 'Salary') {
+        input.setAttribute('type', 'number');
+      } else if (labelName === 'Name') {
+        input.setAttribute('type', 'name');
+      } else {
+        input.setAttribute('type', 'text');
+      }
       label.append(input);
     }
 
@@ -63,11 +77,31 @@ function formCreating() {
 
   const formButton = document.createElement('button');
   formButton.classList.add('button');
+  formButton.setAttribute('type', 'submit');
   formButton.innerText = 'Save to table';
 
   form.append(formLabel);
   form.append(formButton);
   document.querySelector('body').append(form);
+
+  function formValidation(event) {
+    event.preventDefault();
+
+    // const form = event.target;
+    // const formData = new FormData(form);
+
+    // console.log(Object.fromEntries(formData.entries()));
+
+    //   if (!(target instanceof HTMLButtonElement)) {
+    //     return;
+    //   }
+
+    //   switch (true) {
+    //     case
+    //   }
+  }
+
+  form.addEventListener('submit', formValidation);
 }
 
 function compare(element1, element2, regime, orderAscending) {
