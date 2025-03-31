@@ -3,7 +3,7 @@
 'use strict';
 
 // #region constants
-const NOTIFICATION_TIMEOUT_SECONDS = 10;
+const NOTIFICATION_TIMEOUT = 3000;
 const NOTIFICATION_POSITION_X = 10;
 const NOTIFICATION_POSITION_Y = 10;
 const EMPLOYEE_MIN_AGE = 18;
@@ -37,7 +37,6 @@ let selectedRow = null;
 const table = document.querySelector('table');
 const tableHeadings = table.querySelectorAll('thead th');
 const tableBody = table.querySelector('tbody');
-const dataRows = tableBody.querySelectorAll('tr');
 
 addForm();
 
@@ -138,7 +137,6 @@ function addForm() {
     {
       name: 'name',
       type: 'text',
-      required: true,
     },
   );
   const positionField = createFormInput(
@@ -148,7 +146,6 @@ function addForm() {
     {
       name: 'position',
       type: 'text',
-      required: true,
     },
   );
   const ageField = createFormInput(
@@ -158,7 +155,6 @@ function addForm() {
     {
       name: 'age',
       type: 'number',
-      required: true,
     },
   );
   const salaryField = createFormInput(
@@ -168,14 +164,12 @@ function addForm() {
     {
       name: 'salary',
       type: 'number',
-      required: true,
     },
   );
   const officeField = createSelectInput(
     { textContent: 'Office: ' },
     {
       name: 'office',
-      required: true,
     },
   );
   const submitButton = createHtmlElement('button', {
@@ -199,10 +193,18 @@ function addForm() {
 function handleFormSubmit(ev) {
   ev.preventDefault();
 
-  const employee = sanitizeFields(new FormData(ev.target));
+  const formData = new FormData(ev.target);
+
+  const employee = {
+    name: formData.get('name')?.trim(),
+    position: formData.get('position').trim(),
+    office: formData.get('office').trim(),
+    age: formData.get('age').trim(),
+    salary: formData.get('salary').trim(),
+  };
 
   if (Object.values(employee).some((field) => !field)) {
-    pushNotification('Error!', 'There are unfilled fields!');
+    pushNotification('Error!', 'All fields are required');
 
     return;
   }
@@ -243,12 +245,6 @@ function handleFormSubmit(ev) {
   pushNotification('Success!', 'Employee added successfully!', 'success');
 
   ev.target.reset();
-}
-
-function sanitizeFields(formData) {
-  return Object.fromEntries(
-    [...formData.entries()].map(([key, value]) => [key, value.trim()]),
-  );
 }
 
 function createHtmlElement(tag, props) {
@@ -320,7 +316,7 @@ function pushNotification(title, description, type = 'error') {
 
   setTimeout(() => {
     notificationBlock.style.display = 'none';
-  }, NOTIFICATION_TIMEOUT_SECONDS * 1000);
+  }, NOTIFICATION_TIMEOUT);
 }
 
 // #region utility
