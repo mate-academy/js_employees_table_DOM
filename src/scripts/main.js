@@ -1,12 +1,38 @@
 'use strict';
 
-const body = document.querySelector('body');
 const headers = document.querySelectorAll('thead tr');
 const rows = document.querySelectorAll('tbody tr');
-const rowsArray = Array.from(rows);
+let rowsArray = Array.from(rows);
 let currentSortColumn = -1;
 let ascending = true;
 let currentRow = -1;
+
+const tbody = document.querySelector('tbody');
+
+tbody.addEventListener('click', (e) => {
+  const row = e.target.closest('tr');
+
+  if (!row) {
+    return;
+  }
+
+  const index = Array.from(tbody.querySelectorAll('tr')).indexOf(row);
+
+  if (index === -1) {
+    return;
+  }
+
+  if (currentRow >= 0) {
+    rowsArray[currentRow].classList.remove('active');
+  }
+
+  if (currentRow === index) {
+    currentRow = -1;
+  } else {
+    row.classList.add('active');
+    currentRow = index;
+  }
+});
 
 function addEmployeeForm() {
   const form = document.createElement('form');
@@ -101,20 +127,44 @@ function addEmployeeForm() {
   submitButton.textContent = 'Save to table';
   form.appendChild(submitButton);
 
-  form.addEventListener('submit', function (event) {
-    event.preventDefault();
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
 
-    const name = nameInput.value;
+    const employeeName = nameInput.value;
     const position = positionInput.value;
     const office = officeSelect.value;
     const age = parseInt(ageInput.value, 10);
     const salary = parseInt(salaryInput.value, 10);
 
-    const formattedSalary = '$' + salary.toLocaleString();
+    if (employeeName.length < 4) {
+      pushNotification(
+        10,
+        10,
+        'Invalid Name',
+        'Name must be at least 4 characters long.',
+        'error',
+      );
+
+      return;
+    }
+
+    if (age < 18 || age > 90) {
+      pushNotification(
+        10,
+        10,
+        'Invalid Age',
+        'Age must be between 18 and 90 years.',
+        'error',
+      );
+
+      return;
+    }
+
+    const formattedSalary = '$' + salary.toLocaleString('en-US');
 
     const newRow = document.createElement('tr');
 
-    const cells = [name, position, office, age, formattedSalary];
+    const cells = [employeeName, position, office, age, formattedSalary];
 
     cells.forEach((cellText) => {
       const cell = document.createElement('td');
@@ -123,16 +173,16 @@ function addEmployeeForm() {
       newRow.appendChild(cell);
     });
 
-    const tbody = document.querySelector('tbody');
-
     tbody.appendChild(newRow);
-
-    const newIndex = rowsArray.length;
 
     rowsArray.push(newRow);
 
-    newRow.addEventListener('click', (event) =>
-      clickHandlerRow(event, newIndex),
+    pushNotification(
+      10,
+      10,
+      'Employee Added Successfully',
+      'The new employee has been added to the table.',
+      'success',
     );
     form.reset();
   });
@@ -145,27 +195,8 @@ for (const header of headers) {
   header.addEventListener('click', clickHandlerHeader);
 }
 
-rowsArray.forEach((row, index) => {
-  row.addEventListener('click', (event) => clickHandlerRow(event, index));
-});
-
-function clickHandlerRow(event, index) {
-  const rowIndex = index;
-
-  if (currentRow >= 0) {
-    rowsArray[currentRow].classList.remove('active');
-  }
-
-  if (currentRow === rowIndex) {
-    currentRow = -1;
-  } else {
-    rowsArray[rowIndex].classList.add('active');
-    currentRow = rowIndex;
-  }
-}
-
-function clickHandlerHeader(event) {
-  const columnIndex = event.target.cellIndex;
+function clickHandlerHeader(e) {
+  const columnIndex = e.target.cellIndex;
 
   if (currentSortColumn === columnIndex) {
     ascending = !ascending;
@@ -177,7 +208,17 @@ function clickHandlerHeader(event) {
   sortTable(columnIndex, ascending);
 }
 
-function sortTable(columnIndex, ascending) {
+function sortTable(columnIndex, sortOrder) {
+  let selectedRowContent = null;
+
+  if (currentRow >= 0 && currentRow < rowsArray.length) {
+    const selectedRow = rowsArray[currentRow];
+
+    selectedRowContent = Array.from(selectedRow.cells).map(
+      (cell) => cell.textContent,
+    );
+  }
+
   rowsArray.sort((rowA, rowB) => {
     const cellA = rowA.cells[columnIndex];
     const cellB = rowB.cells[columnIndex];
@@ -187,7 +228,6 @@ function sortTable(columnIndex, ascending) {
 
     const numA = Number(textA.replace(/[$,]/g, ''));
     const numB = Number(textB.replace(/[$,]/g, ''));
-    // console.log(numA, numB);
 
     const isNumA = !isNaN(numA);
     const isNumB = !isNaN(numB);
@@ -200,12 +240,74 @@ function sortTable(columnIndex, ascending) {
       result = textA.localeCompare(textB);
     }
 
-    return ascending ? result : -result;
+    return sortOrder ? result : -result;
   });
 
-  rowsArray.forEach((row, index) => {
-    row.parentNode.appendChild(row);
-    row.removeEventListener('click', (event) => clickHandlerRow(event, index));
-    row.addEventListener('click', (event) => clickHandlerRow(event, index));
+  tbody.innerHTML = '';
+
+  const fragment = document.createDocumentFragment();
+
+  const newRows = rowsArray.map((row) => {
+    const clone = row.cloneNode(true);
+
+    clone.classList.remove('active');
+
+    return clone;
   });
+
+  newRows.forEach((clonedRow) => {
+    fragment.appendChild(clonedRow);
+  });
+
+  tbody.appendChild(fragment);
+
+  rowsArray = Array.from(document.querySelectorAll('tbody tr'));
+
+  if (selectedRowContent) {
+    let newSelectedRowIndex = -1;
+
+    rowsArray.forEach((row, index) => {
+      const rowContent = Array.from(row.cells).map((cell) => cell.textContent);
+      const contentMatches = selectedRowContent.every(
+        (content, i) => content === rowContent[i],
+      );
+
+      if (contentMatches) {
+        newSelectedRowIndex = index;
+      }
+    });
+
+    if (newSelectedRowIndex !== -1) {
+      rowsArray[newSelectedRowIndex].classList.add('active');
+      currentRow = newSelectedRowIndex;
+    }
+  }
 }
+
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const body = document.querySelector('body');
+  const element = document.createElement('div');
+
+  element.classList.add('notification');
+  element.classList.add(type);
+  element.setAttribute('data-qa', 'notification');
+  element.style.top = posTop + 'px';
+  element.style.right = posRight + 'px';
+
+  const titleText = document.createElement('h2');
+  const descriptionText = document.createElement('p');
+
+  titleText.classList.add('title');
+  titleText.textContent = title;
+  descriptionText.textContent = description;
+  element.append(titleText);
+  element.append(descriptionText);
+
+  body.append(element);
+
+  setTimeout(() => {
+    if (element) {
+      element.remove();
+    }
+  }, 2000);
+};
