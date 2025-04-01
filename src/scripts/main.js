@@ -24,6 +24,7 @@ notificationError.append(notificationErrorTitle);
 notificationError.append(notificationErrorText);
 notificationError.style.display = 'none';
 notificationError.setAttribute('data-qa', 'notification');
+let timeIdError = null;
 document.querySelector('body').prepend(notificationError);
 
 // notificationSuccess
@@ -37,26 +38,33 @@ notificationSuccess.append(notificationSuccessTitle);
 notificationSuccess.append(notificationSuccessText);
 notificationSuccess.style.display = 'none';
 notificationSuccess.setAttribute('data-qa', 'notification');
+let timeIdSuccess = null;
 document.querySelector('body').prepend(notificationSuccess);
 
 function showNotificationError(type, text) {
+  if (timeIdError !== null) {
+    clearTimeout(timeIdError);
+  }
   notificationSuccess.style.display = 'none';
   notificationError.style.display = 'unset';
   notificationErrorTitle.innerText = type + '!';
   notificationErrorText.innerText = text;
 
-  setTimeout(() => {
+  timeIdError = setTimeout(() => {
     notificationError.style.display = 'none';
   }, 2000);
 }
 
 function showNotificationSuccess(type, text) {
+  if (timeIdSuccess !== null) {
+    clearTimeout(timeIdSuccess);
+  }
   notificationError.style.display = 'none';
   notificationSuccess.style.display = 'unset';
   notificationSuccessTitle.innerText = type + '!';
   notificationSuccessText.innerText = text;
 
-  setTimeout(() => {
+  timeIdSuccess = setTimeout(() => {
     notificationSuccess.style.display = 'none';
   }, 2000);
 }
