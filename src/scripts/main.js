@@ -13,30 +13,52 @@ let rowsBody = [...tbody.querySelectorAll('tr')];
 table.prevColumn = null;
 table.prevRow = null;
 
-const notification = document.createElement('div');
-notification.classList.add('notification');
-const notificationTitle = document.createElement('div');
-notificationTitle.classList.add('title');
-const notificationText = document.createElement('span');
-notification.append(notificationTitle);
-notification.append(notificationText);
-notification.style.scale = '0';
-notification.style.zIndex = '1';
-notification.style.transition = 'scale 0.25s';
-document.querySelector('body').prepend(notification);
+// notificationError
+const notificationError = document.createElement('div');
+notificationError.classList.add('notification');
+notificationError.classList.add('error');
+const notificationErrorTitle = document.createElement('div');
+notificationErrorTitle.classList.add('title');
+const notificationErrorText = document.createElement('span');
+notificationError.append(notificationErrorTitle);
+notificationError.append(notificationErrorText);
+notificationError.style.display = 'none';
+notificationError.setAttribute('data-qa', 'notification');
+document.querySelector('body').prepend(notificationError);
 
-function showNotification(type, text) {
-  if (!notification.classList.contains(type.toLocaleLowerCase())) {
-    notification.classList = '';
-    notification.classList.add('notification', type.toLocaleLowerCase());
-  }
-  notification.style.scale = '1';
-  notificationTitle.innerText = type + '!';
-  notificationText.innerText = text;
+// notificationSuccess
+const notificationSuccess = document.createElement('div');
+notificationSuccess.classList.add('notification');
+notificationSuccess.classList.add('success');
+const notificationSuccessTitle = document.createElement('div');
+notificationSuccessTitle.classList.add('title');
+const notificationSuccessText = document.createElement('span');
+notificationSuccess.append(notificationSuccessTitle);
+notificationSuccess.append(notificationSuccessText);
+notificationSuccess.style.display = 'none';
+notificationSuccess.setAttribute('data-qa', 'notification');
+document.querySelector('body').prepend(notificationSuccess);
+
+function showNotificationError(type, text) {
+  notificationSuccess.style.display = 'none';
+  notificationError.style.display = 'unset';
+  notificationErrorTitle.innerText = type + '!';
+  notificationErrorText.innerText = text;
 
   setTimeout(() => {
-    notification.style.scale = '0';
-  }, 3000);
+    notificationError.style.display = 'none';
+  }, 2000);
+}
+
+function showNotificationSuccess(type, text) {
+  notificationError.style.display = 'none';
+  notificationSuccess.style.display = 'unset';
+  notificationSuccessTitle.innerText = type + '!';
+  notificationSuccessText.innerText = text;
+
+  setTimeout(() => {
+    notificationSuccess.style.display = 'none';
+  }, 2000);
 }
 
 function formCreating() {
@@ -82,8 +104,6 @@ function formCreating() {
       input.setAttribute('required', true);
       if (labelName === 'Age' || labelName === 'Salary') {
         input.setAttribute('type', 'number');
-      } else if (labelName === 'Name') {
-        input.setAttribute('type', 'name');
       } else {
         input.setAttribute('type', 'text');
       }
@@ -136,16 +156,19 @@ function formCreating() {
     switch (true) {
       case data.name.length < 4:
         form.querySelector('#name').focus();
-        showNotification('Error', 'Name must have more than 3 letters!');
+        showNotificationError('Error', 'Name must have more than 3 letters!');
         return;
       case data.age < 18 || data.age > 90:
         // eslint-disable-next-line max-len, prettier/prettier
         form.querySelector('#age').focus();
-        showNotification('Error', 'Age must be more then 18 and less than 90!');
+        showNotificationError(
+          'Error',
+          'Age must be more then 18 and less than 90!',
+        );
         return;
       default:
         addNewEmployee(data);
-        showNotification('Success', 'New employee added successfully!');
+        showNotificationSuccess('Success', 'New employee added successfully!');
     }
   }
 
