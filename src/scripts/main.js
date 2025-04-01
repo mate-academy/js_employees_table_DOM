@@ -1,14 +1,22 @@
+'use strict';
+
 document.addEventListener('DOMContentLoaded', () => {
   const table = document.querySelector('table tbody');
   const headers = document.querySelectorAll('thead th');
-  const sortOrder = {};
+  let currentSortIndex = null;
+  let sortOrder = true;
 
   headers.forEach((header, index) => {
-    header.addEventListener('click', (headerEvent) => {
+    header.addEventListener('click', () => {
       const rows = Array.from(table.rows);
       const isNumber = index === 3 || index === 4;
 
-      sortOrder[index] = !sortOrder[index];
+      if (currentSortIndex !== index) {
+        sortOrder = true;
+        currentSortIndex = index;
+      } else {
+        sortOrder = !sortOrder;
+      }
 
       rows.sort((rowA, rowB) => {
         let cellA = rowA.cells[index].textContent.trim();
@@ -19,25 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
           cellB = parseFloat(cellB.replace(/[^0-9.-]+/g, '')) || 0;
         }
 
-        if (sortOrder[index]) {
-          if (cellA > cellB) {
-            return 1;
-          }
-
-          if (cellA < cellB) {
-            return -1;
-          }
-        } else {
-          if (cellA < cellB) {
-            return 1;
-          }
-
-          if (cellA > cellB) {
-            return -1;
-          }
-        }
-
-        return 0;
+        return sortOrder ? cellA - cellB : cellB - cellA;
       });
 
       table.append(...rows);
@@ -58,9 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
   form.className = 'new-employee-form';
 
   form.innerHTML = `
-    <label>Name: <input name='name' type='text' data-qa='name' required></label>
-    <label>Position: <input name='position' type='text' data-qa='position' required></label>
-    <label>Office: <select name='office' data-qa='office' required>
+    <label>Name: <input name='name' type='text' required></label>
+    <label>Position: <input name='position' type='text' required></label>
+    <label>Office: <select name='office' required>
       <option>Tokyo</option>
       <option>Singapore</option>
       <option>London</option>
@@ -68,8 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
       <option>Edinburgh</option>
       <option>San Francisco</option>
     </select></label>
-    <label>Age: <input name='age' type='number' data-qa='age' required></label>
-    <label>Salary: <input name='salary' type='number' data-qa='salary' required></label>
+    <label>Age: <input name='age' type='number' required></label>
+    <label>Salary: <input name='salary' type='number' required></label>
     <button type='submit'>Save to table</button>
   `;
   document.body.appendChild(form);
@@ -81,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const position = form.position.value.trim();
     const office = form.office.value;
     const age = parseInt(form.age.value, 10);
-    const salary = parseFloat(form.salary.value).toFixed(2);
+    const salary = parseFloat(form.salary.value);
 
     if (employeeName.length < 4) {
       return showNotification('Name must be at least 4 characters', 'error');
@@ -98,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <td>${position}</td>
       <td>${office}</td>
       <td>${age}</td>
-      <td>$${salary}</td>
+      <td>$${salary.toFixed(2)}</td>
     `;
     table.appendChild(row);
     form.reset();
@@ -109,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const notification = document.createElement('div');
 
     notification.className = `notification ${type}`;
-    notification.setAttribute('data-qa', 'notification');
     notification.textContent = message;
     document.body.appendChild(notification);
     setTimeout(() => notification.remove(), 3000);
