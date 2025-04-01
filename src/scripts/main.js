@@ -22,18 +22,20 @@ notification.append(notificationTitle);
 notification.append(notificationText);
 notification.style.scale = '0';
 notification.style.zIndex = '1';
-notification.style.transition = 'all 0.25s';
+notification.style.transition = 'scale 0.25s';
 document.querySelector('body').prepend(notification);
 
 function showNotification(type, text) {
+  if (!notification.classList.contains(type.toLocaleLowerCase())) {
+    notification.classList = '';
+    notification.classList.add('notification', type.toLocaleLowerCase());
+  }
   notification.style.scale = '1';
   notificationTitle.innerText = type + '!';
   notificationText.innerText = text;
-  notification.classList.add(type.toLocaleLowerCase());
 
   setTimeout(() => {
     notification.style.scale = '0';
-    notification.classList.remove(type.toLocaleLowerCase());
   }, 3000);
 }
 
