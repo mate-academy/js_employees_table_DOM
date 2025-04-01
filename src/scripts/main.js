@@ -4,10 +4,11 @@
 'use strict';
 
 const table = document.querySelector('table');
-const head = document.querySelector('thead');
-const rowHead = head.querySelector('tr');
-const body = document.querySelector('tbody');
-const rowsBody = [...body.querySelectorAll('tr')];
+const thead = document.querySelector('thead');
+const rowHead = thead.querySelector('tr');
+const cellsHead = [...rowHead.children];
+const tbody = document.querySelector('tbody');
+let rowsBody = [...tbody.querySelectorAll('tr')];
 
 table.prevColumn = null;
 table.prevRow = null;
@@ -19,19 +20,19 @@ notificationTitle.classList.add('title');
 const notificationText = document.createElement('span');
 notification.append(notificationTitle);
 notification.append(notificationText);
-notification.style.display = 'none';
+notification.style.scale = '0';
 notification.style.zIndex = '1';
-notification.style.transition = 'all 3s';
+notification.style.transition = 'all 0.25s';
 document.querySelector('body').prepend(notification);
 
 function showNotification(type, text) {
-  notification.style.display = 'unset';
+  notification.style.scale = '1';
   notificationTitle.innerText = type + '!';
   notificationText.innerText = text;
   notification.classList.add(type.toLocaleLowerCase());
 
   setTimeout(() => {
-    notification.style.display = 'none';
+    notification.style.scale = '0';
     notification.classList.remove(type.toLocaleLowerCase());
   }, 3000);
 }
@@ -75,6 +76,7 @@ function formCreating() {
       input.classList.add('input');
       input.setAttribute('data-qa', `${labelName.toLocaleLowerCase()}`);
       input.setAttribute('name', `${labelName.toLocaleLowerCase()}`);
+      input.setAttribute('id', `${labelName.toLocaleLowerCase()}`);
       input.setAttribute('required', true);
       if (labelName === 'Age' || labelName === 'Salary') {
         input.setAttribute('type', 'number');
@@ -102,7 +104,24 @@ function formCreating() {
   document.querySelector('body').append(form);
 
   function addNewEmployee(data) {
-    return;
+    const newRow = document.createElement('tr');
+
+    function convertNumToSalary(number) {
+      return '$' + new Intl.NumberFormat('en').format(number);
+    }
+
+    for (const head of cellsHead) {
+      const newTd = document.createElement('td');
+      const newText = data[head.innerText.toLocaleLowerCase()];
+      if (head.innerText === 'Salary') {
+        newTd.innerText = convertNumToSalary(newText);
+      } else {
+        newTd.innerText = newText;
+      }
+      newRow.append(newTd);
+    }
+
+    tbody.append(newRow);
   }
 
   function formValidation(event) {
@@ -114,14 +133,17 @@ function formCreating() {
 
     switch (true) {
       case data.name.length < 4:
-        showNotification('Error', 'Антон даун!');
+        form.querySelector('#name').focus();
+        showNotification('Error', 'Name must have more than 3 letters!');
         return;
       case data.age < 18 || data.age > 90:
         // eslint-disable-next-line max-len, prettier/prettier
-        showNotification('Error', 'Age must be more then 18 and less then 90!');
+        form.querySelector('#age').focus();
+        showNotification('Error', 'Age must be more then 18 and less than 90!');
         return;
       default:
         addNewEmployee(data);
+        showNotification('Success', 'New employee added successfully!');
     }
   }
 
@@ -174,6 +196,7 @@ function tableSort(event) {
 
   prevCheck('prevColumn', target);
 
+  rowsBody = [...tbody.querySelectorAll('tr')];
   const index = target.cellIndex;
 
   const orderAscending = !target.classList.toggle(
@@ -189,7 +212,7 @@ function tableSort(event) {
     return compare(firstValue, secondValue, regime, orderAscending);
   });
 
-  rowsBody.forEach((row) => body.append(row));
+  rowsBody.forEach((row) => tbody.append(row));
 }
 
 function rowSelect(event) {
@@ -206,4 +229,4 @@ function rowSelect(event) {
 
 formCreating();
 rowHead.addEventListener('click', tableSort);
-body.addEventListener('click', rowSelect);
+tbody.addEventListener('click', rowSelect);
