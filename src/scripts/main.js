@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (!position || isNaN(salary)) {
+    if (!position || salaryRow === '' || isNaN(salary)) {
       showNotification('error', 'All fields are required');
 
       return;
