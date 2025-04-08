@@ -210,7 +210,7 @@ form.addEventListener('submit', (e) => {
   const newSalary = document.createElement('td');
 
   function formatSalary(value) {
-    return '$' + Number(salary).toLocaleString();
+    return '$' + Number(value).toLocaleString();
   }
 
   newName.textContent = nameEmployee;
