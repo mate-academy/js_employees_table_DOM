@@ -167,7 +167,7 @@ form.addEventListener('submit', (e) => {
   const position = positionInput.value;
   const office = officeSelect.value;
   const age = Number(ageInput.value);
-  const salary = salaryInput.value;
+  const salary = Number(salaryInput.value);
   let message = '';
 
   if (nameEmployee.length < 4) {
@@ -209,11 +209,15 @@ form.addEventListener('submit', (e) => {
   const newAge = document.createElement('td');
   const newSalary = document.createElement('td');
 
+  function formatSalary(value) {
+    return '$' + Number(salary).toLocaleString();
+  }
+
   newName.textContent = nameEmployee;
   newPosition.textContent = position;
   newOffice.textContent = office;
   newAge.textContent = age;
-  newSalary.textContent = '$' + Number(salary).toLocaleString();
+  newSalary.textContent = formatSalary(salary);
 
   newEmployee.appendChild(newName);
   newEmployee.appendChild(newPosition);
