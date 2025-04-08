@@ -176,6 +176,16 @@ function validateForm(data) {
   for (const element of formContent) {
     const elementName = element.name.toLowerCase();
 
+    if (data[elementName].length === 0) {
+      pushNotification(
+        `Incorrect value in ${elementName}`,
+        `Field is required`,
+        'error',
+      );
+
+      return false;
+    }
+
     if ('min' in element && element.type === 'text') {
       if (data[elementName].length < element.min) {
         pushNotification(
@@ -208,16 +218,6 @@ function validateForm(data) {
 
         return false;
       }
-    }
-
-    if (data[elementName].length === 0) {
-      pushNotification(
-        `Incorrect value in ${elementName}`,
-        `Field is required`,
-        'error',
-      );
-
-      return false;
     }
   }
 
