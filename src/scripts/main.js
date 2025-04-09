@@ -2,6 +2,7 @@
 
 const tableElement = document.querySelector('table');
 const theadElement = document.querySelector('thead');
+const tbodyElement = document.querySelector('tbody');
 
 function determineSortOrder(element) {
   const sortedColumnIndex = element.target.cellIndex;
@@ -21,8 +22,6 @@ function determineSortOrder(element) {
 }
 
 function sortTable() {
-  const tbodyElement = document.querySelector('tbody');
-
   const sortedList = Object.values(tbodyElement.rows).sort(
     (firstEl, secondEl) => {
       const firstValue = cellValueFromRow(firstEl);
@@ -44,6 +43,16 @@ function sortTable() {
   }
 }
 
+function selectRow(element) {
+  const previousSelectedElement = document.querySelector('.active');
+
+  if (previousSelectedElement) {
+    previousSelectedElement.classList.remove('active');
+  }
+
+  element.target.parentElement.classList.add('active');
+}
+
 const sortByAsc = () => tableElement.dataset.sortOrder !== 'desc';
 const sortByRowIndex = () => parseInt(tableElement.dataset.sortIndex) || 0;
 
@@ -52,3 +61,5 @@ const cellValueFromRow = (row) => row.cells[sortByRowIndex()].textContent;
 theadElement.addEventListener('click', (element) => {
   determineSortOrder(element);
 });
+
+tbodyElement.addEventListener('click', (element) => selectRow(element));
