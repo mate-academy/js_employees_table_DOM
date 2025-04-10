@@ -130,6 +130,7 @@ form.innerHTML = `
 `;
 
 document.body.append(form);
+form.setAttribute('novalidate', true);
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -152,6 +153,36 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
+  if (!person) {
+    notify('Error!', 'Name cannot be empty.', 'error');
+
+    return;
+  }
+
+  if (!position) {
+    notify('Error!', 'Position cannot be empty.', 'error');
+
+    return;
+  }
+
+  if (!office) {
+    notify('Error!', 'Office location cannot be empty.', 'error');
+
+    return;
+  }
+
+  if (age === undefined || isNaN(age) || age < 18 || age > 90) {
+    notify('Error!', 'Age must be between 18 and 90.', 'error');
+
+    return;
+  }
+
+  if (isNaN(salary) || salary <= 0) {
+    notify('Error!', 'Salary must be a positive number.', 'error');
+
+    return;
+  }
+
   const newRow = document.createElement('tr');
 
   newRow.innerHTML = `
@@ -159,7 +190,7 @@ form.addEventListener('submit', (e) => {
     <td>${position}</td>
     <td>${office}</td>
     <td>${age}</td>
-    <td>${salary.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+    <td>${salary.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}</td>
   `;
   tableBody.appendChild(newRow);
 
