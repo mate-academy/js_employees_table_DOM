@@ -147,13 +147,7 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  if (!office) {
-    notify('Error!', 'Office location cannot be empty.', 'error');
-
-    return;
-  }
-
-  if (age === undefined || isNaN(age) || age < 18 || age > 90) {
+  if (isNaN(age) || age < 18 || age > 90) {
     notify('Error!', 'Age must be between 18 and 90.', 'error');
 
     return;
