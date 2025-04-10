@@ -50,7 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const position = formData.get('position').trim();
     const office = formData.get('office');
     const age = parseInt(formData.get('age'), 10);
+    const salaryRaw = formData.get('salary');
     const salary = parseFloat(formData.get('salary'));
+
+    if (!employeeName || !position || !office || !salaryRaw || isNaN(age)) {
+      showNotification('Error: All fields are required.', 'error');
+
+      return;
+    }
 
     if (employeeName.length < 4) {
       showNotification(
@@ -63,6 +70,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (age < 18 || age > 90) {
       showNotification('Error: Age must be between 18 and 90.', 'error');
+
+      return;
+    }
+
+    if (isNaN(salary) || salary <= 0) {
+      showNotification(
+        'Error: Salary must be a valid number greater than 0.',
+        'error',
+      );
 
       return;
     }
