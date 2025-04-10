@@ -1,8 +1,18 @@
 'use strict';
 
 const FORM_FIELDS_PROPERTY = [
-  { type: 'text', name: 'Name', decorate: decorateString },
-  { type: 'text', name: 'Position', decorate: decorateString },
+  {
+    type: 'text',
+    name: 'Name',
+    decorate: decorateString,
+    validation: (value) => value.length >= 4,
+  },
+  {
+    type: 'text',
+    name: 'Position',
+    decorate: (value) => value,
+    validation: valuePresent,
+  },
   {
     type: 'select',
     name: 'Office',
@@ -16,9 +26,25 @@ const FORM_FIELDS_PROPERTY = [
     ],
     decorate: decorateString,
   },
-  { type: 'number', name: 'Age', decorate: decorateNumber },
-  { type: 'number', name: 'Salary', decorate: decorateSalary },
+  {
+    type: 'number',
+    name: 'Age',
+    decorate: decorateNumber,
+    validation: (value) => {
+      const parsedValue = parseInt(value);
+
+      return parsedValue >= 18 && parsedValue <= 90;
+    },
+  },
+  {
+    type: 'number',
+    name: 'Salary',
+    decorate: decorateSalary,
+    validation: valuePresent,
+  },
 ];
+const SUCCESS_NOTIFICATION = 'success';
+const ERROR_NOTIFICATION = 'error';
 
 const tableElement = document.querySelector('table');
 const theadElement = document.querySelector('thead');
@@ -119,7 +145,6 @@ function buildFormInputs(form) {
 
       input.name = field.name.toLowerCase();
       input.type = field.type;
-      input.required = true;
 
       input.dataset.qa = field.name.toLowerCase();
 
@@ -141,20 +166,54 @@ const addNewElement = (form) => {
   form.preventDefault();
 
   for (const input of FORM_FIELDS_PROPERTY) {
-    const inputElement = document.querySelector(
-      `[name="${input.name.toLowerCase()}"]`,
-    );
-    const tdElement = document.createElement('td');
+    const { cellElement, valid } = createElementFromInput(input);
 
-    tdElement.textContent = input.decorate(inputElement.value);
+    if (valid !== undefined && !valid) {
+      sendNotification(ERROR_NOTIFICATION);
 
-    trElement.append(tdElement);
+      return;
+    }
+
+    trElement.append(cellElement);
   }
 
   tbodyElement.append(trElement);
 
   sortTable();
+
+  sendNotification(SUCCESS_NOTIFICATION);
 };
+
+function sendNotification(type) {
+  const notificationElement = document.createElement('div');
+
+  notificationElement.classList.add('notification');
+  notificationElement.dataset.qa = 'notification';
+
+  if (type === SUCCESS_NOTIFICATION) {
+    notificationElement.textContent = 'Item added!';
+    notificationElement.classList.add(type);
+  } else {
+    notificationElement.textContent = 'Validation failed';
+    notificationElement.classList.add(type);
+  }
+
+  tableElement.after(notificationElement);
+
+  setTimeout(() => notificationElement.remove(), 2000);
+}
+
+function createElementFromInput(input) {
+  const inputElement = document.querySelector(
+    `[name="${input.name.toLowerCase()}"]`,
+  );
+  const tdElement = document.createElement('td');
+  const isValid = input.validation?.(inputElement.value);
+
+  tdElement.textContent = input.decorate(inputElement.value);
+
+  return { cellElement: tdElement, valid: isValid };
+}
 
 function decorateString(value) {
   const decoratedResult = [];
@@ -180,6 +239,10 @@ function decorateSalary(value) {
   }
 
   return `$${decoratedValue.join('')}`;
+}
+
+function valuePresent(value) {
+  return value.length > 0;
 }
 
 theadElement.addEventListener('click', (element) => {
