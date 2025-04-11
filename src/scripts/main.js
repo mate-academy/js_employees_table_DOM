@@ -198,6 +198,8 @@ function createForm() {
 
     if (!office) {
       notificationDisplay('office is empty', 'error');
+
+      return;
     }
 
     const age = parseInt(form.querySelector('[name="age"]').value, 10);
@@ -210,7 +212,7 @@ function createForm() {
       return;
     }
 
-    if (+age < 18 || +age > 90) {
+    if (age < 18 || age > 90) {
       notificationDisplay('Error! Age must be between 18 and 90', 'error');
 
       return;
