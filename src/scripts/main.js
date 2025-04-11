@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSortColumn = -1;
   let sortAscending = true;
 
+  // SORTING
   headers.forEach((header, index) => {
     header.addEventListener('click', () => {
       if (currentSortColumn === index) {
@@ -35,7 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      rows.forEach((row) => tbody.appendChild(row));
+      rows.forEach((row) => {
+        tbody.appendChild(row);
+      });
     });
   });
 
@@ -46,7 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    tbody.querySelectorAll('tr').forEach((r) => r.classList.remove('active'));
+    tbody.querySelectorAll('tr').forEach((r) => {
+      r.classList.remove('active');
+    });
+
     row.classList.add('active');
   });
 
@@ -71,29 +77,35 @@ document.addEventListener('DOMContentLoaded', () => {
       <button type='submit'>Save to table</button>
     </form>
   `;
+
   document.body.appendChild(formContainer);
 
+  // NOTIFICATION FUNCTION
   const showNotification = (message, isError = false) => {
     const notification = document.createElement('div');
 
     notification.setAttribute('data-qa', 'notification');
     notification.className = isError ? 'error' : 'success';
     notification.innerText = message;
+
     document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
   };
 
   formContainer.querySelector('form').addEventListener('submit', (e) => {
     e.preventDefault();
 
     const form = e.target;
-    const naming = form.naming.value.trim();
+    const employeeName = form.name.value.trim();
     const position = form.position.value.trim();
     const office = form.office.value;
     const age = Number(form.age.value);
     const salary = Number(form.salary.value);
 
-    if (naming.length < 4) {
+    if (employeeName.length < 4) {
       showNotification('Name must be at least 4 characters', true);
 
       return;
@@ -106,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (!position || !office || isNaN(salary)) {
-      showNotification('Please fill out all fields', true);
+      showNotification('Please fill out all fields correctly', true);
 
       return;
     }
@@ -114,14 +126,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const row = document.createElement('tr');
 
     row.innerHTML = `
-      <td>${naming}</td>
+      <td>${employeeName}</td>
       <td>${position}</td>
       <td>${office}</td>
       <td>${age}</td>
       <td>$${salary.toLocaleString()}</td>
     `;
+
     tbody.appendChild(row);
-    showNotification('Employee added successfully');
+
+    showNotification('Employee added successfully!');
     form.reset();
   });
 
@@ -151,7 +165,9 @@ document.addEventListener('DOMContentLoaded', () => {
       editingCell = null;
     };
 
-    input.addEventListener('blur', save);
+    input.addEventListener('blur', () => {
+      save();
+    });
 
     input.addEventListener('keydown', (f) => {
       if (f.key === 'Enter') {
