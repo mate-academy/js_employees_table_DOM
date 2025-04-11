@@ -95,7 +95,13 @@ function createForm() {
 
   form.className = 'new-employee-form';
 
-  const createField = (labelText, inputType, inputName, inputAttribute) => {
+  const createField = (
+    labelText,
+    inputType,
+    inputName,
+    inputAttribute,
+    required = true,
+  ) => {
     const label = document.createElement('label');
 
     label.className = 'label';
@@ -107,7 +113,7 @@ function createForm() {
     input.name = inputName;
     input.className = 'input';
     input.setAttribute('data-qa', inputAttribute);
-    input.required = true;
+    input.required = required;
 
     label.appendChild(input);
 
@@ -123,6 +129,7 @@ function createForm() {
 
   selInput.className = 'select';
   selInput.setAttribute('data-qa', 'office');
+  selInput.setAttribute('name', 'office');
   selInput.required = true;
 
   const options = [
@@ -152,7 +159,10 @@ function createForm() {
   button.setAttribute('data-qa', 'save-to-table');
 
   form.appendChild(createField('Name:', 'text', 'name', 'name'));
-  form.appendChild(createField('Position:', 'text', 'position', 'position'));
+
+  form.appendChild(
+    createField('Position:', 'text', 'position', 'position', false),
+  );
   form.appendChild(labelSelect);
   form.appendChild(createField('Age:', 'number', 'age', 'age'));
   form.appendChild(createField('Salary:', 'number', 'salary', 'salary'));
