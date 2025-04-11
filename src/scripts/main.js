@@ -13,9 +13,8 @@ tBody.addEventListener('click', (ev) => {
 
   if (row) {
     tRows.forEach((tRow) => tRow.classList.remove('active'));
+    row.classList.add('active');
   }
-
-  row.classList.add('active');
 });
 
 tHead.addEventListener('click', (ev) => {
