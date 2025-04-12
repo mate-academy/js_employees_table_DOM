@@ -32,11 +32,14 @@ function sortTBody(indexCell) {
 }
 
 tbody.addEventListener('click', (e) => {
-  [...tbody.children].forEach((x) => x.classList.remove('active'));
-
   const tr = e.target.closest('TR');
 
-  tr.classList.add('active');
+  [...tbody.children].forEach((x) => {
+    if (tr !== x) {
+      x.classList.remove('active');
+    }
+  });
+  tr.classList.toggle('active');
 });
 
 function addForm() {
@@ -77,7 +80,7 @@ function addForm() {
       const input = document.createElement('input');
 
       input.name = x;
-      input.type = 'text';
+      input.type = x === 'age' || x === 'salary' ? 'number' : 'text';
       input.dataset.qa = x;
       label.append(input);
     }
@@ -95,17 +98,157 @@ function addForm() {
 
   body.append(form);
 
-  addEventListener('submit', (e) => {
-    e.preventDefault();
-    //   console.dir(form);
-  });
+  return form;
 }
 
-addForm();
+const formEl = addForm();
 
-// const form = document.createElement('form');
+formEl.addEventListener('submit', (e) => {
+  e.preventDefault();
 
-// form.addEventListener('submit', (e) => {
-//   e.preventDefault();
-//   //   console.dir(form);
-// });
+  let error = false;
+
+  error = isValidValue(
+    formEl.elements.name,
+    'Name',
+    formEl.elements.name.value.length < 4,
+    'Value must contain 4 or more letters',
+  );
+
+  if (!error) {
+    error = isValidValue(
+      formEl.elements.position,
+      'Position',
+      !formEl.elements.position.value,
+      `There is no value of “position”`,
+    );
+  }
+
+  if (!error) {
+    error = isValidValue(
+      formEl.elements.age,
+      'Age',
+      formEl.elements.age.value < 18 || formEl.elements.age.value > 90,
+      'Value must be greater than or equal to 18 and less or equal to 90',
+    );
+  }
+
+  if (!error) {
+    error = isValidValue(
+      formEl.elements.salary,
+      'Salary',
+      formEl.elements.salary.value < 1,
+      'Value must be greater than 0',
+    );
+  }
+
+  if (!error) {
+    addEmployee(formEl.elements);
+
+    pushNotification(
+      10,
+      10,
+      'New employee',
+      'New employee is successfully added to the table',
+      'success',
+    );
+    formEl.reset();
+  }
+});
+
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const body = document.querySelector('body');
+  const div = document.createElement('div');
+  const titleNotification = document.createElement('h2');
+  const descriptionNotification = document.createElement('p');
+
+  div.className = 'notification';
+  div.classList.add(type);
+  div.style.top = `${posTop}px`;
+  div.style.right = `${posRight}px`;
+
+  titleNotification.classList.add('title');
+  titleNotification.textContent = title;
+
+  descriptionNotification.textContent = description;
+
+  div.append(titleNotification, descriptionNotification);
+  body.append(div);
+
+  setTimeout(() => {
+    div.style.display = 'none';
+  }, 4000);
+};
+
+const isValidValue = (dataName, nameValue, rules, errorText) => {
+  if (!dataName.dataset.qa.includes('notification')) {
+    dataName.dataset.qa += ' notification';
+  }
+
+  if (rules) {
+    pushNotification(
+      150,
+      10,
+      `Is invalid ${nameValue} value`,
+      errorText,
+      'error',
+    );
+    dataName.classList.add('error');
+    dataName.classList.remove('success');
+
+    return true;
+  } else {
+    dataName.classList.add('success');
+    dataName.classList.remove('error');
+
+    return false;
+  }
+};
+
+const addEmployee = (dataForm) => {
+  const tr = document.createElement('tr');
+
+  [...dataForm].forEach((x) => {
+    if (x.nodeName !== 'BUTTON') {
+      const td = document.createElement('td');
+
+      td.textContent =
+        x.name === 'salary'
+          ? `$${Number(x.value).toLocaleString('en-US')}`
+          : x.value;
+      tr.append(td);
+    }
+  });
+  tbody.append(tr);
+};
+
+tbody.addEventListener('dblclick', (e) => {
+  const td = e.target.closest('TD');
+
+  if (!td || td.querySelector('.cell-input')) {
+    return;
+  }
+
+  const tdTextContent = td.textContent;
+  const inputEl = document.createElement('input');
+
+  inputEl.classList.add('cell-input');
+  inputEl.type = 'text';
+  inputEl.value = tdTextContent;
+  td.textContent = '';
+  td.appendChild(inputEl);
+
+  const changeText = () => {
+    const newValue = inputEl.value.trim() || tdTextContent;
+
+    td.textContent = newValue;
+  };
+
+  inputEl.addEventListener('keypress', (ev) => {
+    if (ev.code === 'Enter') {
+      changeText();
+    }
+  });
+
+  inputEl.addEventListener('blur', changeText);
+});
