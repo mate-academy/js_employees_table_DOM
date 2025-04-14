@@ -108,50 +108,10 @@ formEl.addEventListener('submit', (e) => {
 
   let error = false;
 
-  error = isValidValue(
-    formEl.elements.name,
-    'Name',
-    formEl.elements.name.value.length < 4,
-    'Value must contain 4 or more letters',
-  );
-
-  if (!error) {
-    error = isValidValue(
-      formEl.elements.position,
-      'Position',
-      !formEl.elements.position.value,
-      `There is no value of “position”`,
-    );
-  }
-
-  if (!error) {
-    error = isValidValue(
-      formEl.elements.age,
-      'Age',
-      formEl.elements.age.value < 18 || formEl.elements.age.value > 90,
-      'Value must be greater than or equal to 18 and less or equal to 90',
-    );
-  }
-
-  if (!error) {
-    error = isValidValue(
-      formEl.elements.salary,
-      'Salary',
-      formEl.elements.salary.value < 1,
-      'Value must be greater than 0',
-    );
-  }
+  error = isValidValue(formEl.elements);
 
   if (!error) {
     addEmployee(formEl.elements);
-
-    pushNotification(
-      10,
-      10,
-      'New employee',
-      'New employee is successfully added to the table',
-      'success',
-    );
     formEl.reset();
   }
 });
@@ -159,6 +119,9 @@ formEl.addEventListener('submit', (e) => {
 const pushNotification = (posTop, posRight, title, description, type) => {
   const body = document.querySelector('body');
   const div = document.createElement('div');
+
+  div.dataset.qa = 'notification';
+
   const titleNotification = document.createElement('h2');
   const descriptionNotification = document.createElement('p');
 
@@ -176,33 +139,41 @@ const pushNotification = (posTop, posRight, title, description, type) => {
   body.append(div);
 
   setTimeout(() => {
-    div.style.display = 'none';
+    div.remove();
   }, 4000);
+
+  return true;
 };
 
-const isValidValue = (dataName, nameValue, rules, errorText) => {
-  if (!dataName.dataset.qa.includes('notification')) {
-    dataName.dataset.qa += ' notification';
+const isValidValue = ({ name: nameForm, position, age, salary }) => {
+  const validations = [
+    {
+      name: 'Name',
+      rule: nameForm.value.length < 4,
+      msg: 'Must be at least 4 letters',
+    },
+    { name: 'Position', rule: !position.value, msg: 'Position is required' },
+    {
+      name: 'Age',
+      rule: age.value < 18 || age.value > 90,
+      msg: 'Must be 18–90',
+    },
+    { name: 'Salary', rule: salary.value < 1, msg: 'Must be greater than 0' },
+  ];
+
+  for (const v of validations) {
+    if (v.rule) {
+      return pushNotification(150, 10, `Invalid ${v.name}`, v.msg, 'error');
+    }
   }
 
-  if (rules) {
-    pushNotification(
-      150,
-      10,
-      `Is invalid ${nameValue} value`,
-      errorText,
-      'error',
-    );
-    dataName.classList.add('error');
-    dataName.classList.remove('success');
-
-    return true;
-  } else {
-    dataName.classList.add('success');
-    dataName.classList.remove('error');
-
-    return false;
-  }
+  pushNotification(
+    10,
+    10,
+    'New employee',
+    'Employee added to the table',
+    'success',
+  );
 };
 
 const addEmployee = (dataForm) => {
