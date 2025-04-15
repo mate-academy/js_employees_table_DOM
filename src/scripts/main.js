@@ -4,10 +4,6 @@ const body = document.querySelector('body');
 const table = document.querySelector('table');
 const headers = table.querySelectorAll('th');
 const tbody = table.querySelector('tbody');
-const tableRows = tbody.querySelectorAll('tr');
-
-const thead = table.querySelector('thead');
-const tr = thead.querySelector('tr');
 
 headers.forEach((e, i) => {
   let way = true;
@@ -38,17 +34,7 @@ headers.forEach((e, i) => {
   });
 });
 
-tableRows.forEach((row, i) => {
-  row.addEventListener('click', () => {
-    if (document.querySelectorAll('.active')) {
-      const activeRow = document.querySelectorAll('.active');
 
-      activeRow.forEach((trr) => trr.classList.remove('active'));
-    }
-
-    row.classList.add('active');
-  });
-});
 
 const offices = [
   'Tokyo',
@@ -60,6 +46,22 @@ const offices = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
+  const tableRows = tbody.querySelectorAll('tr');
+  const thead = table.querySelector('thead');
+  const tr = thead.querySelector('tr');
+
+  tableRows.forEach((row, i) => {
+    row.addEventListener('click', () => {
+      if (document.querySelectorAll('.active')) {
+        const activeRow = document.querySelectorAll('.active');
+
+        activeRow.forEach((trr) => trr.classList.remove('active'));
+      }
+
+      row.classList.add('active');
+    });
+  });
+
   const form = document.createElement('form');
 
   form.classList.add('new-employee-form');
@@ -142,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       notification.appendChild(notTitle);
       notification.classList = 'notification error';
-      notification.dataset.qa = 'notofication';
+      notification.dataset.qa = 'notification';
 
       body.appendChild(notification);
 
