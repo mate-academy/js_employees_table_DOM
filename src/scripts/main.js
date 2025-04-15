@@ -170,7 +170,7 @@ form.addEventListener('submit', (e) => {
       positionValue,
       officeValue,
       ageValue,
-      salaryValue,
+      `$${salaryValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
     ];
 
     for (let i = 0; i < arrayWithNewData.length; i++) {
