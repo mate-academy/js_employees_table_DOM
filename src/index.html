@@ -13,6 +13,57 @@
     />
   </head>
   <body>
+    <form class="new-employee-form">
+      <label>
+        Name:
+        <input
+          name="name"
+          type="text"
+          data-qa="name"
+        />
+      </label>
+      <label>
+        Position:
+        <input
+          name="position"
+          type="text"
+          data-qa="position"
+        />
+      </label>
+      <label>
+        Office:
+        <select
+          name="office"
+          required
+          data-qa="office"
+        >
+          <option>Tokyo</option>
+          <option>Singapore</option>
+          <option>London</option>
+          <option>New York</option>
+          <option>Edinburgh</option>
+          <option>San Francisco</option>
+        </select>
+      </label>
+      <label>
+        Age:
+        <input
+          name="age"
+          type="number"
+          data-qa="age"
+        />
+      </label>
+      <label>
+        Salary:
+        <input
+          name="salary"
+          type="number"
+          data-qa="salary"
+        />
+      </label>
+      <button type="submit">Save to table</button>
+    </form>
+
     <table>
       <thead>
         <tr>
