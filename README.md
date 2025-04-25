@@ -1,5 +1,5 @@
-1. Replace `<your_account>` with your GitHub username in the link
-    - [DEMO LINK](https://<your_account>.github.io/js_employees_table_DOM/)
+1. Replace `<your_account>` with your Github username in the link
+    - [DEMO LINK](https://kyslytsyn.github.io/js_employees_table_DOM/)
 2. Follow [this instructions](https://mate-academy.github.io/layout_task-guideline/)
     - Run `npm run test` command to test your code;
     - Run `npm run test:only -- -n` to run fast test ignoring linter;
@@ -44,11 +44,11 @@ Start table:
 ```
 - Add qa attributes for each input field:
 ```
- data-qa="name" 
- data-qa="position" 
- data-qa="office" 
- data-qa="age" 
- data-qa="salary" 
+ data-qa="name"
+ data-qa="position"
+ data-qa="office"
+ data-qa="age"
+ data-qa="salary"
 ```
 - Select should have 6 options: `Tokyo`, `Singapore`, `London`, `New York`, `Edinburgh`, `San Francisco`.
 - Use texts for labels and buttons from the screenshot below.
@@ -62,13 +62,13 @@ Start table:
 - If the `Age` value is less than 18 or more than 90, show an error notification.
 - If a new employee is successfully added to the table, show success notification.
 - Notification titles and descriptions are up to you.
-- Add qa attribute for notification: `data-qa="notification"` and class `error`/`success` depending on the result.
+- Add qa attribute for notification: `data-qa="notification"` and class `error`/`success` depending on the resul
 
-##### Implement editing of table cells by double-clicking on them (optional). 
-- Double click on the cell of the table, which should remove the text, and append input with `cell-input` class.
-- The input value should be replaced by the input text.
-- Only one cell can be edited at a time.
-- On blur, save changes to the table cell. Remove input and set new text.
+##### Implement editing of table cells by double-clicking on it (optional).
+- Double click on the cell of the table, should remove text, and append input with `cell-input` class.
+- The input value should contain replaced by input text.
+- Only one cell can be edited at the time.
+- On blur save changes to table cell. Remove input and set new text.
 - On 'Enter' keypress, save changes to the table cell. Remove input and set new text in the table cell.
 - If an input is empty on submission, return the initial value.
 
