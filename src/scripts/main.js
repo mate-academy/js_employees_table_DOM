@@ -134,6 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      if (salary <= 0) {
+        showNotification('error', 'Salary must be positive.');
+
+        return;
+      }
+
       const row = document.createElement('tr');
 
       row.innerHTML = `
@@ -196,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
       cleanup();
     }
 
-    input.addEventListener('keydown', (ev) => {
+    function onKeyDown(ev) {
       if (ev.key === 'Enter') {
         ev.preventDefault();
         save();
@@ -205,13 +211,14 @@ document.addEventListener('DOMContentLoaded', () => {
         editingCell = null;
         cleanup();
       }
-    });
-
-    input.addEventListener('blur', save);
+    }
 
     function cleanup() {
-      input.removeEventListener('keydown', this);
+      input.removeEventListener('keydown', onKeyDown);
       input.removeEventListener('blur', save);
     }
+
+    input.addEventListener('keydown', onKeyDown);
+    input.addEventListener('blur', save);
   });
 });
