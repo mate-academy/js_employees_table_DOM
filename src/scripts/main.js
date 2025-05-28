@@ -168,7 +168,7 @@ form.addEventListener('submit', (e) => {
   const office = officeInput.selectedOptions[0].text.trim();
   const age = parseInt(ageInput.value, 10);
   const salary =
-    '$' + parseFloat(salaryInput.value).toFixed(3).replace('.', ',');
+    '$' + parseFloat(salaryInput.value).toFixed(2).replace('.', ',');
 
   if (name.length < 4) {
     showNotification('Error', 'Name must be at least 4 letters long.', 'error');
