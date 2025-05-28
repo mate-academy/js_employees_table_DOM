@@ -203,10 +203,8 @@ form.addEventListener('submit', (e) => {
 
   tbody.appendChild(row);
 
-  // Показати успіх
   showNotification('Success', 'Employee added to the table.', 'success');
 
-  // Очистити форму
   form.reset();
 });
 
