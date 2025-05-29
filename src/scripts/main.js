@@ -177,8 +177,8 @@ saveButton.addEventListener('click', (e) => {
     return pushNotification(
       10,
       10,
-      'Name too short',
-      'Name must be at least 4 characters long',
+      'Position required',
+      'Position cannot be empty',
       'error',
     );
   }
@@ -225,7 +225,16 @@ tbody.addEventListener('dblclick', (changeEvent) => {
   input.focus();
 
   const save = () => {
-    cell.textContent = input.value.trim() === '' ? originalText : input.value;
+    const newValue = input.value.trim() === '' ? originalText : input.value;
+    const rowElement = cell.parentElement;
+    const rowIndex = Array.from(tbody.rows).indexOf(rowElement);
+    const cellIndex = Array.from(rowElement.cells).indexOf(cell);
+
+    const key = headers[cellIndex].textContent.toLowerCase();
+
+    employees[rowIndex][key] = newValue;
+
+    renderTable();
   };
 
   input.addEventListener('blur', save);
