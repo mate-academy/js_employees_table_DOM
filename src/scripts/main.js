@@ -1,7 +1,7 @@
 'use strict';
 
 // write code here
-const headers = document.querySelectorAll('thead tr');
+const headers = document.querySelectorAll('thead th');
 const rows = document.querySelectorAll('tbody tr');
 let rowsArray = Array.from(rows);
 let currentSortColumn = -1;
