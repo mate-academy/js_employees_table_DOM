@@ -202,6 +202,18 @@ function check(nameIn, positionIn, officeIn, ageIn, salaryIn) {
     return false;
   }
 
+  if (salaryIn < 0) {
+    pushNotification(
+      150,
+      10,
+      'Помилка',
+      'Value has fewer than 4 letters',
+      'error',
+    );
+
+    return false;
+  }
+
   if (ageIn < 18 || ageIn > 90) {
     pushNotification(
       150,
