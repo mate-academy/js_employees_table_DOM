@@ -107,13 +107,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = formData.get('name').trim();
         const position = formData.get('position').trim();
         const office = formData.get('office');
-        const age = parseInt(formData.get('age'), 10);
-        const salary = parseFloat(formData.get('salary'));
+         const ageString = formData.get('age').trim();
+        const salaryString = formData.get('salary').trim();
 
-        if (!name || !position || !office || !age || !salary || office === "") {
-            showNotification('error', 'Помилка валідації', 'Усі поля є обов\'язковими.');
+
+         if (name === '') {
+            showNotification('error', 'Помилка валідації', 'Поле "Ім\'я" є обов\'язковим.');
             return;
         }
+        if (position === '') {
+            showNotification('error', 'Помилка валідації', 'Поле "Посада" є обов\'язковим.');
+            return;
+        }
+        if (office === '' || office === null) {
+            showNotification('error', 'Помилка валідації', 'Будь ласка, виберіть офіс.');
+            return;
+        }
+        if (ageString === '' || Number.isNaN(Number(ageString))) {
+            showNotification('error', 'Помилка валідації', 'Поле "Вік" є обов\'язковим і має бути числом.');
+            return;
+        }
+        if (salaryString === '' || Number.isNaN(Number(salaryString))) {
+            showNotification('error', 'Помилка валідації', 'Поле "Зарплата" є обов\'язковим і має бути числом.');
+            return;
+        }
+
+        const age = parseInt(ageString, 10);
+        const salary = parseFloat(salaryString);
+
         if (name.length < 4) {
             showNotification('error', 'Помилка валідації', 'Ім\'я повинно містити щонайменше 4 літери.');
             return;
