@@ -56,10 +56,12 @@ employeeTable.tHead.addEventListener('click', function sortByClick(e) {
 
       operationalRows.sort((a, b) => {
         const aToCompare = +a.cells[whichColumn].textContent
-          .match(/\d+/g)
+          .replace(/[^,.\d]/g, '')
+          .split(',')
           .join('.');
         const bToCompare = +b.cells[whichColumn].textContent
-          .match(/\d+/g)
+          .replace(/[^,.\d]/g, '')
+          .split(',')
           .join('.');
 
         return whatToReturnV3(aToCompare, bToCompare);
@@ -73,7 +75,6 @@ employeeTable.tHead.addEventListener('click', function sortByClick(e) {
   });
 });
 
-// Zaznaczanie (Powinno być wszystko dobrze!)
 // eslint-disable-next-line no-shadow
 employeeTable.tBodies[0].addEventListener('click', function (e) {
   const currentRow = e.target.closest('tr');
@@ -275,7 +276,8 @@ const createPageForm = function () {
         pageInputsValue.name.length > 0 &&
         pageInputsValue.position.length > 0 &&
         pageInputsValue.age.length > 0 &&
-        pageInputsValue.salary.length > 0;
+        pageInputsValue.salary.length > 0 &&
+        pageInputsValue.office.length > 0;
       const canSubmit =
         !isNameFieldTooShort && areAllFieldsFilled && !isTooYoung && !isTooOld;
 
@@ -333,5 +335,3 @@ const createPageForm = function () {
 };
 
 createPageForm();
-
-// Z podstawy zostało czy zaznaczenie ma podążać za sortowaną osobą...
