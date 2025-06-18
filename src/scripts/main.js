@@ -20,7 +20,7 @@ table.addEventListener('click', function (e) {
   if (firstClick.length === 0) {
     firstClick.push(i);
   } else {
-    sortedRows = rows.reverse();
+    sortedRows = Array.from(rows).reverse();
 
     tbody.innerHTML = '';
     tbody.append(...sortedRows);
