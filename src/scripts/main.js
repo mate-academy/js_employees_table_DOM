@@ -7,7 +7,7 @@ function convertToNumber(currencyString) {
 const table = document.querySelector('table');
 const tbody = document.querySelector('tbody');
 const rows = Array.from(tbody.rows);
-const fisrtClick = [];
+const firstClick = [];
 let sortedRows;
 
 table.addEventListener('click', function (e) {
@@ -17,14 +17,14 @@ table.addEventListener('click', function (e) {
 
   const i = Array.from(e.target.parentElement.cells).indexOf(e.target);
 
-  if (fisrtClick.length === 0) {
-    fisrtClick.push(i);
+  if (firstClick.length === 0) {
+    firstClick.push(i);
   } else {
     sortedRows = rows.reverse();
 
     tbody.innerHTML = '';
     tbody.append(...sortedRows);
-    fisrtClick.length = 0;
+    firstClick.length = 0;
 
     return;
   }
@@ -95,27 +95,6 @@ form.insertAdjacentHTML(
   <button type="submit"> Save to table </button>`,
 );
 
-form.addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  const tr = document.createElement('tr');
-
-  tbody.prepend(tr);
-
-  function addElement(x) {
-    const td = document.createElement('td');
-
-    tr.append(td);
-    td.append(x);
-  }
-
-  addElement(form.elements.name.value);
-  addElement(form.elements.position.value);
-  addElement(form.elements.office.value);
-  addElement(form.elements.age.value);
-  addElement(form.elements.salary.value);
-});
-
 const notification = document.createElement('div');
 
 document.body.append(notification);
@@ -152,7 +131,7 @@ form.addEventListener('submit', function (e) {
     <td>$${salary.toLocaleString()}</td>
   `;
 
-  table.append(row);
+  tbody.append(row);
 
   showNotification('Success', 'Employee added to table', 'success');
 
@@ -161,7 +140,7 @@ form.addEventListener('submit', function (e) {
 
 function showNotification(title, message, type) {
   notification.innerHTML = `<strong>${title}:</strong> ${message}`;
-  notification.className = type;
+  notification.classList.add(type);
 }
 
 let isEditing = false;
