@@ -73,11 +73,19 @@ form.addEventListener("submit", (e) => {
   const name = form.name.value.trim();
   const position = form.position.value.trim();
   const office = form.office.value;
+
+  if (
+    form.age.value === '' ||
+    form.salary.value === '' ||
+    !name ||
+    !position ||
+    !office
+  ) return notify("All fields are required");
+
   const age = Number(form.age.value);
   const salary = Number(form.salary.value);
 
   if (name.length < 4) return notify("Name must be at least 4 characters");
-  if (!position || !office || !age || !salary) return notify("All fields are required");
   if (age < 18 || age > 90) return notify("Age must be between 18 and 90");
 
   const row = document.createElement("tr");
