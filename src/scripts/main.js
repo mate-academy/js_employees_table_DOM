@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let hasValidation = false;
 
-    if (formData.name.length <= 4) {
+    if (formData.name.length < 4) {
       hasValidation = true;
 
       createAndShowNotification(
@@ -227,7 +227,17 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     }
 
-    const invalidCharsRegex = /[^a-zA-Za-яА-ЯіІїЇєЄґҐ\s'-]/;
+    if (formData.position.trim().length === 0) {
+      hasValidation = true;
+
+      createAndShowNotification(
+        'Position input error',
+        'Position field cannot be empty.',
+        'error',
+      );
+    }
+
+    const invalidCharsRegex = /[^a-zA-Zа-яА-ЯіІїЇєЄґҐ\s'-_0-9]/;
 
     if (invalidCharsRegex.test(formData.name)) {
       hasValidation = true;
@@ -281,13 +291,13 @@ document.addEventListener('DOMContentLoaded', () => {
       tbody.appendChild(newRow);
 
       if (tbody) {
-      createAndShowNotification(
-        'Success!',
-        'Employee successfully added to the table.',
-        'success',
-      );
+        createAndShowNotification(
+          'Success!',
+          'Employee successfully added to the table.',
+          'success',
+        );
+      }
+      form.reset();
     }
-    form.reset();
-  }
   });
 });
