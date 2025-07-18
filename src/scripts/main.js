@@ -206,9 +206,9 @@ document.addEventListener('DOMContentLoaded', () => {
       newTd.textContent = element;
 
       newRow.appendChild(newTd);
-
-      tbody.appendChild(newRow);
     });
+
+    tbody.appendChild(newRow);
 
     printNotification('success', 'SUCCESS', 'Employee successfully added');
   });
