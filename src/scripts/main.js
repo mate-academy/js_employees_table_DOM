@@ -126,10 +126,12 @@ formPage.addEventListener('submit', function (e) {
 
 table.addEventListener('dblclick', (e) => {
   if (e.target.tagName === 'TD') {
-    e.target.innerHTML = `<input class="cell-input" type="text" value=''>`;
+    const tdValue = e.target.textContent;
+    e.target.innerHTML = `<input class="cell-input" type="text">`;
 
     const cellInput = e.target.querySelector('input');
 
+    cellInput.value = tdValue;
     cellInput.focus();
 
     cellInput.addEventListener('keyup', function (ev) {
