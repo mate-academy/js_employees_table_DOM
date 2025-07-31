@@ -184,3 +184,11 @@ tr.active {
     background: rgba(253, 0, 0, 0.3);
   }
 }
+
+th.sort-asc::after {
+  content: ' ▲';
+}
+
+th.sort-desc::after {
+  content: ' ▼';
+}
