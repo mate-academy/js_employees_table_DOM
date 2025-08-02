@@ -1,8 +1,8 @@
 'use strict';
 
 const th = document.querySelectorAll('th');
-let curentSortIndex;
-let curentSortDirection;
+let currentSortIndex;
+let currentSortDirection;
 
 th.forEach((element) => {
   element.addEventListener('click', (e) => {
@@ -10,8 +10,8 @@ th.forEach((element) => {
     const tr = Array.from(document.querySelectorAll('tbody tr'));
     const tbody = document.querySelector('tbody');
 
-    if (curentSortIndex === index) {
-      if (curentSortDirection === 'desc') {
+    if (currentSortIndex === index) {
+      if (currentSortDirection === 'desc') {
         tr.sort((a, b) => {
           const aItem = a.children[index].textContent.trim();
           const bItem = b.children[index].textContent.trim();
@@ -25,7 +25,7 @@ th.forEach((element) => {
             return bItem.localeCompare(aItem);
           }
         });
-      } else if (curentSortDirection === 'asc') {
+      } else if (currentSortDirection === 'asc') {
         tr.sort((a, b) => {
           const aItem = a.children[index].textContent.trim();
           const bItem = b.children[index].textContent.trim();
@@ -40,10 +40,10 @@ th.forEach((element) => {
           }
         });
       }
-      curentSortDirection = curentSortDirection === 'asc' ? 'desc' : 'asc';
+      currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
     } else {
-      curentSortIndex = index;
-      curentSortDirection = 'asc';
+      currentSortIndex = index;
+      currentSortDirection = 'asc';
 
       tr.sort((a, b) => {
         const aItem = a.children[index].textContent.trim();
@@ -66,15 +66,20 @@ th.forEach((element) => {
   });
 });
 
-const trs = document.querySelectorAll('tbody tr');
+const tBody = document.querySelector('tbody');
 
-trs.forEach((tr) => {
-  tr.addEventListener('click', (e) => {
-    trs.forEach((t) => {
-      t.classList.remove('active');
-    });
-    tr.classList.add('active');
+tBody.addEventListener('click', (e) => {
+  const clickedRow = e.target.closest('tr');
+
+  if (!clickedRow) {
+    return;
+  }
+
+  tBody.querySelectorAll('tr').forEach((tr) => {
+    tr.classList.remove('active');
   });
+
+  clickedRow.classList.add('active');
 });
 
 const form = document.createElement('form');
@@ -165,9 +170,9 @@ form.addEventListener('submit', (s) => {
   const age = form.querySelector('[name = "age"]').value;
   const salary = form.querySelector('[name = "salary"]').value;
   const selectForm = form.querySelector('[name="select"]');
-  const selectText = selectForm.options[select.selectedIndex].textContent;
+  const selectText = selectForm.options[selectForm.selectedIndex].textContent;
 
-  if (!nameForm || !position || !age || !salary || !select) {
+  if (!nameForm || !position || !age || !salary || !selectForm.value) {
     showNotification('Усі поля повинні бути заповненні', 'error');
 
     return;
