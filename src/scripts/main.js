@@ -170,6 +170,7 @@ const fields = [
   },
 ];
 
+
 form.classList.add('new-employee-form');
 
 // off validate and let button send form
