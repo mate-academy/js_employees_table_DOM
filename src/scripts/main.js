@@ -172,6 +172,9 @@ const fields = [
 
 form.classList.add('new-employee-form');
 
+// off validate and let button send form
+form.setAttribute('novalidate', 'true');
+
 for (const field of fields) {
   const label = document.createElement('label');
   let input = null;
@@ -218,6 +221,18 @@ form.addEventListener('submit', (e) => {
     const td = document.createElement('td');
 
     switch (key) {
+      case 'position':
+        if (value.trim() === '' || /[0-9]/.test(value)) {
+          pushNotification(
+            'Invalid position!',
+            'Position should not be empty or contain numbers',
+            'error',
+          );
+
+          return;
+        }
+        break;
+
       case 'name':
         if (value.length < 4) {
           pushNotification(
