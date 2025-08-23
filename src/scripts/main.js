@@ -215,17 +215,33 @@ const handleCellEdit = (cell) => {
   input.focus();
 
   const saveChanges = () => {
-    const newText = input.value.trim();
+    let newText = input.value.trim();
 
-    cell.textContent = newText === '' ? originalText : newText;
+    if (newText === '') {
+      cell.textContent = originalText;
+    } else {
+      if (cell.cellIndex === 4) {
+        const salaryValue = parseInt(newText.replace(/[^0-9]/g, ''), 10);
+
+        newText = `$${salaryValue.toLocaleString('en-US')}`;
+      }
+      cell.textContent = newText;
+    }
+    editingCell = null;
+  };
+
+  const cancelChanges = () => {
+    cell.textContent = originalText;
     editingCell = null;
   };
 
   input.addEventListener('blur', saveChanges);
 
-  input.addEventListener('keypress', (e) => {
+  input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       saveChanges();
+    } else if (e.key === 'Escape') {
+      cancelChanges();
     }
   });
 };
