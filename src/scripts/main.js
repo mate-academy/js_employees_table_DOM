@@ -5,6 +5,7 @@ const headers = table.querySelectorAll('thead th');
 const tbody = table.querySelector('tbody');
 let sortDirections = {};
 let selectedRow = null;
+let editingCell = null;
 
 const sortTable = (headerIndex) => {
   const tableRows = Array.from(tbody.children);
@@ -195,6 +196,40 @@ const addEmployee = (e) => {
   }
 };
 
+const handleCellEdit = (cell) => {
+  if (editingCell) {
+    return;
+  }
+
+  editingCell = cell;
+
+  const originalText = cell.textContent;
+
+  cell.textContent = '';
+
+  const input = document.createElement('input');
+
+  input.className = 'cell-input';
+  input.value = originalText;
+  cell.appendChild(input);
+  input.focus();
+
+  const saveChanges = () => {
+    const newText = input.value.trim();
+
+    cell.textContent = newText === '' ? originalText : newText;
+    editingCell = null;
+  };
+
+  input.addEventListener('blur', saveChanges);
+
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      saveChanges();
+    }
+  });
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   createForm();
 
@@ -217,6 +252,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const headerIndex = Array.from(headers).indexOf(header);
 
       sortTable(headerIndex);
+    }
+  });
+
+  table.addEventListener('dblclick', (e) => {
+    const target = e.target;
+
+    if (target.tagName === 'TD') {
+      handleCellEdit(target);
     }
   });
 });
