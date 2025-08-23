@@ -1,14 +1,17 @@
 body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+  min-height: 100vh;
+  margin: 0;
+  padding: 100px;
+
+  font-family: Roboto, sans-serif;
+
   background-image: linear-gradient(45deg, #4ebd36, #7e7cf9);
   background-attachment: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 100px;
-  font-family: Roboto, sans-serif;
-  margin: 0;
-  box-sizing: border-box;
 }
 
 table {
@@ -18,8 +21,8 @@ table {
 }
 
 tr {
-  background: #fff;
   color: #808080;
+  background: #fff;
 }
 
 tr:nth-child(2n + 1) {
@@ -27,8 +30,8 @@ tr:nth-child(2n + 1) {
 }
 
 thead tr:first-child {
-  background: #e25644;
   color: #fff;
+  background: #e25644;
 }
 
 tfoot tr:first-child {
@@ -37,13 +40,13 @@ tfoot tr:first-child {
 
 td,
 th {
-  text-align: left;
   padding: 18px;
+  text-align: left;
 }
 
 thead th:hover {
-  color: #fff400;
   cursor: pointer;
+  color: #fff400;
 }
 
 thead tr th:first-child {
@@ -63,108 +66,123 @@ tfoot tr th:last-child {
 }
 
 tbody tr:hover {
-  background: #f5f5f5;
-  color: #585858;
   cursor: pointer;
+  color: #585858;
+  background: #f5f5f5;
 }
 
 tr.active {
-  background: #cbcbcb;
   color: #585858;
+  background: #cbcbcb;
 
   &:hover {
-    background: #cbcbcb;
     color: #585858;
+    background: #cbcbcb;
   }
 }
 
 .new-employee-form {
-  background: #f5f5f5;
-  align-self: flex-start;
-  color: #808080;
-  border-top: #e25644 solid 54px;
-  border-radius: 10px;
-  box-sizing: border-box;
-  padding: 24px;
+  position: relative;
+
   display: flex;
   flex-direction: column;
+  align-self: flex-start;
+
+  box-sizing: border-box;
   width: 300px;
-  position: relative;
   margin-left: 24px;
+  padding: 24px;
+  border-top: #e25644 solid 54px;
+  border-radius: 10px;
+
+  color: #808080;
+
+  background: #f5f5f5;
 
   &::before {
-    position: absolute;
     content: 'New employee';
-    color: #fff;
+
+    position: absolute;
+    top: -36px;
+
     font-size: 16px;
     font-weight: 700;
-    top: -36px;
+    color: #fff;
   }
 
   label {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+
     width: 100%;
     margin-bottom: 8px;
     input,
     select {
-      width: 150px;
       box-sizing: border-box;
+      width: 150px;
+      padding: 4px;
       border: 1px solid #808080;
       border-radius: 4px;
+
       color: #808080;
-      padding: 4px;
+
       outline-color: #808080;
     }
   }
 
   button {
+    cursor: pointer;
+
+    box-sizing: border-box;
     margin-top: 16px;
+    padding: 8px 0;
     border: 2px solid transparent;
     border-radius: 10px;
-    box-sizing: border-box;
-    padding: 8px 0;
-    background: #e25644;
-    color: #fff;
+
     font-family: Roboto, sans-serif;
     font-size: 14px;
-    cursor: pointer;
+    font-weight: 700;
+    color: #fff;
+
+    background: #e25644;
+
     transition:
       0.25s ease color,
       0.25s ease background,
       0.25s ease border;
-    font-weight: 700;
 
     &:hover {
       border: 2px solid #e25644;
-      background: #fff;
       color: #e25644;
+      background: #fff;
     }
   }
 }
 
 .cell-input {
-  border: none;
-  color: #808080;
-  font-size: 16px;
-  background: transparent;
   padding: 0;
+  border: none;
+
+  font-size: 16px;
+  color: #808080;
+
+  background: transparent;
   outline: none;
 }
 
 .notification {
   position: absolute;
+  top: 10px;
+  right: 10px;
+
+  box-sizing: border-box;
   width: 300px;
   min-height: 100px;
   padding: 0 16px;
-  box-sizing: border-box;
-
   border-radius: 10px;
-  background: rgba(132, 132, 132, 0.3);
 
-  top: 10px;
-  right: 10px;
+  background: rgba(132, 132, 132, 0.3);
 
   .title {
     display: block;
