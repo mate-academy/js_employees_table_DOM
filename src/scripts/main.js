@@ -6,94 +6,91 @@ const headerList = document.querySelector('thead tr');
 const footerList = document.querySelector('tfoot tr');
 const tbody = document.querySelector('tbody');
 
-// hanlder "sorter" which sort page's list by direct parameter
+// add data-keys to every th by it's value in lower case
+function setDataKeys(list) {
+  const obj = {};
 
+  for (const cell of list.children) {
+    const dataValue = cell.textContent.toLowerCase();
+
+    cell.dataset.key = dataValue;
+    obj[dataValue] = '';
+  }
+
+  return obj;
+}
+
+setDataKeys(headerList);
+setDataKeys(footerList);
+
+// sorts table cells in two directions
 function sortByClick(listLine) {
+  const sortState = setDataKeys(headerList);
+
   listLine.addEventListener('click', (ev) => {
     ev.preventDefault();
 
     const currTbody = document.querySelector('tbody');
     const currTbodyList = Array.from(currTbody.querySelectorAll('tr'));
-
-    const sortParameter = ev.target.closest('th');
+    const key = ev.target.closest('th').dataset.key;
     let count = 0;
     let sortParamNum = 0;
 
     // count a number of a parameter to sorty by
     for (const child of listLine.children) {
-      if (child.textContent === sortParameter.textContent) {
+      if (child.textContent.toLowerCase() === key) {
         sortParamNum = count;
       }
       count++;
     }
 
-    // sorts the array from tbody element by selected parameter
+    // sorts the table in ASC order by direct property
+    if (sortState[key] === 'asc' || sortState[key] === '') {
+      sortState[key] = 'desc';
 
-    currTbodyList.sort((person1, person2) => {
-      const n = sortParamNum;
+      currTbodyList.sort((person1, person2) => {
+        const n = sortParamNum;
 
-      const firstParsed = parseFloat(
-        person1.children[n].textContent.replace(/[^\d.]/g, ''),
-      );
-      const secondParsed = parseFloat(
-        person2.children[n].textContent.replace(/[^\d.]/g, ''),
-      );
+        const firstParsed = parseFloat(
+          person1.children[n].textContent.replace(/[^\d.]/g, ''),
+        );
+        const secondParsed = parseFloat(
+          person2.children[n].textContent.replace(/[^\d.]/g, ''),
+        );
 
-      if (!isNaN(firstParsed) && !isNaN(secondParsed)) {
-        return firstParsed - secondParsed;
-      } else {
-        const pers1 = person1.children[n].textContent;
-        const pers2 = person2.children[n].textContent;
+        if (!isNaN(firstParsed) && !isNaN(secondParsed)) {
+          return firstParsed - secondParsed;
+        } else {
+          const pers1 = person1.children[n].textContent;
+          const pers2 = person2.children[n].textContent;
 
-        return pers1.localeCompare(pers2);
-      }
-    });
+          return pers1.localeCompare(pers2);
+        }
+      });
+    } else {
+      sortState[key] = 'asc';
 
-    currTbody.innerText = '';
+      // sorts the table in DESC order by direct property
+      currTbodyList.sort((person1, person2) => {
+        const n = sortParamNum;
 
-    for (const item of currTbodyList) {
-      currTbody.appendChild(item);
+        const firstParsed = parseFloat(
+          person1.children[n].textContent.replace(/[^\d.]/g, ''),
+        );
+        const secondParsed = parseFloat(
+          person2.children[n].textContent.replace(/[^\d.]/g, ''),
+        );
+
+        if (!isNaN(firstParsed) && !isNaN(secondParsed)) {
+          return secondParsed - firstParsed;
+        } else {
+          const pers1 = person1.children[n].textContent;
+          const pers2 = person2.children[n].textContent;
+
+          return pers2.localeCompare(pers1);
+        }
+      });
     }
-  });
-
-  listLine.addEventListener('dblclick', (ev) => {
-    ev.preventDefault();
-
-    const currTbody = document.querySelector('tbody');
-    const currTbodyList = Array.from(currTbody.querySelectorAll('tr'));
-
-    const sortParameter = ev.target.closest('th');
-    let count = 0;
-    let sortParamNum = 0;
-
-    // count a number of a parameter to sorty by
-    for (const child of listLine.children) {
-      if (child.textContent === sortParameter.textContent) {
-        sortParamNum = count;
-      }
-      count++;
-    }
-
-    // sorts the array from tbody element by selected parameter
-    currTbodyList.sort((person1, person2) => {
-      const n = sortParamNum;
-
-      const firstParsed = parseFloat(
-        person1.children[n].textContent.replace(/[^\d.]/g, ''),
-      );
-      const secondParsed = parseFloat(
-        person2.children[n].textContent.replace(/[^\d.]/g, ''),
-      );
-
-      if (!isNaN(firstParsed) && !isNaN(secondParsed)) {
-        return secondParsed - firstParsed;
-      } else {
-        const pers1 = person1.children[n].textContent;
-        const pers2 = person2.children[n].textContent;
-
-        return pers2.localeCompare(pers1);
-      }
-    });
 
     currTbody.innerText = '';
 
@@ -103,7 +100,7 @@ function sortByClick(listLine) {
   });
 }
 
-// functions to make selected visual effect of any row
+// makes selected visual effect of any row
 function deletePreviousSelected(list) {
   for (const item of list.children) {
     item.classList = '';
@@ -121,7 +118,7 @@ tbody.addEventListener('click', (ev) => {
   }
 });
 
-// make str from salary to append it to a new row created through form
+// makes str from salary to append it to a new row created through form
 function makeStrFromSalary(salary) {
   let result = '';
   let count = 0;
@@ -143,7 +140,7 @@ function makeStrFromSalary(salary) {
 
 // #region FORM
 
-// create form
+// creates form
 const newEmployee = document.createElement('form');
 
 newEmployee.classList.add('new-employee-form');
@@ -327,7 +324,6 @@ addEmployeeButton.addEventListener('click', (ev) => {
     const salary = document.createElement('td');
 
     salary.textContent = makeStrFromSalary(salaryValue);
-    // console.log(salary);
 
     row.append(salary);
 
@@ -345,11 +341,12 @@ addEmployeeButton.addEventListener('click', (ev) => {
     notification.appendChild(notificationDescription);
   }
 
-  setTimeout(() => {
-    notification.style.display = 'none';
-  }, 2000);
-
   document.body.appendChild(notification);
+
+  setTimeout(() => {
+    body.removeChild(notification);
+  }, 2000);
+  newEmployee.reset();
 });
 
 newEmployee.appendChild(addEmployeeButton);
@@ -358,13 +355,47 @@ body.appendChild(newEmployee);
 // #endregion
 
 // creates possibility to edit cells just by doubleClicking on them
+
+// gets age and salary indexes
+function getNumCellIndexes() {
+  const result = [];
+  let count = 0;
+
+  for (const numCell of headerList.children) {
+    if (numCell.dataset.key === 'age' || numCell.dataset.key === 'salary') {
+      result.push(count);
+    }
+
+    count++;
+  }
+
+  return result;
+}
+
+// edits cells by dblclick
 tbody.addEventListener('dblclick', (ev) => {
   ev.preventDefault();
 
+  const numIndexes = getNumCellIndexes();
+
+  // checking on unclosed input before starting to edit new one cell
+  if (document.querySelector('.cell-input')) {
+    const unclosedInput = document.querySelector('.cell-input');
+
+    cellInputValidation(unclosedInput);
+  }
+
   const currCell = ev.target.closest('td');
+  const cellParent = currCell.parentNode;
   const cellTextBefore = currCell.textContent;
 
   const input = document.createElement('input');
+
+  for (const num of numIndexes) {
+    if (currCell === cellParent.children[num]) {
+      input.type = 'number';
+    }
+  }
 
   input.classList.add('cell-input');
   currCell.textContent = '';
@@ -373,9 +404,16 @@ tbody.addEventListener('dblclick', (ev) => {
 
   function cellInputValidation() {
     if (input.value.length > 0) {
-      const newText = input.value;
+      if (currCell === cellParent.children[numIndexes[1]]) {
+        const newText = makeStrFromSalary(input.value);
 
-      currCell.textContent = newText;
+        currCell.textContent = newText;
+      } else {
+        const newText = input.value;
+
+        currCell.textContent = newText;
+      }
+
       currCell.removeChild(input);
     } else {
       currCell.textContent = cellTextBefore;
@@ -396,5 +434,6 @@ tbody.addEventListener('dblclick', (ev) => {
 });
 
 // IMPORTANT TO BE AT THE END OF CODE
+// because it must get actual data
 sortByClick(headerList);
 sortByClick(footerList);
