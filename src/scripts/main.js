@@ -215,6 +215,9 @@ newEmployee.appendChild(officeLabel);
 const ageOfEmployee = document.createElement('input');
 const ageLabel = document.createElement('label');
 
+ageOfEmployee.type = 'number';
+ageOfEmployee.setAttribute('min', 18);
+ageOfEmployee.setAttribute('max', 90);
 ageOfEmployee.dataset.qa = 'age';
 ageLabel.textContent = 'Age:';
 
@@ -225,6 +228,7 @@ newEmployee.appendChild(ageLabel);
 const salaryOfEmoloyee = document.createElement('input');
 const salaryLabel = document.createElement('label');
 
+salaryOfEmoloyee.type = 'number';
 salaryOfEmoloyee.dataset.qa = 'salary';
 salaryLabel.textContent = 'Salary:';
 
@@ -404,6 +408,20 @@ tbody.addEventListener('dblclick', (ev) => {
 
   function cellInputValidation() {
     if (input.value.length > 0) {
+      if (currCell === cellParent.children[numIndexes[0]] && input.value) {
+        const min = 18;
+        const max = 90;
+
+        const newText = +input.value;
+
+        if (newText >= min && newText <= max) {
+          currCell.textContent = newText;
+        } else {
+          currCell.textContent = cellTextBefore;
+          currCell.removeChild(input);
+        }
+      }
+
       if (currCell === cellParent.children[numIndexes[1]]) {
         const newText = makeStrFromSalary(input.value);
 
@@ -413,8 +431,6 @@ tbody.addEventListener('dblclick', (ev) => {
 
         currCell.textContent = newText;
       }
-
-      currCell.removeChild(input);
     } else {
       currCell.textContent = cellTextBefore;
     }
