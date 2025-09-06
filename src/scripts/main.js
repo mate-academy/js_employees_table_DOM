@@ -136,7 +136,7 @@ const arrSelect = [
   'San Francisco',
 ];
 
-inputSelect.name = 'select';
+inputSelect.name = 'office';
 inputSelect.setAttribute('data-qa', 'office');
 
 arrSelect.forEach((textSelet) => {
