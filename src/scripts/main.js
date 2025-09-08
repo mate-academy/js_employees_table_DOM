@@ -1,8 +1,11 @@
 'use strict';
 
 // write code here
+
 function parseSalary(string) {
-  return Number(string.replace(/[^\d.]/g, ''));
+  const cleaned = string.replace(/[^\d.]/g, '');
+
+  return cleaned === '' ? NaN : Number(cleaned);
 }
 
 const table = document.querySelector('table');
@@ -16,7 +19,6 @@ const MIN_NAME_LENGTH = 4;
 const MIN_AGE = 18;
 const MAX_AGE = 90;
 
-// Сортировка по клику на заголовок
 head.forEach((th) => {
   th.addEventListener('click', (e) => {
     const index = Array.from(head).indexOf(e.currentTarget);
@@ -38,13 +40,13 @@ function sortRows(index) {
     const aText = a.cells[index].textContent.trim();
     const bText = b.cells[index].textContent.trim();
 
-    const aNumb = parseSalary(aText);
-    const bNumb = parseSalary(bText);
+    const aNum = parseSalary(aText);
+    const bNum = parseSalary(bText);
 
     let compare;
 
-    if (!isNaN(aNumb) && !isNaN(bNumb)) {
-      compare = aNumb - bNumb;
+    if (!isNaN(aNum) && !isNaN(bNum)) {
+      compare = aNum - bNum;
     } else {
       compare = aText.localeCompare(bText, undefined, { numeric: true });
     }
@@ -55,55 +57,60 @@ function sortRows(index) {
   arrayRows.forEach((row) => tbody.appendChild(row));
 }
 
-// Выделение выбранной строки
 tbody.addEventListener('click', (e) => {
-  const ourRow = e.target.closest('tr');
+  const row = e.target.closest('tr');
 
-  if (!ourRow) {
+  if (!row) {
     return;
   }
 
   tbody.querySelectorAll('tr').forEach((r) => r.classList.remove('active'));
-  ourRow.classList.add('active');
+  row.classList.add('active');
 });
 
-// Создание формы
 function createForm() {
   const form = document.createElement('form');
 
   form.classList.add('new-employee-form');
+  // оставляем novalidate, так как все проверки в JS
   form.setAttribute('novalidate', true);
   document.body.appendChild(form);
 
-  // Name
   const labelName = document.createElement('label');
+
+  labelName.textContent = 'Name: ';
+
   const inputName = document.createElement('input');
 
-  labelName.textContent = 'Name:';
   inputName.name = 'name';
   inputName.type = 'text';
   inputName.setAttribute('data-qa', 'name');
   inputName.setAttribute('required', 'required');
-  inputName.setAttribute('pattern', '[A-Za-z ]+');
   labelName.appendChild(inputName);
   form.appendChild(labelName);
 
-  // Position
   const labelPosition = document.createElement('label');
+
+  labelPosition.textContent = 'Position: ';
+
   const inputPosition = document.createElement('input');
 
-  labelPosition.textContent = 'Position:';
   inputPosition.name = 'position';
   inputPosition.type = 'text';
   inputPosition.setAttribute('data-qa', 'position');
   inputPosition.setAttribute('required', 'required');
-  inputPosition.setAttribute('pattern', '[A-Za-z ]+');
   labelPosition.appendChild(inputPosition);
   form.appendChild(labelPosition);
 
-  // Office
   const labelOffice = document.createElement('label');
+
+  labelOffice.textContent = 'Office: ';
+
   const inputOffice = document.createElement('select');
+
+  inputOffice.name = 'office';
+  inputOffice.setAttribute('data-qa', 'office');
+
   const options = [
     'Tokyo',
     'Singapore',
@@ -112,10 +119,6 @@ function createForm() {
     'Edinburgh',
     'San Francisco',
   ];
-
-  labelOffice.textContent = 'Office:';
-  inputOffice.name = 'office';
-  inputOffice.setAttribute('data-qa', 'office');
 
   options.forEach((city) => {
     const option = document.createElement('option');
@@ -127,35 +130,34 @@ function createForm() {
   labelOffice.appendChild(inputOffice);
   form.appendChild(labelOffice);
 
-  // Age
   const labelAge = document.createElement('label');
+
+  labelAge.textContent = 'Age: ';
+
   const inputAge = document.createElement('input');
 
-  labelAge.textContent = 'Age:';
   inputAge.name = 'age';
   inputAge.type = 'number';
   inputAge.setAttribute('data-qa', 'age');
   inputAge.setAttribute('required', 'required');
   inputAge.setAttribute('min', MIN_AGE);
   inputAge.setAttribute('max', MAX_AGE);
-  inputAge.setAttribute('pattern', '\\d+');
   labelAge.appendChild(inputAge);
   form.appendChild(labelAge);
 
-  // Salary
   const labelSalary = document.createElement('label');
+
+  labelSalary.textContent = 'Salary: ';
+
   const inputSalary = document.createElement('input');
 
-  labelSalary.textContent = 'Salary:';
   inputSalary.name = 'salary';
   inputSalary.type = 'number';
   inputSalary.setAttribute('data-qa', 'salary');
   inputSalary.setAttribute('required', 'required');
-  inputSalary.setAttribute('pattern', '\\d+');
   labelSalary.appendChild(inputSalary);
   form.appendChild(labelSalary);
 
-  // Submit button
   const createButton = document.createElement('button');
 
   createButton.textContent = 'Save to table';
@@ -192,17 +194,27 @@ function checkForm() {
     !inputSalary.value.trim()
   ) {
     message = 'Error! Please fill in all fields';
-  } else if (inputName.value.trim().length < MIN_NAME_LENGTH) {
-    message = 'Error! Name must be at least 4 characters long';
-  } else if (
-    Number(inputAge.value) < MIN_AGE ||
-    Number(inputAge.value) > MAX_AGE
+  }
+
+  const letters = inputName.value.match(/[A-Za-z]/g) || [];
+
+  if (!message && letters.length < MIN_NAME_LENGTH) {
+    message = 'Error! Name must have at least 4 letters';
+  }
+
+  if (!message && !/^[A-Za-z ]+$/.test(inputName.value)) {
+    message = 'Error! Name must contain only letters and spaces';
+  }
+
+  if (
+    !message &&
+    (Number(inputAge.value) < MIN_AGE || Number(inputAge.value) > MAX_AGE)
   ) {
     message = 'Error! Age must be between 18 and 90';
   }
 
   if (message) {
-    createErrorMessage(message, messageClass);
+    createNotification(message, messageClass);
 
     return false;
   }
@@ -210,21 +222,34 @@ function checkForm() {
   return true;
 }
 
-function createErrorMessage(message, messageClass) {
-  const errorMessage = document.createElement('div');
-  const messageTitle = document.createElement('p');
+function createNotification(message, messageClass) {
+  // Удаляем старые уведомления
+  document
+    .querySelectorAll('[data-qa="notification"]')
+    .forEach((n) => n.remove());
 
-  errorMessage.classList.add('notification', messageClass);
-  errorMessage.setAttribute('data-qa', 'notification');
-  messageTitle.classList.add('title');
-  messageTitle.textContent = message;
+  const notification = document.createElement('div');
 
-  errorMessage.appendChild(messageTitle);
-  document.body.appendChild(errorMessage);
+  notification.classList.add('notification', messageClass);
+  notification.setAttribute('data-qa', 'notification');
 
-  setTimeout(() => {
-    errorMessage.remove();
-  }, 4000);
+  const title = document.createElement('p');
+
+  title.classList.add('title');
+  title.textContent = message;
+
+  const description = document.createElement('p');
+
+  description.classList.add('description');
+
+  description.textContent =
+    messageClass === 'success' ? 'Employee added successfully!' : '';
+
+  notification.appendChild(title);
+  notification.appendChild(description);
+  document.body.appendChild(notification);
+
+  setTimeout(() => notification.remove(), 4000);
 }
 
 function addNewRow() {
@@ -251,8 +276,7 @@ function addNewRow() {
 
   tbody.appendChild(newRow);
   form.reset();
-
-  createErrorMessage('Employee successfully added to the table!', 'success');
+  createNotification('Employee added to the table!', 'success');
 
   if (currentSortIndex !== null) {
     sortRows(currentSortIndex);
