@@ -109,6 +109,7 @@ function createForm() {
   const inputOffice = document.createElement('select');
 
   inputOffice.name = 'office';
+  inputOffice.setAttribute('required', 'required');
   inputOffice.setAttribute('data-qa', 'office');
 
   const options = [
@@ -243,7 +244,7 @@ function createNotification(message, messageClass) {
   description.classList.add('description');
 
   description.textContent =
-    messageClass === 'success' ? 'Employee added successfully!' : '';
+    messageClass === 'success' ? 'Employee added successfully!' : message;
 
   notification.appendChild(title);
   notification.appendChild(description);
