@@ -17,8 +17,8 @@ const offices = [
   'San Francisco',
 ];
 
-for (const header of headers.children) {
-  statuses[header] = false;
+for (let index = 0; index < headers.children.length; index++) {
+  statuses[index] = false;
 }
 
 // Helpful functions
@@ -86,7 +86,7 @@ function checkInput(index, value) {
   }
 
   if (
-    (wordsRegex.test(trimmedValue) && index < 2) ||
+    (wordsRegex.test(trimmedValue) && index <= 2) ||
     (digitsRegex.test(trimmedValue) && index > 2)
   ) {
     pushNotification(
@@ -195,7 +195,7 @@ headers.addEventListener('click', (e) => {
       return;
     }
 
-    if (statuses[th] === true) {
+    if (statuses[th.cellIndex] === true) {
       const switchElem = elem1;
 
       copyElem1 = elem2;
@@ -228,10 +228,10 @@ headers.addEventListener('click', (e) => {
     tbody.appendChild(listToSort[i].row);
   }
 
-  if (statuses[th] === true) {
-    statuses[th] = false;
+  if (statuses[th.cellIndex] === true) {
+    statuses[th.cellIndex] = false;
   } else {
-    statuses[th] = true;
+    statuses[th.cellIndex] = true;
   }
 });
 
@@ -316,14 +316,6 @@ for (let i = 0; i < inputs.length; i++) {
     officeElem.setAttribute('name', 'office');
     officeElem.setAttribute('data-qa', 'office');
 
-    const startOption = document.createElement('option');
-
-    startOption.setAttribute('selected', '');
-    startOption.setAttribute('disabled', '');
-    startOption.textContent = 'Select office';
-
-    officeElem.appendChild(startOption);
-
     for (const office of offices) {
       const option = document.createElement('option');
 
@@ -366,6 +358,12 @@ form.addEventListener('submit', (e) => {
 
   for (let i = 0; i < inputs.length; i++) {
     const input = inputs[i];
+    const raw = data.get(input);
+
+    if (raw === null || typeof raw === 'undefined') {
+      return;
+    }
+
     const value = data.get(input).trim();
 
     if (!checkInput(i, value)) {
