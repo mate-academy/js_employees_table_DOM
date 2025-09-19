@@ -5,8 +5,8 @@ const headers = document.querySelector('thead tr');
 const statuses = {};
 const body = document.querySelector('body');
 
-const wordsRegex = /([^a-zA-Z ])/g;
-const digitsRegex = /\D/g;
+const wordsRegex = /^[a-zA-Z ]+$/;
+const digitsRegex = /^(\d)+$/;
 const inputs = ['name', 'position', 'office', 'age', 'salary'];
 const offices = [
   'Tokyo',
@@ -58,7 +58,7 @@ const pushNotification = (posTop, posRight, title, description, type) => {
 
 function checkInput(index, value) {
   const input = inputs[index];
-  const trimmedValue = value.trim();
+  let trimmedValue = value.trim();
 
   if (
     typeof index !== 'number' ||
@@ -66,7 +66,7 @@ function checkInput(index, value) {
     typeof input === 'undefined' ||
     input === null
   ) {
-    return;
+    return false;
   }
 
   if (
@@ -86,8 +86,8 @@ function checkInput(index, value) {
   }
 
   if (
-    (wordsRegex.test(trimmedValue) && index <= 2) ||
-    (digitsRegex.test(trimmedValue) && index > 2)
+    (!wordsRegex.test(trimmedValue) && index <= 2) ||
+    (!digitsRegex.test(trimmedValue) && index > 2)
   ) {
     pushNotification(
       10,
@@ -112,8 +112,17 @@ function checkInput(index, value) {
     return false;
   }
 
-  if (input === 'age' && (trimmedValue < 18 || trimmedValue > 90)) {
+  if (
+    input === 'age' &&
+    (Number(trimmedValue) < 18 || Number(trimmedValue) > 90)
+  ) {
     let message = '';
+
+    trimmedValue = +trimmedValue;
+
+    if (Number.isNaN(trimmedValue)) {
+      return false;
+    }
 
     if (trimmedValue < 18) {
       message = 'Minimum age for registration is 18';
@@ -139,14 +148,18 @@ function formatInput(identifier, value) {
   }
 
   if (key === 'salary') {
+    if (Number.isNaN(+value)) {
+      return false;
+    }
+
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(value);
+    }).format(+value);
   } else {
-    return value.trim();
+    return String(value).trim();
   }
 }
 
@@ -159,19 +172,19 @@ headers.addEventListener('click', (e) => {
   const th = e.target.closest('th');
 
   if (!th) {
-    return;
+    return false;
   }
 
   const aimIndx = th?.cellIndex;
 
   if (typeof aimIndx !== 'number' || aimIndx === -1) {
-    return;
+    return false;
   }
 
   for (let i = 0; i < bodyRows.length; i++) {
     const row = bodyRows[i];
 
-    if (row.children.length < aimIndx) {
+    if (aimIndx < 0 || row.children.length < aimIndx) {
       continue;
     }
 
@@ -192,7 +205,7 @@ headers.addEventListener('click', (e) => {
       typeof elem2 === 'undefined' ||
       elem2 === null
     ) {
-      return;
+      return 0;
     }
 
     if (statuses[th.cellIndex] === true) {
@@ -236,43 +249,109 @@ headers.addEventListener('click', (e) => {
 });
 
 // Changing value by doubleclick
-tbody.addEventListener('click', (e) => {
-  const activeTr = document.querySelector('tr.active');
+// tbody.addEventListener('click', (e) => {
+//   const activeTr = document.querySelector('tr.active');
 
-  if (e.target.closest('tr') === activeTr) {
-    const td = e.target.closest('td');
+//   if (e.target.closest('tr') === activeTr) {
+//     const td = e.target.closest('td');
 
-    if (
-      typeof td !== 'undefined' &&
-      td !== null &&
-      !document.querySelector('tr.active input') &&
-      !document.querySelector('tr.active select')
-    ) {
-      const cellIndex = td.cellIndex;
-      const tdPreviousValue = td.textContent;
+//     if (
+//       typeof td !== 'undefined' &&
+//       td !== null &&
+//       !document.querySelector('tr.active input') &&
+//       !document.querySelector('tr.active select')
+//     ) {
+//       const cellIndex = td.cellIndex;
+//       const tdPreviousValue = td.textContent;
 
-      td.textContent = '';
+//       td.textContent = '';
 
-      const input = document.createElement('input');
+//       const input = document.createElement('input');
 
-      input.classList.add('cell-input');
-      input.setAttribute('type', 'text');
-      input.setAttribute('name', 'input-field');
+//       input.classList.add('cell-input');
+//       input.setAttribute('type', 'text');
+//       input.setAttribute('name', 'input-field');
 
-      td.appendChild(input);
+//       td.appendChild(input);
 
-      input.focus();
+//       input.focus();
 
-      input.addEventListener('change', () => {
-        if (!checkInput(cellIndex, input.value)) {
-          td.textContent = tdPreviousValue;
-        } else {
+//       input.addEventListener('change', () => {
+//         if (!checkInput(cellIndex, input.value)) {
+//           td.textContent = tdPreviousValue;
+//         } else {
+//           const result = formatInput(cellIndex, input.value);
+
+//           if (result) {
+//             td.textContent = formatInput(cellIndex, input.value);
+//           } else {
+//             td.textContent = tdPreviousValue;
+//           }
+//         }
+
+//         input.remove();
+//       });
+//     }
+//   }
+// });
+
+tbody.addEventListener('dblclick', (e) => {
+  const td = e.target.closest('td');
+
+  if (
+    typeof td !== 'undefined' &&
+    td !== null &&
+    !document.querySelector('tr.active input') &&
+    !document.querySelector('tr.active select')
+  ) {
+    const cellIndex = td.cellIndex;
+    const tdPreviousValue = td.textContent;
+
+    td.textContent = '';
+
+    const input = document.createElement('input');
+
+    input.classList.add('cell-input');
+    input.setAttribute('type', 'text');
+    input.setAttribute('name', 'input-field');
+
+    td.appendChild(input);
+
+    input.focus();
+
+    input.addEventListener('blur', () => {
+      if (!checkInput(cellIndex, input.value)) {
+        td.textContent = tdPreviousValue;
+      } else {
+        const result = formatInput(cellIndex, input.value);
+
+        if (result) {
           td.textContent = formatInput(cellIndex, input.value);
+        } else {
+          td.textContent = tdPreviousValue;
         }
+      }
 
-        input.remove();
-      });
-    }
+      input.remove();
+    });
+
+    input.addEventListener('keydown', (evnt) => {
+      if (evnt.key !== 'Enter') {
+        return;
+      }
+
+      if (!checkInput(cellIndex, input.value)) {
+        td.textContent = tdPreviousValue;
+      } else {
+        const result = formatInput(cellIndex, input.value);
+
+        if (result) {
+          td.textContent = formatInput(cellIndex, input.value);
+        } else {
+          td.textContent = tdPreviousValue;
+        }
+      }
+    });
   }
 });
 
@@ -364,7 +443,7 @@ form.addEventListener('submit', (e) => {
       return;
     }
 
-    const value = data.get(input).trim();
+    const value = raw.trim();
 
     if (!checkInput(i, value)) {
       return;
@@ -376,7 +455,11 @@ form.addEventListener('submit', (e) => {
   for (const [key, value] of data.entries()) {
     const cell = document.createElement('td');
 
-    cell.textContent = formatInput(key, value);
+    if (key === 'salary' || key === 'age') {
+      cell.textContent = formatInput(key, +value);
+    } else {
+      cell.textContent = formatInput(key, value);
+    }
 
     row.appendChild(cell);
   }
