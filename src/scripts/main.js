@@ -94,8 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Creating form elements
   const labName = createInput('Name:', 'name', 'text', 'name');
   const labPosition = createInput('Position:', 'position', 'text', 'position');
-  const labAge = createInput('Age:', 'age', 'text', 'age');
-  const labSalary = createInput('Salary:', 'salary', 'text', 'salary');
+  const labAge = createInput('Age:', 'age', 'number', 'age');
+  const labSalary = createInput('Salary:', 'salary', 'number', 'salary');
 
   // Creating select
   const labOffice = document.createElement('label');
@@ -229,10 +229,15 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (tbody.querySelector('.cell-input')) {
+      return;
+    }
+
     const oldText = td.textContent;
 
     const input = document.createElement('input');
 
+    input.classList.add('cell-input');
     input.type = 'text';
     input.value = oldText;
 
