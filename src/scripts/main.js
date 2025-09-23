@@ -146,13 +146,21 @@ document.addEventListener('DOMContentLoaded', () => {
       positionVal,
       officeVal,
       ageVal,
-      `$${salaryVal.toLocaleString()}`,
+      `$${salaryVal.toLocaleString('en-US')}`,
     ];
 
     if (nameVal.length < 4) {
       return pushNotification(
         'Error!',
         'Name value should be more than 4 symbols',
+        'error',
+      );
+    }
+
+    if (positionVal.length < 2) {
+      return pushNotification(
+        'Error!',
+        'Position value should have at least 2 symbols',
         'error',
       );
     }
@@ -183,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tbody.append(tr);
     form.reset();
 
-    pushNotification('Succes!', 'Employee has been added!', 'succes');
+    pushNotification('Success!', 'Employee has been added!', 'success');
   });
 
   // Showing notification
@@ -194,6 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const p = document.createElement('p');
 
     notification.classList.add('notification', type);
+    notification.setAttribute('data-qa', 'notification');
     h2.classList.add('title');
 
     h2.textContent = title;
@@ -208,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
       notification.style.visibility = 'hidden';
-    }, 3000);
+    }, 5000);
   };
 
   // Changing information on DoubleClick
