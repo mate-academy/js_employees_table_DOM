@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   form.classList.add('new-employee-form');
 
-  function createInput(labelText, inputName, type, qaAttr) {
+  function createInput(labelText, inputName, type, qaAttr, req = true) {
     const label = document.createElement('label');
 
     label.textContent = labelText + ' ';
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     input.setAttribute('name', inputName);
     input.setAttribute('type', type);
     input.setAttribute('data-qa', qaAttr);
-    input.required = true;
+    input.required = req;
 
     label.appendChild(input);
 
@@ -93,7 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Creating form elements
   const labName = createInput('Name:', 'name', 'text', 'name');
-  const labPosition = createInput('Position:', 'position', 'text', 'position');
+  const labPosition = createInput(
+    'Position:',
+    'position',
+    'text',
+    'position',
+    false,
+  );
   const labAge = createInput('Age:', 'age', 'number', 'age');
   const labSalary = createInput('Salary:', 'salary', 'number', 'salary');
 
@@ -150,35 +156,39 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     if (nameVal.length < 4) {
-      return pushNotification(
+      pushNotification(
         'Error!',
         'Name value should be more than 4 symbols',
         'error',
       );
+
+      return;
     }
 
-    if (positionVal.length < 2) {
-      return pushNotification(
+    if (!positionVal || positionVal.length < 2) {
+      pushNotification(
         'Error!',
-        'Position value should have at least 2 symbols',
+        'Position value should have at least 2 characters',
         'error',
       );
+
+      return;
     }
 
     if (isNaN(ageVal) || ageVal < 18 || ageVal > 90) {
-      return pushNotification(
-        'Error!',
-        'Age should be not bigger than 90 and not smaller than 18',
-        'error',
-      );
+      pushNotification('Error!', 'Age should be between 18 and 90', 'error');
+
+      return;
     }
 
     if (isNaN(salaryVal) || salaryVal <= 0) {
-      return pushNotification(
+      pushNotification(
         'Error!',
         'Salary must be a valid number (bigger than 0)',
         'error',
       );
+
+      return;
     }
 
     fields.forEach((field) => {
@@ -216,8 +226,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(notification);
 
     setTimeout(() => {
-      notification.style.visibility = 'hidden';
-    }, 5000);
+      notification.remove();
+    }, 3000);
   };
 
   // Changing information on DoubleClick
