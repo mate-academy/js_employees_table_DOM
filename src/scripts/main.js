@@ -177,8 +177,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const empName = form.name.value.trim();
       const position = form.position.value.trim();
       const office = form.office.value;
-      const age = Number(String(form.age.value).trim());
-      const salary = Number(String(form.salary.value).trim());
+      const ageStr = String(form.age.value).trim();
+      const salaryStr = String(form.salary.value).trim();
+
+      if (
+        !empName ||
+        !position ||
+        !office ||
+        ageStr === '' ||
+        salaryStr === ''
+      ) {
+        pushNotification(10, 10, 'Помилка', 'Усі поля обовʼязкові.', 'error');
+
+        return;
+      }
 
       if (empName.length < 4) {
         pushNotification(
@@ -192,17 +204,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      if (position.length < 4) {
-        pushNotification(
-          10,
-          10,
-          'Помилка',
-          'Position має містити щонайменше 4 літери.',
-          'error',
-        );
-
-        return;
-      }
+      const age = Number(ageStr);
+      const salary = Number(salaryStr);
 
       if (!Number.isFinite(age) || age < 18 || age > 90) {
         pushNotification(
@@ -224,12 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
           'Salary має бути додатнім числом.',
           'error',
         );
-
-        return;
-      }
-
-      if (!office) {
-        pushNotification(10, 10, 'Помилка', 'Усі поля обовʼязкові.', 'error');
 
         return;
       }
