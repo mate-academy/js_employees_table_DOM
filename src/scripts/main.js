@@ -107,8 +107,10 @@ function setupFormHandler() {
       return showNotification('error', 'All fields are required.');
     }
 
-    if (nameForm.length < 4) {
-      return showNotification('error', 'Name must be at least 4 characters.');
+    const letterCount = (nameForm.match(/[A-Za-z]/g) || []).length;
+
+    if (letterCount < 4) {
+      return showNotification('error', 'Name must contain at least 4 letters.');
     }
 
     if (age < 18 || age > 90) {
@@ -130,7 +132,11 @@ function setupFormHandler() {
   });
 }
 
-function showNotification(type, message) {
+function showNotification(
+  type,
+  message,
+  title = type === 'error' ? 'Error' : 'Success',
+) {
   const existing = document.querySelector('[data-qa="notification"]');
 
   if (existing) {
@@ -141,7 +147,19 @@ function showNotification(type, message) {
 
   note.className = type;
   note.setAttribute('data-qa', 'notification');
-  note.textContent = message;
+
+  const titleEl = document.createElement('div');
+
+  titleEl.className = 'notification__title';
+  titleEl.textContent = title;
+
+  const descEl = document.createElement('div');
+
+  descEl.className = 'notification__description';
+  descEl.textContent = message;
+
+  note.appendChild(titleEl);
+  note.appendChild(descEl);
 
   document.querySelector('table').insertAdjacentElement('beforebegin', note);
   setTimeout(() => note.remove(), 3000);
