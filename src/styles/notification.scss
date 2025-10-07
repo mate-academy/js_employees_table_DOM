@@ -1,0 +1,44 @@
+.logo {
+  text-transform: uppercase;
+  background-color: #fc4b3b;
+  color: white;
+  border-radius: 16px;
+  user-select: none;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification {
+  position: absolute;
+  width: 300px;
+  min-height: 100px;
+  padding: 0 16px;
+  box-sizing: border-box;
+
+  border-radius: 10px;
+  background: rgba(132, 132, 132, 0.3);
+
+  top: 10px;
+  right: 10px;
+
+  .title {
+    display: block;
+    font-size: 20px;
+    font-weight: 900;
+  }
+
+  &.warning {
+    background: rgba(255, 212, 39, 0.3);
+  }
+
+  &.success {
+    background: rgba(10, 189, 0, 0.3);
+  }
+
+  &.error {
+    background: rgba(253, 0, 0, 0.3);
+  }
+}
