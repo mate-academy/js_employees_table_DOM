@@ -1,7 +1,7 @@
 'use strict';
 
 import { pushNotification } from './notification.js';
-import { validateInput, createNewRow } from './functions.js';
+import { validateInput, createNewRow, createChangeCells } from './functions.js';
 
 const tab = document.querySelector('table');
 const rowTh = tab.firstElementChild;
@@ -177,26 +177,12 @@ btnForm.addEventListener('click', (e) => {
 
 // Редактируемая строка.
 
-// console.log('tBodi1 =', tBodi1);
-
 tBodi1.addEventListener('dblclick', (e) => {
-  // console.log('dblclick пойман!', e.target);
-
   const td = e.target.closest('td');
 
   if (!td) {
     return;
   }
 
-  const oldValue = td.textContent;
-  const input = document.createElement('input');
-
-  input.value = oldValue;
-  td.textContent = '';
-  td.append(input);
-  input.focus();
-
-  input.addEventListener('blur', () => {
-    td.textContent = input.value;
-  });
+  createChangeCells(td);
 });

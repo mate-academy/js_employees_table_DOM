@@ -1,20 +1,28 @@
 export const validateInput = (inp) => {
   const value = inp.value.trim().toLowerCase();
-  const typ = inp.type.toLowerCase();
   const data = inp.dataset.qa;
 
-  if (data === 'office') {
+  if (data === 'Office') {
     return true;
   }
 
-  if (typ === 'text') {
-    return /^[A-Za-zА-Яа-яЁё\s]+$/.test(value);
+  if (data === 'Name') {
+    return value.length >= 4 && /^[A-Za-zА-Яа-яЁё\s]+$/.test(value);
   }
 
-  if (typ === 'number') {
+  if (data === 'Age') {
+    return value >= 18 && value <= 90;
+  }
+
+  if (data === 'Position') {
+    return value.length >= 4 && /^[A-Za-zА-Яа-яЁё\s]+$/.test(value);
+  }
+
+  if (data === 'Salary') {
     return /^[0-9]+$/.test(value);
   }
 };
+
 // Создание строки с колонками при Клике.
 
 export function createNewRow(arrayInput) {
@@ -35,4 +43,22 @@ export function createNewRow(arrayInput) {
   }
 
   return row;
+}
+
+export function createChangeCells(cells) {
+  const oldValue = cells.textContent;
+  const input = document.createElement('input');
+
+  input.value = oldValue;
+  cells.textContent = '';
+  cells.append(input);
+  input.focus();
+
+  function handleInput(even) {
+    if (even.type === 'blur' || even.key === 'Enter') {
+      cells.textContent = input.value || oldValue;
+    }
+  }
+  input.addEventListener('blur', handleInput);
+  input.addEventListener('keydown', handleInput);
 }

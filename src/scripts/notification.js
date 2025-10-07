@@ -19,5 +19,5 @@ export const pushNotification = (
   div.append(h2, p);
   document.body.append(div);
 
-  setTimeout(() => (div.hidden = true), 7000);
+  setTimeout(() => (div.hidden = true), 5000);
 };
