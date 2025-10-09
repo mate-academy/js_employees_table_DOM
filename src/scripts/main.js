@@ -8,11 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function parseValue(value, colIndex) {
     if (colIndex === 3) {
-      return parseInt(value) || 0;
+      return Number(value) || 0;
     }
 
     if (colIndex === 4) {
-      return parseInt(value.replace(/[^0-9]/g, '')) || 0;
+      return Number(value.replace(/[^0-9.]/g, '')) || 0;
     }
 
     return value.toLowerCase();
@@ -47,12 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
     sortDirections[index] = 'asc';
 
     th.addEventListener('click', () => {
-      if (lastSortedIndex !== index) {
-        sortDirections[index] = 'asc';
-      } else {
-        sortDirections[index] =
-          sortDirections[index] === 'asc' ? 'desc' : 'asc';
-      }
+      sortDirections[index] =
+        lastSortedIndex !== index
+          ? 'asc'
+          : sortDirections[index] === 'asc'
+            ? 'desc'
+            : 'asc';
       sortTable(index, sortDirections[index]);
       lastSortedIndex = index;
     });
@@ -67,12 +67,14 @@ document.addEventListener('DOMContentLoaded', () => {
   tbody.addEventListener('click', (e) => {
     const tr = e.target.closest('tr');
 
-    if (tr) {
-      tbody
-        .querySelectorAll('tr')
-        .forEach((row) => row.classList.remove('active'));
-      tr.classList.add('active');
+    if (!tr) {
+      return;
     }
+
+    tbody
+      .querySelectorAll('tr')
+      .forEach((row) => row.classList.remove('active'));
+    tr.classList.add('active');
   });
 
   const form = document.createElement('form');
@@ -80,23 +82,23 @@ document.addEventListener('DOMContentLoaded', () => {
   form.classList.add('new-employee-form');
 
   form.innerHTML = `
-<label>Name: <input name="name" type="text" data-qa="name"></label>
-<label>Position: <input name="position" type="text" data-qa="position"></label>
-<label>Office:
-  <select name="office" data-qa="office">
-    <option value="Tokyo">Tokyo</option>
-    <option value="Singapore">Singapore</option>
-    <option value="London">London</option>
-    <option value="New York">New York</option>
-    <option value="Edinburgh">Edinburgh</option>
-    <option value="San Francisco">San Francisco</option>
-  </select>
-</label>
-<label>Age: <input name="age" type="number" data-qa="age"></label>
-<label>Salary: <input name="salary" type="number" data-qa="salary"></label>
-<button type="submit">Save to table</button>
-`;
-
+    <label>Name: <input name="name" type="text" data-qa="name" required></label>
+    <label>Position: <input name="position" type="text" data-qa="position" required></label>
+    <label>Office:
+      <select name="office" data-qa="office" required>
+        <option value="">Select office</option>
+        <option value="Tokyo">Tokyo</option>
+        <option value="Singapore">Singapore</option>
+        <option value="London">London</option>
+        <option value="New York">New York</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="San Francisco">San Francisco</option>
+      </select>
+    </label>
+    <label>Age: <input name="age" type="number" data-qa="age" required></label>
+    <label>Salary: <input name="salary" type="number" data-qa="salary" required></label>
+    <button type="submit">Save to table</button>
+  `;
   document.body.insertBefore(form, table);
 
   const notification = document.createElement('div');
@@ -113,17 +115,26 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
 
     const empName = form.name.value.trim();
-    const empPosition = form.position.value.trim();
-    const empOffice = form.office.value;
-    const empAge = parseInt(form.age.value.trim());
-    const empSalary = parseInt(form.salary.value.trim());
+    const lettersCount = (empName.match(/[A-Za-z]/g) || []).length;
+    const position = form.position.value.trim();
+    const office = form.office.value;
+    const empAge = Number(form.age.value);
+    const empSalary = Number(form.salary.value);
 
-    if (empName.length < 4) {
-      return showNotification('Name must be at least 4 characters', 'error');
+    if (lettersCount < 4) {
+      return showNotification('Name must have at least 4 letters', 'error');
     }
 
-    if (!empPosition || !empOffice || isNaN(empAge) || isNaN(empSalary)) {
-      return showNotification('All fields are required', 'error');
+    if (
+      !position ||
+      !office ||
+      !Number.isFinite(empAge) ||
+      !Number.isFinite(empSalary)
+    ) {
+      return showNotification(
+        'All fields are required and must be valid',
+        'error',
+      );
     }
 
     if (empAge < 18 || empAge > 90) {
@@ -133,12 +144,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const tr = document.createElement('tr');
 
     tr.innerHTML = `
-<td>${empName}</td>
-<td>${empPosition}</td>
-<td>${empOffice}</td>
-<td>${empAge}</td>
-<td>$${empSalary.toLocaleString('en-US')}</td>
-`;
+      <td>${empName}</td>
+      <td>${position}</td>
+      <td>${office}</td>
+      <td>${empAge}</td>
+      <td>$${empSalary.toLocaleString('en-US')}</td>
+    `;
     tbody.appendChild(tr);
     form.reset();
     showNotification('Employee added successfully', 'success');
@@ -151,23 +162,45 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const originalText = cell.textContent;
+    const existingInput = document.querySelector('.cell-input');
+
+    if (existingInput) {
+      existingInput.blur();
+
+      return;
+    }
+
+    const originalText = cell.textContent.trim();
     const input = document.createElement('input');
 
     input.classList.add('cell-input');
-    input.value = originalText.replace(/[^0-9,.$]/g, '');
-    cell.innerHTML = '';
+    input.value = originalText;
+    cell.textContent = '';
     cell.appendChild(input);
     input.focus();
 
     input.addEventListener('blur', () => {
-      cell.textContent = input.value.trim() || originalText;
+      const value = input.value.trim();
+
+      if (cell.cellIndex === 4) {
+        const numVal = Number(value.replace(/[^0-9.]/g, ''));
+
+        if (Number.isFinite(numVal)) {
+          cell.textContent = `$${numVal.toLocaleString('en-US')}`;
+        } else {
+          cell.textContent = originalText;
+        }
+      } else {
+        cell.textContent = value || originalText;
+      }
     });
 
     input.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') {
         ev.preventDefault();
-        cell.textContent = input.value.trim() || originalText;
+        input.blur();
+      } else if (ev.key === 'Escape') {
+        cell.textContent = originalText;
       }
     });
   });
