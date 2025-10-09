@@ -7,15 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastSortedIndex = null;
 
   function parseValue(value, colIndex) {
-    if (colIndex === 3) {
-      return Number(value) || 0;
+    if (colIndex === 3 || colIndex === 4) {
+      const raw = colIndex === 4 ? value.replace(/[^0-9.]/g, '') : value;
+      const num = Number(raw);
+
+      return Number.isFinite(num) ? num : NaN;
     }
 
-    if (colIndex === 4) {
-      return Number(value.replace(/[^0-9.]/g, '')) || 0;
-    }
-
-    return value.toLowerCase();
+    return String(value).toLowerCase();
   }
 
   function sortTable(columnIndex, direction) {
@@ -32,13 +31,29 @@ document.addEventListener('DOMContentLoaded', () => {
       );
 
       if (typeof cellA === 'number' && typeof cellB === 'number') {
+        const aNaN = Number.isNaN(cellA);
+        const bNaN = Number.isNaN(cellB);
+
+        if (aNaN && bNaN) {
+          return 0;
+        }
+
+        if (aNaN) {
+          return 1;
+        }
+
+        if (bNaN) {
+          return -1;
+        }
+
         return direction === 'asc' ? cellA - cellB : cellB - cellA;
       }
 
       return direction === 'asc'
-        ? cellA.localeCompare(cellB)
-        : cellB.localeCompare(cellA);
+        ? String(cellA).localeCompare(String(cellB))
+        : String(cellB).localeCompare(String(cellA));
     });
+
     tbody.innerHTML = '';
     rowsArray.forEach((row) => tbody.appendChild(row));
   }
@@ -86,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
     <label>Position: <input name="position" type="text" data-qa="position" required></label>
     <label>Office:
       <select name="office" data-qa="office" required>
-        <option value="">Select office</option>
         <option value="Tokyo">Tokyo</option>
         <option value="Singapore">Singapore</option>
         <option value="London">London</option>
@@ -122,7 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const empSalary = Number(form.salary.value);
 
     if (lettersCount < 4) {
-      return showNotification('Name must have at least 4 letters', 'error');
+      showNotification('Name must have at least 4 letters', 'error');
+
+      return;
     }
 
     if (
@@ -131,14 +147,15 @@ document.addEventListener('DOMContentLoaded', () => {
       !Number.isFinite(empAge) ||
       !Number.isFinite(empSalary)
     ) {
-      return showNotification(
-        'All fields are required and must be valid',
-        'error',
-      );
+      showNotification('All fields are required and must be valid', 'error');
+
+      return;
     }
 
     if (empAge < 18 || empAge > 90) {
-      return showNotification('Age must be between 18 and 90', 'error');
+      showNotification('Age must be between 18 and 90', 'error');
+
+      return;
     }
 
     const tr = document.createElement('tr');
@@ -148,9 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <td>${position}</td>
       <td>${office}</td>
       <td>${empAge}</td>
-      <td>$${empSalary.toLocaleString('en-US')}</td>
+      <td>$${Number(empSalary).toLocaleString('en-US')}</td>
     `;
     tbody.appendChild(tr);
+
     form.reset();
     showNotification('Employee added successfully', 'success');
   });
@@ -166,18 +184,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (existingInput) {
       existingInput.blur();
-
-      return;
     }
 
     const originalText = cell.textContent.trim();
     const input = document.createElement('input');
 
     input.classList.add('cell-input');
-    input.value = originalText;
+
+    input.value =
+      cell.cellIndex === 4
+        ? Number(originalText.replace(/[^0-9.]/g, '')) || originalText
+        : originalText;
+
     cell.textContent = '';
     cell.appendChild(input);
     input.focus();
+
+    function cleanUpAndRestore(text) {
+      if (cell.contains(input)) {
+        input.remove();
+      }
+      cell.textContent = text;
+    }
 
     input.addEventListener('blur', () => {
       const value = input.value.trim();
@@ -185,13 +213,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cell.cellIndex === 4) {
         const numVal = Number(value.replace(/[^0-9.]/g, ''));
 
-        if (Number.isFinite(numVal)) {
-          cell.textContent = `$${numVal.toLocaleString('en-US')}`;
-        } else {
-          cell.textContent = originalText;
-        }
+        cleanUpAndRestore(
+          Number.isFinite(numVal)
+            ? `$${numVal.toLocaleString('en-US')}`
+            : originalText,
+        );
       } else {
-        cell.textContent = value || originalText;
+        cleanUpAndRestore(value || originalText);
       }
     });
 
@@ -199,8 +227,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ev.key === 'Enter') {
         ev.preventDefault();
         input.blur();
-      } else if (ev.key === 'Escape') {
-        cell.textContent = originalText;
+      }
+
+      if (ev.key === 'Escape') {
+        cleanUpAndRestore(originalText);
       }
     });
   });
