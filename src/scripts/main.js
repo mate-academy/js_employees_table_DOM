@@ -16,6 +16,7 @@ const toNumberIfPossible = (value) => {
 const tlo = document.querySelectorAll('thead th');
 const list = [...tlo];
 let ascending = true;
+let lastSortedIndex = -1;
 
 const tbody = document.querySelector('tbody');
 
@@ -31,6 +32,11 @@ tbody.addEventListener('click', (eve) => {
 list.forEach((column) => {
   column.addEventListener('click', () => {
     const index = list.indexOf(column);
+
+    if (index !== lastSortedIndex) {
+      ascending = true;
+    }
+
     const dataList = [...document.querySelectorAll('tbody tr')];
 
     dataList.sort((a, b) => {
@@ -51,6 +57,7 @@ list.forEach((column) => {
     tbody.innerHTML = '';
     dataList.forEach((row) => tbody.appendChild(row));
     ascending = !ascending;
+    lastSortedIndex = index;
   });
 });
 
@@ -216,6 +223,7 @@ const addNewRowToTable = (employeeData) => {
 
 const notification = document.createElement('div');
 
+// notification.classList('error');
 notification.setAttribute('data-qa', 'notification');
 notification.style.display = 'none';
 newForm.before(notification);
@@ -228,7 +236,7 @@ const showNotification = (message, type = 'error') => {
 
   setTimeout(() => {
     notification.style.display = 'none';
-    notification.classList.remove('error');
+    notification.classList.remove('error', 'success');
   }, 4000);
 };
 
@@ -297,6 +305,8 @@ newForm.addEventListener('submit', (events) => {
   };
 
   addNewRowToTable(employeeData);
+
+  showNotification('Employee added', 'success');
 
   newForm.reset();
 });
