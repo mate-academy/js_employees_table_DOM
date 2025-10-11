@@ -45,11 +45,18 @@ function sortTable(rows, id, count) {
 // клик по колонке заголовка
 
 let countClick = 0;
+let targCol = 0;
 
 rowTh.addEventListener('click', (e) => {
-  countClick += 1;
-
   const idCol = e.target.closest('th').cellIndex;
+
+  if (targCol === idCol) {
+    countClick++;
+  } else {
+    targCol = idCol;
+    countClick = 1;
+  }
+
   const rowArray = Array.from(tab.tBodies[0].rows);
   const sortArray = sortTable(rowArray, idCol, countClick);
 
@@ -85,7 +92,7 @@ function createFields(nameEl, typeEl) {
 
     const arrOffice = [
       '',
-      'Tokio',
+      'Tokyo',
       'Singapore',
       'London',
       'New York',
@@ -118,11 +125,11 @@ function createFields(nameEl, typeEl) {
 }
 
 form.append(
-  createFields('Name', 'text'),
-  createFields('Position', 'text'),
-  createFields('Office', 'select'),
-  createFields('Age', 'number'),
-  createFields('Salary', 'number'),
+  createFields('name', 'text'),
+  createFields('position', 'text'),
+  createFields('office', 'select'),
+  createFields('age', 'number'),
+  createFields('salary', 'number'),
   btnForm,
 );
 
@@ -155,9 +162,9 @@ btnForm.addEventListener('click', (e) => {
     pushNotification(
       180,
       180,
-      'Error message',
-      `Incorrect data format: ${firstInvalid.dataset.qa} is not filled`,
-      'warning',
+      'filling error',
+      `Invalid field data: ${firstInvalid.dataset.qa}`,
+      'error',
     );
 
     return;

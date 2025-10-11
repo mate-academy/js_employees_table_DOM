@@ -1,24 +1,24 @@
 export const validateInput = (inp) => {
-  const value = inp.value.trim().toLowerCase();
+  const value = inp.value.trim();
   const data = inp.dataset.qa;
 
-  if (data === 'Office') {
+  if (data === 'office') {
     return true;
   }
 
-  if (data === 'Name') {
+  if (data === 'name') {
     return value.length >= 4 && /^[A-Za-zА-Яа-яЁё\s]+$/.test(value);
   }
 
-  if (data === 'Age') {
+  if (data === 'age') {
     return value >= 18 && value <= 90;
   }
 
-  if (data === 'Position') {
+  if (data === 'position') {
     return value.length >= 4 && /^[A-Za-zА-Яа-яЁё\s]+$/.test(value);
   }
 
-  if (data === 'Salary') {
+  if (data === 'salary') {
     return /^[0-9]+$/.test(value);
   }
 };
@@ -33,8 +33,8 @@ export function createNewRow(arrayInput) {
     const data = arrayInput[i].dataset.qa;
     const value = arrayInput[i].value;
 
-    if (data === 'Salary') {
-      col.textContent = `$${value}`;
+    if (data === 'salary') {
+      col.textContent = `$${Number(value).toLocaleString('en-US')}`;
     } else {
       col.textContent = value;
     }
