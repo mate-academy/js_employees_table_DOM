@@ -61,14 +61,6 @@ list.forEach((column) => {
   });
 });
 
-const rowsClick = [...document.querySelectorAll('tbody tr')];
-
-rowsClick.forEach((row) => {
-  row.addEventListener('click', () => {
-    row.classList.add('active');
-  });
-});
-
 // #endregion //
 
 // #region form //
@@ -300,7 +292,7 @@ newForm.addEventListener('submit', (events) => {
     name: nameValue,
     position: positionValue,
     office: newOffice.value,
-    age: ageValue,
+    age: ager,
     salary: formattedSalary,
   };
 
