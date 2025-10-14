@@ -5,6 +5,26 @@ const headers = document.querySelectorAll('thead th');
 const tbody = document.querySelector('tbody');
 const rows = Array.from(tbody.querySelectorAll('tr'));
 
+function formatSalary(salary) {
+  if (salary === null || salary === undefined) {
+    return null;
+  }
+
+  const s = String(salary).trim();
+
+  if (s === '') {
+    return null;
+  }
+
+  const num = Number(s);
+
+  if (isNaN(num)) {
+    return null;
+  }
+
+  return '$' + num.toLocaleString('en-US');
+}
+
 addRowClickListener();
 
 let sortColumnIndex = null;
@@ -157,9 +177,12 @@ form.addEventListener('submit', (e) => {
     ? form.elements['office'].value.trim()
     : '';
   const ageLb = Number(form.elements['age'].value);
-  const salaryRaw = form.elements['salary'].value.trim();
+  const salaryLb = form.elements['salary'].value.trim();
 
-  if (nameLb.length < 4) {
+  const matches = nameLb.match(/[A-Za-z\u00C0-\u017FА-Яа-яЁё]/g) || [];
+  const lettersCount = matches.length;
+
+  if (lettersCount < 4) {
     showNotification('Помилка: Ім’я має містити щонайменше 4 літери.', true);
 
     return;
@@ -178,38 +201,27 @@ form.addEventListener('submit', (e) => {
   }
 
   if (!officeLb) {
-    showNotification('Помилка: Будь ласка, виберіть офіс.', true);
+    showNotification('Помилка: Будь ласка, оберіть офіс.', true);
 
     return;
   }
 
-  const salaryDigits = salaryRaw.replace(/[^\d.-]/g, '');
-  const salaryNum = salaryDigits === '' ? NaN : Number(salaryDigits);
-
-  if (salaryRaw === '' || isNaN(salaryNum)) {
-    showNotification('Помилка: Будь ласка, введіть коректну зарплату.', true);
+  if (salaryLb === '') {
+    showNotification('Помилка: Будь ласка, введіть зарплату.', true);
 
     return;
   }
 
-  function formatSalary(salary) {
-    const num = Number(salary.replace(/[^\d.-]/g, ''));
+  const formatted = formatSalary(salaryLb);
 
-    if (isNaN(num)) {
-      return salary;
-    }
+  if (formatted === null) {
+    showNotification('Помилка: Неправильний формат зарплати.', true);
 
-    return '$' + num.toLocaleString('en-US');
+    return;
   }
 
   const newRow = document.createElement('tr');
-  const cellsData = [
-    nameLb,
-    positionLb,
-    officeLb,
-    ageLb,
-    formatSalary(salaryRaw),
-  ];
+  const cellsData = [nameLb, positionLb, officeLb, ageLb, formatted];
 
   cellsData.forEach((data) => {
     const td = document.createElement('td');
@@ -225,8 +237,6 @@ form.addEventListener('submit', (e) => {
   showNotification('Новий співробітник успішно доданий до таблиці.');
   form.reset();
 });
-
-/* ---------- Editing cells (dblclick) ---------- */
 
 let editingCell = null;
 let originalValue = null;
