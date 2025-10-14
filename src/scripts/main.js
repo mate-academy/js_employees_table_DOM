@@ -1,4 +1,4 @@
-'use srict';
+'use strict';
 
 const table = document.querySelector('table');
 const headers = document.querySelectorAll('thead th');
@@ -8,7 +8,7 @@ const rows = Array.from(tbody.querySelectorAll('tr'));
 addRowClickListener();
 
 let sortColumnIndex = null;
-let sortDirection = 1;
+let sortDirection = 1; // 1 for ascending, -1 for descending
 
 headers.forEach((header, index) => {
   header.addEventListener('click', () => {
@@ -84,7 +84,9 @@ fields.forEach((field) => {
 
   input.setAttribute('data-qa', field.name);
 
-  wrapper.append(label, input);
+  label.appendChild(input);
+  wrapper.appendChild(label);
+
   form.appendChild(wrapper);
 });
 
@@ -117,7 +119,9 @@ offices.forEach((city) => {
   officeSelect.appendChild(option);
 });
 
-officeWrapper.append(officeLabel, officeSelect);
+officeLabel.appendChild(officeSelect);
+officeWrapper.appendChild(officeLabel);
+
 form.insertBefore(officeWrapper, form.children[2]);
 
 const saveButton = document.createElement('button');
@@ -149,9 +153,11 @@ form.addEventListener('submit', (e) => {
 
   const nameLb = form.elements['name'].value.trim();
   const positionLb = form.elements['position'].value.trim();
-  const officeLb = form.elements['office'].value.trim();
+  const officeLb = form.elements['office']
+    ? form.elements['office'].value.trim()
+    : '';
   const ageLb = Number(form.elements['age'].value);
-  const salaryLb = form.elements['salary'].value.trim();
+  const salaryRaw = form.elements['salary'].value.trim();
 
   if (nameLb.length < 4) {
     showNotification('Помилка: Ім’я має містити щонайменше 4 літери.', true);
@@ -165,14 +171,29 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  if (ageLb < 18 || ageLb > 90) {
+  if (isNaN(ageLb) || ageLb < 18 || ageLb > 90) {
     showNotification('Помилка: Вік має бути від 18 до 90 років.', true);
 
     return;
   }
 
+  if (!officeLb) {
+    showNotification('Помилка: Будь ласка, виберіть офіс.', true);
+
+    return;
+  }
+
+  const salaryDigits = salaryRaw.replace(/[^\d.-]/g, '');
+  const salaryNum = salaryDigits === '' ? NaN : Number(salaryDigits);
+
+  if (salaryRaw === '' || isNaN(salaryNum)) {
+    showNotification('Помилка: Будь ласка, введіть коректну зарплату.', true);
+
+    return;
+  }
+
   function formatSalary(salary) {
-    const num = Number(salary);
+    const num = Number(salary.replace(/[^\d.-]/g, ''));
 
     if (isNaN(num)) {
       return salary;
@@ -187,7 +208,7 @@ form.addEventListener('submit', (e) => {
     positionLb,
     officeLb,
     ageLb,
-    formatSalary(salaryLb),
+    formatSalary(salaryRaw),
   ];
 
   cellsData.forEach((data) => {
@@ -204,6 +225,8 @@ form.addEventListener('submit', (e) => {
   showNotification('Новий співробітник успішно доданий до таблиці.');
   form.reset();
 });
+
+/* ---------- Editing cells (dblclick) ---------- */
 
 let editingCell = null;
 let originalValue = null;
