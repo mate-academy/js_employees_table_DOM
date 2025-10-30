@@ -3,10 +3,18 @@
 const table = document.querySelector('table');
 let sortKey = '';
 let countOfClick = 0;
-const rows = [...table.tBodies[0].children];
+let rows = [...table.tBodies[0].children];
 const titles = [...table.tHead.rows[0].cells];
 let currentNotificationTop = 10;
 const notificationGap = 15;
+const offices = [
+  `Tokyo`,
+  `Singapore`,
+  `London`,
+  `New York`,
+  `Edinburgh`,
+  `San Francisco`,
+];
 
 createForm();
 
@@ -16,6 +24,8 @@ table.addEventListener('click', (e) => {
   const headers = [...document.querySelectorAll('th')];
   const clickedTh = e.target.closest('th');
   const clickedTr = e.target.closest('tbody tr');
+
+  rows = [...table.tBodies[0].children];
 
   const index = headers.indexOf(clickedTh);
 
@@ -86,6 +96,8 @@ document.addEventListener('submit', (e) => {
   let salary = Number(formData.get('salary'));
   const nameRegex = /^[a-zA-Zа-яА-Я\s]+$/;
 
+  rows = [...table.tBodies[0].children];
+
   if (nameForm.length < 4) {
     validation = true;
 
@@ -102,7 +114,7 @@ document.addEventListener('submit', (e) => {
     pushNotification(
       'Invalid charachters in name',
       'Enter valid date\n',
-      'warning',
+      'error',
     );
   }
 
@@ -112,7 +124,29 @@ document.addEventListener('submit', (e) => {
     pushNotification(
       'Invalid charachters in position',
       'Enter valid data.\n ' + 'Data could contain letters and spaces.',
-      'warning',
+      'error',
+    );
+  }
+
+  if (!office) {
+    validation = true;
+
+    pushNotification(
+      'Wrong choice of office ',
+      'Enter valid data.\n ' +
+        'You need to choose one of the six existing ones',
+      'error',
+    );
+  }
+
+  if (isNaN(salary) || salary > 1000000 || salary < 100) {
+    validation = true;
+
+    pushNotification(
+      'Wrong salary ',
+      'Enter valid data.\n ' +
+        'You need to enter a number between 100 and one million',
+      'error',
     );
   }
 
@@ -219,16 +253,7 @@ function createSelect(titleEl, parentEl) {
   select.name = titleEl.textContent.toLowerCase();
   select.dataset.qa = titleEl.textContent.toLowerCase();
 
-  const indexCol = titles.findIndex(
-    (el) => el.textContent === titleEl.textContent,
-  );
-  const values = new Set();
-
-  for (const row of rows) {
-    values.add(row.children[indexCol].textContent);
-  }
-
-  for (const value of values) {
+  for (const value of offices) {
     const option = document.createElement('option');
 
     option.selected = false;
