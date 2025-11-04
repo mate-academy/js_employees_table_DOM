@@ -33,9 +33,9 @@ const optionSanFrancisco = document.createElement('option');
 optionTokyo.textContent = 'Tokyo';
 optionSingapore.textContent = 'Singapore';
 optionLondon.textContent = 'London';
-optionNewYork.textContent = 'NewYork';
+optionNewYork.textContent = 'New York';
 optionEdinburgh.textContent = 'Edinburgh';
-optionSanFrancisco.textContent = 'SanFrancisco';
+optionSanFrancisco.textContent = 'San Francisco';
 
 ageInput.type = 'number';
 salaryInput.type = 'number';
@@ -177,8 +177,21 @@ submitButton.addEventListener('click', (e) => {
   const age = ageInput.value;
   const salary = salaryInput.value;
 
-  if (Name.length < 4 || Number(age) < 18 || Number(age) > 90) {
-    pushNotification(10, 10, 'Warning!', 'Incorrect data', 'warning');
+  if (!Name || !position || !office || !age || !salary) {
+    return;
+  }
+
+  if (
+    !Name ||
+    Name.length < 4 ||
+    !position ||
+    !age ||
+    !office ||
+    Number(age) < 18 ||
+    Number(age) > 90 ||
+    !salary
+  ) {
+    pushNotification(10, 10, 'Error!', 'Incorrect data', 'error');
 
     return;
   } else {
