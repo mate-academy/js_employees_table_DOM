@@ -1,7 +1,7 @@
 'use strict';
 
 const table = document.querySelector('table');
-const form = document.querySelector('.new-employee-form');
+let form = null;
 const pushNotification = (posTop, posRight, title, description, type) => {
   const container = document.createElement('div');
   const titleMessage = document.createElement('h2');
@@ -43,6 +43,91 @@ const toNumber = (value) => {
 
   return Number(cleaned);
 };
+
+const createEmployeeForm = () => {
+  if (!table) {
+    return null;
+  }
+
+  const formElement = document.createElement('form');
+
+  formElement.classList.add('new-employee-form');
+  formElement.noValidate = true;
+
+  const createLabel = (text, control) => {
+    const label = document.createElement('label');
+
+    label.textContent = `${text} `;
+    label.appendChild(control);
+
+    return label;
+  };
+
+  const createInput = (fieldName, type, qa) => {
+    const input = document.createElement('input');
+
+    input.type = type;
+    input.name = fieldName;
+    input.required = true;
+    input.setAttribute('data-qa', qa);
+
+    return input;
+  };
+
+  const nameInput = createInput('name', 'text', 'name');
+  const positionInput = createInput('position', 'text', 'position');
+  const ageInput = createInput('age', 'number', 'age');
+  const salaryInput = createInput('salary', 'number', 'salary');
+
+  const officeSelect = document.createElement('select');
+
+  officeSelect.name = 'office';
+  officeSelect.required = true;
+  officeSelect.setAttribute('data-qa', 'office');
+
+  const offices = [
+    'Tokyo',
+    'Singapore',
+    'London',
+    'New York',
+    'Edinburgh',
+    'San Francisco',
+  ];
+
+  offices.forEach((city, index) => {
+    const option = document.createElement('option');
+
+    option.value = city;
+    option.textContent = city;
+
+    if (index === 0) {
+      option.selected = true;
+    }
+
+    officeSelect.appendChild(option);
+  });
+
+  formElement.append(
+    createLabel('Name:', nameInput),
+    createLabel('Position:', positionInput),
+    createLabel('Office:', officeSelect),
+    createLabel('Age:', ageInput),
+    createLabel('Salary:', salaryInput),
+  );
+
+  const submitButton = document.createElement('button');
+
+  submitButton.type = 'submit';
+  submitButton.textContent = 'Save to table';
+
+  formElement.appendChild(submitButton);
+
+  table.after(formElement);
+
+  return formElement;
+};
+
+form = createEmployeeForm();
 
 if (table) {
   table.addEventListener('click', (e) => {
@@ -111,18 +196,29 @@ if (form) {
     const ageInput = form.elements['age'];
     const salaryInput = form.elements['salary'];
 
+    nameInput.setCustomValidity('');
+    positionInput.setCustomValidity('');
+    ageInput.setCustomValidity('');
+    salaryInput.setCustomValidity('');
+
     const nameValue = nameInput.value.trim();
     const positionValue = positionInput.value.trim();
     const ageRawValue = ageInput.value.trim();
     const salaryRawValue = salaryInput.value.trim();
 
     if (!nameValue) {
+      nameInput.setCustomValidity('Name is required.');
+      nameInput.reportValidity();
+
       pushNotification(24, 24, 'Invalid name', 'Name is required.', 'error');
 
       return;
     }
 
     if (!positionValue) {
+      positionInput.setCustomValidity('Position is required.');
+      positionInput.reportValidity();
+
       pushNotification(
         24,
         24,
@@ -135,12 +231,18 @@ if (form) {
     }
 
     if (!ageRawValue) {
+      ageInput.setCustomValidity('Age is required.');
+      ageInput.reportValidity();
+
       pushNotification(24, 24, 'Invalid age', 'Age is required.', 'error');
 
       return;
     }
 
     if (!salaryRawValue) {
+      salaryInput.setCustomValidity('Salary is required.');
+      salaryInput.reportValidity();
+
       pushNotification(
         24,
         24,
@@ -153,6 +255,9 @@ if (form) {
     }
 
     if (nameValue.length < 4) {
+      nameInput.setCustomValidity('Name must be at least 4 characters long.');
+      nameInput.reportValidity();
+
       pushNotification(
         24,
         24,
@@ -167,6 +272,9 @@ if (form) {
     const ageValue = Number(ageRawValue);
 
     if (Number.isNaN(ageValue) || ageValue < 18 || ageValue > 90) {
+      ageInput.setCustomValidity('Age must be between 18 and 90.');
+      ageInput.reportValidity();
+
       pushNotification(
         24,
         24,
@@ -181,6 +289,9 @@ if (form) {
     const salaryNumber = Number(salaryRawValue);
 
     if (Number.isNaN(salaryNumber)) {
+      salaryInput.setCustomValidity('Salary must be a number.');
+      salaryInput.reportValidity();
+
       pushNotification(
         24,
         24,
