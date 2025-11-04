@@ -130,6 +130,8 @@ const createEmployeeForm = () => {
 form = createEmployeeForm();
 
 if (table) {
+  let sortedHeader = null;
+
   table.addEventListener('click', (e) => {
     const th = e.target.closest('th');
 
@@ -137,13 +139,24 @@ if (table) {
       const columnIndex = th.cellIndex;
       const tBodies = [...table.tBodies];
 
-      const order = (th.dataset.order =
-        th.dataset.order === 'asc' ? 'desc' : 'asc');
-      const dir = order === 'asc' ? 1 : -1;
-
       if (!tBodies || tBodies.length === 0) {
         return;
       }
+
+      if (sortedHeader && sortedHeader !== th) {
+        delete sortedHeader.dataset.order;
+      }
+
+      let order = 'asc';
+
+      if (sortedHeader === th) {
+        order = th.dataset.order === 'asc' ? 'desc' : 'asc';
+      }
+
+      th.dataset.order = order;
+      sortedHeader = th;
+
+      const dir = order === 'asc' ? 1 : -1;
 
       tBodies.forEach((tBody) => {
         const rows = [...tBody.rows];
