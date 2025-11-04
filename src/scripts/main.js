@@ -94,13 +94,16 @@ rows.forEach((row) => {
 
 function sortColumn(index) {
   rows.sort((a, b) => {
-    const valA =
-      a.cells[index].dataset.value ||
-      a.cells[index].textContent.trim().replace(/[^0-9.-]/g, '');
+    const textA = a.cells[index].textContent.trim();
+    const textB = b.cells[index].textContent.trim();
 
+    const cleanedA = textA.replace(/[^0-9.-]/g, '');
+    const cleanedB = textB.replace(/[^0-9.-]/g, '');
+
+    const valA =
+      a.cells[index].dataset.value ?? (cleanedA !== '' ? cleanedA : textA);
     const valB =
-      b.cells[index].dataset.value ||
-      b.cells[index].textContent.trim().replace(/[^0-9.-]/g, '');
+      b.cells[index].dataset.value ?? (cleanedB !== '' ? cleanedB : textB);
 
     if (currentSortOrder === 'asc') {
       if (Number.isFinite(Number(valA)) && Number.isFinite(Number(valB))) {
@@ -177,10 +180,6 @@ submitButton.addEventListener('click', (e) => {
   const age = ageInput.value;
   const salary = salaryInput.value;
 
-  if (!Name || !position || !office || !age || !salary) {
-    return;
-  }
-
   if (
     !Name ||
     Name.length < 4 ||
@@ -191,7 +190,7 @@ submitButton.addEventListener('click', (e) => {
     Number(age) > 90 ||
     !salary
   ) {
-    pushNotification(10, 10, 'Error!', 'Incorrect data', 'error');
+    pushNotification(10, 10, 'Error!', 'All fields are required!', 'error');
 
     return;
   } else {
