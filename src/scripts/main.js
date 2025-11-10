@@ -36,11 +36,20 @@ function sortTable(parentEl, targetEl, sortingState) {
     }
   });
 
-  tRtDArr.forEach((trow, i) => {
-    trow.forEach((td) => {
-      collectionTr[i].insertAdjacentElement('beforeend', td);
-    });
-    tbodyParent.insertAdjacentElement('beforeend', collectionTr[i]);
+  // tRtDArr.forEach((trow, i) => {
+  //   trow.forEach((td) => {
+  //     collectionTr[i].insertAdjacentElement('beforeend', td);
+  //   });
+  //   tbodyParent.insertAdjacentElement('beforeend', collectionTr[i]);
+  // });
+
+  tbodyParent.innerHTML = '';
+
+  tRtDArr.forEach((trow) => {
+    const row = document.createElement('tr');
+
+    trow.forEach((td) => row.insertAdjacentElement('beforeend', td));
+    tbodyParent.insertAdjacentElement('beforeend', row);
   });
 
   if (isAscending) {
@@ -105,6 +114,7 @@ tbody.addEventListener('dblclick', (e) => {
     'type',
     `${Number.isNaN(typeOriginText) ? 'text' : 'number'}`,
   );
+  inputEl.classList.add('cell-input');
   inputEl.value = originText;
   e.target.textContent = '';
   e.target.appendChild(inputEl);
@@ -139,7 +149,10 @@ function createForm() {
     values.forEach((option) => {
       const optionEl = document.createElement('option');
 
-      optionEl.setAttribute('values', `${option.toLowerCase()}`);
+      optionEl.setAttribute(
+        'value',
+        `${option[0].toUpperCase()}${option.slice(1)}`,
+      );
       optionEl.textContent = option;
       selectEl.insertAdjacentElement('beforeend', optionEl);
     });
