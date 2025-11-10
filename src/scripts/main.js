@@ -254,28 +254,40 @@ const saveChanges = (inputElement, tdElement, initialValue) => {
 };
 
 table.addEventListener('dblclick', (e) => {
-  const td = e.target;
+  const td = e.target.closest('td');
 
-  if (td.tagName === 'TD' && !td.querySelector('input')) {
-    const initialValue = td.textContent;
-    const input = document.createElement('input');
-
-    input.className = 'cell-input';
-    input.value = initialValue;
-
-    td.textContent = '';
-    td.appendChild(input);
-
-    input.focus();
-
-    input.addEventListener('blur', () => {
-      saveChanges(input, td, initialValue);
-    });
-
-    input.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Enter') {
-        saveChanges(input, td, initialValue);
-      }
-    });
+  if (!td || td.parentNode.parentNode.tagName !== 'TBODY') {
+    return;
   }
+
+  const existingInput = table.querySelector('.cell-input');
+
+  if (existingInput) {
+    if (existingInput.closest('td') !== td) {
+      existingInput.blur();
+    } else {
+      return;
+    }
+  }
+
+  const initialValue = td.textContent;
+  const input = document.createElement('input');
+
+  input.className = 'cell-input';
+  input.value = initialValue;
+
+  td.textContent = '';
+  td.appendChild(input);
+
+  input.focus();
+
+  input.addEventListener('blur', () => {
+    saveChanges(input, td, initialValue);
+  });
+
+  input.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter') {
+      saveChanges(input, td, initialValue);
+    }
+  });
 });
