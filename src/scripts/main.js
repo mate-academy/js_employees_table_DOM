@@ -6,15 +6,15 @@ const bodyTable = document.querySelector('tbody');
 
 thead.forEach((element, index) => {
   element.addEventListener('click', () => {
-    const columnName = element.innerText;
+    // const columnName = element.innerText;
     // console.log(columnName);
 
-    if (element.innerText !== columnName) {
-      element.setAttribute(
-        'sort',
-        element.getAttribute('sort') === 'ASC' ? 'DESC' : 'ASC',
-      );
-    }
+    // if (element.innerText !== columnName) {
+    //   element.setAttribute(
+    //     'sort',
+    //     element.getAttribute('sort') === 'ASC' ? 'DESC' : 'ASC',
+    //   );
+    // }
 
     if (!element.hasAttribute('sort')) {
       element.setAttribute('sort', 'ASC');
@@ -64,33 +64,30 @@ const form = document.createElement('form');
 form.setAttribute('class', 'new-employee-form');
 
 form.innerHTML = `
- <form action="#">
-     <div>
-        <label>Name:
-          <input
-            type="text"
-            id="name"
-            name="name"
-            data-qa="name"
-            required
-            aria-errormessage="name-error"
-          />
-        </label>
-        <div class="error" id="name-error"></div>
-    </div>
-
-    <div>
-      <label>Position:
-        <input
-          type="text"
-          id="position"
-          name="position"
-          data-qa="position"
-          aria-errormessage="name-position"
-        />
+  <div>
+    <label>Name:
+      <input
+        type="text"
+        id="name"
+        name="name"
+        data-qa="name"
+        required
+      />
       </label>
-      <div class="error" id="name-position"></div>
-    </div>
+      <div class="error" id="name-error"></div>
+  </div>
+
+  <div>
+    <label>Position:
+      <input
+        type="text"
+        id="position"
+        name="position"
+        data-qa="position"
+      />
+    </label>
+    <div class="error" id="name-position"></div>
+  </div>
 
     <div>
       <label>Office:
@@ -114,7 +111,6 @@ form.innerHTML = `
           name="age"
           data-qa="age"
           required
-          aria-errormessage="age-error"
         />
       </label>
       <div class="error" id="age-error"></div>
@@ -128,14 +124,12 @@ form.innerHTML = `
           name="salary"
           data-qa="salary"
           required
-          aria-errormessage="salary-error"
         />
       </label>
       <div class="error" id="salary-error"></div>
     </div>
 
-      <button type="submit">Save to table</button>
-    </form>
+    <button type="submit">Save to table</button>
 `;
 
 body.appendChild(form);
@@ -171,12 +165,14 @@ function validateForm(date) {
   const nameElement = document.getElementById('name');
   const ageElement = document.getElementById('age');
   const positionElement = document.getElementById('position');
+  const salaryElement = document.getElementById('salary');
 
   let isValid = true;
 
   const nameValue = date.name.trim();
   const positionValue = date.position.trim();
   const ageValue = Number(date.age.trim());
+  const salaryValue = Number(date.salary.trim());
 
   if (nameValue.length < 4) {
     showError(nameElement, 'Name must be at least 4 characters long');
@@ -190,6 +186,11 @@ function validateForm(date) {
 
   if (positionValue.length === 0) {
     showError(positionElement, 'Position is required');
+    isValid = false;
+  }
+
+  if (salaryValue < 1) {
+    showError(salaryElement, 'Salary must be more than 0');
     isValid = false;
   }
 
@@ -241,7 +242,7 @@ function showNotification(message, description, type) {
 }
 
 // select row
-const rows = [...document.querySelectorAll('tbody tr')];
+const rows = document.querySelectorAll('tbody tr');
 
 rows.forEach((element) => {
   element.addEventListener('click', () => {
