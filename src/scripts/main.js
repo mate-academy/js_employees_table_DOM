@@ -6,15 +6,11 @@ const bodyTable = document.querySelector('tbody');
 
 thead.forEach((element, index) => {
   element.addEventListener('click', () => {
-    // const columnName = element.innerText;
-    // console.log(columnName);
-
-    // if (element.innerText !== columnName) {
-    //   element.setAttribute(
-    //     'sort',
-    //     element.getAttribute('sort') === 'ASC' ? 'DESC' : 'ASC',
-    //   );
-    // }
+    thead.forEach((el) => {
+      if (el !== element) {
+        el.removeAttribute('sort');
+      }
+    });
 
     if (!element.hasAttribute('sort')) {
       element.setAttribute('sort', 'ASC');
@@ -242,20 +238,17 @@ function showNotification(message, description, type) {
 }
 
 // select row
-const rows = document.querySelectorAll('tbody tr');
+bodyTable.addEventListener('click', (e) => {
+  const activeElement = document.querySelector('.active');
 
-rows.forEach((element) => {
-  element.addEventListener('click', () => {
-    const activeElement = document.querySelector('.active');
+  const row = e.target.closest('tr');
 
-    if (element.classList.contains('active')) {
-      element.classList.add('active');
-    } else {
-      element.classList.add('active');
+  if (!row) {
+    return;
+  }
 
-      if (activeElement) {
-        activeElement.classList.remove('active');
-      }
-    }
-  });
+  if (activeElement) {
+    activeElement.classList.remove('active');
+  }
+  e.target.closest('tr').classList.add('active');
 });
