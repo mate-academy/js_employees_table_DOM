@@ -237,8 +237,14 @@ function getFieldError(fieldName, value) {
       break;
 
     case 'position':
-      if (value.length === 0) {
+      if (!value || value.length === 0) {
         return 'You should enter position';
+      }
+      break;
+
+    case 'salary':
+      if (!value || value.length === 0) {
+        return 'You should enter salary';
       }
       break;
   }
