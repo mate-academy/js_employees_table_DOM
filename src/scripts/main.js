@@ -83,7 +83,6 @@ function CreateLabelAndInput(labelText, inputName, inputType = 'text') {
   input.name = inputName;
   input.type = inputType;
   input.dataset.qa = inputName;
-  input.required = true;
   label.append(input);
 
   return label;
@@ -159,6 +158,30 @@ form.addEventListener('submit', (e) => {
       'Invalid Age',
       'You have to be older than 18 and younger than 90',
       'error',
+    );
+
+    return;
+  }
+
+  if (!positionValue) {
+    pushNotifications(
+      10,
+      10,
+      'Position is empty',
+      'Position field cannot be empty',
+      'error',
+    );
+
+    return;
+  }
+
+  if (!salaryValue) {
+    pushNotifications(
+      10,
+      10,
+      'Position is empty',
+      'Are you gonna work for free?',
+      'warning',
     );
 
     return;
