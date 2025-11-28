@@ -182,16 +182,6 @@ function handleFormSubmit(e) {
     return;
   }
 
-  if (position.length < 4) {
-    showNotification(
-      'Position too short',
-      'Position must be at least 4 characters long',
-      'error',
-    );
-
-    return;
-  }
-
   if (age < 18) {
     showNotification(
       'Age too young',
