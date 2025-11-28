@@ -134,6 +134,44 @@ function handleFormSubmit(e) {
   const age = parseInt(formData.get('age'));
   const salary = parseInt(formData.get('salary'));
 
+  if (!nameF) {
+    showNotification('Name required', 'Please enter employee name', 'error');
+
+    return;
+  }
+
+  if (!position) {
+    showNotification(
+      'Position required',
+      'Please enter employee position',
+      'error',
+    );
+
+    return;
+  }
+
+  if (!office) {
+    showNotification('Office required', 'Please select an office', 'error');
+
+    return;
+  }
+
+  if (isNaN(age)) {
+    showNotification('Age required', 'Please enter employee age', 'error');
+
+    return;
+  }
+
+  if (isNaN(salary)) {
+    showNotification(
+      'Salary required',
+      'Please enter employee salary',
+      'error',
+    );
+
+    return;
+  }
+
   if (nameF.length < 4) {
     showNotification(
       'Name too short',
