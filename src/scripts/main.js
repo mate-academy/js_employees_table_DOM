@@ -238,7 +238,7 @@ tbody.addEventListener('dblclick', (e) => {
   if (currentCellInput) {
     const parentTd = currentCellInput.closest('td');
 
-    parentTd.textContent = currentCellInput.value;
+    parentTd.textContent = startValue.textContent;
 
     currentCellInput.remove();
   }
@@ -263,11 +263,11 @@ tbody.addEventListener('dblclick', (e) => {
   });
 
   cellInput.addEventListener('keydown', (eKey) => {
-    if (cellInput.value.length === 0) {
-      showNotification('error', 'Error', 'Input is empty');
-      dblclickedItem.textContent = startValue;
-    } else {
-      if (eKey.key === 'Enter') {
+    if (eKey.key === 'Enter') {
+      if (cellInput.value.length === 0) {
+        showNotification('error', 'Error', 'Input is empty');
+        dblclickedItem.textContent = startValue;
+      } else {
         dblclickedItem.textContent = cellInput.value;
         cellInput.remove();
       }
