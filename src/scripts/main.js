@@ -8,6 +8,12 @@ th.forEach((item, index) => {
   item.dataset.sortOrder = 'asc';
 
   item.addEventListener('click', () => {
+    th.forEach((otherTh) => {
+      if (otherTh !== item) {
+        otherTh.dataset.sortOrder = 'asc';
+      }
+    });
+
     const tr = Array.from(tbody.querySelectorAll('tr'));
 
     tr.sort((rowA, rowB) => {
@@ -170,14 +176,14 @@ button.addEventListener('click', (e) => {
 
   const data = new FormData(form);
 
-  if (data.get('position').length === 0) {
-    showNotification('error', 'Error', 'Position cannot be empty');
+  if (data.get('name').length < 4) {
+    showNotification('error', 'Error', 'Name has fewer than 4 letters');
 
     return;
   }
 
-  if (data.get('name').length < 4) {
-    showNotification('error', 'Error', 'Name has fewer than 4 letters');
+  if (data.get('position').length === 0) {
+    showNotification('error', 'Error', 'Position cannot be empty');
 
     return;
   }
@@ -190,6 +196,12 @@ button.addEventListener('click', (e) => {
 
   if (data.get('age') > 90) {
     showNotification('error', 'Error', 'Age is more than 90');
+
+    return;
+  }
+
+  if (data.get('salary').length === 0) {
+    showNotification('error', 'Error', 'Salary cannot be empty');
 
     return;
   }
@@ -215,11 +227,13 @@ button.addEventListener('click', (e) => {
 tbody.addEventListener('dblclick', (e) => {
   const dblclickedItem = e.target.closest('td');
 
+  const startValue = dblclickedItem.textContent;
+
   if (!dblclickedItem) {
     return;
   }
 
-  const currentCellInput = tbody.querySelector('tbody.cell-input');
+  const currentCellInput = tbody.querySelector('.cell-input');
 
   if (currentCellInput) {
     const parentTd = currentCellInput.closest('td');
@@ -241,6 +255,7 @@ tbody.addEventListener('dblclick', (e) => {
   cellInput.addEventListener('blur', () => {
     if (cellInput.value.length === 0) {
       showNotification('error', 'Error', 'Input is empty');
+      dblclickedItem.textContent = startValue;
     } else {
       dblclickedItem.textContent = cellInput.value;
       cellInput.remove();
@@ -250,6 +265,7 @@ tbody.addEventListener('dblclick', (e) => {
   cellInput.addEventListener('keydown', (eKey) => {
     if (cellInput.value.length === 0) {
       showNotification('error', 'Error', 'Input is empty');
+      dblclickedItem.textContent = startValue;
     } else {
       if (eKey.key === 'Enter') {
         dblclickedItem.textContent = cellInput.value;
