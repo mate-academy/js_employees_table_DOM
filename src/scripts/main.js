@@ -39,6 +39,7 @@ form.classList.add('new-employee-form');
 const nameInput = document.createElement('input');
 const nameLabel = document.createElement('label');
 
+nameLabel.textContent = 'Name';
 nameInput.type = 'text';
 nameInput.name = 'name';
 nameInput.placeholder = 'Name';
@@ -49,6 +50,8 @@ form.appendChild(nameLabel);
 const positionInput = document.createElement('input');
 const positionLabel = document.createElement('label');
 
+positionLabel.textContent = 'Position';
+
 positionInput.type = 'text';
 positionInput.name = 'position';
 positionInput.placeholder = 'Position';
@@ -58,6 +61,8 @@ form.appendChild(positionLabel);
 
 const officeInput = document.createElement('select');
 const officeLabel = document.createElement('label');
+
+officeLabel.textContent = 'Office';
 
 officeInput.name = 'office';
 officeInput.setAttribute('data-qa', 'office');
@@ -85,6 +90,8 @@ offices.forEach((office) => {
 const ageInput = document.createElement('input');
 const ageLabel = document.createElement('label');
 
+ageLabel.textContent = 'Age';
+
 ageInput.type = 'number';
 ageInput.name = 'age';
 ageInput.placeholder = 'Age';
@@ -94,6 +101,8 @@ form.appendChild(ageLabel);
 
 const salaryInput = document.createElement('input');
 const salaryLabel = document.createElement('label');
+
+salaryLabel.textContent = 'Salary';
 
 salaryInput.type = 'number';
 salaryInput.name = 'salary';
