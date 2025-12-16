@@ -5,6 +5,7 @@ const heads = document.querySelectorAll('thead th');
 
 let currentColumn = null;
 let isAscending = true;
+let editingCell = null;
 
 heads.forEach((th, index) => {
   th.addEventListener('click', () => {
@@ -32,29 +33,46 @@ tbody.addEventListener('click', (e) => {
 });
 
 const form = document.createElement('form');
+
+form.classList.add('new-employee-form');
+
 const nameInput = document.createElement('input');
+const nameLabel = document.createElement('label');
 
 nameInput.type = 'text';
 nameInput.name = 'name';
 nameInput.placeholder = 'Name';
 nameInput.setAttribute('data-qa', 'name');
-form.appendChild(nameInput);
+nameLabel.appendChild(nameInput);
+form.appendChild(nameLabel);
 
 const positionInput = document.createElement('input');
+const positionLabel = document.createElement('label');
 
 positionInput.type = 'text';
 positionInput.name = 'position';
 positionInput.placeholder = 'Position';
 positionInput.setAttribute('data-qa', 'position');
-form.appendChild(positionInput);
+positionLabel.appendChild(positionInput);
+form.appendChild(positionLabel);
 
 const officeInput = document.createElement('select');
+const officeLabel = document.createElement('label');
 
 officeInput.name = 'office';
 officeInput.setAttribute('data-qa', 'office');
-form.appendChild(officeInput);
+officeLabel.appendChild(officeInput);
+form.appendChild(officeLabel);
 
-const offices = ['', 'San Francisco', 'London', 'Tokyo', 'New York'];
+const offices = [
+  '',
+  'San Francisco',
+  'London',
+  'Tokyo',
+  'New York',
+  'Singapore',
+  'Edinburgh',
+];
 
 offices.forEach((office) => {
   const option = document.createElement('option');
@@ -65,20 +83,24 @@ offices.forEach((office) => {
 });
 
 const ageInput = document.createElement('input');
+const ageLabel = document.createElement('label');
 
 ageInput.type = 'number';
 ageInput.name = 'age';
 ageInput.placeholder = 'Age';
 ageInput.setAttribute('data-qa', 'age');
-form.appendChild(ageInput);
+ageLabel.appendChild(ageInput);
+form.appendChild(ageLabel);
 
 const salaryInput = document.createElement('input');
+const salaryLabel = document.createElement('label');
 
 salaryInput.type = 'number';
 salaryInput.name = 'salary';
 salaryInput.placeholder = 'Salary';
 salaryInput.setAttribute('data-qa', 'salary');
-form.appendChild(salaryInput);
+salaryLabel.appendChild(salaryInput);
+form.appendChild(salaryLabel);
 
 const submitBtn = document.createElement('button');
 
@@ -220,20 +242,20 @@ tbody.addEventListener('dblclick', (e) => {
     return;
   }
 
-  if (td.querySelector('input')) {
+  if (editingCell) {
     return;
   }
+
+  editingCell = td;
 
   const currentValue = td.textContent;
   const input = document.createElement('input');
 
-  if (td.cellIndex === 3 || td.cellIndex === 4) {
-    input.type = 'number';
-  } else {
-    input.type = 'text';
-  }
+  input.classList.add('cell-input');
 
+  input.type = td.cellIndex === 3 || td.cellIndex === 4 ? 'number' : 'text';
   input.value = currentValue;
+
   td.textContent = '';
   td.appendChild(input);
   input.focus();
@@ -242,11 +264,16 @@ tbody.addEventListener('dblclick', (e) => {
     if (input.type === 'number' && isNaN(Number(input.value))) {
       showNotification('Error!', 'error');
       td.textContent = currentValue;
+      editingCell = null;
 
       return;
     }
 
-    td.textContent = input.value.trim() || currentValue;
+    td.textContent =
+      td.cellIndex === 4
+        ? formatSalary(input.value)
+        : input.value.trim() || currentValue;
+    editingCell = null;
   };
 
   input.addEventListener('keydown', (ev) => {
@@ -256,6 +283,7 @@ tbody.addEventListener('dblclick', (e) => {
 
     if (ev.key === 'Escape') {
       td.textContent = currentValue;
+      editingCell = null;
     }
   });
 
