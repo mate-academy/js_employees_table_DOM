@@ -155,22 +155,31 @@ button.textContent = 'Save to table';
 button.type = 'submit';
 forma.appendChild(button);
 
-console.log(forma);
-console.log(forma.elements.name);
-
 // =======================================================================
-// віправка форми + валідація
+// віправка форми +
 
 forma.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const inputName = forma.elements.name.value;
 
+  if (!isValidName(inputName)) {
+    showNotification('error', 'Name must be at least 4 characters');
+
+    return;
+  }
+
   const inputPosition = forma.elements.position.value;
 
   const inputOffice = forma.elements.office.value;
 
   const inputAge = forma.elements.age.value;
+
+  if (!isValidAge(inputAge)) {
+    showNotification('error', 'Age must be between 18 and 90');
+
+    return;
+  }
 
   const inputSalary = forma.elements.salary.value;
 
@@ -207,4 +216,58 @@ forma.addEventListener('submit', (e) => {
   row.appendChild(tdSalary);
 
   tbody.appendChild(row);
+
+  // очищення форми
+  forma.reset();
+
+  showNotification('success', 'Employee added successfully');
 });
+
+//  валідація імені
+function isValidName(nameUser) {
+  if (nameUser.length >= 4) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// валідація віку
+
+function isValidAge(age) {
+  if (age >= 18 && age <= 90) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// показать повідомлення
+
+function showNotification(type, message) {
+  const notification = document.createElement('div');
+
+  notification.classList.add('notification');
+  notification.setAttribute('data-qa', 'notification');
+
+  const title = document.createElement('span');
+
+  title.classList.add('title');
+
+  if (type === 'success') {
+    notification.classList.add('success');
+    title.textContent = 'Success';
+  } else {
+    notification.classList.add('error');
+    title.textContent = 'Error';
+  }
+
+  const text = document.createElement('p');
+
+  text.textContent = message;
+
+  notification.appendChild(title);
+  notification.appendChild(text);
+
+  body.appendChild(notification);
+}
