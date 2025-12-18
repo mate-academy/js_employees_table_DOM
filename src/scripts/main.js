@@ -165,12 +165,12 @@ const validators = {
     {
       check: (v) => v.length >= 4,
       message: 'Name must contain at least 4 letters',
-      type: 'warning',
+      type: 'error',
     },
     {
       check: (v) => /^[a-zA-Z\s]+$/.test(v),
       message: 'Name must contain only letters',
-      type: 'warning',
+      type: 'error',
     },
   ],
 
@@ -178,12 +178,12 @@ const validators = {
     {
       check: (v) => v.trim() !== '',
       message: 'Please enter position',
-      type: 'warning',
+      type: 'error',
     },
     {
       check: (v) => /^[a-zA-Z\s]+$/.test(v),
       message: 'Position must contain only letters',
-      type: 'warning',
+      type: 'error',
     },
   ],
 
@@ -234,15 +234,27 @@ function validateEmployee(data) {
 function addEmployeeToTable(data) {
   const row = document.createElement('tr');
 
-  row.innerHTML = `
-    <td>${data.name}</td>
-    <td>${data.position}</td>
-    <td>${data.office}</td>
-    <td>${data.age}</td>
-    <td>$${Number(data.salary).toLocaleString()}</td>
-  `;
+  const cells = [
+    data.name,
+    data.position,
+    data.office,
+    data.age,
+    `$${Number(data.salary).toLocaleString()}`,
+  ];
+
+  cells.forEach((value) => {
+    const td = document.createElement('td');
+
+    td.textContent = value;
+    row.append(td);
+  });
 
   tbody.append(row);
+
+  // если таблица уже отсортирована — пересортировать
+  if (currentSortColumn !== null) {
+    sortTableByColumn(currentSortColumn, currentSortDirection);
+  }
 }
 
 function pushNotification(title, description, type) {
