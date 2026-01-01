@@ -3,11 +3,6 @@
 const thead = document.querySelector('thead tr');
 const tbody = document.querySelector('tbody');
 
-const input = document.createElement('input');
-
-input.name = 'age';
-input.type = 'number';
-
 const form = document.querySelector('.new-employee-form');
 
 const headers = thead.querySelectorAll('th');
@@ -105,10 +100,10 @@ form.addEventListener('submit', (e) => {
   const currentName = currentFd.get('name')?.trim() || '';
   const position = currentFd.get('position')?.trim() || '';
   const office = currentFd.get('office')?.trim() || '';
-  const age = currentFd.get('age');
-  const salary = currentFd.get('salary');
+  const ageValue = currentFd.get('age');
+  const salaryValue = currentFd.get('salary');
 
-  if (!currentName || !position || !office || !age || !salary) {
+  if (!currentName || !position || !office || !ageValue || !salaryValue) {
     showNotification('All fields are required');
 
     return;
@@ -120,16 +115,30 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
+  const ages = Number(ageValue);
+
+  if (ages < 18 || ages > 90 || isNaN(ages)) {
+    showNotification('Age must be between 18 and 90');
+
+    return;
+  }
+
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  });
+
+  const formattedSalary = formatter.format(Number(salaryValue));
+
   const newRow = document.createElement('tr');
 
-  [currentName, position, office, Number(age), Number(salary)].forEach(
-    (text) => {
-      const td = document.createElement('td');
+  [currentName, position, office, ageValue, formattedSalary].forEach((text) => {
+    const td = document.createElement('td');
 
-      td.textContent = text;
-      newRow.append(td);
-    },
-  );
+    td.textContent = text;
+    newRow.append(td);
+  });
 
   tbody.append(newRow);
   showNotification('Employee added!', false);
