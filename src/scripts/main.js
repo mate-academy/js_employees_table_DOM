@@ -3,7 +3,35 @@
 const thead = document.querySelector('thead tr');
 const tbody = document.querySelector('tbody');
 
-const form = document.querySelector('.new-employee-form');
+const form = document.createElement('form');
+
+form.classList.add('new-employee-form');
+
+document.body.prepend(form);
+
+function createInput(fieldName, type = 'text') {
+  const input = document.createElement('input');
+
+  input.name = fieldName;
+  input.type = type;
+
+  return input;
+}
+
+form.append(
+  createInput('name'),
+  createInput('position'),
+  createInput('office'),
+  createInput('age', 'number'),
+  createInput('salary', 'number'),
+);
+
+const submitBtn = document.createElement('button');
+
+submitBtn.type = 'submit';
+submitBtn.textContent = 'Add';
+
+form.append(submitBtn);
 
 const headers = thead.querySelectorAll('th');
 
@@ -61,6 +89,10 @@ tbody.addEventListener('dblclick', (e) => {
 
 const sortState = { idx: null, dir: 1 };
 
+function parseNumber(value) {
+  return Number(value.replace(/[^0-9.-]+/g, ''));
+}
+
 function applyCurrentSort() {
   const rows = Array.from(tbody.querySelectorAll('tr'));
   const { idx, dir } = sortState;
@@ -68,8 +100,8 @@ function applyCurrentSort() {
   rows.sort((a, b) => {
     const va = a.cells[idx].textContent.trim();
     const vb = b.cells[idx].textContent.trim();
-    const na = Number(va);
-    const nb = Number(vb);
+    const na = parseNumber(va);
+    const nb = parseNumber(vb);
 
     if (isFinite(na) && isFinite(nb) && va !== '' && vb !== '') {
       return (na - nb) * dir;
