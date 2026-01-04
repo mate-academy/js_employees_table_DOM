@@ -7,31 +7,69 @@ const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
 
-document.body.prepend(form);
+const table = document.querySelector('table');
 
-function createInput(fieldName, type = 'text') {
+table.after(form);
+
+function createLabeledInput(labelText, nameLabel, type = 'text') {
+  const label = document.createElement('label');
+
+  label.textContent = `${labelText}: `;
+
   const input = document.createElement('input');
 
-  input.name = fieldName;
+  input.name = nameLabel;
   input.type = type;
+  input.setAttribute('data-qa', nameLabel);
 
-  return input;
+  label.append(input);
+
+  return label;
 }
 
-form.append(
-  createInput('name'),
-  createInput('position'),
-  createInput('office'),
-  createInput('age', 'number'),
-  createInput('salary', 'number'),
-);
+function createOfficeSelect() {
+  const label = document.createElement('label');
+
+  label.textContent = 'Office: ';
+
+  const select = document.createElement('select');
+
+  select.name = 'office';
+  select.setAttribute('data-qa', 'office');
+
+  [
+    'Tokyo',
+    'Singapore',
+    'London',
+    'New York',
+    'Edinburgh',
+    'San Francisco',
+  ].forEach((city) => {
+    const option = document.createElement('option');
+
+    option.value = city;
+    option.textContent = city;
+    select.append(option);
+  });
+
+  label.append(select);
+
+  return label;
+}
 
 const submitBtn = document.createElement('button');
 
 submitBtn.type = 'submit';
 submitBtn.textContent = 'Add';
 
-form.append(submitBtn);
+form.append(
+  createLabeledInput('Name', 'name'),
+  createLabeledInput('Position', 'position'),
+  createOfficeSelect(),
+  createLabeledInput('Age', 'age', 'number'),
+  createLabeledInput('Salary', 'salary', 'number'),
+  submitBtn,
+);
 
 const headers = thead.querySelectorAll('th');
 
@@ -100,17 +138,15 @@ function applyCurrentSort() {
   rows.sort((a, b) => {
     const va = a.cells[idx].textContent.trim();
     const vb = b.cells[idx].textContent.trim();
-    const na = parseNumber(va);
-    const nb = parseNumber(vb);
 
-    if (isFinite(na) && isFinite(nb) && va !== '' && vb !== '') {
-      return (na - nb) * dir;
+    if (idx === 3 || idx === 4) {
+      return (parseNumber(va) - parseNumber(vb)) * dir;
     }
 
-    return va.localeCompare(vb, undefined, { sensitivity: 'base' }) * dir;
+    return va.localeCompare(vb, 'en', { sensitivity: 'base' }) * dir;
   });
 
-  rows.forEach((r) => tbody.append(r));
+  rows.forEach((row) => tbody.append(row));
 }
 
 headers.forEach((th, index) => {
