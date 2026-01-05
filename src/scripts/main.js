@@ -60,7 +60,7 @@ function createOfficeSelect() {
 const submitBtn = document.createElement('button');
 
 submitBtn.type = 'submit';
-submitBtn.textContent = 'Add';
+submitBtn.textContent = 'Save to table';
 
 form.append(
   createLabeledInput('Name', 'name'),
