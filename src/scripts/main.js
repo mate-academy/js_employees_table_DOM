@@ -152,7 +152,7 @@ tbody.addEventListener('click', (e) => {
 const formTemplate = `
     <form class="new-employee-form">
       <label>Name: <input name="name" type="text" data-qa="name" required></label>
-      <label>Position: <input name="position" type="text" data-qa="position" required></label>
+      <label>Position: <input name="position" type="text" data-qa="position"></label>
       <label>Office:
         <select name="office"  data-qa="office" required>
           <option>Tokyo</option>
@@ -180,12 +180,17 @@ form.addEventListener('submit', (e) => {
   const positionValue = formStat.get('position');
   const ageVal = Number(formStat.get('age'));
 
-  if (ageVal < 18 || ageVal > 90 || nameValue.length < 4) {
+  if (
+    ageVal < 18 ||
+    ageVal > 90 ||
+    nameValue.length < 4 ||
+    positionValue === ''
+  ) {
     pushNotification(
       150,
       10,
       'Some information is invalid',
-      'Check age and name value.',
+      'Check age, position and name values.',
       'error',
     );
 
