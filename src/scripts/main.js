@@ -121,7 +121,7 @@ form.addEventListener('submit', (e) => {
     isValid = false;
   }
 
-  if (formDataObj.position.length < 4) {
+  if (formDataObj.position.length === 0) {
     pushNotification(
       310,
       10,
@@ -132,7 +132,11 @@ form.addEventListener('submit', (e) => {
     isValid = false;
   }
 
-  if (parseInt(formDataObj.age) < 18 || parseInt(formDataObj.age) > 90) {
+  if (
+    formDataObj.age.length === 0 ||
+    parseInt(formDataObj.age) < 18 ||
+    parseInt(formDataObj.age) > 90
+  ) {
     pushNotification(
       460,
       10,
@@ -168,6 +172,11 @@ document.addEventListener('click', (e) => {
       resortTableByColumn(table, collumNumber);
       e.target.classList.remove('sorted');
     } else {
+      const headerRow = table.rows[0];
+
+      for (let i = 0; i < headerRow.cells.length; i++) {
+        headerRow.cells[i].classList.remove('sorted');
+      }
       sortTableByColumn(table, collumNumber);
       e.target.classList.add('sorted');
     }
