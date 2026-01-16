@@ -132,6 +132,17 @@ form.addEventListener('submit', (e) => {
     isValid = false;
   }
 
+  if (formDataObj.salary.length === 0) {
+    pushNotification(
+      610,
+      10,
+      'Incorrectly entered employee salary!',
+      'Make sure your salary is not empty.',
+      'error',
+    );
+    isValid = false;
+  }
+
   if (
     formDataObj.age.length === 0 ||
     parseInt(formDataObj.age) < 18 ||
