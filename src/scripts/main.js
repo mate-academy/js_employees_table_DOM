@@ -19,7 +19,6 @@ function clearActiveClasses() {
 
 clearActiveClasses();
 
-
 headers.forEach((header, index) => {
   header.addEventListener('click', () => {
     sortTable(index);
@@ -205,7 +204,7 @@ function makeForm() {
 }
 makeForm();
 
-tbody.addEventListener('click', (e) => {
+tbody.addEventListener('dblclick', (e) => {
   const cell = e.target;
 
   if (cell.tagName.toLowerCase() !== 'td') {
