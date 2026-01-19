@@ -19,6 +19,7 @@ function clearActiveClasses() {
 
 clearActiveClasses();
 
+
 headers.forEach((header, index) => {
   header.addEventListener('click', () => {
     sortTable(index);
