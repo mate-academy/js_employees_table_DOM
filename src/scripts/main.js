@@ -194,7 +194,7 @@ function makeForm() {
       <td>${position}</td>
       <td>${office}</td>
       <td>${age}</td>
-      <td>$${salary.toString()}</td>`;
+      <td>$${salary.toLocaleString('en-US')}</td>`;
     tbody.appendChild(newRow);
 
     form.reset();
@@ -226,10 +226,11 @@ tbody.addEventListener('click', (e) => {
       saveChanges(cell, input);
     }
   });
-
-  function saveChanges(cell, input) {
-    const newValue = input.value.trim();
-
-    cell.textContent = newValue === '' ? initialValue : newValue;
-  }
 });
+
+function saveChanges(cell, input, initialValue) {
+  const newValue = input.value.trim();
+
+  cell.textContent = newValue === '' ? initialValue : newValue;
+  input.remove();
+}
