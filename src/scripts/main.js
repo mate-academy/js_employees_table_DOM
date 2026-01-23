@@ -47,7 +47,7 @@ headers.forEach((th, index) => {
       } else {
         return sortState.direction === 'asc'
           ? valA.localeCompare(valB)
-          : valB.localeCompare(valA) * -1;
+          : valB.localeCompare(valA);
       }
     });
 
@@ -202,6 +202,7 @@ table.addEventListener('dblclick', (e) => {
   const input = document.createElement('input');
 
   input.type = 'text';
+  input.classList.add('cell-input');
   cell.textContent = '';
   cell.appendChild(input);
   input.focus();
