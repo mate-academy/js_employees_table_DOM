@@ -34,7 +34,7 @@ tHead.addEventListener('click', (e) => {
   const content = rows[0].cells[columnIndex].textContent;
 
   const clean = (str) => {
-    return parseFloat(str.replace(/,/g, '.').replace(/[^\d.]/g, ''));
+    return parseFloat(str.replace(/\D/g, ''));
   };
 
   const cleaned = clean(content);
