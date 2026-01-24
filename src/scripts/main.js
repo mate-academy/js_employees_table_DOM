@@ -6,6 +6,10 @@ const tBody = table.querySelector('tbody');
 
 // sort
 tHead.addEventListener('click', (e) => {
+  if (tBody.rows.length === 0) {
+    return;
+  }
+
   const currentTh = e.target.closest('th');
   const columnIndex = currentTh.cellIndex;
 
@@ -69,11 +73,13 @@ tBody.addEventListener('click', (e) => {
 
 // inline editing
 tBody.addEventListener('dblclick', (e) => {
-  // const oldCellInputs = document.querySelectorAll('.cell-input');
-  //
-  // for (const old of oldCellInputs) {
-  //
-  // }
+  const oldCellInputs = document.querySelectorAll('.cell-input');
+
+  if (oldCellInputs) {
+    for (const old of oldCellInputs) {
+      old.blur();
+    }
+  }
 
   const cell = e.target.closest('td');
   const cellOriginalValue = cell.textContent;
@@ -203,7 +209,7 @@ form.addEventListener('submit', (e) => {
   const employeeAge = form.elements.age.value;
 
   const rawSalary = form.elements.salary.value;
-  const employeeSalary = `$${rawSalary.replace('.', ',')}`;
+  const employeeSalary = `$${Number(rawSalary).toLocaleString('en-US')}`;
 
   function createNotification(message, type) {
     const notif = document.createElement('div');
