@@ -67,16 +67,198 @@ tBody.addEventListener('click', (e) => {
   target.classList.toggle('active');
 });
 
+// inline editing
+tBody.addEventListener('dblclick', (e) => {
+  // const oldCellInputs = document.querySelectorAll('.cell-input');
+  //
+  // for (const old of oldCellInputs) {
+  //
+  // }
+
+  const cell = e.target.closest('td');
+  const cellOriginalValue = cell.textContent;
+
+  cell.innerHTML = '';
+
+  const input = document.createElement('input');
+
+  input.classList.add('cell-input');
+  input.value = cellOriginalValue;
+
+  input.addEventListener('blur', () => {
+    let currentValue = input.value;
+
+    if (currentValue === '') {
+      currentValue = cellOriginalValue;
+    }
+
+    input.remove();
+
+    cell.textContent = currentValue;
+  });
+
+  // eslint-disable-next-line no-shadow
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      input.blur();
+    }
+  });
+
+  cell.append(input);
+
+  input.focus();
+});
+
 // form
-const form = document.createElement('div');
+const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
 
-// const formFields = [
-//   { label: 'Name', name: 'name', type: 'text' },
-//   { label: 'Position', name: 'position', type: 'text' },
-//   { label: 'Age', name: 'age', type: 'number' },
-//   { label: 'Salary', name: 'salary', type: 'number' },
-// ];
+const formFields = [
+  {
+    label: 'Name',
+    name: 'name',
+    type: 'text',
+    tag: 'input',
+  },
+  {
+    label: 'Position',
+    name: 'position',
+    type: 'text',
+    tag: 'input',
+  },
+  {
+    label: 'Office',
+    name: 'office',
+    tag: 'select',
+    options: [
+      'Tokyo',
+      'Singapore',
+      'London',
+      'New York',
+      'Edinburgh',
+      'San Francisco',
+    ],
+  },
+  {
+    label: 'Age',
+    name: 'age',
+    type: 'number',
+    tag: 'input',
+  },
+  {
+    label: 'Salary',
+    name: 'salary',
+    type: 'number',
+    tag: 'input',
+    step: 'any',
+  },
+];
+
+for (const item of formFields) {
+  const label = document.createElement('label');
+
+  label.textContent = `${item.label}: `;
+
+  const elem = document.createElement(item.tag);
+
+  elem.required = true;
+  elem.name = item.name;
+
+  if (item.type) {
+    elem.type = item.type;
+  }
+
+  if (item.step) {
+    elem.step = item.step;
+  }
+
+  if (item.tag === 'select') {
+    for (const opt of item.options) {
+      const option = document.createElement('option');
+
+      option.textContent = opt;
+
+      elem.append(option);
+    }
+  }
+
+  elem.dataset.qa = item.name;
+
+  label.append(elem);
+  form.append(label);
+}
+
+const button = document.createElement('button');
+
+button.textContent = 'Save to table';
+form.append(button);
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const employeeName = form.elements.name.value;
+  const employeePosition = form.elements.position.value;
+  const employeeOffice = form.elements.office.value;
+  const employeeAge = form.elements.age.value;
+
+  const rawSalary = form.elements.salary.value;
+  const employeeSalary = `$${rawSalary.replace('.', ',')}`;
+
+  function createNotification(message, type) {
+    const notif = document.createElement('div');
+    const notifMessage = document.createElement('p');
+
+    notif.classList.add('notification', type);
+
+    notifMessage.textContent = message;
+    notifMessage.classList.add('title');
+
+    notif.append(notifMessage);
+
+    notif.dataset.qa = 'notification';
+
+    document.body.append(notif);
+  }
+
+  const oldNotifs = document.querySelectorAll('.notification');
+
+  for (const old of oldNotifs) {
+    old.remove();
+  }
+
+  if (employeeName.length < 4) {
+    createNotification('Name must be longer than 4 letters', 'error');
+
+    return;
+  }
+
+  if (employeeAge < 18 || employeeAge > 90) {
+    createNotification('Please, enter a correct age', 'error');
+
+    return;
+  }
+
+  const employees = [
+    employeeName,
+    employeePosition,
+    employeeOffice,
+    employeeAge,
+    employeeSalary,
+  ];
+
+  const row = document.createElement('tr');
+
+  for (const employee of employees) {
+    const cell = document.createElement('td');
+
+    cell.append(employee);
+    row.append(cell);
+  }
+
+  tBody.append(row);
+
+  createNotification('Employee successfully added!', 'success');
+});
 
 document.body.append(form);
