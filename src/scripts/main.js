@@ -17,7 +17,7 @@ columnsAll.forEach((th) => {
 
     if (sortedColumnIndex === clickedIndex) {
       sortDirection = -sortDirection;
-    } else if (sortedColumnIndex !== clickedIndex) {
+    } else {
       sortDirection = 1;
       sortedColumnIndex = clickedIndex;
     }
@@ -206,12 +206,10 @@ form.addEventListener('submit', (e) => {
   // #region add new employee
 
   const newEployee = document.createElement('tr');
-  const firstRow = tableBody.querySelector('tr');
-  const columnsCount = firstRow.querySelectorAll('td').length;
 
   const keys = ['name', 'position', 'office', 'age', 'salary'];
 
-  for (let i = 0; i < columnsCount; i++) {
+  for (let i = 0; i < keys.length; i++) {
     const newData = document.createElement('td');
 
     if (keys[i] === 'salary') {
