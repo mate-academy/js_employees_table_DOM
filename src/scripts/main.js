@@ -37,6 +37,8 @@ const formFields = [
     fieldName: 'age',
     element: 'input',
     type: 'number',
+    min: 18,
+    max: 90
   },
   {
     fieldName: 'salary',
@@ -72,6 +74,11 @@ function addForm() {
       }
     } else {
       element.type = field.type;
+    }
+
+    if (field.min && field.max) {
+      element.min = field.min;
+      element.max = field.max;
     }
 
     element.required = true;
@@ -247,7 +254,7 @@ function handleFormEvent(e) {
 
 function validateData(obj) {
   for (const field in obj) {
-    if (!obj[field]) {
+    if (!obj[field].trim()) {
       pushNotification(
         10,
         10,
@@ -355,6 +362,7 @@ function enableTableEditing() {
     }
 
     const newValue = activeInput.value.trim();
+
     activeInput.classList.remove('cell-input');
 
     if (save && newValue) {
@@ -362,7 +370,7 @@ function enableTableEditing() {
     } else {
       activeCell.textContent = oldValue;
     }
-    
+
     activeCell = null;
     activeInput = null;
   }
@@ -372,7 +380,7 @@ function enableTableEditing() {
       return;
     }
 
-    closeEditor(true);
+    closeEditor(true, activeCell.textContent);
 
     activeCell = cell;
 
@@ -382,7 +390,7 @@ function enableTableEditing() {
 
     input.type = 'text';
     input.value = value;
-    input.classList.add('cell-input')
+    input.classList.add('cell-input');
 
     activeInput = input;
 
