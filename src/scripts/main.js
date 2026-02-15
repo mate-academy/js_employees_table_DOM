@@ -36,12 +36,12 @@ const formFields = [
   {
     fieldName: 'age',
     element: 'input',
-    type: 'text',
+    type: 'number',
   },
   {
     fieldName: 'salary',
     element: 'input',
-    type: 'text',
+    type: 'number',
   },
 ];
 
@@ -74,6 +74,7 @@ function addForm() {
       element.type = field.type;
     }
 
+    element.required = true;
     label.appendChild(element);
     form.appendChild(label);
   });
@@ -354,13 +355,14 @@ function enableTableEditing() {
     }
 
     const newValue = activeInput.value.trim();
+    activeInput.classList.remove('cell-input');
 
     if (save && newValue) {
       activeCell.textContent = newValue;
     } else {
       activeCell.textContent = oldValue;
     }
-
+    
     activeCell = null;
     activeInput = null;
   }
@@ -380,6 +382,7 @@ function enableTableEditing() {
 
     input.type = 'text';
     input.value = value;
+    input.classList.add('cell-input')
 
     activeInput = input;
 
