@@ -79,12 +79,11 @@ const createForm = () => {
   form.className = 'new-employee-form';
 
   form.innerHTML = `
-    <label>Name: <input name="name" data-qa="name"></label>
-    <label>Position: <input name="position" data-qa="position"></label>
+    <label>Name: <input type="text" name="name" data-qa="name"></label>
+    <label>Position: <input type="text" name="position" data-qa="position"></label>
     <label>
       Office:
       <select name="office" data-qa="office">
-        <option value="">Select office</option>
         <option>Tokyo</option>
         <option>Singapore</option>
         <option>London</option>
@@ -126,7 +125,11 @@ const handleFormSubmit = (ev) => {
 };
 
 const validateEmployee = ({ name: empName, position, office, age, salary }) => {
-  if (!empName || !position || !office || !age || !salary) {
+  if (empName.trim() === '' || position.trim() === '' || office.trim() === '') {
+    return 'All fields are required';
+  }
+
+  if (Number.isNaN(age) || Number.isNaN(salary)) {
     return 'All fields are required';
   }
 
@@ -164,7 +167,8 @@ const notify = (title, description, type) => {
 
   const notification = document.createElement('div');
 
-  notification.className = `notification ${type}`;
+  notification.className = 'notification';
+  notification.classList.add(type);
   notification.dataset.qa = 'notification';
   notification.style.top = '10px';
   notification.style.right = '10px';
