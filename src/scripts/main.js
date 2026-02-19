@@ -5,13 +5,13 @@
 const body = document.querySelector('body');
 const theadTh = document.querySelectorAll('thead th');
 const tbody = document.querySelector('tbody');
-const tbodyTr = tbody.querySelectorAll('tr');
 let countForSort = 0;
 let prevElementForSort;
 
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
+form.setAttribute('novalidate', true);
 
 const nameLabel = document.createElement('label');
 const nameInput = document.createElement('input');
@@ -54,6 +54,7 @@ positionInput.setAttribute('name', 'position');
 positionInput.setAttribute('type', 'text');
 positionInput.setAttribute('id', 'position-input');
 positionInput.setAttribute('data-qa', 'position');
+positionInput.required = true;
 positionLabel.textContent = 'Position:';
 
 officeSelect.setAttribute('name', 'office');
@@ -112,11 +113,11 @@ theadTh.forEach((th, index) => {
     const rows = [...tbody.querySelectorAll('tr')];
 
     if (prevElementForSort === undefined) {
-      prevElementForSort = e.target.textContent;
+      prevElementForSort = e.currentTarget.textContent;
     }
 
-    if (prevElementForSort !== e.target.textContent) {
-      prevElementForSort = e.target.textContent;
+    if (prevElementForSort !== e.currentTarget.textContent) {
+      prevElementForSort = e.currentTarget.textContent;
       countForSort = 0;
     }
 
@@ -159,16 +160,16 @@ theadTh.forEach((th, index) => {
   });
 });
 
-tbodyTr.forEach((td) => {
-  td.addEventListener('click', (e) => {
-    tbodyTr.forEach((tr) => {
-      if (tr.classList.contains('active')) {
-        tr.classList.remove('active');
-      }
-    });
+tbody.addEventListener('click', (e) => {
+  const targetRow = e.target.closest('tr');
 
-    e.target.parentElement.classList.add('active');
-  });
+  if (!targetRow) {
+    return;
+  }
+
+  tbody.querySelectorAll('tr').forEach((tr) => tr.classList.remove('active'));
+
+  targetRow.classList.add('active');
 });
 
 form.addEventListener('submit', (e) => {
