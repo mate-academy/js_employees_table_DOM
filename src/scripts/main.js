@@ -179,7 +179,7 @@ form.addEventListener('submit', (e) => {
   const position = document.getElementById('position-input').value;
   const office = document.getElementById('office-select').value;
   const age = +document.getElementById('age-input').value;
-  const salary = +document.getElementById('salary-input').value;
+  const salary = document.getElementById('salary-input').value;
 
   let check = true;
 
@@ -210,8 +210,16 @@ form.addEventListener('submit', (e) => {
     check = false;
   }
 
+  if (!salary) {
+    pushNotification('Salary error', 'Salary is required', 'error');
+  }
+
+  if (+salary < 0) {
+    pushNotification('Salary error', 'Salary can be negative', 'error');
+  }
+
   if (check) {
-    const convertedSalary = '$' + salary.toLocaleString('en-US');
+    const convertedSalary = '$' + Number(salary).toLocaleString('en-US');
 
     const newRow = tbody.insertRow();
 
@@ -259,6 +267,6 @@ const pushNotification = (title, description, type) => {
   bodyBlock.appendChild(divBlock);
 
   setTimeout(() => {
-    divBlock.style.display = 'none';
+    divBlock.remove();
   }, 5000);
 };
