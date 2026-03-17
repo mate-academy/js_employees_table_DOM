@@ -195,41 +195,86 @@ function addRowToTable({ name: employeeName, position, office, age, salary }) {
   tbody.appendChild(tr);
 }
 
+const columnTypes = ['string', 'string', 'string', 'number', 'salary'];
+
+function salaryToNumber(text) {
+  return Number(text.replace(/[^0-9]/g, ''));
+}
+
+function getCellValue(text, type) {
+  const t = text.trim();
+
+  if (type === 'number') {
+    const v = Number(t);
+
+    return Number.isFinite(v) ? v : Infinity;
+  }
+
+  if (type === 'salary') {
+    const v = salaryToNumber(t);
+
+    return Number.isFinite(v) ? v : Infinity;
+  }
+
+  return t.toLowerCase();
+}
+
+function sortTableByColumn(columnIndex, direction) {
+  const type = columnTypes[columnIndex];
+
+  const rows = Array.from(tbody.querySelectorAll('tr'))
+
+    .map((row, index) => ({ row, index }));
+
+  rows.sort((a, b) => {
+    const aVal = getCellValue(a.row.children[columnIndex].textContent, type);
+    const bVal = getCellValue(b.row.children[columnIndex].textContent, type);
+
+    if (typeof aVal === 'string') {
+      const cmp = aVal.localeCompare(bVal, 'en', { sensitivity: 'base' });
+
+      if (cmp !== 0) {
+        return direction === 'asc' ? cmp : -cmp;
+      }
+    } else {
+      const diff = aVal - bVal;
+
+      if (diff !== 0) {
+        return direction === 'asc' ? diff : -diff;
+      }
+    }
+
+    return a.index - b.index;
+  });
+
+  const fragment = document.createDocumentFragment();
+
+  rows.forEach(({ row }) => fragment.appendChild(row));
+  tbody.appendChild(fragment);
+}
+
 const sortState = {
   column: null,
   direction: 'asc',
 };
 
-table.querySelectorAll('th').forEach((th, index) => {
-  th.addEventListener('click', () => {
-    const column = th.getAttribute('data-column');
+table.querySelector('thead').addEventListener('click', (e) => {
+  const th = e.target.closest('th');
 
-    if (sortState.column === column) {
-      sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
-    } else {
-      sortState.column = column;
-      sortState.direction = 'asc';
-    }
+  if (!th) {
+    return;
+  }
 
-    sortTableByColumn(index, sortState.direction);
-  });
+  const column = th.getAttribute('data-column');
+
+  const index = Array.from(th.parentElement.children).indexOf(th);
+
+  if (sortState.column === column) {
+    sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortState.column = column;
+    sortState.direction = 'asc';
+  }
+
+  sortTableByColumn(index, sortState.direction);
 });
-
-function sortTableByColumn(columnIndex, direction) {
-  const rows = Array.from(tbody.querySelectorAll('tr'));
-
-  rows.sort((a, b) => {
-    const cellA = a.children[columnIndex].textContent.trim();
-    const cellB = b.children[columnIndex].textContent.trim();
-
-    if (!isNaN(cellA) && !isNaN(cellB)) {
-      return direction === 'asc' ? cellA - cellB : cellB - cellA;
-    }
-
-    return direction === 'asc'
-      ? cellA.localeCompare(cellB)
-      : cellB.localeCompare(cellA);
-  });
-
-  rows.forEach((row) => tbody.appendChild(row));
-}
