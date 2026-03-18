@@ -134,6 +134,8 @@ function initForm() {
 
     if (isNaN(age) || isNaN(salary)) {
       showNotification('Age and Salary must be numbers', 'error');
+
+      return;
     }
 
     if (nameEmployee.length < 4) {
