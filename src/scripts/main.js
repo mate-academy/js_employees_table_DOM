@@ -27,7 +27,19 @@ function initTableSort() {
 
   tHead.forEach((header) => {
     header.addEventListener('click', () => {
-      const isAsc = header.classList.toggle('asc');
+      tHead.forEach((h) => {
+        if (h !== header) {
+          h.classList.remove('asc');
+        }
+      });
+
+      const isAsc = !header.classList.contains('asc');
+
+      if (isAsc) {
+        header.classList.add('asc');
+      } else {
+        header.classList.remove('asc');
+      }
 
       sortTable(table, header.cellIndex, isAsc);
     });
@@ -106,10 +118,23 @@ function initForm() {
     const nameEmployee = formData.get('name').trim();
     const position = formData.get('position').trim();
     const office = formData.get('office');
-    const age = Number(formData.get('age'));
-    const salary = Number(formData.get('salary'));
+    const ageStr = formData.get('age').trim();
+    const salaryStr = formData.get('salary').trim();
+
+    if (!nameEmployee || !position || !office || !ageStr || !salaryStr) {
+      showNotification('All fields are required', 'error');
+
+      return;
+    }
+
+    const age = Number(ageStr);
+    const salary = Number(salaryStr);
 
     const formattedSalary = '$' + salary.toLocaleString('en-US');
+
+    if (isNaN(age) || isNaN(salary)) {
+      showNotification('Age and Salary must be numbers', 'error');
+    }
 
     if (nameEmployee.length < 4) {
       showNotification('Name must be at least 4 characters', 'error');
@@ -119,12 +144,6 @@ function initForm() {
 
     if (age < 18 || age > 90) {
       showNotification('Age must be beetwen 18 and 90', 'error');
-
-      return;
-    }
-
-    if (!nameEmployee || !position || !office || !age || !salary) {
-      showNotification('All fields are required', 'error');
 
       return;
     }
