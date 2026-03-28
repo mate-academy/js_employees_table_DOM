@@ -6,7 +6,6 @@ const tbody = document.querySelector('tbody');
 headers.forEach((header) => {
   header.addEventListener('click', () => {
     const index = header.cellIndex;
-    // const type = header.dataset.type;
     const columnName = header.textContent.trim();
     const rows = Array.from(tbody.rows);
 
@@ -19,7 +18,7 @@ headers.forEach((header) => {
       const valA = rowA.cells[index].textContent.trim();
       const valB = rowB.cells[index].textContent.trim();
 
-      if (columnName === 'Salary') {
+      if (columnName === 'Salary' || columnName === 'Age') {
         const numA = Number(valA.replace(/[$,]/g, '')) || 0;
         const numB = Number(valB.replace(/[$,]/g, '')) || 0;
 
@@ -87,7 +86,7 @@ form.addEventListener('submit', (e) => {
   const salary = Number(formData.get('salary'));
   const office = formData.get('office');
 
-  if (!employeeName || !position || !age || !salary) {
+  if (!employeeName || !position || !age || !salary || !office) {
     showNotification('Error', 'All fields are required', 'error');
 
     return;
