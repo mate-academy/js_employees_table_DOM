@@ -35,7 +35,7 @@ Start table:
 ##### Write a script to add a form to the document. Form allows users to add new employees to the spreadsheet.
 - The form should have class `new-employee-form` (to apply correct styles).
 - The form should have:
-  - 4 inputs: `name`, `position`, `age`, and `salary`
+  - 4 inputs:  
   - 1 select: `office`
   - Submit button.
 - Put inputs inside labels:
