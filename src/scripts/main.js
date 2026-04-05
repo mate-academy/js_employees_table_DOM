@@ -1,3 +1,5 @@
 'use strict';
 
-// write code here
+import { init } from './controllers/initTable';
+
+init();

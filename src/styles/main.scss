@@ -37,6 +37,7 @@ tfoot tr:first-child {
 
 td,
 th {
+  position: relative;
   text-align: left;
   padding: 18px;
 }
@@ -145,6 +146,8 @@ tr.active {
 }
 
 .cell-input {
+  position: absolute;
+  inset: 0;
   border: none;
   color: #808080;
   font-size: 16px;
@@ -154,6 +157,8 @@ tr.active {
 }
 
 .notification {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   width: 300px;
   min-height: 100px;
