@@ -69,24 +69,24 @@ const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
 
-function createInput(labelText, name, type, qa) {
+function createInput(labelText, nameEmp, type, qa) {
   return `
     <label>
       ${labelText}
-      <input name='${name}' type='${type}' data-qa='${qa}'>
+      <input name='${nameEmp}' type='${type}' data-qa='${qa}'>
     </label>
   `;
 }
 
 let formContent = '';
 
-function createSelect(name, qa, arrCity) {
+function createSelect(nameEmp, qa, arrCity) {
   const city = arrCity.map((n) => `<option>${n}</option>`).join('');
 
   return `
   <label>
   Office
-  <select name='${name}' data-qa='${qa}'>
+  <select name='${nameEmp}' data-qa='${qa}'>
   ${city}
   </select>
   </label>
