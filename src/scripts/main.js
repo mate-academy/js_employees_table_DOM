@@ -126,6 +126,13 @@ const officeSelect = document.createElement('select');
 officeSelect.name = 'office';
 officeSelect.dataset.qa = 'office';
 
+const defaultOfficeOption = document.createElement('option');
+
+defaultOfficeOption.value = '';
+defaultOfficeOption.textContent = 'Select office';
+
+officeSelect.append(defaultOfficeOption);
+
 const offices = [
   'Tokyo',
   'Singapore',
@@ -251,3 +258,51 @@ form.addEventListener('submit', (e) => {
 });
 
 document.body.append(form);
+
+// Редактирование ячеек
+let editingCell = null;
+
+tbody.addEventListener('dblclick', (e) => {
+  const cell = e.target.closest('td');
+
+  if (!cell) {
+    return;
+  }
+
+  if (cell.querySelector('input')) {
+    return;
+  }
+
+  if (editingCell) {
+    return;
+  }
+
+  editingCell = cell;
+
+  const initialValue = cell.textContent.trim();
+  const input = document.createElement('input');
+
+  input.classList.add('cell-input');
+  input.value = initialValue;
+
+  cell.textContent = '';
+  cell.append(input);
+  input.focus();
+
+  function saveCellValue() {
+    const newValue = input.value.trim();
+
+    cell.textContent = newValue || initialValue;
+    editingCell = null;
+  }
+
+  input.addEventListener('blur', () => {
+    saveCellValue();
+  });
+
+  input.addEventListener('keydown', (eventInput) => {
+    if (eventInput.key === 'Enter') {
+      input.blur();
+    }
+  });
+});
