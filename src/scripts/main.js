@@ -65,6 +65,24 @@ tbody.addEventListener('click', (e) => {
   row.classList.add('active');
 });
 
+// Notification
+function showNotification(message, type) {
+  const old = document.querySelector('[data-qa="notification"]');
+
+  if (old) {
+    old.remove();
+  }
+
+  const notification = document.createElement('div');
+
+  notification.dataset.qa = 'notification';
+  notification.classList.add('notification');
+  notification.classList.add(type);
+  notification.textContent = message;
+
+  document.body.append(notification);
+}
+
 // Новое поле
 const form = document.createElement('form');
 
@@ -170,7 +188,7 @@ form.addEventListener('submit', (e) => {
   const nameEmployer = nameInput.value.trim();
   const position = positionInput.value.trim();
   const office = officeSelect.value;
-  const age = ageInput.value.trim();
+  const age = Number(ageInput.value);
   const salary = salaryInput.value.trim();
 
   if (nameEmployer.length < 4) {
@@ -181,6 +199,12 @@ form.addEventListener('submit', (e) => {
 
   if (!position) {
     showNotification('Position is required', 'error');
+
+    return;
+  }
+
+  if (!office) {
+    showNotification('Office is required', 'error');
 
     return;
   }
@@ -220,29 +244,10 @@ form.addEventListener('submit', (e) => {
   tdSalary.textContent = `$${Number(salary).toLocaleString()}`;
 
   tr.append(tdName, tdPosition, tdOffice, tdAge, tdSalary);
-
   tbody.append(tr);
 
   form.reset();
-
-  // Notification
-  function showNotification(message, type) {
-    const old = document.querySelector('[data-qa="notification"]');
-
-    if (old) {
-      old.remove();
-    }
-
-    const notification = document.createElement('div');
-
-    notification.dataset.qa = 'notification';
-    notification.classList.add('notification');
-    notification.classList.add(type);
-    notification.textContent = message;
-
-    document.body.append(notification);
-  }
-
   showNotification('Employee added', 'success');
 });
+
 document.body.append(form);
