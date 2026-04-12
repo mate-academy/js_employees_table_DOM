@@ -20,12 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
         let valA = a.children[index].innerText.replace(/[$,]/g, '');
         let valB = b.children[index].innerText.replace(/[$,]/g, '');
 
-        if (!isNaN(valA) && !isNaN(valB)) {
+        const isNumA = valA.trim() !== '' && !Number.isNaN(Number(valA));
+        const isNumB = valB.trim() !== '' && !Number.isNaN(Number(valB));
+
+        if (isNumA && isNumB) {
           valA = Number(valA);
           valB = Number(valB);
+
+          return asc ? valA - valB : valB - valA;
         }
 
-        return asc ? (valA > valB ? 1 : -1) : valA < valB ? 1 : -1;
+        return asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
       });
       tbody.innerHTML = '';
       rows.forEach((r) => tbody.appendChild(r));
@@ -107,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (!salary) {
+    if (data.salary.trim() === '' || !Number.isFinite(salary)) {
       showNotification('Salary is required', 'error');
 
       return;
@@ -132,17 +137,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const cell = e.target;
 
     if (cell.tagName === 'TD' && !cell.querySelector('input')) {
-      const oldValue = cell.innerText;
+      const existingInput = document.querySelector('.cell-input');
+
+      if (existingInput) {
+        const parentCell = existingInput.parentElement;
+        const oldValue = existingInput.value || parentCell.dataset.oldValue;
+
+        parentCell.innerText = existingInput.value.trim() || oldValue;
+      }
+
+      const currentValue = cell.innerText;
       const input = document.createElement('input');
 
-      input.value = oldValue;
+      input.value = currentValue;
       input.className = 'cell-input';
+      cell.dataset.oldValue = currentValue;
       cell.innerHTML = '';
       cell.appendChild(input);
       input.focus();
 
       const save = () => {
-        cell.innerText = input.value.trim() || oldValue;
+        cell.innerText = input.value.trim() || currentValue;
       };
 
       input.addEventListener('blur', save);
