@@ -75,7 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showNotification(message, type) {
     notification.textContent = message;
-    notification.className = type;
+    notification.classList.remove('error', 'success');
+    notification.classList.add(type);
   }
 
   function sortTableByColumn(columnIndex) {
@@ -194,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleCellEditing(e) {
     const cell = e.target.closest('td');
 
-    if (!cell || cell.querySelector('input')) {
+    if (!cell || document.querySelector('.cell-input')) {
       return;
     }
 
