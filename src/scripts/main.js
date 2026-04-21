@@ -12,7 +12,6 @@ headers.forEach((th, index) => {
       isAsc = true;
       currentColumn = index;
     }
-
     sortByColumn(index, isAsc);
   });
 });
@@ -26,7 +25,6 @@ function sortByColumn(colIndex, asc) {
   rowsArray.sort((a, b) => {
     const contentA = a.cells[colIndex].textContent.trim();
     const contentB = b.cells[colIndex].textContent.trim();
-
     const numA = parseFloat(contentA.replace(/[$,]/g, ''));
     const numB = parseFloat(contentB.replace(/[$,]/g, ''));
 
@@ -40,7 +38,6 @@ function sortByColumn(colIndex, asc) {
 
     return asc ? comparison : -comparison;
   });
-
   tbody.append(...rowsArray);
 }
 
@@ -63,6 +60,7 @@ tbody.addEventListener('click', (e) => {
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
+form.setAttribute('novalidate', true);
 
 form.innerHTML = `
   <label>Name: <input name="name" type="text" data-qa="name" required></label>
@@ -105,16 +103,16 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  const ageNum = Number(ageRaw);
-
-  if (ageNum < 18 || ageNum > 90) {
-    showNotification('Age must be between 18 and 90', true);
+  if (positionValue.length < 4) {
+    showNotification('Position is too short', true);
 
     return;
   }
 
-  if (positionValue.length < 4) {
-    showNotification('Position is invalid', true);
+  const ageNum = Number(ageRaw);
+
+  if (ageNum < 18 || ageNum > 90) {
+    showNotification('Age must be between 18 and 90', true);
 
     return;
   }
@@ -151,5 +149,5 @@ function showNotification(message, isError) {
   notification.textContent = message;
   document.body.appendChild(notification);
 
-  setTimeout(() => notification.remove(), 4000);
+  setTimeout(() => notification.remove(), 2000);
 }
