@@ -24,8 +24,9 @@ function sortByColumn(colIndex, asc) {
   const rowsArray = Array.from(tbody.rows);
 
   rowsArray.sort((a, b) => {
-    const contentA = a.cells[colIndex].textContent;
-    const contentB = b.cells[colIndex].textContent;
+    const contentA = a.cells[colIndex].textContent.trim();
+    const contentB = b.cells[colIndex].textContent.trim();
+
     const numA = parseFloat(contentA.replace(/[$,]/g, ''));
     const numB = parseFloat(contentB.replace(/[$,]/g, ''));
 
@@ -65,7 +66,7 @@ form.classList.add('new-employee-form');
 
 form.innerHTML = `
   <label>Name: <input name="name" type="text" data-qa="name" required></label>
-  <label>Position: <input name="position" type="text" data-qa="position"></label>
+  <label>Position: <input name="position" type="text" data-qa="position" required></label>
   <label>Office:
     <select name="office" data-qa="office" required>
       <option value="Tokyo">Tokyo</option>
@@ -87,38 +88,38 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const nameValue = form.elements.name.value.trim();
-  const ageValue = form.elements.age.value.trim();
   const positionValue = form.elements.position.value.trim();
   const officeValue = form.elements.office.value;
-  const salaryValue = form.elements.salary.value;
+  const ageRaw = form.elements.age.value.trim();
+  const salaryRaw = form.elements.salary.value.trim();
 
-  if (!nameValue || !ageValue || !positionValue || !salaryValue) {
-    showNotification('Всі поля мають бути заповнені', true);
+  if (!nameValue || !positionValue || !ageRaw || !salaryRaw) {
+    showNotification('All fields are required', true);
 
     return;
   }
 
   if (nameValue.length < 4) {
-    showNotification("Ім'я занадто коротке", true);
+    showNotification('Name is too short', true);
 
     return;
   }
 
-  const ageNum = Number(ageValue);
+  const ageNum = Number(ageRaw);
 
   if (ageNum < 18 || ageNum > 90) {
-    showNotification('Помилка: вік має бути від 18 до 90', true);
+    showNotification('Age must be between 18 and 90', true);
 
     return;
   }
 
   if (positionValue.length < 4) {
-    showNotification('Посада не валідна', true);
+    showNotification('Position is invalid', true);
 
     return;
   }
 
-  const salaryNum = Number(salaryValue);
+  const salaryNum = Number(salaryRaw);
   const formattedSalary = '$' + salaryNum.toLocaleString('en-US');
 
   const newRow = document.createElement('tr');
@@ -127,13 +128,12 @@ form.addEventListener('submit', (e) => {
     <td>${nameValue}</td>
     <td>${positionValue}</td>
     <td>${officeValue}</td>
-    <td>${ageValue}</td>
+    <td>${ageNum}</td>
     <td>${formattedSalary}</td>
   `;
 
   tbody.appendChild(newRow);
-
-  showNotification('Працівника додано!', false);
+  showNotification('Employee added successfully!', false);
   form.reset();
 });
 
@@ -142,9 +142,13 @@ function showNotification(message, isError) {
 
   notification.setAttribute('data-qa', 'notification');
 
-  notification.className = isError ? 'error' : 'success';
-  notification.textContent = message;
+  if (isError) {
+    notification.classList.add('error');
+  } else {
+    notification.classList.add('success');
+  }
 
+  notification.textContent = message;
   document.body.appendChild(notification);
 
   setTimeout(() => notification.remove(), 4000);
