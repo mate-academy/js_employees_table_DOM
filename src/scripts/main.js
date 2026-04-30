@@ -20,8 +20,14 @@ headers.forEach((header, index) => {
       const cellA = a.children[index].textContent.trim();
       const cellB = b.children[index].textContent.trim();
 
-      if (!isNaN(cellA) && !isNaN(cellB)) {
-        return currentSortOrder === 'asc' ? cellA - cellB : cellB - cellA;
+      const numA = parseFloat(cellA.replace(/[$,]/g, ''));
+      const numB = parseFloat(cellB.replace(/[$,]/g, ''));
+
+      const isNumberA = !isNaN(numA);
+      const isNumberB = !isNaN(numB);
+
+      if (isNumberA && isNumberB) {
+        return currentSortOrder === 'asc' ? numA - numB : numB - numA;
       }
 
       return currentSortOrder === 'asc'
@@ -126,7 +132,7 @@ form.addEventListener('submit', (ev) => {
     return;
   }
 
-  if (age < 18 || age > 90) {
+  if (Number(age) < 18 || Number(age) > 90) {
     showNotification('Age must be between 18 and 90', 'error');
 
     return;
@@ -139,7 +145,7 @@ form.addEventListener('submit', (ev) => {
     <td>${position}</td>
     <td>${office}</td>
     <td>${age}</td>
-    <td>$${salary.toLocaleString()}</td>
+    <td>$${Number(salary).toLocaleString('en-EN')}</td>
   `;
   tbody.append(row);
   form.reset();
