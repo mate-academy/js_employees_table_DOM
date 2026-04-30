@@ -197,7 +197,7 @@ const delNotification = () => {
   setTimeout(() => {
     newEmployeForm.reset();
     selectOfice.value = '';
-    notification.remove();
+    notification.style.display = 'none';
   }, 4000);
 };
 
@@ -388,7 +388,7 @@ newEmployeForm.addEventListener('submit', (e) => {
   formData.position = normalizer(formData.position);
 
   if (massages.length === 0) {
-    delNotification();
+    // delNotification();
 
     const newRow = table.tBodies[0].insertRow();
 
