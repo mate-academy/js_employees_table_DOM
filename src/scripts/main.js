@@ -14,6 +14,7 @@ const newEmployeForm = document.createElement('form');
 
 newEmployeForm.classList.add('new-employee-form');
 newEmployeForm.id = 'new-employe';
+newEmployeForm.noValidate = true;
 
 body.append(newEmployeForm);
 
@@ -53,7 +54,7 @@ inputPos.name = 'position';
 inputPos.id = 'position';
 inputPos.type = 'text';
 inputPos.classList.add('input');
-// inputPos.required = true;
+inputPos.required = true;
 
 labelPosition.append(inputPos);
 newEmployeForm.append(labelPosition);
@@ -190,6 +191,16 @@ newEmployeForm.append(button);
 newEmployeForm.setAttribute('method', 'get');
 newEmployeForm.setAttribute('action', '');
 
+// #region delNotification
+
+const delNotification = () => {
+  setTimeout(() => {
+    newEmployeForm.reset();
+    selectOfice.value = '';
+    notification.remove();
+  }, 4000);
+};
+
 // #region salary to notm
 
 const salaryToNorm = new Intl.NumberFormat('en-US', {
@@ -199,6 +210,7 @@ const salaryToNorm = new Intl.NumberFormat('en-US', {
 });
 
 // #endregion
+
 // #region compare
 function compareFn(a, b) {
   const valA = a.cells[indColumns].textContent;
@@ -226,6 +238,7 @@ function compareFn(a, b) {
 
   return valB.trim().toLowerCase().localeCompare(valA.trim().toLowerCase());
 }
+
 // #endregion
 
 // #region sort
@@ -310,6 +323,11 @@ const createMessage = function (massag) {
 };
 
 const redy = function () {
+  const existing = document.querySelector('[data-qa="notification"]');
+
+  if (existing) {
+    existing.remove();
+  }
   newEmployeForm.append(notification);
 };
 
@@ -327,20 +345,22 @@ newEmployeForm.addEventListener('submit', (e) => {
 
   e.preventDefault();
 
-  if (inputPos.value.length < 4) {
+  if (inputPos.value.trim() === '') {
     massages.push('Position is required');
     error = 'error';
-    spanTitle.textContent = 'Position must be less than 4 characters!';
+    spanTitle.textContent = 'field must not be empty!';
     createMessage(error);
     redy();
+    // delNotification();
   }
 
   if (inputName.value.length < 4) {
-    massages.push('Name must be less than 4 characters');
+    massages.push('The name must be more than 4 characters!');
     error = 'error';
-    spanTitle.textContent = 'Name must be less than 4 characters!';
+    spanTitle.textContent = 'The name must be more than 4 characters!';
     createMessage(error);
     redy();
+    // delNotification();
   }
 
   if (Number(inputAge.value) < 18 || Number(inputAge.value) > 90) {
@@ -349,11 +369,13 @@ newEmployeForm.addEventListener('submit', (e) => {
     spanTitle.textContent = 'Incorrect age';
     createMessage(error);
     redy();
+    // delNotification();
   }
 
   if (massages.length !== 0) {
     createMessage('error');
     redy();
+    // delNotification();
 
     return;
   }
@@ -366,6 +388,8 @@ newEmployeForm.addEventListener('submit', (e) => {
   formData.position = normalizer(formData.position);
 
   if (massages.length === 0) {
+    delNotification();
+
     const newRow = table.tBodies[0].insertRow();
 
     spanTitle.textContent = 'SUCCESS';
@@ -382,14 +406,7 @@ newEmployeForm.addEventListener('submit', (e) => {
         newCell.textContent = salaryToNorm.format(Number(formData[el]));
       }
     });
-    newEmployeForm.reset();
   }
 });
 
 // #endregion
-
-const delNotification = () => {
-  setTimeout(() => {
-    notification.remove();
-  }, 3000);
-};
