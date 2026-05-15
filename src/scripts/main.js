@@ -53,12 +53,25 @@ tbody.addEventListener('dblclick', (e) => {
   const previousText = td.textContent;
   const input = document.createElement('input');
 
+  input.classList.add('cell-input');
   input.value = previousText;
   td.textContent = '';
 
+  const save = () => {
+    const newValue = input.value.trim();
+
+    td.textContent = newValue !== '' ? newValue : previousText;
+  };
+
+  input.addEventListener('blur', () => save);
+
   input.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter') {
-      td.textContent = input.value;
+      input.blur();
+    }
+
+    if (ev.key === 'Escape') {
+      td.textContent = previousText;
     }
   });
 
