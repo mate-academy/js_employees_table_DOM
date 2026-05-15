@@ -63,7 +63,7 @@ tbody.addEventListener('dblclick', (e) => {
     td.textContent = newValue !== '' ? newValue : previousText;
   };
 
-  input.addEventListener('blur', () => save);
+  input.addEventListener('blur', save);
 
   input.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter') {
@@ -103,6 +103,7 @@ document.body.insertAdjacentHTML(
       <span data-qa="notification" id="position-error"></span>
 
       <label>
+        Office:
         <select
           name="office"
           data-qa="office"
