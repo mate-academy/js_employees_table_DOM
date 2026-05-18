@@ -87,6 +87,7 @@ const addForm = () => {
   ];
 
   form.classList.add('new-employee-form');
+  form.setAttribute('novalidate', '');
 
   fields.forEach((nameField) => {
     const label = document.createElement('label');
@@ -153,6 +154,12 @@ const addForm = () => {
 addForm();
 
 const createNotification = (type, description) => {
+  const existNtf = document.querySelector('[data-qa="notification"]');
+
+  if (existNtf) {
+    existNtf.remove();
+  }
+
   if (type !== 'success' && type !== 'error') {
     throw new Error(`Invalid notification type: ${type}`);
   }
@@ -182,26 +189,29 @@ const createNotification = (type, description) => {
 const checkValidation = (formEl) => {
   const nameInput = formEl.elements.name;
   const ageInput = formEl.elements.age;
-  let isValid = true;
+  const positionInput = formEl.elements.position;
 
   if (nameInput.value.length < 4) {
     createNotification('error', 'The field "Name" has fewer than 4 letters');
 
-    isValid = false;
+    return false;
+  }
 
-    return;
+  if (positionInput.value.length === 0) {
+    createNotification('error', 'The field "Position" cannot be empty');
+
+    return false;
   }
 
   if (ageInput.value < 18 || ageInput.value > 90) {
     createNotification('error', 'Age must be between 18 and 90');
-    isValid = false;
 
-    return;
+    return false;
   }
 
   createNotification('success', 'A new employee is added to the table');
 
-  return isValid;
+  return true;
 };
 
 // actions by clicking form submit btn
@@ -245,15 +255,52 @@ form.addEventListener('submit', (e) => {
 
   form.reset();
 });
-//   console.log(
-//     // можна отримати так: form.elements.email.value
-//     // email: data.get('email'),
 
-//     // можна отримати так: form.elements.password.value
-//     f
-//   );
-//   console.log(formData.entries);
-// });
+document.querySelector('tbody').addEventListener('dblclick', (e) => {
+  const cell = e.target.closest('td');
+  const columnIndex = cell.cellIndex;
+  const columnName = titles[columnIndex].textContent.toLowerCase();
 
-// - Click on `Save to table`; you should add a new employee to the table.
-// - All fields are required.
+  if (!cell || cell.querySelector('input')) {
+    return;
+  }
+
+  const existInput = document.querySelector('.cell-input');
+
+  if (existInput) {
+    existInput.blur();
+  }
+
+  const cellOriginalValue = cell.textContent;
+
+  cell.textContent = '';
+
+  const input = document.createElement('input');
+
+  input.classList.add('cell-input');
+  input.value = cellOriginalValue;
+  cell.appendChild(input);
+  input.focus();
+
+  const saveState = () => {
+    const value = input.value;
+
+    if (value === '') {
+      cell.textContent = cellOriginalValue;
+    } else {
+      cell.textContent = value;
+    }
+
+    if (columnName === 'salary') {
+      cell.textContent = `$${Number(value).toLocaleString('en-US')}`;
+    }
+  };
+
+  input.addEventListener('blur', saveState);
+
+  input.addEventListener('keydown', (evt) => {
+    if (evt.key === 'Enter') {
+      saveState();
+    }
+  });
+});
