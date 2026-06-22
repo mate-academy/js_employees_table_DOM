@@ -6,6 +6,12 @@ const tbody = document.querySelector('tbody');
 // обьект для хранения текущей сортировки
 const sortDirect = {};
 
+// индекс столбца, по которому отсортировано прямо сейчас
+// (нужен, чтобы при клике на ДРУГОЙ столбец сортировка
+// всегда начиналась заново с 'asc', а не продолжала
+// чужое сохранённое направление)
+let currentSortIndex = null;
+
 // СОРТИРОВКА ПО КЛИКУ НА ЗАГОЛОВОК //
 thead.addEventListener('click', (e) => {
   // реагируем только на клик именно по ячейке <th>
@@ -16,9 +22,18 @@ thead.addEventListener('click', (e) => {
     // чтобы можно было sort()
     const rows = Array.from(tbody.querySelectorAll('tr'));
 
-    // переключаем направление сортировки для этого столбца:
-    // если было 'asc' — становится 'desc', и наоборот (по умолчанию un
-    sortDirect[index] = sortDirect[index] === 'asc' ? 'desc' : 'asc';
+    if (index !== currentSortIndex) {
+      // кликнули на НОВЫЙ столбец — всегда начинаем с восходящего порядка,
+      // независимо от того, что было сохранено для него ранее
+      sortDirect[index] = 'asc';
+    } else {
+      // кликнули на ТОТ ЖЕ столбец повторно — переключаем направление:
+      // 'asc' -> 'desc', 'desc' -> 'asc'
+      sortDirect[index] = sortDirect[index] === 'asc' ? 'desc' : 'asc';
+    }
+
+    // запоминаем, какой столбец сейчас активен для сортировки
+    currentSortIndex = index;
 
     const direction = sortDirect[index];
 
