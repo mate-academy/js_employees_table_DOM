@@ -88,7 +88,7 @@ table.insertAdjacentHTML(
 
       <label>
         Position:
-        <input name="position" type="text" data-qa="position">
+        <input name="position" type="text" data-qa="position" required>
       </label>
 
       <label>
@@ -118,6 +118,8 @@ table.insertAdjacentHTML(
 );
 
 const form = document.querySelector('form');
+
+form.noValidate = true;
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
