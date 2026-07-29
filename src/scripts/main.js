@@ -88,7 +88,7 @@ table.insertAdjacentHTML(
 
       <label>
         Position:
-        <input name="position" type="text" data-qa="position"/>
+        <input name="position" type="text" data-qa="position"/ >
       </label>
 
       <label>
