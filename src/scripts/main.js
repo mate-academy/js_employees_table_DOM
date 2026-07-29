@@ -110,7 +110,7 @@ table.insertAdjacentHTML(
 
       <label>
         Salary:
-        <input name="salary" data-qa="salary" type="number" required/>
+        <input name="salary" data-qa="salary" type="number" required />
       </label>
       <button type="submit">Save to table</button>
     </form>
