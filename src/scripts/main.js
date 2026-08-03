@@ -74,6 +74,7 @@ const handleCellEdit = (evt) => {
 
   input.type = 'text';
   input.value = oldValue;
+  input.classList.add('cell-input');
 
   cell.textContent = '';
   cell.append(input);
@@ -161,15 +162,6 @@ const validateFormData = (data) => {
     };
   }
 
-  if (!data.position) {
-    return {
-      valid: false,
-      field: 'position',
-      title: 'Error',
-      message: 'Position is required.',
-    };
-  }
-
   if (data?.name.length < 4) {
     return {
       valid: false,
@@ -202,15 +194,6 @@ const validateFormData = (data) => {
       field: 'salary',
       title: 'Error',
       message: 'Salary is required.',
-    };
-  }
-
-  if (data.name.length < 4) {
-    return {
-      valid: false,
-      field: 'name',
-      title: 'Invalid Name',
-      message: 'Name must have at least 4 letters.',
     };
   }
 
