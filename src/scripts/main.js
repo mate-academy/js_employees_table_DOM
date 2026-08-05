@@ -68,21 +68,28 @@ const form = document.createElement('form');
 form.className = 'new-employee-form';
 
 form.innerHTML = `
-<label>Name: <input name="name" type="text" data-qa="name"></label>
-<label>Position: <input name="position" type="text" data-qa="position"></label>
-<label>
-<label>Office:
-<select name="office" data-qa="office">
+<label for="employee-name">Name:
+  <input id="employee-name" name="name" type="text" data-qa="name">
+</label>
+<label for="employee-position">Position:
+  <input id="employee-position" name="position" type="text" data-qa="position">
+</label>
+<label for="employee-office">Office:
+  <select id="employee-office" name="office" data-qa="office">
   <option value="Tokyo">Tokyo</option>
   <option value="Singapore">Singapore</option>
   <option value="London">London</option>
   <option value="New York">New York</option>
   <option value="Edinburgh">Edinburgh</option>
   <option value="San Francisco">San Francisco</option>
-</select>
+  </select>
 </label>
-<label>Age: <input name="age" type="number" data-qa="age"></label>
-<label>Salary: <input name="salary" type="number" data-qa="salary"></label>
+<label for="employee-age">Age:
+  <input id="employee-age" name="age" type="number" data-qa="age">
+</label>
+<label for="employee-salary">Salary:
+  <input id="employee-salary" name="salary" type="number" data-qa="salary">
+</label>
 <button type="submit">Save to table</button>
 `;
 
@@ -150,8 +157,12 @@ form.addEventListener('submit', function (e) {
     isValid = false;
   }
 
-  if (isNaN(salary) || salary <= 0) {
-    pushNotification('Error', 'Salary must be a positive number.', 'error');
+  if (isNaN(age) || age < 18 || age > 90) {
+    pushNotification(
+      'Error',
+      'Age must be a number between 18 and 90',
+      'error',
+    );
     isValid = false;
   }
 
