@@ -139,21 +139,8 @@ form.addEventListener('submit', function (e) {
     isValid = false;
   }
 
-  if (position.length < 4) {
-    pushNotification(
-      'Error',
-      'Position must be at least 4 characters long.',
-      'error',
-    );
-    isValid = false;
-  }
-
-  if (isNaN(age) || age < 18 || age > 90) {
-    pushNotification(
-      'Error',
-      'Age must be a number between 18 and 90',
-      'error',
-    );
+  if (!position) {
+    pushNotification('Error', 'Position is required.', 'error');
     isValid = false;
   }
 
@@ -185,4 +172,35 @@ form.addEventListener('submit', function (e) {
   pushNotification('Success', 'New employee added successfully.', 'success');
 
   form.reset();
+});
+
+tbody.addEventListener('dblclick', function (e) {
+  const cell = e.target.closest('td');
+
+  if (!cell) {
+    return;
+  }
+
+  const initialValue = cell.textContent;
+  const input = document.createElement('input');
+
+  input.className = 'cell-input';
+  input.value = initialValue;
+
+  cell.textContent = '';
+  cell.appendChild(input);
+  input.focus();
+
+  function saveValue() {
+    const newValue = input.value.trim();
+
+    cell.textContent = newValue === '' ? initialValue : newValue;
+  }
+  input.addEventListener('blur', saveValue);
+
+  input.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Enter') {
+      input.blur();
+    }
+  });
 });
