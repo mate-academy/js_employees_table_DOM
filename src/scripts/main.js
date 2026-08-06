@@ -128,15 +128,11 @@ form.addEventListener('submit', (e) => {
   const nameValue = form.elements.name.value;
   const ageValue = form.elements.age.value;
   const positionValue = form.elements.position.value;
+  const officeValue = form.elements.select.value;
+  const salaryValue = form.elements.salary.value;
 
   if (nameValue.length < 4) {
     showNotification('Name must be at least 4 characters', 'error');
-
-    return;
-  }
-
-  if (+ageValue < 18 || +ageValue > 90) {
-    showNotification('Age must be between 18 and 90', 'error');
 
     return;
   }
@@ -147,7 +143,23 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  showNotification('Employee added!', 'success');
+  if (+ageValue < 18 || +ageValue > 90) {
+    showNotification('Age must be between 18 and 90', 'error');
+
+    return;
+  }
+
+  if (!officeValue) {
+    showNotification('Office is required', 'error');
+
+    return;
+  }
+
+  if (!salaryValue) {
+    showNotification('Salary is required', 'error');
+
+    return;
+  }
 
   const newRow = tbody.insertRow();
   const nameCell = newRow.insertCell();
@@ -158,9 +170,11 @@ form.addEventListener('submit', (e) => {
 
   nameCell.textContent = nameValue;
   positionCell.textContent = positionValue;
-  officeCell.textContent = form.elements.select.value;
+  officeCell.textContent = officeValue;
   ageCell.textContent = ageValue;
-  salaryCell.textContent = `$${Number(form.elements.salary.value).toLocaleString('en-US')}`;
+  salaryCell.textContent = `$${Number(salaryValue).toLocaleString('en-US')}`;
+
+  showNotification('Employee added!', 'success');
 });
 
 // NOTIFICATION
