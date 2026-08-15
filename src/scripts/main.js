@@ -14,7 +14,7 @@ headers.forEach((header, index) => {
       currentDirection = currentDirection === 'asc' ? 'desc' : 'asc';
     } else {
       currentColumn = index;
-      currentColumn = 'asc';
+      currentDirection = 'asc';
     }
 
     const rows = Array.from(tbody.querySelectorAll('tr'));
@@ -32,7 +32,7 @@ headers.forEach((header, index) => {
 
       const result = valueA.localeCompare(valueB);
 
-      return currentColumn === 'asc' ? result : -result;
+      return currentDirection === 'asc' ? result : -result;
     });
 
     rows.forEach((row) => {
@@ -110,10 +110,15 @@ form.innerHTML = `
     >
   </label>
 
-  <button type="submit">Save to table</button>
+  <button
+  type="submit"
+  data-qa="submit"
+>
+  Save to table
+</button>
 `;
 
-document.body.append('form');
+document.body.append(form);
 
 function showNotification(title, description, type) {
   const OldNotification = document.querySelector('[data-qa="notification"]');
@@ -132,7 +137,7 @@ function showNotification(title, description, type) {
     <p>${description}</p>
   `;
 
-  document.body.append('notification');
+  document.body.append(notification);
 
   setTimeout(() => {
     notification.remove();
@@ -233,7 +238,7 @@ tbody.addEventListener('dblclick', (e) => {
 function saveCell(cell) {
   const input = cell.querySelector('.cell-input');
 
-  if (input) {
+  if (!input) {
     return;
   }
 
