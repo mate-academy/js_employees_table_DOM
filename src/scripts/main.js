@@ -1,5 +1,27 @@
 'use strict';
 
+const pushNotification = (title, description, type) => {
+  const notif = document.createElement('div');
+  const head = document.createElement('h2');
+  const content = document.createElement('p');
+
+  notif.dataset.qa = 'notification';
+
+  notif.classList.add('notification');
+  notif.classList.add(type);
+
+  head.textContent = title;
+  head.classList.add('title');
+  content.textContent = description;
+
+  notif.append(head);
+  notif.append(content);
+  document.body.append(notif);
+
+  setTimeout(() => {
+    notif.style.display = 'none';
+  }, 4000);
+};
 const table = document.querySelector('table');
 
 table.addEventListener('click', (e) => {
@@ -59,11 +81,17 @@ label1.textContent = 'Name:';
 
 input1.setAttribute('name', 'name');
 input1.setAttribute('type', 'text');
+input1.setAttribute('minlength', 4);
 input1.setAttribute('required', '');
 input1.dataset.qa = 'name';
 
 label1.append(input1);
 form.append(label1);
+
+input1.addEventListener('invalid', (e) => {
+  e.preventDefault();
+  pushNotification('Error', 'Invalid data!', 'error');
+});
 
 const label2 = document.createElement('label');
 const input2 = document.createElement('input');
@@ -113,10 +141,17 @@ label4.textContent = 'Age:';
 input4.setAttribute('name', 'age');
 input4.setAttribute('type', 'number');
 input4.setAttribute('required', '');
+input4.setAttribute('min', 18);
+input4.setAttribute('max', 90);
 input4.dataset.qa = 'age';
 
 label4.append(input4);
 form.append(label4);
+
+input4.addEventListener('invalid', (e) => {
+  e.preventDefault();
+  pushNotification('Error', 'Invalid data!', 'error');
+});
 
 const label5 = document.createElement('label');
 const input5 = document.createElement('input');
@@ -131,9 +166,9 @@ input5.dataset.qa = 'salary';
 label5.append(input5);
 form.append(label5);
 
-const submit = document.createElement('input');
+const submit = document.createElement('button');
 
-submit.setAttribute('type', 'submit');
+submit.textContent = 'Save to table';
 form.append(submit);
 
 document.body.append(form);
@@ -149,6 +184,18 @@ form.addEventListener('submit', (e) => {
     ...[...data].map((values) => {
       const td = document.createElement('td');
 
+      if (values[0] === 'name' && values[1].length < 4) {
+        pushNotification('Error', 'Invalid data!', 'error');
+
+        return;
+      }
+
+      if (values[0] === 'position' && values[1].length === 0) {
+        pushNotification('Error', 'Invalid data!', 'error');
+
+        return;
+      }
+
       if (values[0] === 'salary') {
         td.textContent =
           '$' + values[1].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -160,9 +207,6 @@ form.addEventListener('submit', (e) => {
     }),
   );
 
+  pushNotification('Success', 'Rows updated!', 'success');
   table.tBodies[0].appendChild(row);
-
-  // luke please note in your review all mistakes made in this current code.
-  // I'm fully aware that this app is missing alerts.
-  // Just note my current mistakes
 });
