@@ -88,11 +88,6 @@ input1.dataset.qa = 'name';
 label1.append(input1);
 form.append(label1);
 
-input1.addEventListener('invalid', (e) => {
-  e.preventDefault();
-  pushNotification('Error', 'Invalid data!', 'error');
-});
-
 const label2 = document.createElement('label');
 const input2 = document.createElement('input');
 
@@ -102,6 +97,10 @@ input2.setAttribute('name', 'position');
 input2.setAttribute('type', 'text');
 input2.setAttribute('required', '');
 input2.dataset.qa = 'position';
+
+input2.addEventListener('invalid', (e) => {
+  pushNotification('Error', 'Invalid data!', 'error');
+});
 
 label2.append(input2);
 form.append(label2);
@@ -173,28 +172,41 @@ form.append(submit);
 
 document.body.append(form);
 
+input1.addEventListener('invalid', (e) => {
+  pushNotification('Error', 'Invalid data!', 'error');
+});
+
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const data = new FormData(e.currentTarget);
+  const nameData = data.get('name');
+  const posData = data.get('position');
+  const ageData = data.get('age');
+
+  if (!nameData || nameData.length < 4) {
+    pushNotification('Error', 'Invalid data!', 'error');
+
+    return;
+  }
+
+  if (!posData) {
+    pushNotification('Error', 'Invalid data!', 'error');
+
+    return;
+  }
+
+  if (!ageData || +ageData < 18 || +ageData > 90) {
+    pushNotification('Error', 'Invalid data!', 'error');
+
+    return;
+  }
 
   const row = document.createElement('tr');
 
   row.append(
     ...[...data].map((values) => {
       const td = document.createElement('td');
-
-      if (values[0] === 'name' && values[1].length < 4) {
-        pushNotification('Error', 'Invalid data!', 'error');
-
-        return;
-      }
-
-      if (values[0] === 'position' && values[1].length === 0) {
-        pushNotification('Error', 'Invalid data!', 'error');
-
-        return;
-      }
 
       if (values[0] === 'salary') {
         td.textContent =
