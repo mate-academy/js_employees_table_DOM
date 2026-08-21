@@ -248,7 +248,7 @@ function dataInputValidation(nameVal, age, position) {
 }
 
 function getDividedSalary(salary) {
-  const splitSalary = toString(salary).split('');
+  const splitSalary = salary.toString().split('');
 
   splitSalary.reverse();
 
