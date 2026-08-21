@@ -154,7 +154,7 @@ const formHTMLFillment = `
     <label for="">
       Age:
       <input
-        type="text"
+        type="number"
         name="age"
         data-qa="age"
         required
@@ -163,7 +163,7 @@ const formHTMLFillment = `
     <label for="">
       Salary:
       <input
-        type="text"
+        type="number"
         name="salary"
         data-qa="salary"
         required
@@ -212,7 +212,7 @@ newForm.addEventListener('submit', (e) => {
     positionValue,
     officeValue,
     ageValue,
-    salaryValue,
+    +salaryValue,
   );
 
   showNotification('success');
@@ -248,7 +248,7 @@ function dataInputValidation(nameVal, age, position) {
 }
 
 function getDividedSalary(salary) {
-  const splitSalary = salary.split('');
+  const splitSalary = toString(salary).split('');
 
   splitSalary.reverse();
 
