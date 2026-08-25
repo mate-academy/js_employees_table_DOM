@@ -25,8 +25,8 @@ headers.addEventListener('click', (e) => {
 
     e.target.removeAttribute('id');
   } else {
-    if (document.getElementById('#clicked')) {
-      document.getElementById('#clicked').removeAttribute('id');
+    if (document.getElementById('clicked')) {
+      document.getElementById('clicked').removeAttribute('id');
     }
 
     sorted.sort((a, b) => {
@@ -83,15 +83,14 @@ for (let i = 0; i < formFill.length; i++) {
     select.setAttribute('name', formFill[i]);
     select.setAttribute('data-qa', formFill[i]);
 
-    const officeLocations = [];
-
-    for (let o = 0; o < table.tBodies[0].rows.length; o++) {
-      if (
-        !officeLocations.includes(table.tBodies[0].rows[o].cells[2].innerText)
-      ) {
-        officeLocations.push(table.tBodies[0].rows[o].cells[2].innerText);
-      }
-    }
+    const officeLocations = [
+      'Tokyo',
+      'Singapore',
+      'London',
+      'New York',
+      'Edinburgh',
+      'San Francisco',
+    ];
 
     officeLocations.forEach((x) => {
       const option = document.createElement('option');
@@ -118,6 +117,10 @@ form.append(button);
 table.insertAdjacentElement('afterend', form);
 
 button.addEventListener('click', (e) => {
+  if (document.querySelector('div')) {
+    document.querySelector('div').remove();
+  }
+
   const notification = document.createElement('div');
   const alertTitle = document.createElement('h2');
   const message = document.createElement('p');
@@ -169,5 +172,32 @@ button.addEventListener('click', (e) => {
 // #endregion adding form
 
 // #region double-click editing
+body.addEventListener('dblclick', (e) => {
+  if (e.target.tagName === 'TD') {
+    const input = document.createElement('input');
+    const originalText = e.target.innerText;
 
+    input.classList.add('cell-input');
+    e.target.innerText = '';
+    e.target.append(input);
+
+    input.addEventListener('blur', () => {
+      if (input.value.trim() === '') {
+        e.target.innerText = originalText;
+      } else {
+        e.target.innerText = input.value;
+      }
+    });
+
+    input.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        if (input.value.trim() === '') {
+          e.target.innerText = originalText;
+        } else {
+          e.target.innerText = input.value;
+        }
+      }
+    });
+  }
+});
 // #endregion double-click editing
