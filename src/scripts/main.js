@@ -183,6 +183,8 @@ function showNotification(type, title, description) {
   }, 2000);
 }
 
+let currentInput = null;
+
 body.addEventListener('dblclick', (e) => {
   if (e.target.querySelector('input')) {
     return;
@@ -197,19 +199,17 @@ body.addEventListener('dblclick', (e) => {
   input.classList.add('cell-input');
   e.target.append(input);
 
-  e.target.addEventListener('keypress', (ev) => {
+  currentInput = input;
+
+  currentInput.addEventListener('keypress', (ev) => {
     if (ev.key === 'Enter') {
-      rewrite(input, e, target);
+      rewrite(currentInput, e, target);
     }
   });
 
-  e.target.addEventListener(
-    'blur',
-    () => {
-      rewrite(input, e, target);
-    },
-    true,
-  );
+  currentInput.addEventListener('blur', () => {
+    rewrite(currentInput, e, target);
+  });
 });
 
 function rewrite(input, e, target) {
@@ -219,4 +219,5 @@ function rewrite(input, e, target) {
     e.target.textContent = input.value;
   }
   input.remove();
+  currentInput = null;
 }
