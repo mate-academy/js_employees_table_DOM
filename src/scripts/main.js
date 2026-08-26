@@ -1,14 +1,5 @@
 'use strict';
 
-// write code here
-'use strict';
-
-// write code here
-'use strict';
-
-// write code here
-'use strict';
-
 // table sort
 const body = document.querySelector('body');
 const table = document.querySelector('table');
@@ -57,10 +48,9 @@ headers.forEach((header, index) => {
 
 function activateRow(row) {
   row.addEventListener('click', () => {
-    row.classList.toggle(activeRow);
-
     if (currentRow !== row) {
       currentRow?.classList.remove(activeRow);
+      row.classList.add(activeRow);
     }
 
     currentRow = row;
