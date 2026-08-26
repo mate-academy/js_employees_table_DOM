@@ -30,11 +30,10 @@ function sortSalary(el) {
 
 function sorting(el1, el2, index) {
   let result;
+  const element1 = sortSalary(el1.children[index].textContent);
 
-  if (sortSalary(el1.children[index].textContent)) {
-    result =
-      sortSalary(el1.children[index].textContent) -
-      sortSalary(el2.children[index].textContent);
+  if (element1 === +element1) {
+    result = element1 - sortSalary(el2.children[index].textContent);
   } else {
     result = el1.children[index].textContent.localeCompare(
       el2.children[index].textContent,
@@ -53,7 +52,7 @@ body.addEventListener('click', (e) => {
     body.children[selected].classList.remove('active');
   }
 
-  e.target.parentElement.classList.toggle('active');
+  e.target.closest('tr').classList.toggle('active');
 });
 
 const form = document.createElement('form');
@@ -124,7 +123,13 @@ form.addEventListener('submit', (e) => {
   const age = data.get('age');
   const salary = makeSalary(data.get('salary'));
 
-  if (Name.length < 4 || age < 18 || age > 90 || position.length < 5) {
+  if (
+    Name.length < 4 ||
+    age < 18 ||
+    age > 90 ||
+    position.length < 5 ||
+    !office
+  ) {
     showNotification('error', 'Error', 'Wrong input');
   } else {
     showNotification('success', 'Success!', 'Information added');
@@ -179,6 +184,10 @@ function showNotification(type, title, description) {
 }
 
 body.addEventListener('dblclick', (e) => {
+  if (e.target.querySelector('input')) {
+    return;
+  }
+
   const target = e.target.textContent;
 
   e.target.textContent = '';
