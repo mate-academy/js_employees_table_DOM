@@ -97,9 +97,9 @@ function modifyForm(type, named) {
       newSelect.append(newOption);
     });
 
-    newSelect.dataset.qa = 'Office';
+    newSelect.dataset.qa = 'office';
     newSelect.name = named;
-    newSelect.required = true;
+    // newSelect.required = true;
     newLabel.append(newSelect);
     newForm.append(newLabel);
 
@@ -109,7 +109,7 @@ function modifyForm(type, named) {
   newInput.dataset.qa = named;
   newInput.type = type;
   newInput.name = named;
-  newInput.required = true;
+  // newInput.required = true;
 
   newLabel.append(newInput);
   newForm.append(newLabel);
@@ -117,7 +117,7 @@ function modifyForm(type, named) {
 
 modifyForm('text', 'name');
 modifyForm('text', 'position');
-modifyForm('select', 'country');
+modifyForm('select', 'office');
 modifyForm('number', 'age');
 modifyForm('number', 'salary');
 
@@ -145,7 +145,7 @@ newForm.addEventListener('submit', (e) => {
 
   row.insertCell().textContent = data.get('name');
   row.insertCell().textContent = data.get('position');
-  row.insertCell().textContent = data.get('country');
+  row.insertCell().textContent = data.get('office');
   row.insertCell().textContent = data.get('age');
   row.insertCell().textContent = `$${salaryValue}`;
 
@@ -161,9 +161,6 @@ const pushNotification = (title, description, type) => {
 
   const rect = newForm.getBoundingClientRect();
 
-  notification.style.top = `${rect.bottom}px`;
-  notification.style.left = `${rect.left}px`;
-
   const titleElement = document.createElement('h2');
 
   titleElement.classList.add('title');
@@ -176,6 +173,9 @@ const pushNotification = (title, description, type) => {
   notification.append(titleElement, descriptionElement);
   document.body.append(notification);
 
+  notification.style.top = `${rect.bottom + notification.offsetHeight / 2}px`;
+  notification.style.left = `${rect.left}px`;
+
   setTimeout(() => notification.remove(), 2000);
 };
 
@@ -184,6 +184,11 @@ let activeInput = null;
 function validateEmp(data) {
   const named = data.get('name');
   const age = data.get('age');
+  const values = [...data.values()];
+
+  if (values.some((value) => value.trim() === '')) {
+    return 'All inputs must be filled';
+  }
 
   if (named.length < 4) {
     return 'Name must be at least 4 characters long.';
