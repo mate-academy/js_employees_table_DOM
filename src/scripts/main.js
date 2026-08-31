@@ -215,7 +215,7 @@ table.addEventListener('dblclick', (e) => {
   const initialText = cellForEdit.textContent;
   const input = document.createElement('input');
 
-  input.className = 'cellInput';
+  input.className = 'cell-input';
   input.value = initialText;
 
   cellForEdit.textContent = '';
