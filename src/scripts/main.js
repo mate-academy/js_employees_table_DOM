@@ -1,17 +1,9 @@
 'use strict';
 
-const body = document.querySelector('body');
-const table = document.querySelector('table');
-const thead = table.querySelector('thead');
-const tbody = table.querySelector('tbody');
-const thThead = [...thead.querySelectorAll('th')];
-const form = document.createElement('form');
-const notification = document.createElement('div');
-const title = document.createElement('h1');
-const massage = document.createElement('p');
 const MIN_NAME_LENGTH = 4;
 const MIN_AGE = 18;
 const MAX_AGE = 90;
+const NOTIFICATION_DELAY = 3000;
 const OFFICES = [
   'Tokyo',
   'Singapore',
@@ -19,11 +11,88 @@ const OFFICES = [
   'New York',
   'Edinburgh',
   'San Francisco',
-  'Kharkov',
 ];
+
+const body = document.querySelector('body');
+const table = document.querySelector('table');
+const thead = table.querySelector('thead');
+const tbody = table.querySelector('tbody');
+const form = document.createElement('form');
 const citySelection = OFFICES.map(
   (office) => `<option value="${office}"> ${office} </option>`,
 ).join('');
+
+/**
+ * @param {Number | string} value
+ *
+ * @returns {string}
+ */
+function formatSalary(value) {
+  return `$${Number(value).toLocaleString('en-US')}`;
+}
+
+/**
+ * @param {string} type
+ * @param {string} title
+ * @param {string} description
+ *
+ */
+function addingNotification(type, title, description) {
+  const previousMessage = document.querySelector('[data-qa="notification"]');
+  const notification = document.createElement('div');
+  const messageTitle = document.createElement('h2');
+  const massage = document.createElement('p');
+
+  if (previousMessage) {
+    previousMessage.remove();
+  }
+
+  notification.classList.add('notification', type);
+  notification.dataset.qa = 'notification';
+
+  messageTitle.classList.add('title');
+  messageTitle.textContent = title;
+
+  massage.textContent = description;
+
+  notification.append(messageTitle, massage);
+  document.body.append(notification);
+
+  setTimeout(() => notification.remove(), NOTIFICATION_DELAY);
+}
+
+/**
+ * @param {Object} employee
+ *
+ * @returns {string}
+ */
+function getValidationError(employee) {
+  if (employee.fullName.length < MIN_NAME_LENGTH) {
+    return `Name should contain at least ${MIN_NAME_LENGTH} letters.`;
+  }
+
+  if (!employee.position) {
+    return 'Position is required.';
+  }
+
+  if (!employee.office) {
+    return 'Office is required.';
+  }
+
+  if (!employee.age) {
+    return 'Age is required.';
+  }
+
+  if (Number(employee.age) < MIN_AGE || Number(employee.age) > MAX_AGE) {
+    return `Age should be between ${MIN_AGE} and ${MAX_AGE}.`;
+  }
+
+  if (!employee.salary) {
+    return 'Salary is required.';
+  }
+
+  return '';
+}
 
 let currentSortColumn = null;
 let isAscending = true;
@@ -51,12 +120,15 @@ form.innerHTML = `
   <label>Salary:
     <input name="salary" type="number" data-qa="salary" />
   </label>
-  <button type="button">Save to table</button>
+  <button type="submit">Save to table</button>
 `;
 body.appendChild(form);
 
-const button = document.querySelector('button');
-
+/**
+ * @param {number | string} value
+ *
+ * @returns {number}
+ */
 function parseValue(value) {
   const cleaned = value.replace(/[^0-9.-]/g, '');
   const number = Number(cleaned);
@@ -68,7 +140,6 @@ function parseValue(value) {
 thead.addEventListener('click', (event) => {
   const tr = [...tbody.querySelectorAll('tr')];
   const sorting = event.target.closest('th');
-  const indexSorting = thThead.indexOf(sorting);
   const columnIndex = sorting.cellIndex;
 
   if (currentSortColumn === columnIndex) {
@@ -83,8 +154,8 @@ thead.addEventListener('click', (event) => {
   }
 
   tr.sort((element1, element2) => {
-    const a = parseValue(element1.children[indexSorting].textContent.trim());
-    const b = parseValue(element2.children[indexSorting].textContent.trim());
+    const a = parseValue(element1.children[columnIndex].textContent.trim());
+    const b = parseValue(element2.children[columnIndex].textContent.trim());
 
     if (isAscending === true) {
       if (typeof a === 'number' && typeof b === 'number') {
@@ -137,7 +208,12 @@ tbody.addEventListener('dblclick', (event) => {
   const save = () => {
     const value = input.value.trim();
 
-    selectedСell.textContent = value === '' ? initialText : value;
+    selectedСell.textContent =
+      value === ''
+        ? initialText
+        : String(initialText).includes('$') === false
+          ? value
+          : formatSalary(Number(value.replace(/[$,]/g, '')));
   };
 
   input.addEventListener('blur', save);
@@ -149,79 +225,52 @@ tbody.addEventListener('dblclick', (event) => {
   });
 });
 
-notification.setAttribute('data-qa', 'notification');
-notification.className = 'notification';
-notification.classList.toggle('success');
-notification.style.display = 'none';
+// eslint-disable-next-line no-shadow
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
 
-title.className = 'title';
-title.innerText = 'success';
+  const data = new FormData(form);
+  const employee = {
+    fullName: data.get('name').trim(),
+    position: data.get('position').trim(),
+    office: data.get('office'),
+    age: data.get('age').trim(),
+    salary: data.get('salary').trim(),
+  };
 
-massage.classList = 'success';
-massage.innerText = 'This is a success';
+  const error = getValidationError(employee);
 
-notification.appendChild(title);
-notification.appendChild(massage);
-body.appendChild(notification);
+  if (error) {
+    addingNotification('error', 'Invalid data', error);
 
-button.onclick = () => {
-  const dateNewPosition = [...document.querySelectorAll('[name]')];
-  const tr = document.createElement('tr');
-
-  notification.style.display = 'none';
-  dateNewPosition.shift();
-
-  if (
-    dateNewPosition[0].value.length >= MIN_NAME_LENGTH &&
-    dateNewPosition[1].value &&
-    dateNewPosition[2].value &&
-    dateNewPosition[3].value > MIN_AGE &&
-    dateNewPosition[3].value <= MAX_AGE &&
-    dateNewPosition[4].value
-  ) {
-    dateNewPosition.forEach((element) => {
-      const td = document.createElement('td');
-
-      if (element.getAttribute('name') === 'salary') {
-        const salary = String(element.value);
-
-        td.innerText =
-          '$' +
-          salary.slice(0, salary.length - 3) +
-          ',' +
-          salary.slice(salary.length - 3, salary.length);
-      } else {
-        td.innerText = element.value;
-      }
-
-      tr.appendChild(td);
-    });
-  } else {
-    title.innerText = 'error';
-
-    if (notification.className.includes('success')) {
-      notification.classList.toggle('success');
-      notification.classList.toggle('error');
-    }
-
-    notification.style.display = 'block';
-
-    // checking the length of a name
-    if (dateNewPosition[0].value.length < MIN_NAME_LENGTH) {
-      massage.innerText = 'Short name. It is worth giving a full name';
-      process.exit();
-    } else {
-      // checking the age
-      if (
-        dateNewPosition[3].value < MIN_AGE ||
-        dateNewPosition[3].value >= MAX_AGE
-      ) {
-        massage.innerText = 'Age does not match';
-        process.exit();
-      }
-    }
+    return;
   }
-  form.reset();
+
+  const tr = document.createElement('tr');
+  const dateNewPosition = [
+    employee.fullName,
+    employee.position,
+    employee.office,
+    employee.age,
+    formatSalary(employee.salary),
+  ];
+
+  dateNewPosition.forEach((element) => {
+    const td = document.createElement('td');
+
+    td.innerText = element;
+    tr.appendChild(td);
+  });
 
   tbody.appendChild(tr);
-};
+  form.reset();
+
+  addingNotification(
+    'success',
+    'Success',
+    `
+      ${employee.fullName} ${employee.age} years from ${employee.office}
+      as ${employee.position} with $${employee.salary} added to the table.
+    `,
+  );
+});
