@@ -184,7 +184,7 @@ tbody.addEventListener('click', (event) => {
   if (anotherString) {
     anotherString.classList.toggle('active');
   }
-  string.className = 'active';
+  string.classList.add('active');
 });
 
 // Add ability to edit row cells
@@ -211,7 +211,7 @@ tbody.addEventListener('dblclick', (event) => {
     selectedСell.textContent =
       value === ''
         ? initialText
-        : String(initialText).includes('$') === false
+        : initialText.includes('$') === false
           ? value
           : formatSalary(Number(value.replace(/[$,]/g, '')));
   };
