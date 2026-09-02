@@ -6,6 +6,25 @@ const thead = table.querySelector('thead');
 const tbody = table.querySelector('tbody');
 const thThead = [...thead.querySelectorAll('th')];
 const form = document.createElement('form');
+const notification = document.createElement('div');
+const title = document.createElement('h1');
+const massage = document.createElement('p');
+const MIN_NAME_LENGTH = 4;
+const MIN_AGE = 18;
+const MAX_AGE = 90;
+const OFFICES = [
+  'Tokyo',
+  'Singapore',
+  'London',
+  'New York',
+  'Edinburgh',
+  'San Francisco',
+  'Kharkov',
+];
+const citySelection = OFFICES.map(
+  (office) => `<option value="${office}"> ${office} </option>`,
+).join('');
+
 let currentSortColumn = null;
 let isAscending = true;
 
@@ -23,12 +42,7 @@ form.innerHTML = `
   </label>
   <label>Office:
     <select name="office" data-qa="office">
-      <option value="Tokyo" selected>Tokyo</option>
-      <option value="Singapore">Singapore</option>
-      <option value="London">London</option>
-      <option value="New York">New York</option>
-      <option value="Edinburgh">Edinburgh</option>
-      <option value="San Francisco">San Francisco</option>
+      ${citySelection}
     </select>
   </label>
   <label>Age:
@@ -56,8 +70,6 @@ thead.addEventListener('click', (event) => {
   const sorting = event.target.closest('th');
   const indexSorting = thThead.indexOf(sorting);
   const columnIndex = sorting.cellIndex;
-
-  // console.log(columnIndex);
 
   if (currentSortColumn === columnIndex) {
     isAscending = !isAscending;
@@ -98,85 +110,73 @@ tbody.addEventListener('click', (event) => {
   const anotherString = tbody.querySelector('.active');
   const string = event.target.closest('tr');
 
-  if (anotherString === string) {
-    const arrayOfOutputFields = [...document.querySelectorAll('[name]')];
-    const stringElements = [...string.querySelectorAll('td')];
-    const cell = event.target.closest('td');
-    const initialText = cell.textContent;
-    const input = document.createElement('input');
-
-    if (!cell || cell.querySelector('.cell-input')) {
-      return;
-    }
-
-    const save = () => {
-      const value = input.value.trim();
-
-      cell.textContent = value === '' ? initialText : value;
-    };
-
-    input.addEventListener('blur', save);
-
-    input.addEventListener('keydown', (keyEvent) => {
-      if (keyEvent.key === 'Enter') {
-        input.blur();
-      }
-    });
-
-    string.remove();
-
-    // console.log('lets go doing');
-    // console.log(string);
-
-    // eslint-disable-next-line no-undef
-    arrayOfOutputFields.shift();
-
-    for (let i = 0; i < arrayOfOutputFields.length; i++) {
-      // console.log(arrayOfOutputFields[i]);
-      // console.log(stringElements[i].innerText);
-
-      if (arrayOfOutputFields[i].type === 'number') {
-        arrayOfOutputFields[i].value = parseValue(stringElements[i].innerText);
-      } else {
-        arrayOfOutputFields[i].value = stringElements[i].innerText;
-      }
-    }
-  }
-
-  // console.log(anotherString);
-
   if (anotherString) {
     anotherString.classList.toggle('active');
   }
   string.className = 'active';
 });
 
-const notification = document.createElement('div');
-const title = document.createElement('h1');
-const massage = document.createElement('p');
+// Add ability to edit row cells
+// eslint-disable-next-line no-shadow
+tbody.addEventListener('dblclick', (event) => {
+  const selectedСell = event.target.closest('td');
+  const initialText = selectedСell.textContent;
+  const input = document.createElement('input');
+
+  if (!selectedСell || selectedСell.querySelector('.cell-input')) {
+    return;
+  }
+
+  input.classList.add('cell-input');
+  input.value = initialText;
+
+  selectedСell.textContent = '';
+  selectedСell.append(input);
+  input.focus();
+
+  const save = () => {
+    const value = input.value.trim();
+
+    selectedСell.textContent = value === '' ? initialText : value;
+  };
+
+  input.addEventListener('blur', save);
+
+  input.addEventListener('keydown', (keyEvent) => {
+    if (keyEvent.key === 'Enter') {
+      input.blur();
+    }
+  });
+});
+
+notification.setAttribute('data-qa', 'notification');
+notification.className = 'notification';
+notification.classList.toggle('success');
+notification.style.display = 'none';
+
+title.className = 'title';
+title.innerText = 'success';
+
+massage.classList = 'success';
+massage.innerText = 'This is a success';
+
+notification.appendChild(title);
+notification.appendChild(massage);
+body.appendChild(notification);
 
 button.onclick = () => {
   const dateNewPosition = [...document.querySelectorAll('[name]')];
   const tr = document.createElement('tr');
 
-  notification.setAttribute('data-qa', 'notification');
-  notification.className = 'notification';
-  notification.classList.toggle('success');
-
-  title.className = 'title';
-  title.innerText = 'success';
-
-  massage.classList = 'success';
-  massage.innerText = 'This is a success';
-
+  notification.style.display = 'none';
   dateNewPosition.shift();
 
   if (
-    dateNewPosition[0].value.length >= 4 &&
+    dateNewPosition[0].value.length >= MIN_NAME_LENGTH &&
     dateNewPosition[1].value &&
     dateNewPosition[2].value &&
-    dateNewPosition[3].value >= 18 &&
-    dateNewPosition[3].value < 90 &&
+    dateNewPosition[3].value > MIN_AGE &&
+    dateNewPosition[3].value <= MAX_AGE &&
     dateNewPosition[4].value
   ) {
     dateNewPosition.forEach((element) => {
@@ -192,33 +192,36 @@ button.onclick = () => {
           salary.slice(salary.length - 3, salary.length);
       } else {
         td.innerText = element.value;
-        // element.value = '';
       }
 
       tr.appendChild(td);
     });
   } else {
-    // checking the length of a name
-    if (dateNewPosition[0].length < 4) {
+    title.innerText = 'error';
+
+    if (notification.className.includes('success')) {
       notification.classList.toggle('success');
       notification.classList.toggle('error');
-      title.innerText = 'error';
-      massage.innerText = 'Короткое имя. Стоит дать полное имя';
     }
 
-    // checking the age
-    if (dateNewPosition[3].value >= 18 || dateNewPosition[3].value < 90) {
-      notification.classList.toggle('success');
-      notification.classList.add('error');
-      title.innerText = 'error';
-      massage.innerText = 'Возрост не соответствует';
+    notification.style.display = 'block';
+
+    // checking the length of a name
+    if (dateNewPosition[0].value.length < MIN_NAME_LENGTH) {
+      massage.innerText = 'Short name. It is worth giving a full name';
+      process.exit();
+    } else {
+      // checking the age
+      if (
+        dateNewPosition[3].value < MIN_AGE ||
+        dateNewPosition[3].value >= MAX_AGE
+      ) {
+        massage.innerText = 'Age does not match';
+        process.exit();
+      }
     }
   }
-
   form.reset();
 
-  notification.appendChild(title);
-  notification.appendChild(massage);
   tbody.appendChild(tr);
-  body.appendChild(notification);
 };
