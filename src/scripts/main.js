@@ -149,18 +149,18 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const formData = new FormData(form);
-  const name = formData.get('name').trim();
+  const employeeName = formData.get('name').trim();
   const position = formData.get('position').trim();
   const office = formData.get('office');
   const age = formData.get('age').trim();
   const salary = formData.get('salary').trim();
 
-  if (!name || !position || !office || !age || !salary) {
+  if (!employeeName || !position || !office || !age || !salary) {
     showNotification('error', 'Error', 'All fields are required');
     return;
   }
 
-  if (name.length < 4) {
+  if (employeeName.length < 4) {
     showNotification('error', 'Error', 'Name must be at least 4 characters long');
     return;
   }
@@ -177,7 +177,7 @@ form.addEventListener('submit', (e) => {
   const newRow = document.createElement('tr');
 
   newRow.innerHTML = `
-    <td>${name}</td>
+    <td>${employeeName}</td>
     <td>${position}</td>
     <td>${office}</td>
     <td>${ageNum}</td>
@@ -228,8 +228,8 @@ tbody.addEventListener('dblclick', (e) => {
 
   input.addEventListener('blur', saveChanges);
 
-  input.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
+  input.addEventListener('keydown', (evt) => {
+    if (evt.key === 'Enter') {
       input.blur();
     }
   });
