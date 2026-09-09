@@ -226,7 +226,7 @@ function validateForm(nameInput, position, age) {
     return false;
   }
 
-  if (nameInput.length < 4) {
+  if (!nameInput || nameInput.length < 4) {
     showNotification(
       'The name is too short',
       'Please, enter correct name',
