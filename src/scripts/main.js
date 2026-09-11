@@ -238,7 +238,7 @@ function validateForm(nameInput, position, age) {
 
   if (age < 18 || age > 90) {
     showNotification(
-      'The age is too little',
+      'The age is not valid!!!',
       'Please, enter correct age',
       'error',
     );
@@ -249,6 +249,53 @@ function validateForm(nameInput, position, age) {
   return true;
 }
 
+let activeInput = null;
+
+function editCell(e) {
+  const cell = e.target.closest('td');
+
+  if (!cell) {
+    return;
+  }
+
+  if (activeInput) {
+    return;
+  }
+
+  const newInput = document.createElement('input');
+
+  newInput.classList.add('cell-input');
+
+  const savedOldValue = cell.textContent;
+
+  newInput.value = savedOldValue;
+
+  cell.textContent = '';
+  cell.append(newInput);
+  newInput.focus();
+  activeInput = newInput;
+
+  function saveChange() {
+    if (!newInput.value) {
+      cell.textContent = savedOldValue;
+    } else {
+      cell.textContent = newInput.value;
+    }
+
+    newInput.remove();
+    activeInput = null;
+  }
+
+  function pressedEnter(button) {
+    if (button.key === 'Enter') {
+      saveChange();
+    }
+  }
+
+  newInput.addEventListener('blur', saveChange);
+  newInput.addEventListener('keydown', pressedEnter);
+}
+
 tableHead.addEventListener('click', sortedHeaders);
 tableBody.addEventListener('click', activeRow);
 createForm();
@@ -256,3 +303,5 @@ createForm();
 const tableForm = document.querySelector('form');
 
 tableForm.addEventListener('submit', addNewEmployee);
+
+tableBody.addEventListener('dblclick', editCell);
