@@ -6,7 +6,7 @@ const tabBody = document.querySelector('tbody');
 
 const rows = tabBody.rows;
 
-let clickCount = null;
+let clickCount = 0;
 
 function convertToNumber(elem) {
   return elem.split('$').join('').split(',').join('');
@@ -33,7 +33,15 @@ function pushNotification(title, description, type) {
 tabHead.addEventListener('click', ev => {
   const targeted = ev.target.closest('th');
 
+  if (!targeted) {
+    return;
+  }
+
   clickCount++;
+
+  if (clickCount > 2) {
+    clickCount = 1;
+  }
 
   const cellIndex = targeted.cellIndex;
 
@@ -41,21 +49,24 @@ tabHead.addEventListener('click', ev => {
     const first = convertToNumber(a.cells[cellIndex].textContent);
     const second = convertToNumber(b.cells[cellIndex].textContent);
 
-    if (clickCount === 1) {
-      if (isNaN(first)) {
-        return first.localeCompare(second);
-      } else {
-        return first - second;
-      }
-    } else if (clickCount === 2) {
-      if (isNaN(second)) {
-        return second.localeCompare(first);
-      } else {
-        return second - first;
-      }
-    }
+    switch (clickCount) {
+      case 1:
+        if (isNaN(first)) {
+          return first.localeCompare(second);
+        } else {
+          return first - second;
+        }
 
-    clickCount = 1;
+      case 2:
+        if (isNaN(second)) {
+          return second.localeCompare(first);
+        } else {
+          return second - first;
+        }
+
+      default:
+        return 0;
+    }
   });
 
   tabBody.append(...sorted);
@@ -111,7 +122,7 @@ body.insertAdjacentHTML('beforeend', `
         data-qa="salary"
       >
     </label>
-    <button>Save to table</buttom>
+    <button>Save to table</button>
   </form>
 `);
 
@@ -141,10 +152,7 @@ form.addEventListener('submit', ev => {
   } else if (data.get('name').length < 4) {
     pushNotification('Error', 'Invalid name', 'error');
   } else if (+data.get('age') < 18 || +data.get('age') > 90) {
-    pushNotification('Error',
-      'Invalid age. Min 18 and max 90',
-      'error'
-    );
+    pushNotification('Error', 'Invalid age. Min 18 and max 90', 'error');
   } else {
     for (let i = 0; i < arrData.length; i++) {
       const td = document.createElement('td');
@@ -158,13 +166,11 @@ form.addEventListener('submit', ev => {
       }
 
       tr.append(td);
-
-      pushNotification('Success', 'Successfully added', 'success');
-      form.reset();
     }
+    tabBody.append(tr);
+    pushNotification('Success', 'Successfully added', 'success');
+    form.reset();
   }
-
-  tabBody.append(tr);
 });
 
 tabBody.addEventListener('dblclick', ev => {
@@ -217,9 +223,9 @@ tabBody.addEventListener('dblclick', ev => {
 
           pushNotification('Error', 'Not a number', 'error');
         } else {
-          targeted.textContent = `
-            $${parseInt(textInput.value).toLocaleString('en-US')}
-          `;
+          const salary = parseInt(textInput.value).toLocaleString('en-US');
+
+          targeted.textContent = `$${salary}`;
 
           pushNotification('Success', 'Successfully changed', 'success');
         }
@@ -258,9 +264,9 @@ tabBody.addEventListener('dblclick', ev => {
 
         pushNotification('Error', 'Not a number', 'error');
       } else {
-        targeted.textContent = `
-          $${parseInt(textInput.value).toLocaleString('en-US')}
-        `;
+        const salary = parseInt(textInput.value).toLocaleString('en-US');
+
+        targeted.textContent = `$${salary}`;
 
         pushNotification('Success', 'Successfully changed', 'success');
       }
