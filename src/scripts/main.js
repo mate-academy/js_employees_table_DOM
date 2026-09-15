@@ -140,7 +140,7 @@ function createForm() {
     createNotification('success');
 
     if (sortColumn) {
-      sortTableData();
+      sortTableData(sortOrder, sortColumn);
     }
 
     updateTableBody();
@@ -161,19 +161,19 @@ function createNotification(notificationType) {
       notification.classList.add('error');
       title.textContent = 'Error';
 
-      notification.textContent = `
+      notification.append(`
       An error has occured, 
       try checking the values entered.
-      `;
+      `);
 
       break;
     case 'success':
       notification.classList.add('success');
       title.textContent = 'Success';
 
-      notification.textContent = `
+      notification.append(`
       New person was succesfully added.
-      `;
+      `);
 
       break;
   }
