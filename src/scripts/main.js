@@ -25,21 +25,22 @@ form.addEventListener('submit', (elem) => {
 
   const formData = new FormData(form);
   const notification = document.createElement('div');
+  const resultCehckForm = checkValidForm(formData);
 
-  if (checkValidForm(formData)) {
+  if (resultCehckForm[0]) {
     addNewEmployees(formData);
 
     notification.setAttribute('data-qa', 'notification');
     notification.setAttribute('class', 'success notification');
 
-    notification.textContent = 'Success';
+    notification.textContent = resultCehckForm[1];
 
     body.append(notification);
   } else {
     notification.setAttribute('data-qa', 'notification');
     notification.setAttribute('class', 'error notification');
 
-    notification.textContent = 'Error';
+    notification.textContent = resultCehckForm[1];
 
     body.append(notification);
   }
@@ -84,8 +85,10 @@ function sortAbc(elements, nameOrPos, direction) {
 
   if (nameOrPos === 'Name') {
     index = 0;
-  } else {
+  } else if (nameOrPos === 'Position') {
     index = 1;
+  } else {
+    index = 2;
   }
 
   const elem = elements.children;
@@ -259,17 +262,17 @@ function convertCorrectValue(value) {
 
 function checkValidForm(formData) {
   if (formData.get('name').length < 4) {
-    return false;
+    return [false, 'Name must be at least 4 characters'];
   }
 
   if (formData.get('age') < 18 || formData.get('age') > 90) {
-    return false;
+    return [false, 'The age must be between 18 and 90.'];
   }
 
   if (formData.get('position').length < 4) {
-    return false;
+    return [false, 'Fill in the field "Position'];
   }
 
-  return true;
+  return [true, 'Success'];
 }
 // write code here
