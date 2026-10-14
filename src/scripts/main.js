@@ -160,7 +160,18 @@ inputs.forEach((newInputName) => {
     label.appendChild(input);
 
     input.name = newInputName;
-    input.type = 'text';
+
+    switch (newInputName) {
+      case 'name':
+      case 'position':
+        input.type = 'text';
+        break;
+      case 'age':
+      case 'salary':
+        input.type = 'number';
+        break;
+    }
+
     input.required = true;
     input.dataset.qa = newInputName;
   } else {
@@ -258,18 +269,18 @@ form.addEventListener('submit', (ev) => {
         break;
     }
     tr.appendChild(td);
-
-    pushNotification(
-      10,
-      10,
-      'Успіх!',
-      'Співробітника додано в таблицю.',
-      'success',
-    );
   });
 
   tbody.appendChild(tr);
   form.reset();
+
+  pushNotification(
+    10,
+    10,
+    'Успіх!',
+    'Співробітника додано в таблицю.',
+    'success',
+  );
 });
 
 tbody.addEventListener('dblclick', (ev) => {
