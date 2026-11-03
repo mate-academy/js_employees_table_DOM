@@ -6,7 +6,7 @@ const table = document.querySelector('table');
 const tBody = document.querySelector('tbody');
 const tableHead = table.querySelector('thead');
 let clickCounter = 0;
-let currentSortColumn = '';
+let currentSortColumn = null;
 let selectedRow = document.querySelector('tr.active');
 
 tableHead.addEventListener('click', (clickEvent) => {
@@ -164,6 +164,10 @@ form.addEventListener('submit', (submitEvent) => {
     error.textContent = 'Unsuccesful registration!';
     document.body.append(error);
 
+    setTimeout(() => {
+      error.remove();
+    }, 3000);
+
     return;
   }
 
@@ -192,11 +196,20 @@ form.addEventListener('submit', (submitEvent) => {
   success.classList.add('success');
   success.textContent = 'Sucessful registration!';
   document.body.append(success);
+  form.reset();
+
+  setTimeout(() => {
+    success.remove();
+  }, 3000);
 });
 
 let previousText = '';
 
 tBody.addEventListener('dblclick', (dblClickEvent) => {
+  if (tBody.querySelector('.cell-input')) {
+    return;
+  }
+
   if (dblClickEvent.target.tagName === 'TD') {
     const cellEdit = dblClickEvent.target;
 
