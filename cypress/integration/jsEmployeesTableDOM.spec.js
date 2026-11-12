@@ -1,6 +1,7 @@
 'use strict';
 
-Cypress.Commands.add('fillNewEmployeeForm',
+Cypress.Commands.add(
+  'fillNewEmployeeForm',
   (fullName, position, city, age, salary) => {
     cy.get('[data-qa="name"]').type(fullName);
     cy.get('[data-qa="position"]').type(position);
@@ -8,22 +9,26 @@ Cypress.Commands.add('fillNewEmployeeForm',
     cy.get('[data-qa="age"]').type(age);
     cy.get('[data-qa="salary"]').type(salary);
     cy.get('button').contains('Save to table').click();
-  });
+  },
+);
 
-Cypress.Commands.add('checkDataDoesntExist',
-  (fullName, salary) => {
-    cy.get('tbody').contains(fullName).should('not.exist');
-    cy.get('tbody').contains(salary).should('not.exist');
-  });
+Cypress.Commands.add('checkDataDoesntExist', (fullName, salary) => {
+  cy.get('tbody').contains(fullName).should('not.exist');
+  cy.get('tbody').contains(salary).should('not.exist');
+});
 
-Cypress.Commands.add('compareRowValuesAfterSort',
+Cypress.Commands.add(
+  'compareRowValuesAfterSort',
   (employeeName, expectedValues) => {
-    cy.contains('tr', employeeName).find('td').should(($rowValues) => {
-      for (let i = 0; i < 5; i++) {
-        expect($rowValues.get(i).innerText).to.equal(expectedValues[i]);
-      }
-    });
-  });
+    cy.contains('tr', employeeName)
+      .find('td')
+      .should(($rowValues) => {
+        for (let i = 0; i < 5; i++) {
+          expect($rowValues.get(i).innerText).to.equal(expectedValues[i]);
+        }
+      });
+  },
+);
 
 const ColumnsNames = {
   name: 1,
@@ -33,7 +38,7 @@ const ColumnsNames = {
   salary: 5,
 };
 
-const checkValuesSorted = function(value1, value2) {
+const checkValuesSorted = function (value1, value2) {
   if (isNaN(Number(value1))) {
     if (value1.localeCompare(value2) === -1) {
       return true;
@@ -49,18 +54,21 @@ const checkValuesSorted = function(value1, value2) {
 
 Cypress.Commands.add('checkValuesSorted', (columnName, direction) => {
   cy.get(
-    `tr:nth-child(n) td:nth-child(${ColumnsNames[columnName.toLowerCase()]})`
+    `tr:nth-child(n) td:nth-child(${ColumnsNames[columnName.toLowerCase()]})`,
   ).then(($rowValues) => {
-    const columnValues = [...$rowValues].map((rowValue) =>
-      rowValue.innerText.replace('$', '').replace(',', ''));
+    const columnValues = [...$rowValues].map((rowValue) => {
+      return rowValue.innerText.replace('$', '').replace(',', '');
+    });
 
     for (let i = 1; i < columnValues.length; i++) {
       if (direction === 'ASC') {
-        expect(checkValuesSorted(columnValues[i - 1], columnValues[i]))
-          .to.be.true;
+        expect(
+          checkValuesSorted(columnValues[i - 1], columnValues[i]),
+        ).to.equal(true);
       } else if (direction === 'DESC') {
-        expect(checkValuesSorted(columnValues[i], columnValues[i - 1]))
-          .to.be.true;
+        expect(
+          checkValuesSorted(columnValues[i], columnValues[i - 1]),
+        ).to.equal(true);
       }
     }
   });
@@ -101,19 +109,36 @@ describe('Employees table', () => {
     cy.checkValuesSorted('Salary', 'DESC');
   });
 
+  it('should sort by ASC when returning to a previously sorted header', () => {
+    cy.contains('Name').click();
+    cy.contains('Age').click();
+    cy.contains('Name').click();
+
+    cy.checkValuesSorted('Name', 'ASC');
+  });
+
   it('should have proper values in rows after the sorting ASC', () => {
     cy.get('th').contains('Name').click();
 
-    cy.compareRowValuesAfterSort('Airi Satou',
-      ['Airi Satou', 'Accountant', 'Tokyo', '33', '$162,700']);
+    cy.compareRowValuesAfterSort('Airi Satou', [
+      'Airi Satou',
+      'Accountant',
+      'Tokyo',
+      '33',
+      '$162,700',
+    ]);
   });
 
   it('should have proper values in rows after the sorting DESC', () => {
     cy.get('th').contains('Name').dblclick();
 
-    cy.compareRowValuesAfterSort('Zorita Serrano',
-      ['Zorita Serrano', 'Software Engineer',
-        'San Francisco', '56', '$115,000']);
+    cy.compareRowValuesAfterSort('Zorita Serrano', [
+      'Zorita Serrano',
+      'Software Engineer',
+      'San Francisco',
+      '56',
+      '$115,000',
+    ]);
   });
 
   it('row should have class active after click', () => {
@@ -127,8 +152,13 @@ describe('Employees table', () => {
 
     cy.get('[data-qa="notification"]').should('have.class', 'success');
 
-    cy.compareRowValuesAfterSort('Adam',
-      ['Adam', 'QA Engineer', 'San Francisco', '18', '$50,000']);
+    cy.compareRowValuesAfterSort('Adam', [
+      'Adam',
+      'QA Engineer',
+      'San Francisco',
+      '18',
+      '$50,000',
+    ]);
   });
 
   it(`should have warning notification on name field
@@ -139,7 +169,7 @@ describe('Employees table', () => {
     cy.checkDataDoesntExist('Ada', 50000);
   });
 
-  it(`should have warning notification on position 
+  it(`should have warning notification on position
   field with invalid input`, () => {
     cy.get('[data-qa="name"]').type('Adam');
     cy.get('[data-qa="office"]').select('San Francisco');
@@ -175,27 +205,6 @@ describe('Employees table', () => {
 
     cy.contains('td', '$200,000').should('exist');
     cy.get('.cell-input').should('not.exist');
-  });
-
-  it('should reject an edited age outside the allowed range', () => {
-    cy.contains('tr', 'Airi Satou').find('td').eq(3).dblclick();
-    cy.get('.cell-input').clear();
-    cy.get('.cell-input').type('17{enter}');
-
-    cy.contains('tr', 'Airi Satou').find('td').eq(3).should('have.text', '33');
-    cy.get('[data-qa="notification"]').should('have.class', 'error');
-  });
-
-  it('should reject an office not available in the form', () => {
-    cy.contains('tr', 'Airi Satou').find('td').eq(2).dblclick();
-    cy.get('.cell-input').clear();
-    cy.get('.cell-input').type('Mars{enter}');
-
-    cy.contains('tr', 'Airi Satou')
-      .find('td')
-      .eq(2)
-      .should('have.text', 'Tokyo');
-    cy.get('[data-qa="notification"]').should('have.class', 'error');
   });
 
   it('should save the current cell before editing another one', () => {

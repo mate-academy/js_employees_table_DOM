@@ -9,6 +9,8 @@ const tableRows = sourceTable.querySelector('tbody').children;
   header.setAttribute('data-qa', '');
 });
 
+let currentSortedHeaderIndex = null;
+
 tableHeaders.addEventListener('click', (e) => {
   if (e.target.closest('th') === null) {
     return;
@@ -16,6 +18,12 @@ tableHeaders.addEventListener('click', (e) => {
 
   const headerIndex = e.target.closest('th').cellIndex;
   const copyRows = [...tableRows];
+
+  if (headerIndex !== currentSortedHeaderIndex) {
+    currentSortedHeaderIndex = headerIndex;
+    tableHeaders.rows[0].cells[headerIndex].setAttribute('data-qa', '');
+  }
+
   const headerDataQa =
     tableHeaders.rows[0].cells[headerIndex].getAttribute('data-qa');
 
