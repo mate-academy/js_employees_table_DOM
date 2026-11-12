@@ -166,4 +166,45 @@ describe('Employees table', () => {
     cy.get('[data-qa="notification"]').should('have.class', 'error');
     cy.checkDataDoesntExist('Adam', 50000);
   });
+
+  it('should edit a cell and format an edited salary', () => {
+    cy.contains('td', '$162,700').dblclick();
+    cy.get('.cell-input').should('have.value', '162700');
+    cy.get('.cell-input').clear();
+    cy.get('.cell-input').type('200000{enter}');
+
+    cy.contains('td', '$200,000').should('exist');
+    cy.get('.cell-input').should('not.exist');
+  });
+
+  it('should reject an edited age outside the allowed range', () => {
+    cy.contains('tr', 'Airi Satou').find('td').eq(3).dblclick();
+    cy.get('.cell-input').clear();
+    cy.get('.cell-input').type('17{enter}');
+
+    cy.contains('tr', 'Airi Satou').find('td').eq(3).should('have.text', '33');
+    cy.get('[data-qa="notification"]').should('have.class', 'error');
+  });
+
+  it('should reject an office not available in the form', () => {
+    cy.contains('tr', 'Airi Satou').find('td').eq(2).dblclick();
+    cy.get('.cell-input').clear();
+    cy.get('.cell-input').type('Mars{enter}');
+
+    cy.contains('tr', 'Airi Satou')
+      .find('td')
+      .eq(2)
+      .should('have.text', 'Tokyo');
+    cy.get('[data-qa="notification"]').should('have.class', 'error');
+  });
+
+  it('should save the current cell before editing another one', () => {
+    cy.contains('td', 'Airi Satou').dblclick();
+    cy.get('.cell-input').clear();
+    cy.get('.cell-input').type('Airi Sato');
+    cy.contains('td', 'Accountant').dblclick();
+
+    cy.contains('td', 'Airi Sato').should('exist');
+    cy.get('.cell-input').should('have.length', 1);
+  });
 });
