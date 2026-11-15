@@ -154,16 +154,14 @@ form.addEventListener('submit', (e) => {
 
     return;
   }
+
   if (!data.get('salary').trim()) {
-    printNotification(
-      'Invalid salary',
-      'Salary cannot be empty',
-      'error',
-    );
+    printNotification('Invalid salary', 'Salary cannot be empty', 'error');
 
     return;
   }
-  if (data.get('name').length < 4) {
+
+  if (data.get('name').trim().length < 4) {
     printNotification(
       'Invalid name',
       'Name must contain at least 4 letters',
