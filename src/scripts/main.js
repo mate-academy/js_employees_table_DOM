@@ -109,8 +109,13 @@ for (let i = 0; i < amountOfLabels; i++) {
 
   const input = document.createElement('input');
 
+  if (labelNames[i] === 'age' || labelNames[i] === 'salary') {
+    input.setAttribute('type', 'number');
+  } else {
+    input.setAttribute('type', 'text');
+  }
+
   input.setAttribute('name', labelNames[i]);
-  input.setAttribute('type', 'text');
   input.setAttribute('data-qa', labelNames[i]);
   input.required = true;
 
