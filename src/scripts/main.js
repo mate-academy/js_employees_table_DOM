@@ -112,7 +112,7 @@ for (let i = 0; i < amountOfLabels; i++) {
   input.setAttribute('name', labelNames[i]);
   input.setAttribute('type', 'text');
   input.setAttribute('data-qa', labelNames[i]);
-  input.required = 'true';
+  input.required = true;
 
   label.append(input);
   form.append(label);
@@ -125,7 +125,7 @@ const select = document.createElement('select');
 
 select.setAttribute('name', 'office');
 select.setAttribute('data-qa', 'office');
-select.classList.toggle('required');
+select.required = true;
 
 const options = [
   'Tokyo',
@@ -205,8 +205,10 @@ function isFormDataValid(memberData) {
   };
 
   if (validation.hasEmptyFields(memberData)) {
-    notificationBlock.classList.add('warning');
-    notificationHeading.textContent = 'Warning, validation find an empty field';
+    notificationBlock.classList.add('error');
+
+    notificationHeading.textContent =
+      'Warning, validation found an empty field';
     notificationParagraph.textContent = 'Please, complete all required fields';
 
     appendNotification(notificationBlock);
@@ -252,7 +254,10 @@ form.addEventListener('submit', (e) => {
       cell.textContent = newMember[informationType];
 
       if (informationType === 'salary') {
-        cell.textContent = '$' + cell.textContent;
+        const salaryNumber = Number(newMember.salary);
+        const formatedSalary = '$' + salaryNumber.toLocaleString('en-US');
+
+        cell.textContent = formatedSalary;
       }
 
       row.append(cell);
