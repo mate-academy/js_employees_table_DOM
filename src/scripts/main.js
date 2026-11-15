@@ -4,12 +4,12 @@ const body = document.querySelector('body');
 const table = document.querySelector('table');
 const thead = table.querySelector('thead');
 const tbody = table.querySelector('tbody');
-const rows = [...tbody.querySelectorAll('tr')];
 let currentColumn = null;
 let isAscending = true;
 
 thead.addEventListener('click', (e) => {
   const index = e.target.cellIndex;
+  const rows = [...tbody.querySelectorAll('tr')];
 
   if (currentColumn === index) {
     isAscending = !isAscending;
@@ -154,7 +154,15 @@ form.addEventListener('submit', (e) => {
 
     return;
   }
+  if (!data.get('salary').trim()) {
+    printNotification(
+      'Invalid salary',
+      'Salary cannot be empty',
+      'error',
+    );
 
+    return;
+  }
   if (data.get('name').length < 4) {
     printNotification(
       'Invalid name',
