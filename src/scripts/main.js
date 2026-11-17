@@ -6,6 +6,7 @@ const tableBody = table.querySelector('tbody');
 
 let currentColumn = -1;
 let isAscending = true;
+let activeInput = null;
 
 function sortTable(columnIndex) {
   if (currentColumn === columnIndex) {
@@ -192,7 +193,7 @@ form.addEventListener('submit', (e) => {
 tableBody.addEventListener('dblclick', (e) => {
   const cell = e.target.closest('td');
 
-  if (!cell || cell.querySelector('.cell-input')) {
+  if (!cell || activeInput) {
     return;
   }
 
@@ -205,12 +206,15 @@ tableBody.addEventListener('dblclick', (e) => {
   cell.textContent = '';
   cell.append(input);
 
+  activeInput = input;
+
   input.focus();
 
   function saveCell() {
     const newValue = input.value.trim();
 
     cell.textContent = newValue || oldValue;
+    activeInput = null;
   }
 
   input.addEventListener('blur', saveCell, { once: true });
