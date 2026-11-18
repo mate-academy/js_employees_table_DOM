@@ -128,7 +128,7 @@ form.addEventListener('submit', (e) => {
 
   const formData = new FormData(form);
 
-  const { name: naming, age, position } = Object.fromEntries(formData);
+  const { name: naming, age, position, salary } = Object.fromEntries(formData);
 
   if (naming.trim().length < 4) {
     pushNotification(
@@ -152,6 +152,14 @@ form.addEventListener('submit', (e) => {
       10,
       'Invalid position',
       'Position must be declared',
+      'error',
+    );
+  } else if (salary.trim().length === 0) {
+    pushNotification(
+      10,
+      10,
+      'Invalid salary',
+      'Salary must be declared',
       'error',
     );
   } else {
