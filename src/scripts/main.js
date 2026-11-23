@@ -159,7 +159,9 @@ form.addEventListener('submit', (e) => {
     nameValue.length < 4 ||
     ageValue < 18 ||
     ageValue > 90 ||
-    !positionValue
+    !positionValue ||
+    !salaryValue ||
+    salaryValue <= 0
   ) {
     pushNotification('Error', 'Data invalid', 'error');
   } else {
