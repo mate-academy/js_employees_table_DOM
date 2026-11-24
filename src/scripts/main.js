@@ -5,6 +5,14 @@
 const tbody = document.querySelector('tbody');
 const tableHeaders = document.querySelectorAll('th');
 
+tbody.addEventListener('click', (e) => {
+  const tr = e.target.closest('tr');
+
+  [...tbody.rows].forEach((row) => row.classList.remove('active'));
+
+  tr.classList.add('active');
+});
+
 tbody.addEventListener('dblclick', (e) => {
   const target = e.target.closest('td');
 
@@ -17,12 +25,12 @@ tbody.addEventListener('dblclick', (e) => {
   if (target.cellIndex === 2) {
     target.innerHTML = `
       <select class="cell-input">
-        <option value="Tokyo">Tokyo</option>
-        <option value="Singapore">Singapore</option>
-        <option value="London">London</option>
-        <option value="New York">New York</option>
-        <option value="Edinburgh">Edinburgh</option>
-        <option value="San Francisco">San Francisco</option>
+        <option ${text === 'Tokyo' ? 'selected' : ''} value="Tokyo">Tokyo</option>
+        <option ${text === 'Singapore' ? 'selected' : ''} value="Singapore">Singapore</option>
+        <option ${text === 'London' ? 'selected' : ''} value="London">London</option>
+        <option ${text === 'New York' ? 'selected' : ''} value="New York">New York</option>
+        <option ${text === 'Edinburgh' ? 'selected' : ''} value="Edinburgh">Edinburgh</option>
+        <option ${text === 'San Francisco' ? 'selected' : ''} value="San Francisco">San Francisco</option>
       </select>
     `;
   } else {
@@ -33,9 +41,9 @@ tbody.addEventListener('dblclick', (e) => {
 
   field.focus();
 
-  field.addEventListener('blur', () => {
-    target.textContent = field.value.trim() ? field.value : text;
-  });
+  // field.addEventListener('blur', () => {
+  //   target.textContent = field.value.trim() ? field.value : text;
+  // });
 
   field.addEventListener('keydown', (events) => {
     if (events.code === 'Enter') {
@@ -55,10 +63,10 @@ tableHeaders.forEach((th) => {
       sortItems = [...tr].sort((tr1, tr2) => sortTable(tr2, tr1, i));
     } else {
       sortItems = [...tr].sort((tr1, tr2) => sortTable(tr1, tr2, i));
-      tableHeaders.forEach((item) => item.classList.remove('active'));
     }
 
-    th.classList.toggle('active');
+    tableHeaders.forEach((item) => item.classList.remove('active'));
+    th.classList.add('active');
 
     sortItems.forEach((sortItem) => {
       tbody.append(sortItem);
@@ -77,7 +85,7 @@ function createForm() {
     <label>Name: <input name="name" type="text" data-qa="name" required></label>
     <label>Position: <input name="position" type="text" data-qa="position" required></label>
     <label>Office:
-      <select name="office" data-qa="office required">
+      <select name="office" data-qa="office" required>
         <option value="Tokyo">Tokyo</option>
         <option value="Singapore">Singapore</option>
         <option value="London">London</option>
@@ -93,10 +101,21 @@ function createForm() {
 
   document.body.append(form);
 
-  form.addEventListener('submit', (e) => {
+  document.querySelector('button').addEventListener('click', (e) => {
     e.preventDefault();
 
     const formData = new FormData(form);
+
+    if (
+      !formData.get('name') ||
+      !formData.get('position') ||
+      !formData.get('age') ||
+      !formData.get('salary')
+    ) {
+      notification('error', 'All fields must be filled in.');
+
+      return;
+    }
 
     if (formData.get('name').length < 4) {
       notification('error', 'The name field must contain at least 4 letters.');
