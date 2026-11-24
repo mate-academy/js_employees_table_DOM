@@ -6,7 +6,11 @@ const tbody = document.querySelector('tbody');
 const tableHeaders = document.querySelectorAll('th');
 
 tbody.addEventListener('dblclick', (e) => {
-  const target = e.target;
+  const target = e.target.closest('td');
+
+  if (!target) {
+    return;
+  }
 
   const text = target.textContent;
 
@@ -73,7 +77,7 @@ function createForm() {
     <label>Name: <input name="name" type="text" data-qa="name" required></label>
     <label>Position: <input name="position" type="text" data-qa="position" required></label>
     <label>Office:
-      <select name="office" data-qa="office">
+      <select name="office" data-qa="office required">
         <option value="Tokyo">Tokyo</option>
         <option value="Singapore">Singapore</option>
         <option value="London">London</option>
@@ -96,15 +100,6 @@ function createForm() {
 
     if (formData.get('name').length < 4) {
       notification('error', 'The name field must contain at least 4 letters.');
-
-      return;
-    }
-
-    if (formData.get('position').length < 4) {
-      notification(
-        'error',
-        'The position field must contain at least 4 letters.',
-      );
 
       return;
     }
