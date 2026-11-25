@@ -15,7 +15,6 @@ tbody.addEventListener('click', (e) => {
   row.classList.add('active');
 });
 
-
 thead.addEventListener('click', (e) => {
   const th = e.target.closest('th');
 
@@ -50,7 +49,6 @@ thead.addEventListener('click', (e) => {
   tbody.append(...rows);
 });
 
-
 const pushNotification = (posTop, posRight, title, description, type) => {
   const notification = document.createElement('div');
 
@@ -77,7 +75,6 @@ const pushNotification = (posTop, posRight, title, description, type) => {
     notification.remove();
   }, 2000);
 };
-
 
 const form = document.createElement('form');
 
@@ -170,7 +167,7 @@ form.addEventListener('submit', (e) => {
   }
 
   const formattedSalary = `$${rawSalary.toLocaleString('en-US')}`;
-s
+
   const tr = document.createElement('tr');
   const rowData = [fullName, position, office, age, formattedSalary];
 
