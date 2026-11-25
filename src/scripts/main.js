@@ -7,13 +7,14 @@ const tbody = table.querySelector('tbody');
 tbody.addEventListener('click', (e) => {
   const row = e.target.closest('tr');
 
-  if (!row) {
+  if (!row || !tbody.contains(row)) {
     return;
   }
 
-  tbody.querySelectorAll('tr').forEach((r) => r.classList.remove('selected'));
-  row.classList.add('selected');
+  tbody.querySelectorAll('tr').forEach((r) => r.classList.remove('active'));
+  row.classList.add('active');
 });
+
 
 thead.addEventListener('click', (e) => {
   const th = e.target.closest('th');
@@ -49,9 +50,39 @@ thead.addEventListener('click', (e) => {
   tbody.append(...rows);
 });
 
+
+const pushNotification = (posTop, posRight, title, description, type) => {
+  const notification = document.createElement('div');
+
+  notification.className = `notification ${type}`;
+  notification.dataset.qa = 'notification';
+
+  notification.style.top = `${posTop}px`;
+  notification.style.right = `${posRight}px`;
+
+  const titleElement = document.createElement('h2');
+
+  titleElement.className = 'title';
+  titleElement.textContent = title;
+
+  const descriptionElement = document.createElement('p');
+
+  descriptionElement.className = 'description';
+  descriptionElement.textContent = description;
+
+  notification.append(titleElement, descriptionElement);
+  document.body.append(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 2000);
+};
+
+
 const form = document.createElement('form');
 
 form.classList.add('new-employee-form');
+form.noValidate = true;
 
 function createInputField(labelText, fullName, type) {
   const label = document.createElement('label');
@@ -63,7 +94,6 @@ function createInputField(labelText, fullName, type) {
   input.name = fullName;
   input.type = type;
   input.dataset.qa = fullName;
-  input.required = true;
 
   label.append(input);
 
@@ -83,7 +113,6 @@ const officeSelect = document.createElement('select');
 
 officeSelect.name = 'office';
 officeSelect.dataset.qa = 'office';
-officeSelect.required = true;
 
 const offices = [
   'Tokyo',
@@ -127,12 +156,21 @@ form.addEventListener('submit', (e) => {
   const age = Number(form.elements.age.value);
   const rawSalary = Number(form.elements.salary.value);
 
-  if (fullName.length < 4 || age < 18 || age > 90) {
+  if (
+    fullName.length < 4 ||
+    !position ||
+    !age ||
+    age < 18 ||
+    age > 90 ||
+    !rawSalary
+  ) {
+    pushNotification(20, 20, 'Error', 'Invalid data provided', 'error');
+
     return;
   }
 
   const formattedSalary = `$${rawSalary.toLocaleString('en-US')}`;
-
+s
   const tr = document.createElement('tr');
   const rowData = [fullName, position, office, age, formattedSalary];
 
@@ -144,5 +182,7 @@ form.addEventListener('submit', (e) => {
   });
 
   tbody.append(tr);
+
+  pushNotification(20, 20, 'Success', 'Employee added successfully', 'success');
   form.reset();
 });
