@@ -151,15 +151,14 @@ form.addEventListener('submit', (e) => {
   const position = form.elements.position.value.trim();
   const office = form.elements.office.value;
   const age = Number(form.elements.age.value);
+
+  if (form.elements.salary.value === '') {
+    form.elements.salary.value = 0;
+  }
+
   const rawSalary = Number(form.elements.salary.value);
 
-  if (
-    fullName.length < 4 ||
-    !position ||
-    !age ||
-    age < 18 ||
-    age > 90
-  ) {
+  if (fullName.length < 4 || !position || !age || age < 18 || age > 90) {
     pushNotification(20, 20, 'Error', 'Invalid data provided', 'error');
 
     return;
