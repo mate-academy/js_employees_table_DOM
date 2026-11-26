@@ -158,8 +158,7 @@ form.addEventListener('submit', (e) => {
     !position ||
     !age ||
     age < 18 ||
-    age > 90 ||
-    !rawSalary
+    age > 90
   ) {
     pushNotification(20, 20, 'Error', 'Invalid data provided', 'error');
 
